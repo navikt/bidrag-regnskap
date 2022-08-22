@@ -1,9 +1,9 @@
-package no.nav.bidrag.template.controller
+package no.nav.bidrag.regnskap.controller
 
 import StubUtils
 import no.nav.bidrag.commons.web.test.HttpHeaderTestRestTemplate
-import no.nav.bidrag.template.BidragTemplateLocal
-import no.nav.bidrag.template.model.HentPersonResponse
+import no.nav.bidrag.regnskap.BidragRegnskapLocal
+import no.nav.bidrag.regnskap.model.HentPersonResponse
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
@@ -17,7 +17,7 @@ import org.springframework.test.context.ActiveProfiles
 
 
 @ActiveProfiles("test")
-@SpringBootTest(classes = [BidragTemplateLocal::class, StubUtils::class], webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = [BidragRegnskapLocal::class, StubUtils::class], webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWireMock(port = 0)
 @EnableMockOAuth2Server
 class ExampleControllerTest {
@@ -33,7 +33,7 @@ class ExampleControllerTest {
     @Test
     fun `Skal hente persondata`(){
         stubUtils.stubBidragPersonResponse(HentPersonResponse("123213", "Navn Navnesen", "213213213"))
-        var response = httpHeaderTestRestTemplate.exchange("${rootUri()}//213213213213",    HttpMethod.GET, null, HentPersonResponse::class.java)
+        val response = httpHeaderTestRestTemplate.exchange("${rootUri()}//213213213213",    HttpMethod.GET, null, HentPersonResponse::class.java)
 
         Assertions.assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
 

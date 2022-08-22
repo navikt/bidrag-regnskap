@@ -5,9 +5,8 @@ management:
         include: "prometheus,health"
 
 springdoc:
-  packages-to-scan: no.nav.bidrag.dialog.controller
-spring.main.banner-mode: off
----
+  packages-to-scan: no.nav.bidrag.regnskap.controller
+
 spring.config.activate.on-profile: nais,local
 
 no.nav.security.jwt:

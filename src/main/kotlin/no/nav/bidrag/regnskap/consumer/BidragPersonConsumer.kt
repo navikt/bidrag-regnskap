@@ -1,9 +1,9 @@
-package no.nav.bidrag.template.consumer
+package no.nav.bidrag.regnskap.consumer
 
 import no.nav.bidrag.commons.security.service.SecurityTokenService
-import no.nav.bidrag.template.SECURE_LOGGER
-import no.nav.bidrag.template.config.CacheConfig.Companion.PERSON_CACHE
-import no.nav.bidrag.template.model.HentPersonResponse
+import no.nav.bidrag.regnskap.SECURE_LOGGER
+import no.nav.bidrag.regnskap.config.CacheConfig.Companion.PERSON_CACHE
+import no.nav.bidrag.regnskap.model.HentPersonResponse
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cache.annotation.Cacheable

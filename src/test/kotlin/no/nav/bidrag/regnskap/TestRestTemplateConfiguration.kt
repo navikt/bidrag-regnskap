@@ -1,4 +1,4 @@
-package no.nav.bidrag.template
+package no.nav.bidrag.regnskap
 
 import no.nav.bidrag.commons.web.test.HttpHeaderTestRestTemplate
 import no.nav.security.mock.oauth2.MockOAuth2Server

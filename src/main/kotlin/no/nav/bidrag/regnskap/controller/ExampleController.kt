@@ -1,11 +1,11 @@
-package no.nav.bidrag.template.controller
+package no.nav.bidrag.regnskap.controller
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import no.nav.bidrag.template.model.HentPersonResponse
-import no.nav.bidrag.template.service.ExampleService
+import no.nav.bidrag.regnskap.model.HentPersonResponse
+import no.nav.bidrag.regnskap.service.ExampleService
 import no.nav.security.token.support.core.api.Protected
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable

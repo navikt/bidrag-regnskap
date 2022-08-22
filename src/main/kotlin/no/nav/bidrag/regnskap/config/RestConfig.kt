@@ -1,4 +1,4 @@
-package no.nav.bidrag.template.config
+package no.nav.bidrag.regnskap.config
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import no.nav.bidrag.commons.CorrelationId

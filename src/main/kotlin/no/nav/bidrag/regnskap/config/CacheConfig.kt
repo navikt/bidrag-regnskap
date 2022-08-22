@@ -1,4 +1,4 @@
-package no.nav.bidrag.template.config
+package no.nav.bidrag.regnskap.config
 
 import com.github.benmanes.caffeine.cache.Caffeine
 import org.springframework.cache.CacheManager
@@ -21,7 +21,7 @@ class CacheConfig {
     fun cacheManager(): CacheManager {
         val caffeineCacheManager = CaffeineCacheManager()
         caffeineCacheManager.registerCustomCache(PERSON_CACHE, Caffeine.newBuilder().expireAfterWrite(24, TimeUnit.HOURS).build())
-        return caffeineCacheManager;
+        return caffeineCacheManager
     }
 
 }

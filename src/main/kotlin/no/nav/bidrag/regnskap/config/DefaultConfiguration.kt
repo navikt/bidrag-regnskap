@@ -1,4 +1,4 @@
-package no.nav.bidrag.template.config
+package no.nav.bidrag.regnskap.config
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType
@@ -9,5 +9,5 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy
 
 @EnableAspectJAutoProxy
 @OpenAPIDefinition(info = Info(title = "bidrag-regnskap", version = "v1"), security = [SecurityRequirement(name = "bearer-key")])
-@SecurityScheme(bearerFormat = "JWT", name = "bearer-key", scheme = "bearer", type = SecuritySchemeType.OAUTH2)
+@SecurityScheme(bearerFormat = "JWT", name = "bearer-key", scheme = "bearer", type = SecuritySchemeType.HTTP)
 class DefaultConfiguration

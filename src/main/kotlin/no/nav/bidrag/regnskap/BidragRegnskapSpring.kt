@@ -1,4 +1,4 @@
-package no.nav.bidrag.template
+package no.nav.bidrag.regnskap
 
 import no.nav.security.token.support.spring.api.EnableJwtTokenValidation
 import org.slf4j.Logger
