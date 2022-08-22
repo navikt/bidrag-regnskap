@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>no.nav</groupId>
-	<artifactId>bidrag-template-spring</artifactId>
+	<artifactId>bidrag-regnskap</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>bidrag-template-spring</name>
+	<name>bidrag-regnskap</name>
 	<properties>
 		<java.version>17</java.version>
 		<kotlin.version>1.7.10</kotlin.version>
