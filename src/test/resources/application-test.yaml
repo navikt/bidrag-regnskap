@@ -1,4 +1,4 @@
-BIDRAG_PERSON_URL: http://localhost:${wiremock.server.port}/person
+SKATT_URL: http://localhost:${wiremock.server.port}/skatt
 AZURE_OPENID_CONFIG_ISSUER: http://localhost:${mock-oauth2-server.port}/aad
 AZURE_APP_TENANT_ID: 12321321-123213-3213123
 AZURE_APP_CLIENT_ID: asdasd-sadas-ddas-qwe
@@ -7,7 +7,7 @@ NAIS_APP_NAME: bidrag-regnskap
 no.nav.security.jwt:
   client:
     registration:
-      bidrag-person:
+      skatt:
         token-endpoint-url: http://localhost:${mock-oauth2-server.port:1234}/aad/token
         grant-type: urn:ietf:params:oauth:grant-type:jwt-bearer
         scope: api://123/.default

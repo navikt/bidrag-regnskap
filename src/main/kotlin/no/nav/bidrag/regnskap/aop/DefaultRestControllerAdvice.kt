@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.client.HttpClientErrorException
 
 @RestControllerAdvice
 class DefaultRestControllerAdvice {
@@ -35,5 +36,13 @@ class DefaultRestControllerAdvice {
             .build<Any>()
     }
 
-
+    @ResponseBody
+    @ExceptionHandler(HttpClientErrorException::class)
+    fun handleClientErrorException(exception: HttpClientErrorException): ResponseEntity<*> {
+        LOGGER.warn("Det skjedde en feil ved kall på endepunkt", exception)
+        return ResponseEntity
+            .status(exception.statusCode)
+            .header(HttpHeaders.WARNING, "Det skjedde en feil ved kall på endepunkt: ${exception.message}")
+            .body(exception.responseBodyAsString)
+    }
 }
