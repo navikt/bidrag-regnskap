@@ -1,6 +1,5 @@
 name: bidrag-regnskap-feature
 ingresses:
-  - https://bidrag-regnskap-feature.dev.adeo.no
   - https://bidrag-regnskap-feature.dev.intern.nav.no
 azure:
   skatt_url: bidrag-stubs.dev.intern.nav.no
