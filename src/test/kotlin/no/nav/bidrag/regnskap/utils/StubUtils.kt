@@ -23,7 +23,7 @@ class StubUtils {
             }
     }
 
-    fun stubKravResponse(kravResponse: KravResponse, httpStatus: HttpStatus) {
+    fun stubKravResponse(kravResponse: KravResponse?, httpStatus: HttpStatus) {
         try {
             stubFor(
                 post(urlMatching("/skatt/.*")).willReturn(

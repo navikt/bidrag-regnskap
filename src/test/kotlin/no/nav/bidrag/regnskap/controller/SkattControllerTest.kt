@@ -48,7 +48,7 @@ class SkattControllerTest {
 
   @Test
   fun `Skal lagre krav konteringer hos Skatteetaten`() {
-    stubUtils.stubKravResponse(KravResponse(emptyList()), HttpStatus.OK)
+    stubUtils.stubKravResponse(null, HttpStatus.OK)
 
     val response = httpHeadTestRestTemplate.exchange(
       "http://localhost:$port/api/krav", HttpMethod.POST, HttpEntity(KravRequest(emptyList())), KravResponse::class.java
