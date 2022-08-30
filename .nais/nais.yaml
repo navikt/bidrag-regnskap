@@ -37,8 +37,7 @@ spec:
     - {{url}}
   {{/each}}
   env:
-    - name: BIDRAG_PERSON_URL
-      value: https://{{ azure.person }}
-    - name: BIDRAG_PERSON_SCOPE
-      value: {{ azure.person_clientid }}
-
+    - name: SKATT_URL
+      value: https://{{ azure.skatt_url }}
+    - name: SKATT_SCOPE
+      value: {{ azure.skatt_scope }}

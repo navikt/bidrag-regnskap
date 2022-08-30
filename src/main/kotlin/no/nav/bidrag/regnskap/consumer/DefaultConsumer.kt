@@ -1,4 +1,4 @@
-package no.nav.bidrag.template.consumer
+package no.nav.bidrag.regnskap.consumer
 
 import no.nav.bidrag.commons.security.service.SecurityTokenService
 import org.springframework.boot.web.client.RootUriTemplateHandler

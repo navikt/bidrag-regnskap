@@ -5,18 +5,17 @@ management:
         include: "prometheus,health"
 
 springdoc:
-  packages-to-scan: no.nav.bidrag.dialog.controller
-spring.main.banner-mode: off
----
+  packages-to-scan: no.nav.bidrag.regnskap.controller
+
 spring.config.activate.on-profile: nais,local
 
 no.nav.security.jwt:
   client:
     registration:
-      bidrag-person:
+      skatt:
         token-endpoint-url: https://login.microsoftonline.com/${AZURE_APP_TENANT_ID}/oauth2/v2.0/token
         grant-type: urn:ietf:params:oauth:grant-type:jwt-bearer
-        scope: api://${BIDRAG_PERSON_SCOPE}/.default
+        scope: api://${SKATT_SCOPE}/.default
         authentication:
           client-id: ${AZURE_APP_CLIENT_ID}
           client-secret: ${AZURE_APP_CLIENT_SECRET}

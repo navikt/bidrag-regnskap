@@ -1,4 +1,4 @@
-name: release bidrag-template-spring
+name: release bidrag-regnskap
 on:
   push:
     branches:
