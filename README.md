@@ -1,14 +1,10 @@
 # Bidrag-template-spring
-Template repo for å opprette ny Spring applikasjon for Bidrag
 
-[![continuous integration](https://github.com/navikt/bidrag-template-spring/actions/workflows/ci.yaml/badge.svg)](https://github.com/navikt/bidrag-dialog/actions/workflows/ci.yaml)
-[![release bidrag-template-spring](https://github.com/navikt/bidrag-template-spring/actions/workflows/release.yaml/badge.svg)](https://github.com/navikt/bidrag-dialog/actions/workflows/release.yaml)
+[![continuous integration](https://github.com/navikt/bidrag-regnskap/actions/workflows/ci.yaml/badge.svg)](https://github.com/navikt/bidrag-regnskap/actions/workflows/ci.yaml)
+[![release bidrag-template-spring](https://github.com/navikt/bidrag-regnskap/actions/workflows/release.yaml/badge.svg)](https://github.com/navikt/bidrag-regnskap/actions/workflows/release.yaml)
 
 ## Beskrivelse
-
-Erstatt alt som har postfix `-template-spring` med din applikasjonsnavn
-
-Legg til Github secret `NAIS_DEPLOY_APIKEY` hvor secret hentes fra [Api key](https://deploy.nais.io/apikeys)
+Bidrag-Regnskap er en applikasjon for å opprette og sende kvoteringer til Skatteetaten slik at fakturaer kan sendes ut.
 
 ## Kjøre applikasjonen lokalt
 
@@ -23,8 +19,11 @@ Når du starter applikasjon må derfor følgende miljøvariabl(er) settes:
 ```
 Disse kan hentes ved å kjøre kan hentes ved å kjøre 
 ```bash
-kubectl exec --tty deployment/bidrag-dialog-feature -- printenv | grep -e AZURE_APP_CLIENT_ID -e AZURE_APP_CLIENT_SECRET
+kubectl exec --tty deployment/bidrag-regnskap-feature -- printenv | grep -e AZURE_APP_CLIENT_ID -e AZURE_APP_CLIENT_SECRET
 ```
+
+### JWT-Token
+JWT-Token kan hentes ved hjelp at skriptet her: [hentJwtToken](https://github.com/navikt/bidrag-dev/blob/main/scripts/hentJwtToken.sh).
 
 ### Live reload
 Med `spring-boot-devtools` har Spring støtte for live-reload av applikasjon. Dette betyr i praksis at Spring vil automatisk restarte applikasjonen når en fil endres. Du vil derfor slippe å restarte applikasjonen hver gang du gjør endringer. Dette er forklart i [dokumentasjonen](https://docs.spring.io/spring-boot/docs/1.5.16.RELEASE/reference/html/using-boot-devtools.html#using-boot-devtools-restart).

@@ -54,7 +54,7 @@ data class Konteringer(
         "Dersom konteringen ikke gjelder en av de automatiske justeringstypene blir ikke feltet benyttet. "
         + "For blant annet Jackson deserialisering i Java gir dette en NULL-verdi for feltet. " +
         "Feltet settes kun for første måned med justert beløp.",
-    example = "INDEKSREULERING",
+    example = "INDEKSREGULERING",
     required = false
   ) val justering: Justering?,
 
