@@ -1,5 +1,5 @@
-SKATT_URL: https://bidrag-stub-feature.dev.adeo.no
-SKATT_SCOPE: dev-gcp.bidrag.bidrag-stub-feature
+SKATT_URL: https://bidrag-stubs.dev.intern.nav.no
+SKATT_SCOPE: dev-gcp.bidrag.bidrag-stubs
 AZURE_APP_TENANT_ID: 966ac572-f5b7-4bbe-aa88-c76419c0f851
 AZURE_APP_CLIENT_ID: <app_client_id>
 AZURE_APP_CLIENT_SECRET: unset

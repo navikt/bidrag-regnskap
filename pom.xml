@@ -22,7 +22,6 @@
 		<springframework-cloud.version>3.1.3</springframework-cloud.version>
 		<token-support.version>2.0.14</token-support.version>
 		<bidrag-commons-test.version>0.2.2</bidrag-commons-test.version>
-<!--		<bidrag-behandling-felles-dto>0.0.37</bidrag-behandling-felles-dto>-->
 	</properties>
 	<dependencies>
 
@@ -109,11 +108,6 @@
 			<artifactId>bidrag-commons</artifactId>
 			<version>${bidrag-commons.version}</version>
 		</dependency>
-<!--		<dependency>-->
-<!--			<groupId>no.nav.bidrag</groupId>-->
-<!--			<artifactId>bidrag-behandling-felles-dto</artifactId>-->
-<!--			<version>${bidrag-behandling-felles-dto}</version>-->
-<!--		</dependency>-->
 
 		<!--Diverse-->
 		<dependency>

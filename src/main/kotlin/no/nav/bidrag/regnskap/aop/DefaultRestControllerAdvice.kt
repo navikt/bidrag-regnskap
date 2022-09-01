@@ -8,8 +8,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestControllerAdvice
-import org.springframework.web.client.HttpClientErrorException
-import org.springframework.web.client.HttpClientErrorException.BadRequest
 
 @RestControllerAdvice
 class DefaultRestControllerAdvice {
@@ -32,15 +30,5 @@ class DefaultRestControllerAdvice {
         LOGGER.warn("Ugyldig eller manglende sikkerhetstoken", exception)
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
             .header(HttpHeaders.WARNING, "Ugyldig eller manglende sikkerhetstoken").build<Any>()
-    }
-
-    @ResponseBody
-    @ExceptionHandler(BadRequest::class)
-    fun handleClientErrorException(exception: HttpClientErrorException): ResponseEntity<*> {
-        LOGGER.warn("Det skjedde en feil ved kall på endepunkt", exception)
-        return ResponseEntity.status(exception.statusCode).header(
-                HttpHeaders.WARNING,
-                "En eller flere av konteringene har ikke gått gjennom validering, ${exception.message}"
-            ).body(exception.responseBodyAsString)
     }
 }
