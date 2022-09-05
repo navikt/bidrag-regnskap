@@ -36,6 +36,8 @@ spec:
   {{#each ingresses as |url|}}
     - {{url}}
   {{/each}}
+  kafka:
+    pool: {{ kafka.pool }}
   env:
     - name: SKATT_URL
       value: https://{{ azure.skatt_url }}
