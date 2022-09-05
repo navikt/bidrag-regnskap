@@ -21,7 +21,7 @@ class BehandleHendelseService(private val objectMapper: ObjectMapper){
   }
 
   fun behandleHendelse(vedtakHendelse: VedtakHendelse) {
-    LOGGER.info("Behndler vedakHendelse for vedtakid: ${vedtakHendelse.vedtakId}")
+    LOGGER.info("Behandler vedakHendelse for vedtakid: ${vedtakHendelse.vedtakId}")
     SECURE_LOGGER.info("Behandler vedtakHendelse: $vedtakHendelse")
 
     when (vedtakHendelse.hentStonadType()) {
