@@ -7,12 +7,10 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 
+private val LOGGER = LoggerFactory.getLogger(KravService::class.java)
+
 @Service
 class KravService(var skattConsumer: SkattConsumer) {
-
-  companion object {
-    private val LOGGER = LoggerFactory.getLogger(KravService::class.java)
-  }
 
   fun lagreKrav(kravRequest: KravRequest): ResponseEntity<KravResponse> {
     LOGGER.info("Starter lagring av krav")

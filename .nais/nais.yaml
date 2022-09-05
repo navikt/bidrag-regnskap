@@ -41,3 +41,5 @@ spec:
       value: https://{{ azure.skatt_url }}
     - name: SKATT_SCOPE
       value: {{ azure.skatt_scope }}
+    - name: TOPIC_VEDTAK
+      value: {{ kafka-topic-vedtak }}

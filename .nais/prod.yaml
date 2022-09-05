@@ -4,3 +4,4 @@ ingresses:
 azure:
   skatt_url: bidrag-stubs.dev.intern.nav.no #TODO: LEGGE INN URL
   skatt_scope: dev-gcp.bidrag.bidrag-stubs
+kafka-topic-vedtak: bidrag.vedtak
