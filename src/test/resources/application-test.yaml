@@ -1,4 +1,4 @@
-SKATT_URL: http://localhost:${wiremock.server.port}/skatt
+SKATT_URL: http://localhost:${wiremock.server.port:0}/skatt
 AZURE_OPENID_CONFIG_ISSUER: http://localhost:${mock-oauth2-server.port}/aad
 AZURE_APP_TENANT_ID: 12321321-123213-3213123
 AZURE_APP_CLIENT_ID: asdasd-sadas-ddas-qwe
