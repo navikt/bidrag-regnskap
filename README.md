@@ -1,7 +1,7 @@
 # Bidrag-template-spring
 
-[![continuous integration](https://github.com/navikt/bidrag-regnskap/actions/workflows/ci.yaml/badge.svg)](https://github.com/navikt/bidrag-regnskap/actions/workflows/ci.yaml)
-[![release bidrag-template-spring](https://github.com/navikt/bidrag-regnskap/actions/workflows/release.yaml/badge.svg)](https://github.com/navikt/bidrag-regnskap/actions/workflows/release.yaml)
+[![continuous integration](https://github.com/navikt/bidrag-regnskap/actions/workflows/ci.yaml/badge.svg?branch=main)](https://github.com/navikt/bidrag-regnskap/actions/workflows/ci.yaml)
+[![release bidrag-regnskap](https://github.com/navikt/bidrag-regnskap/actions/workflows/release.yaml/badge.svg)](https://github.com/navikt/bidrag-regnskap/actions/workflows/release.yaml)
 
 ## Beskrivelse
 Bidrag-Regnskap er en applikasjon for å opprette og sende kvoteringer til Skatteetaten slik at fakturaer kan sendes ut.

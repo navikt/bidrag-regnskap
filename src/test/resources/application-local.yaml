@@ -3,5 +3,17 @@ SKATT_SCOPE: dev-gcp.bidrag.bidrag-stubs
 AZURE_APP_TENANT_ID: 966ac572-f5b7-4bbe-aa88-c76419c0f851
 AZURE_APP_CLIENT_ID: <app_client_id>
 AZURE_APP_CLIENT_SECRET: unset
+TOPIC_VEDTAK: bidrag.vedtak-feature
 server.port: 8999
 NAIS_APP_NAME: bidrag-regnskap
+
+spring.kafka:
+  properties:
+    schema:
+      registry.url: http://unused-dummy-url
+      security.protocol: PLAINTEXT
+  consumer:
+    group-id: test
+    auto-offset-reset: earliest
+    key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    value-deserializer: org.apache.kafka.common.serialization.StringDeserializer

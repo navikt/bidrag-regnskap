@@ -12,17 +12,14 @@ import org.springframework.stereotype.Service
 import org.springframework.web.client.HttpClientErrorException.BadRequest
 import org.springframework.web.client.RestTemplate
 
+private val LOGGER = LoggerFactory.getLogger(SkattConsumer::class.java)
+
 @Service
 class SkattConsumer(
   @Value("\${SKATT_URL}") skattUrl: String,
   restTemplate: RestTemplate,
   securityTokenService: SecurityTokenService
 ) : DefaultConsumer("skatt", skattUrl, restTemplate, securityTokenService) {
-
-
-  companion object {
-    private val LOGGER = LoggerFactory.getLogger(SkattConsumer::class.java)
-  }
 
   fun lagreKrav(kravRequest: KravRequest): ResponseEntity<KravResponse> {
     LOGGER.info("Lagrer krav")

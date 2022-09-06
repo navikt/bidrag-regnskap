@@ -14,7 +14,7 @@ spec:
   image: {{ image }}
   liveness:
     path: /actuator/health
-    initialDelay: 20
+    initialDelay: 30
     timeout: 1
     periodSeconds: 5
     failureThreshold: 10
@@ -36,8 +36,12 @@ spec:
   {{#each ingresses as |url|}}
     - {{url}}
   {{/each}}
+  kafka:
+    pool: {{ kafka.pool }}
   env:
     - name: SKATT_URL
       value: https://{{ azure.skatt_url }}
     - name: SKATT_SCOPE
       value: {{ azure.skatt_scope }}
+    - name: TOPIC_VEDTAK
+      value: {{ kafka-topic-vedtak }}

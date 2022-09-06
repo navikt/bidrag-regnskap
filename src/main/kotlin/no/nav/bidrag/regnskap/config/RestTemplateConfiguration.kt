@@ -17,7 +17,7 @@ import org.springframework.web.client.RestTemplate
 
 @Configuration
 @EnableSecurityConfiguration
-class RestConfig {
+class RestTemplateConfiguration {
     @Bean
     @Scope("prototype")
     fun baseRestTemplate(@Value("\${NAIS_APP_NAME}") naisAppName: String, metricsRestTemplateCustomizer: MetricsRestTemplateCustomizer ): RestTemplate {
