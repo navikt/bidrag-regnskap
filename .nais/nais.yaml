@@ -45,3 +45,10 @@ spec:
       value: {{ azure.skatt_scope }}
     - name: TOPIC_VEDTAK
       value: {{ kafka-topic-vedtak }}
+  gcp:
+    sqlInstances:
+      - name: {{ databasenavn }}
+        type: POSTGRES_14
+        databases:
+          - name: bidrag-regnskap-db
+            envVarPrefix: DB
