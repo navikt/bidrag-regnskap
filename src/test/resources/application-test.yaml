@@ -20,13 +20,25 @@ no.nav.security.jwt:
     discovery_url: http://localhost:${mock-oauth2-server.port:0}/aad/.well-known/openid-configuration
     accepted_audience: ${AZURE_APP_CLIENT_ID}, api://${AZURE_APP_CLIENT_ID}
 
-spring.kafka:
-  properties:
-    schema:
-      registry.url: http://unused-dummy-url
-      security.protocol: PLAINTEXT
-  consumer:
-    group-id: test
-    auto-offset-reset: earliest
-    key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-    value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+spring:
+  kafka:
+    properties:
+      schema:
+        registry.url: http://unused-dummy-url
+        security.protocol: PLAINTEXT
+    consumer:
+      group-id: test
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  flyway:
+    enabled: false
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:h2:mem:default
+  h2:
+    console:
+      enabled: true
+  jpa:
+    hibernate:
+      hbmddl-auto: create-drop

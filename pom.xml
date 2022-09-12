@@ -95,6 +95,27 @@
 			<version>${springdoc.version}</version>
 		</dependency>
 
+		<!-- Database -->
+		<dependency>
+			<groupId>com.zaxxer</groupId>
+			<artifactId>HikariCP</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+			<scope>compile</scope>
+		</dependency>
+
 		<!--Sikkerhet-->
 		<dependency>
 			<groupId>no.nav.security</groupId>
