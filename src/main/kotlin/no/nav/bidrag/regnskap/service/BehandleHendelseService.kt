@@ -26,7 +26,7 @@ class BehandleHendelseService(private val objectMapper: ObjectMapper){
 
     when (vedtakHendelse.hentStonadType()) {
       StonadType.BIDRAG, StonadType.FORSKUDD -> LOGGER.warn("IKKE_IMPLEMENTERT ${vedtakHendelse.stonadType}") //TODO: IMPLEMENTERE
-      StonadType.NO_SUPPORT -> LOGGER.warn("bidrag-stønad støtter ikke hendelsen ${vedtakHendelse.stonadType}")
+      StonadType.NO_SUPPORT -> LOGGER.warn("bidrag-regnskap støtter ikke hendelsen ${vedtakHendelse.stonadType}")
       else -> {
         LOGGER.warn("Bidrag-regnskap ukjent stønadtype ${vedtakHendelse.stonadType}")
       }

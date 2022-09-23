@@ -4,11 +4,11 @@ import StubUtils
 import com.github.tomakehurst.wiremock.client.WireMock
 import no.nav.bidrag.commons.web.test.HttpHeaderTestRestTemplate
 import no.nav.bidrag.regnskap.BidragRegnskapLocal
-import no.nav.bidrag.regnskap.model.KonteringId
-import no.nav.bidrag.regnskap.model.Konteringsfeil
-import no.nav.bidrag.regnskap.model.KravRequest
-import no.nav.bidrag.regnskap.model.KravResponse
-import no.nav.bidrag.regnskap.model.Transaksjonskode
+import no.nav.bidrag.regnskap.dto.KonteringId
+import no.nav.bidrag.regnskap.dto.Konteringsfeil
+import no.nav.bidrag.regnskap.dto.SkattKonteringerRequest
+import no.nav.bidrag.regnskap.dto.SkattKonteringerResponse
+import no.nav.bidrag.regnskap.dto.Transaksjonskode
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -29,7 +29,7 @@ import java.time.YearMonth
 )
 @AutoConfigureWireMock(port = 0)
 @EnableMockOAuth2Server
-class SkattControllerTest {
+class KonteringControllerTest {
 
   @LocalServerPort
   private val port = 0
@@ -51,7 +51,7 @@ class SkattControllerTest {
     stubUtils.stubKravResponse(null, HttpStatus.OK)
 
     val response = httpHeadTestRestTemplate.exchange(
-      "http://localhost:$port/api/krav", HttpMethod.POST, HttpEntity(KravRequest(emptyList())), KravResponse::class.java
+      "http://localhost:$port/api/krav", HttpMethod.POST, HttpEntity(SkattKonteringerRequest(emptyList())), SkattKonteringerResponse::class.java
     )
 
     Assertions.assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
@@ -60,7 +60,7 @@ class SkattControllerTest {
   @Test
   fun `Skal ta i mot feil i konteringer fra Skatteetaten`() {
     stubUtils.stubKravResponse(
-      KravResponse(
+      SkattKonteringerResponse(
         listOf(
           Konteringsfeil(
             "TOLKNING", "Tolkning feilet i Elin.", KonteringId(
@@ -72,7 +72,7 @@ class SkattControllerTest {
     HttpStatus.BAD_REQUEST)
 
     val response = httpHeadTestRestTemplate.exchange(
-      "http://localhost:$port/api/krav", HttpMethod.POST, HttpEntity(KravRequest(emptyList())), KravResponse::class.java
+      "http://localhost:$port/api/krav", HttpMethod.POST, HttpEntity(SkattKonteringerRequest(emptyList())), SkattKonteringerResponse::class.java
     )
 
     Assertions.assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)

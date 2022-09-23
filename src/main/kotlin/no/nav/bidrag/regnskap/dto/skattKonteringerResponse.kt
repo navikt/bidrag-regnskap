@@ -1,4 +1,4 @@
-package no.nav.bidrag.regnskap.model
+package no.nav.bidrag.regnskap.dto
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
@@ -8,8 +8,8 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.springframework.format.annotation.DateTimeFormat
 import java.time.YearMonth
 
-@Schema(name = "Kravfeil", description = "Lister feil i et krav.")
-data class KravResponse(
+@Schema(name = "SkattKonteringerResponse", description = "Lister feil i et krav.")
+data class SkattKonteringerResponse(
   val konteringsfeil: List<Konteringsfeil>
 )
 
@@ -50,8 +50,8 @@ data class KonteringId(
   @field:JsonDeserialize(using = YearMonthDeserializer::class)
   val periode: YearMonth,
 
-  @field:Schema(description = "Unik referanse til perioden i vedtaket. " +
-      "I bidragssaken kan en periode strekke over flere måneder, og samme referanse blir da benyttet for alle månedene. " +
+  @field:Schema(description = "Unik referanse til oppdragsperioden i vedtaket. " +
+      "I bidragssaken kan en oppdragsperiode strekke over flere måneder, og samme referanse blir da benyttet for alle månedene. " +
       "Samme referanse kan ikke benyttes to ganger for samme transaksjonskode i samme måned.",
     example = "123456789",
     required = true)

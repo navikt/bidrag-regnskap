@@ -37,10 +37,10 @@ spring:
         truststore:
           location: ${KAFKA_TRUSTSTORE_PATH}
           password: ${KAFKA_CREDSTORE_PASSWORD}
-        endpoint.identification.algorithm:
-        producer:
-          key-serializer: org.apache.kafka.common.serialization.StringSerializer
-          value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      enableAutoCommit: false
+    listener:
+      ackMode: RECORD
 
   datasource:
     type: com.zaxxer.hikari.HikariDataSource

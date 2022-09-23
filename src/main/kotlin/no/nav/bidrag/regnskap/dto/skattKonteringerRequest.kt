@@ -1,4 +1,4 @@
-package no.nav.bidrag.regnskap.model
+package no.nav.bidrag.regnskap.dto
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
@@ -10,17 +10,34 @@ import java.time.LocalDate
 import java.time.YearMonth
 
 const val KRAV_BESKRIVELSE =
-  "Operasjon for å levere krav fra NAV til regnskapet hos Skatteetaten. " + "Et krav består av en liste med konteringer. Det forventes at disse konteringen behandles samlet. " + "Det vil si at hvis én av konteringene feiler, skal ingen av konteringene i kravet benyttes.\n" + "\n" + "Dersom et krav feiler kan det forsøkes overført på nytt gjentatte ganger inntil kravet er overført. " + "Krav som gjelder samme fagsak må leveres i korrekt rekkefølge. " + "Feiler et krav i en sak, skal ikke senere krav i samme sak overføres. " + "Senere krav i andre saker kan overføres, selv om noen av partene fra den feilende fagsaken er involvert.\n" + "\n" + "Det forventes at et krav alltid inneholder de samme konteringene. " + "Dersom et nytt vedtak fører til et nytt krav som venter på et tidligere feilende krav, skal ikke konteringene fra det seneste kravet slås sammen med det ventende kravet.\n" + "\n" + "NAV har ansvar for å manuelt følge opp krav som ved flere forsøk ikke kan overføres, og vil løse opp i problemet i samarbeid med Skatteetaten.\n" + "\n" + "Ved månedlig påløp skal ikke dette grensesnittet benyttes. " + "Tilsvarende krav legges i stedet inn i en fil som overføres til Skatteetaten gjennom filslusa.\n" + "\n" + "Formatet på påløpsfilen skal være tilsvarende det nye grensesnittet, men hvor hvert krav legges inn på egen linje."
+  "Operasjon for å levere krav fra NAV til regnskapet hos Skatteetaten. " +
+      "Et krav består av en liste med konteringer. Det forventes at disse konteringen behandles samlet. " +
+      "Det vil si at hvis én av konteringene feiler, skal ingen av konteringene i kravet benyttes.\n" + "\n" +
+      "Dersom et krav feiler kan det forsøkes overført på nytt gjentatte ganger inntil kravet er overført. " +
+      "Krav som gjelder samme fagsak må leveres i korrekt rekkefølge. " +
+      "Feiler et krav i en sak, skal ikke senere krav i samme sak overføres. " +
+      "Senere krav i andre saker kan overføres, selv om noen av partene fra den feilende fagsaken er involvert.\n" + "\n" +
+      "Det forventes at et krav alltid inneholder de samme konteringene. " +
+      "Dersom et nytt vedtak fører til et nytt krav som venter på et tidligere feilende krav, skal ikke konteringene fra det seneste kravet slås sammen med det ventende kravet.\n" + "\n" +
+      "NAV har ansvar for å manuelt følge opp krav som ved flere forsøk ikke kan overføres, og vil løse opp i problemet i samarbeid med Skatteetaten.\n" + "\n" +
+      "Ved månedlig påløp skal ikke dette grensesnittet benyttes. " + "Tilsvarende krav legges i stedet inn i en fil som overføres til Skatteetaten gjennom filslusa.\n" + "\n" +
+      "Formatet på påløpsfilen skal være tilsvarende det nye grensesnittet, men hvor hvert krav legges inn på egen linje."
 
-@Schema(name = "Krav", description = "Et krav består av en liste med konteringer.")
-data class KravRequest(
-  val konteringer: List<Konteringer>
+@Schema(name = "SkattKonteringRequest", description = "Et krav består av en liste med konteringer.")
+data class SkattKonteringerRequest(
+  val konteringer: List<SkattKontering>
 )
 
 @Schema(
-  description = "En kontering angir hvor mye som skal betales av skyldner til mottaker på vegne av kravhaver.\n" + "\nKonteringen kan unikt identifiseres med kombinasjonen transaksjonskode, delytelsesId og periode. " + "Det forutsettes at delytelsesid'n er unik også på tvers av fagsystemid'er.\n" + "\nPersonidenter for gjelderIdent, kravhaverIdent, mottakerIdent og skyldnerIdent angis med enten FNR eller DNR. " + "(Håndtering av BNR og NPID er uavklart.) Aktoernummer kan benyttes i kravhaverIdent, mottakerIdent og skyldnerIdent. " + "Aktoernummere er elleve siffer og starter med enten 8 eller 9.\n" + "\nI testmiljøene må Tenor-identer støttes i stedet for FNR/DNR. Disse identene har 8 eller 9 i tredje siffer."
+  description = "En kontering angir hvor mye som skal betales av skyldner til mottaker på vegne av kravhaver.\n" +
+      "\nKonteringen kan unikt identifiseres med kombinasjonen transaksjonskode, delytelsesId og periode. " +
+      "Det forutsettes at delytelsesid'n er unik også på tvers av fagsystemid'er.\n" +
+      "\nPersonidenter for gjelderIdent, kravhaverIdent, mottakerIdent og skyldnerIdent angis med enten FNR eller DNR. " +
+      "(Håndtering av BNR og NPID er uavklart.) Aktoernummer kan benyttes i kravhaverIdent, mottakerIdent og skyldnerIdent. " +
+      "Aktoernummere er elleve siffer og starter med enten 8 eller 9.\n" +
+      "\nI testmiljøene må Tenor-identer støttes i stedet for FNR/DNR. Disse identene har 8 eller 9 i tredje siffer."
 )
-data class Konteringer(
+data class SkattKontering(
 
   @field:Schema(
     description = "Type transaksjon.\n\n"
@@ -77,7 +94,7 @@ data class Konteringer(
         "\n\nKravhaver angis ikke for gebyr.",
     example = "14871298182",
     required = false
-  ) val kravhaverIdent: String,
+  ) val kravhaverIdent: String?,
 
 
   @field:Schema(
@@ -107,7 +124,7 @@ data class Konteringer(
   @field:Schema(
     description = "Angir hvilken periode (måned og år) konteringen gjelder.",
     type = "String",
-    format = "yyyy-mm",
+    format = "yyyy-MM",
     example = "2022-04",
     required = true
   ) @field:JsonSerialize(using = YearMonthSerializer::class) @field:JsonDeserialize(using = YearMonthDeserializer::class) @field:DateTimeFormat(
@@ -153,8 +170,8 @@ data class Konteringer(
   ) val fagsystemId: String,
 
   @field:Schema(
-    description = "Unik referanse til perioden i vedtaket angitt som String. " +
-        "I bidragssaken kan en periode strekke over flere måneder, og samme referanse blir da benyttet for alle månedene. " +
+    description = "Unik referanse til oppdragsperioden i vedtaket angitt som String. " +
+        "I bidragssaken kan en oppdragsperiode strekke over flere måneder, og samme referanse blir da benyttet for alle månedene. " +
         "Samme referanse kan ikke benyttes to ganger for samme transaksjonskode i samme måned.",
     example = "123456789",
     required = true

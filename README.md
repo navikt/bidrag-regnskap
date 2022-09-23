@@ -6,7 +6,7 @@
 ## Beskrivelse
 Bidrag-Regnskap er en applikasjon for å opprette og sende kvoteringer til Skatteetaten slik at fakturaer kan sendes ut.
 
-## Kjøre applikasjonen lokalt
+### Lokal utvikling
 
 Start opp applikasjonen ved å kjøre [BidragRegnskapLocal.kt](src/test/kotlin/no/nav/bidrag/regnskap/BidragRegnskapLocal.kt).
 Dette starter applikasjonen med profil `local` og henter miljøvariabler for Q1 miljøet fra filen [application-local.yaml](src/test/resources/application-local.yaml).
@@ -17,10 +17,48 @@ Når du starter applikasjon må derfor følgende miljøvariabl(er) settes:
 -DAZURE_APP_CLIENT_SECRET=<secret>
 -DAZURE_APP_CLIENT_ID=<id>
 ```
-Disse kan hentes ved å kjøre kan hentes ved å kjøre 
+Disse kan hentes ved å kjøre kan hentes ved å kjøre
 ```bash
 kubectl exec --tty deployment/bidrag-regnskap-feature -- printenv | grep -e AZURE_APP_CLIENT_ID -e AZURE_APP_CLIENT_SECRET
 ```
+
+#### Lokal database
+Dette blir opprettet når du kjører på root mappen
+```bash
+docker-compose up -d
+```
+Ved neste oppstart av applikasjonen vil flyway kjøre på den lokale databasen.
+For å koble seg til databasen gjelder følgende:
+```bash
+jdbc:postgresql://localhost:5432/default_database
+```
+Brukernavn og passord:
+```bash
+user: cloudsqliamuser
+password: admin 
+```
+
+#### Kjør lokalt med kafka
+Start kafka lokalt i en docker container samtidig som databasen
+
+Bruk `kafkacat` til å sende meldinger til kafka topic.
+#### Windows 
+Kafkacat må installeres via wsl (Windows Subsystem for Windows).
+```bash
+wsl kafkacat -b localhost:9092 -t bidrag.vedtak-feature -P -K:
+```
+#### MacOS
+```bash
+kcat -b localhost:9092 -t bidrag-journalpost -P -K:
+```
+og lim inn:
+```bash
+TODO
+```
+```bash
+TODO
+```
+og deretter trykk Enter og Ctrl+D. Da vil meldingen bli sendt til topic bidrag.vedtak-feature
 
 ### JWT-Token
 JWT-Token kan hentes ved hjelp at skriptet her: [hentJwtToken](https://github.com/navikt/bidrag-dev/blob/main/scripts/hentJwtToken.sh).

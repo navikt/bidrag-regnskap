@@ -7,4 +7,6 @@ azure:
 kafka:
   pool: nav-dev
 kafka-topic-vedtak: bidrag.vedtak
-databasenavn: bidrag-regnskap-main
+database:
+  navn: bidrag-regnskap-main
+  autoResize: true

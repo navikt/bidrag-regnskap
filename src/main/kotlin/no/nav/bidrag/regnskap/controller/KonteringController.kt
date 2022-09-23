@@ -1,30 +1,31 @@
 package no.nav.bidrag.regnskap.controller
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.Parameters
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import no.nav.bidrag.regnskap.model.KRAV_BESKRIVELSE
-import no.nav.bidrag.regnskap.model.KravRequest
-import no.nav.bidrag.regnskap.model.KravResponse
-import no.nav.bidrag.regnskap.service.KravService
+import no.nav.bidrag.regnskap.dto.KRAV_BESKRIVELSE
+import no.nav.bidrag.regnskap.dto.SkattKonteringerResponse
+import no.nav.bidrag.regnskap.service.KonteringService
 import no.nav.security.token.support.core.api.Protected
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.ResponseBody
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import java.time.YearMonth
 
 @RestController
 @Protected
-class SkattController(
-  var kravService: KravService
+class KonteringController(
+  var konteringService: KonteringService
 ) {
 
-  @PostMapping("/api/krav")
+  @PostMapping("/sendKonteringTilSkatt")
   @Operation(
     description = KRAV_BESKRIVELSE, security = [SecurityRequirement(name = "bearer-key")]
   )
@@ -42,7 +43,7 @@ class SkattController(
           "Det er ingen garanti for at konteringer som ikke kommer med på listen over feilede konteringer er feilfrie.",
       content = [Content(
         mediaType = "application/json",
-        array = ArraySchema(schema = Schema(implementation = KravResponse::class))
+        array = ArraySchema(schema = Schema(implementation = SkattKonteringerResponse::class))
       )]
     ), ApiResponse(
       responseCode = "401",
@@ -52,9 +53,19 @@ class SkattController(
       responseCode = "403", description = "Dersom klienten ikke har tilgang.", content = [Content()]
     )]
   )
-  @ResponseBody
-  fun lagreKrav(@RequestBody kravRequest: KravRequest): ResponseEntity<KravResponse> {
-    return kravService.lagreKrav(kravRequest)
+  @Parameters(
+    value = [Parameter(
+      name = "oppdragId",
+      required = true,
+      example = "10"
+    ), Parameter(
+      name = "periode",
+      required = true,
+      example = "2022-01"
+    )]
+  )
+  fun sendKonteringer(@RequestParam oppdragId: Int, @RequestParam periode: YearMonth): ResponseEntity<SkattKonteringerResponse> {
+    return konteringService.sendKontering(oppdragId, periode)
   }
 }
 
