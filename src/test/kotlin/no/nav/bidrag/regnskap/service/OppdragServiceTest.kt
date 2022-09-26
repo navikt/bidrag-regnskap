@@ -11,7 +11,6 @@ import no.nav.bidrag.regnskap.dto.OppdragRequest
 import no.nav.bidrag.regnskap.utils.TestDataGenerator.genererPersonnummer
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.springframework.http.HttpStatus
 import java.time.LocalDate
 
 @ExtendWith(MockKExtension::class)
@@ -30,10 +29,10 @@ class OppdragServiceTest {
     every { persistenceService.lagreOppdragsperiode(any()) } returns 1
     every { persistenceService.lagreKontering(any()) } returns Unit
 
-    val responseEntity = oppdragService.lagreOppdrag(oppdragRequest)
+    val oppdragId = oppdragService.lagreOppdrag(oppdragRequest)
 
     verify(exactly = 12) { persistenceService.lagreKontering(any()) }
-    responseEntity.statusCode shouldBe HttpStatus.OK
+    oppdragId shouldBe 1
   }
 
   private fun opprettOppdragRequest(): OppdragRequest {

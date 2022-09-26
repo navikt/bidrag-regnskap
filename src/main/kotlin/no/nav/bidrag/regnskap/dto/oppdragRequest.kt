@@ -40,8 +40,8 @@ data class OppdragRequest(
   val saksId: Int,
 
   @field:Schema(
-    description = "Referanse. (TODO)",
-    example = "Referanse til noe TODO",
+    description = "Referanse til gebyr.",
+    example = "ABC123",
     required = false)
   val referanse: String?,
 

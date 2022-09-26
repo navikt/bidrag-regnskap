@@ -51,13 +51,15 @@ class KonteringController(
       content = [Content()]
     ), ApiResponse(
       responseCode = "403", description = "Dersom klienten ikke har tilgang.", content = [Content()]
+    ), ApiResponse(
+      responseCode = "404", description = "Oppdraget finnes ikke.", content = [Content()]
     )]
   )
   @Parameters(
     value = [Parameter(
       name = "oppdragId",
       required = true,
-      example = "10"
+      example = "1"
     ), Parameter(
       name = "periode",
       required = true,

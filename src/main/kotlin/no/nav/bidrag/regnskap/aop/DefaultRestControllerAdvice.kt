@@ -31,4 +31,13 @@ class DefaultRestControllerAdvice {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
             .header(HttpHeaders.WARNING, "Ugyldig eller manglende sikkerhetstoken").build<Any>()
     }
+
+    @ResponseBody
+    @ExceptionHandler(NoSuchElementException::class)
+    fun handleNoSuchElementException(exception: java.util.NoSuchElementException): ResponseEntity<*> {
+        LOGGER.info("Fant ingen gyldig verdi.", exception)
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+            .build<Any>()
+    }
+
 }

@@ -1,5 +1,6 @@
 package no.nav.bidrag.regnskap.service
 
+import no.nav.bidrag.behandling.felles.enums.StonadType
 import no.nav.bidrag.regnskap.dto.Justering
 import no.nav.bidrag.regnskap.dto.KonteringResponse
 import no.nav.bidrag.regnskap.dto.OppdragRequest
@@ -10,8 +11,6 @@ import no.nav.bidrag.regnskap.dto.Type
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -21,54 +20,66 @@ import java.time.temporal.ChronoUnit
 import java.util.stream.Collectors
 import java.util.stream.Stream
 
-
 @Service
 class OppdragService(
   val persistenceService: PersistenceService
 ) {
 
-  fun hentOppdrag(oppdragId: Int): ResponseEntity<OppdragResponse> {
+  fun hentOppdrag(oppdragId: Int): OppdragResponse {
+    val oppdrag = persistenceService.hentOppdrag(oppdragId).get()
 
-    var response = ResponseEntity<OppdragResponse>(HttpStatus.NO_CONTENT)
-
-    persistenceService.hentOppdrag(oppdragId).ifPresent { oppdrag ->
-      response = ResponseEntity(
-        OppdragResponse(
-          oppdrag.oppdragId,
-          oppdrag.stonadType,
-          oppdrag.kravhaverIdent,
-          oppdrag.skyldnerIdent,
-          oppdrag.sakId,
-          oppdrag.referanse,
-          opprettListeAvPerioderMedKonteringer(oppdrag.oppdragId)
-        ), HttpStatus.OK
-      )
-    }
-
-    return response
+    return OppdragResponse(
+      oppdragId = oppdrag.oppdragId,
+      stonadType = StonadType.valueOf(oppdrag.stonadType),
+      kravhaverIdent = oppdrag.kravhaverIdent,
+      skyldnerIdent = oppdrag.skyldnerIdent,
+      saksId = oppdrag.sakId,
+      referanse = oppdrag.referanse,
+      oppdragsperioder = hentPerioderMedKonteringer(oppdrag)
+    )
   }
 
-  private fun opprettListeAvPerioderMedKonteringer(oppdragId: Int): List<OppdragsperiodeResponse> {
+  @Transactional
+  fun lagreOppdrag(oppdragRequest: OppdragRequest): Int {
+    val oppdrag = Oppdrag(
+      stonadType = oppdragRequest.stonadType.toString(),
+      kravhaverIdent = oppdragRequest.kravhaverIdent,
+      skyldnerIdent = oppdragRequest.skyldnerIdent,
+      sakId = oppdragRequest.saksId,
+      referanse = oppdragRequest.referanse,
+      utsattTilDato = oppdragRequest.utsattTilDato
+    )
+
+    val oppdragId = persistenceService.lagreOppdrag(oppdrag)
+    val oppdragsperiode = opprettOppdragsperiode(oppdragId, oppdragRequest)
+    val oppdragsperiodeId = persistenceService.lagreOppdragsperiode(oppdragsperiode)
+
+    opprettKonteringer(oppdragsperiodeId, hentPerioderForOppdrag(oppdragRequest))
+
+    return oppdragId!!
+  }
+
+  private fun hentPerioderMedKonteringer(oppdrag: Oppdrag): List<OppdragsperiodeResponse> {
     val oppdragsperiodeResponser = mutableListOf<OppdragsperiodeResponse>()
 
-    persistenceService.hentOppdragsperiodePaOppdragsId(oppdragId).forEach { oppdragsperiode ->
+    (oppdrag.oppdragsperioder)?.forEach { oppdragsperiode ->
       oppdragsperiodeResponser.add(
         OppdragsperiodeResponse(
-          oppdragsperiode.oppdragsperiodeId,
-          oppdragsperiode.oppdragId,
-          oppdragsperiode.vedtakId,
-          oppdragsperiode.gjelderIdent,
-          oppdragsperiode.mottakerIdent,
-          oppdragsperiode.belop,
-          oppdragsperiode.valuta,
-          oppdragsperiode.periodeFra,
-          oppdragsperiode.periodeTil,
-          oppdragsperiode.vedtaksdato,
-          oppdragsperiode.opprettetAv,
-          oppdragsperiode.delytelseId,
-          oppdragsperiode.aktiv,
-          oppdragsperiode.erstatterPeriode,
-          opprettListeAvKonteringer(oppdragsperiode)
+          oppdragsperiodeId = oppdragsperiode.oppdragsperiodeId,
+          oppdragId = oppdragsperiode.oppdragId,
+          vedtakId = oppdragsperiode.vedtakId,
+          gjelderIdent = oppdragsperiode.gjelderIdent,
+          mottakerIdent = oppdragsperiode.mottakerIdent,
+          belop = oppdragsperiode.belop,
+          valuta = oppdragsperiode.valuta,
+          periodeFra = oppdragsperiode.periodeFra.toString(),
+          periodeTil = oppdragsperiode.periodeTil.toString(),
+          vedtaksdato = oppdragsperiode.vedtaksdato.toString(),
+          opprettetAv = oppdragsperiode.opprettetAv,
+          delytelseId = oppdragsperiode.delytelseId,
+          aktiv = oppdragsperiode.aktiv,
+          erstatterPeriode = oppdragsperiode.erstatterPeriode,
+          konteringer = hentKonteringer(oppdrag)
         )
       )
     }
@@ -76,81 +87,60 @@ class OppdragService(
     return oppdragsperiodeResponser
   }
 
-  private fun opprettListeAvKonteringer(oppdragsperiode: Oppdragsperiode): List<KonteringResponse> {
+  private fun hentKonteringer(oppdrag: Oppdrag): List<KonteringResponse> {
     val konteringResponser = mutableListOf<KonteringResponse>()
 
-    persistenceService.hentKonteringPaPeriodeId(oppdragsperiode.oppdragsperiodeId).forEach { kontering ->
-      konteringResponser.add(
-        KonteringResponse(
-          kontering.konteringId,
-          kontering.oppdragsperiodeId,
-          Transaksjonskode.valueOf(kontering.transaksjonskode),
-          YearMonth.parse(kontering.overforingsperiode),
-          kontering.overforingstidspunkt,
-          kontering.type?.let { Type.valueOf(it) },
-          kontering.justering?.let { Justering.valueOf(it) },
-          kontering.gebyrRolle,
-          kontering.sendtIPalopsfil
+    oppdrag.oppdragsperioder?.forEach { oppdragsperiode ->
+      oppdragsperiode.konteringer?.forEach { kontering ->
+        konteringResponser.add(
+          KonteringResponse(
+            konteringId = kontering.konteringId,
+            oppdragsperiodeId = kontering.oppdragsperiodeId,
+            transaksjonskode = Transaksjonskode.valueOf(kontering.transaksjonskode),
+            overforingsperiode = kontering.overforingsperiode,
+            overforingstidspunkt = kontering.overforingstidspunkt.toString(),
+            type = kontering.type?.let { Type.valueOf(kontering.type) },
+            justering = kontering.justering?.let { Justering.valueOf(kontering.justering) },
+            gebyrRolle = kontering.gebyrRolle,
+            sendtIPalopsfil = kontering.sendtIPalopsfil
+          )
         )
-      )
+      }
     }
 
     return konteringResponser
   }
 
-  @Transactional
-  fun lagreOppdrag(oppdragRequest: OppdragRequest): ResponseEntity<Int> {
-    val oppdrag = Oppdrag(
-      0,
-      oppdragRequest.stonadType,
-      oppdragRequest.kravhaverIdent,
-      oppdragRequest.skyldnerIdent,
-      oppdragRequest.saksId,
-      oppdragRequest.referanse,
-      oppdragRequest.utsattTilDato
-    )
-
-    val oppdragId = persistenceService.lagreOppdrag(oppdrag)
-
-    val oppdragsperiode = Oppdragsperiode(
-      0,
-      oppdragId,
-      oppdragRequest.vedtakId,
-      oppdragRequest.gjelderIdent,
-      oppdragRequest.mottakerIdent,
-      oppdragRequest.belop,
-      oppdragRequest.valuta,
-      oppdragRequest.periodeFra,
-      oppdragRequest.periodeTil,
-      oppdragRequest.vedtaksdato,
-      oppdragRequest.opprettetAv,
-      oppdragRequest.delytelseId,
-      true,
-      null,
-      oppdragRequest.tekst
-    )
-
-    val oppdragsperiodeId = persistenceService.lagreOppdragsperiode(oppdragsperiode)
-
-    val perioderForOppdrag = hentPerioderForOppdrag(oppdragRequest)
-
+  private fun opprettKonteringer(oppdragsperiodeId: Int?, perioderForOppdrag: List<YearMonth>) {
     perioderForOppdrag.forEachIndexed { index, periode ->
       persistenceService.lagreKontering(
         Kontering(
-          konteringId = 0,
           oppdragsperiodeId = oppdragsperiodeId,
           transaksjonskode = Transaksjonskode.A1.toString(), //TODO: Utlede denne
           overforingsperiode = periode.toString(),
-          overforingstidspunkt = null,
           type = if (index == 0) Type.NY.toString() else Type.ENDRING.toString(),
           justering = null, //TODO: Denne må inn på en eller annen måte
           gebyrRolle = null, //TODO referanse?
-          sendtIPalopsfil = false
         )
       )
     }
+  }
 
-    return ResponseEntity(oppdragId, HttpStatus.OK)
+  private fun opprettOppdragsperiode(oppdragId: Int?, oppdragRequest: OppdragRequest): Oppdragsperiode {
+    return Oppdragsperiode(
+      oppdragId = oppdragId,
+      vedtakId = oppdragRequest.vedtakId,
+      gjelderIdent = oppdragRequest.gjelderIdent,
+      mottakerIdent = oppdragRequest.mottakerIdent,
+      belop = oppdragRequest.belop,
+      valuta = oppdragRequest.valuta,
+      periodeFra = oppdragRequest.periodeFra,
+      periodeTil = oppdragRequest.periodeTil,
+      vedtaksdato = oppdragRequest.vedtaksdato,
+      opprettetAv = oppdragRequest.opprettetAv,
+      delytelseId = oppdragRequest.delytelseId,
+      tekst = oppdragRequest.tekst,
+    )
   }
 
   private fun hentPerioderForOppdrag(oppdragRequest: OppdragRequest): List<YearMonth> {

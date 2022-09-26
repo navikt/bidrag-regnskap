@@ -36,13 +36,13 @@ class PersistenceService(
     return oppdragsperiodeRepository.findAllByOppdragIdAndAktivIsTrue(oppdragId)
   }
 
-  fun lagreOppdrag(oppdrag: Oppdrag): Int {
+  fun lagreOppdrag(oppdrag: Oppdrag): Int? {
     val nyttOppdrag = oppdragRepository.save(oppdrag)
     LOGGER.info("Lagret oppdrag med ID: ${nyttOppdrag.oppdragId}")
     return nyttOppdrag.oppdragId
   }
 
-  fun lagreOppdragsperiode(oppdragsperiode: Oppdragsperiode): Int {
+  fun lagreOppdragsperiode(oppdragsperiode: Oppdragsperiode): Int? {
     val nyOppdragsperiode = oppdragsperiodeRepository.save(oppdragsperiode)
     LOGGER.info("Lagret oppdragsperiode med ID: ${nyOppdragsperiode.oppdragsperiodeId}")
     return nyOppdragsperiode.oppdragsperiodeId

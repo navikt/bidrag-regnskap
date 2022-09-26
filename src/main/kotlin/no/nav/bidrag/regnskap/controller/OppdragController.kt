@@ -44,7 +44,7 @@ class OppdragController(
     )]
   )
   fun hentOppdrag(oppdragId: Int): ResponseEntity<OppdragResponse> {
-    return oppdragService.hentOppdrag(oppdragId)
+    return ResponseEntity.ok(oppdragService.hentOppdrag(oppdragId))
   }
 
   @PostMapping("/oppdrag")
@@ -70,7 +70,7 @@ class OppdragController(
     )]
   )
   fun lagreOppdrag(oppdragRequest: OppdragRequest): ResponseEntity<Int> {
-    return oppdragService.lagreOppdrag(oppdragRequest)
+    return ResponseEntity.ok(oppdragService.lagreOppdrag(oppdragRequest))
   }
 }
 

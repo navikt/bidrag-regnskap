@@ -90,7 +90,7 @@ class KonteringServiceTest {
   }
 
   private fun opprettOppdragOptional() =
-    Optional.of(Oppdrag(oppdragsId, StonadType.BIDRAG, "123456789", "987654321", 123456, null, null))
+    Optional.of(Oppdrag(oppdragsId, StonadType.BIDRAG.toString(), "123456789", "987654321", 123456, null, null, emptyList()))
 
   private fun opprettOppdragsperiode(periodeFra: LocalDate, periodeTil: LocalDate) = Oppdragsperiode(
     oppdragsperiodeId = oppdragsperiodeId,
@@ -107,6 +107,7 @@ class KonteringServiceTest {
     delytelseId = "DelytelsesId",
     aktiv = true,
     erstatterPeriode = null,
-    tekst = null
+    tekst = null,
+    emptyList()
   )
 }

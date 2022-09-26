@@ -13,10 +13,10 @@ data class Kontering(
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "kontering_id")
-  val konteringId: Int,
+  val konteringId: Int? = null,
 
   @Column(name = "oppdragsperiode_id")
-  val oppdragsperiodeId: Int,
+  val oppdragsperiodeId: Int? = null,
 
   @Column(name = "transaksjonskode")
   val transaksjonskode: String,
@@ -25,7 +25,7 @@ data class Kontering(
   val overforingsperiode: String,
 
   @Column(name = "overforinstidspunkt")
-  val overforingstidspunkt: LocalDateTime?,
+  val overforingstidspunkt: LocalDateTime? = null,
 
   @Column(name = "type")
   val type: String?,
@@ -37,7 +37,7 @@ data class Kontering(
   val gebyrRolle: String?,
 
   @Column(name = "sendt_i_palopsfil")
-  val sendtIPalopsfil: Boolean
+  val sendtIPalopsfil: Boolean = false
 )
 
 

@@ -1,15 +1,7 @@
 package no.nav.bidrag.regnskap.dto
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.databind.annotation.JsonSerialize
-import com.fasterxml.jackson.datatype.jsr310.deser.YearMonthDeserializer
-import com.fasterxml.jackson.datatype.jsr310.ser.YearMonthSerializer
 import io.swagger.v3.oas.annotations.media.Schema
 import no.nav.bidrag.behandling.felles.enums.StonadType
-import org.springframework.format.annotation.DateTimeFormat
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.YearMonth
 
 @Schema(
   name = "OppdragResponse",
@@ -20,13 +12,13 @@ data class OppdragResponse(
   @field:Schema(
     description = "Id til oppdraget.",
     example = "10")
-  val oppdragId: Int,
+  val oppdragId: Int?,
 
   @field:Schema(
     description = "Type stønad.",
     example = "BIDRAG"
     )
-  val stonadType: StonadType,
+  val stonadType: StonadType?,
 
   @field:Schema(
     description = "Personident (FNR/DNR) eller aktoernummer (TSS-ident/samhandler) til kravhaver." +
@@ -50,8 +42,8 @@ data class OppdragResponse(
   val saksId: Int,
 
   @field:Schema(
-    description = "Referanse. (TODO)",
-    example = "Referanse til noe TODO"
+    description = "Referanse til gebyr.",
+    example = "ABC123"
     )
   val referanse: String?,
 
@@ -72,13 +64,13 @@ data class OppdragsperiodeResponse(
     description = "Id til oppdragsperioden.",
     example = "20"
     )
-  val oppdragsperiodeId: Int,
+  val oppdragsperiodeId: Int?,
 
   @field:Schema(
     description = "Id til oppdraget oppdragsperioden tilhører.",
     example = "10"
     )
-  val oppdragId: Int,
+  val oppdragId: Int?,
 
   @field:Schema(
     description = "VedtaksId for vedtaket oppdraget gjelder for.",
@@ -114,24 +106,24 @@ data class OppdragsperiodeResponse(
 
   @field:Schema(
     description = "Datoen utbetalingen skal starte fra.",
-    format = "yyyy-mm-dd",
+    format = "date",
     example = "2022-01-01"
     )
-  val periodeFra: LocalDate,
+  val periodeFra: String,
 
   @field:Schema(
     description = "Datoen utbetalingen skal opphøre.",
-    format = "yyyy-mm-dd",
+    format = "date",
     example = "2022-02-01"
     )
-  val periodeTil: LocalDate,
+  val periodeTil: String,
 
   @field:Schema(
     description = "Datoen vedtaket ble fattet.",
-    format = "yyyy-mm-dd",
+    format = "date",
     example = "2022-01-01"
     )
-  val vedtaksdato: LocalDate,
+  val vedtaksdato: String,
 
   @field:Schema(
     description = "SaksbehandlerId til saksbehandler som fattet vedtaket.",
@@ -175,13 +167,13 @@ data class KonteringResponse(
     description = "Id til konteringen.",
     example = "30"
     )
-  val konteringId: Int,
+  val konteringId: Int?,
 
   @field:Schema(
     description = "Id til oppdragsperioden konteringen tilhører.",
     example = "20"
     )
-  val oppdragsperiodeId: Int,
+  val oppdragsperiodeId: Int?,
 
   @field:Schema(
     description = "Type transaksjon.\n\n"
@@ -206,21 +198,17 @@ data class KonteringResponse(
   @field:Schema(
     description = "Angir hvilken periode (måned og år) konteringen gjelder.",
     type = "String",
-    format = "yyyy-MM",
     example = "2022-04",
     required = true
   )
-  @field:DateTimeFormat(pattern = "yyyy-MM")
-  @field:JsonSerialize(using = YearMonthSerializer::class)
-  @field:JsonDeserialize(using = YearMonthDeserializer::class)
-  val overforingsperiode: YearMonth,
+  val overforingsperiode: String,
 
   @field:Schema(
     description = "Tidspunktet overføringen ble gjennomført. ",
-    format = "yyyy-mm-dd:HH:mm:ss",
+    format = "date-time",
     example = "2022-02-01:00:00:00",
     )
-  val overforingstidspunkt: LocalDateTime?,
+  val overforingstidspunkt: String?,
 
   @field:Schema(
     description = "Angir om det er en ny transaksjon eller en endring.",
