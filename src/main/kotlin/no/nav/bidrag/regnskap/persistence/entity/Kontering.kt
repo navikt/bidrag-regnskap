@@ -6,6 +6,8 @@ import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
+import javax.persistence.JoinColumn
+import javax.persistence.ManyToOne
 
 @Entity(name = "konteringer")
 data class Kontering(
@@ -15,8 +17,9 @@ data class Kontering(
   @Column(name = "kontering_id")
   val konteringId: Int? = null,
 
-  @Column(name = "oppdragsperiode_id")
-  val oppdragsperiodeId: Int? = null,
+  @ManyToOne
+  @JoinColumn(name = "oppdragsperiode_id")
+  val oppdragsperiode: Oppdragsperiode? = null,
 
   @Column(name = "transaksjonskode")
   val transaksjonskode: String,

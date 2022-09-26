@@ -1,6 +1,5 @@
 package no.nav.bidrag.regnskap.service
 
-import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
 import no.nav.bidrag.regnskap.persistence.repository.KonteringRepository
@@ -26,35 +25,14 @@ class PersistenceService(
     return oppdragRepository.findById(oppdragId)
   }
 
-  fun hentOppdragsperiodePaOppdragsId(oppdragId: Int): List<Oppdragsperiode> {
-    LOGGER.info("Henter oppdragsperioder på oppdragsID: $oppdragId")
-    return oppdragsperiodeRepository.findAllByOppdragId(oppdragId)
-  }
-
-  fun hentOppdragsperiodePaOppdragsIdSomErAktiv(oppdragId: Int): List<Oppdragsperiode> {
-    LOGGER.info("Henter aktive oppdragsperioder på oppdragsID: $oppdragId")
-    return oppdragsperiodeRepository.findAllByOppdragIdAndAktivIsTrue(oppdragId)
+  fun hentOppdragsperiodePaOppdragsperiodeId(oppdragsperiodeId: Int): List<Oppdragsperiode> {
+    LOGGER.info("Henter aktive oppdragsperioder på oppdragsID: $oppdragsperiodeId")
+    return oppdragsperiodeRepository.findAllByOppdragsperiodeId(oppdragsperiodeId)
   }
 
   fun lagreOppdrag(oppdrag: Oppdrag): Int? {
     val nyttOppdrag = oppdragRepository.save(oppdrag)
     LOGGER.info("Lagret oppdrag med ID: ${nyttOppdrag.oppdragId}")
     return nyttOppdrag.oppdragId
-  }
-
-  fun lagreOppdragsperiode(oppdragsperiode: Oppdragsperiode): Int? {
-    val nyOppdragsperiode = oppdragsperiodeRepository.save(oppdragsperiode)
-    LOGGER.info("Lagret oppdragsperiode med ID: ${nyOppdragsperiode.oppdragsperiodeId}")
-    return nyOppdragsperiode.oppdragsperiodeId
-  }
-
-  fun hentKonteringPaPeriodeId(oppdragsperiodeId: Int): List<Kontering> {
-    LOGGER.info("Henter konteringer på oppdragsperiodeID: $oppdragsperiodeId")
-    return konteringRepository.findAllByOppdragsperiodeId(oppdragsperiodeId)
-  }
-
-  fun lagreKontering(kontering: Kontering) {
-    val nyKontering = konteringRepository.save(kontering)
-    LOGGER.info("Lagret kontering med ID: $nyKontering")
   }
 }

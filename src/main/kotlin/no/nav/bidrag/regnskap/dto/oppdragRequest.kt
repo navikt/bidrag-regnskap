@@ -43,7 +43,7 @@ data class OppdragRequest(
     description = "Referanse til gebyr.",
     example = "ABC123",
     required = false)
-  val referanse: String?,
+  val referanse: String? = null,
 
   @field:Schema(
     description = "VedtaksId for vedtaket oppdraget gjelder for.",
@@ -131,12 +131,12 @@ data class OppdragRequest(
     required = false
   )
   @field:DateTimeFormat(pattern = "yyyy-MM-dd")
-  val utsattTilDato: LocalDate?,
+  val utsattTilDato: LocalDate? = null,
 
   @field:Schema(
     description = "Fritekstfelt. Benyttes av utlandsavdelingen.",
     example = "VII W → 450 → 40 /11",
     required = false
   )
-  val tekst: String?,
+  val tekst: String? = null,
 )

@@ -37,11 +37,11 @@ class KonteringServiceTest {
 
   @Test
   @Suppress("NonAsciiCharacters")
-  fun `skal hente hente oppdragsperiode og sende kontering til skatt når oppdragsperioden er innenfor innsendt periode`() {
-    every { persistenceService.hentOppdragsperiodePaOppdragsIdSomErAktiv(oppdragsperiodeId) } returns listOf(
-      opprettOppdragsperiode(now.minusMonths(3), now.plusMonths(1))
+  fun `skal sende kontering til skatt når oppdragsperioden er innenfor innsendt periode`() {
+    every { persistenceService.hentOppdrag(oppdragsId) } returns opprettOppdragOptionalForPeriode(
+      now.minusMonths(3), now.plusMonths(1)
     )
-    every { persistenceService.hentOppdrag(oppdragsId) } returns opprettOppdragOptional()
+
     every { skattConsumer.sendKontering(any()) } returns ResponseEntity.ok(null)
 
     val restResponse = konteringService.sendKontering(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
@@ -53,11 +53,11 @@ class KonteringServiceTest {
 
   @Test
   @Suppress("NonAsciiCharacters")
-  fun `skal hente oppdragsperiode og sende kontering om perioden kun er for en måned`() {
-    every { persistenceService.hentOppdragsperiodePaOppdragsIdSomErAktiv(oppdragsperiodeId) } returns listOf(
-      opprettOppdragsperiode(now, now.plusMonths(1))
+  fun `skal sende kontering om perioden kun er for en måned`() {
+
+    every { persistenceService.hentOppdrag(oppdragsId) } returns opprettOppdragOptionalForPeriode(
+      now, now.plusMonths(1)
     )
-    every { persistenceService.hentOppdrag(oppdragsId) } returns opprettOppdragOptional()
     every { skattConsumer.sendKontering(any()) } returns ResponseEntity.ok(null)
 
     val restResponse = konteringService.sendKontering(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
@@ -67,9 +67,9 @@ class KonteringServiceTest {
 
   @Test
   @Suppress("NonAsciiCharacters")
-  fun `skal hente oppdragsperiode og ikke sende kontering til skatt når oppdragsperioden er utenfor innsendt periode`() {
-    every { persistenceService.hentOppdragsperiodePaOppdragsIdSomErAktiv(oppdragsperiodeId) } returns listOf(
-      opprettOppdragsperiode(now.minusMonths(3), now.minusMonths(1))
+  fun `skal ikke sende kontering til skatt når oppdragsperioden er utenfor innsendt periode`() {
+    every { persistenceService.hentOppdrag(oppdragsId) } returns opprettOppdragOptionalForPeriode(
+      now.minusMonths(3), now.minusMonths(1)
     )
 
     val restResponse = konteringService.sendKontering(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
@@ -78,10 +78,19 @@ class KonteringServiceTest {
   }
 
   @Test
-  fun `skal hente oppdragsperiode og ikke om det finnes flere aktive perioder`() {
-    every { persistenceService.hentOppdragsperiodePaOppdragsIdSomErAktiv(oppdragsperiodeId) } returns listOf(
-      opprettOppdragsperiode(now.minusMonths(3), now.plusMonths(1)),
-      opprettOppdragsperiode(now.minusMonths(2), now.plusMonths(1))
+  fun `skal ikke sende kontering om det finnes flere aktive perioder`() {
+    every { persistenceService.hentOppdrag(oppdragsId) } returns Optional.of(
+      Oppdrag(
+        oppdragId = oppdragsId,
+        stonadType = StonadType.BIDRAG.toString(),
+        kravhaverIdent = "123456789",
+        skyldnerIdent = "987654321",
+        sakId = 123456,
+        oppdragsperioder = listOf(
+          opprettOppdragsperiode(now.minusMonths(3), now.plusMonths(1)),
+          opprettOppdragsperiode(now.minusMonths(2), now.plusMonths(1))
+        )
+      )
     )
 
     val restResponse = konteringService.sendKontering(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
@@ -89,25 +98,41 @@ class KonteringServiceTest {
     restResponse.statusCode shouldBe HttpStatus.I_AM_A_TEAPOT //TODO: Bedre feilhåndtering
   }
 
-  private fun opprettOppdragOptional() =
-    Optional.of(Oppdrag(oppdragsId, StonadType.BIDRAG.toString(), "123456789", "987654321", 123456, null, null, emptyList()))
+  @Test
+  fun `skal ikke sende kontering om oppdrag ikke finens`() {
+    every { persistenceService.hentOppdrag(oppdragsId) } returns Optional.empty()
 
-  private fun opprettOppdragsperiode(periodeFra: LocalDate, periodeTil: LocalDate) = Oppdragsperiode(
-    oppdragsperiodeId = oppdragsperiodeId,
-    oppdragId = oppdragsId,
-    vedtakId = 123,
-    gjelderIdent = genererPersonnummer(),
-    mottakerIdent = genererPersonnummer(),
-    belop = 7500,
-    valuta = "NOK",
-    periodeFra = periodeFra,
-    periodeTil = periodeTil,
-    vedtaksdato = now,
-    opprettetAv = "MEG",
-    delytelseId = "DelytelsesId",
-    aktiv = true,
-    erstatterPeriode = null,
-    tekst = null,
-    emptyList()
-  )
+    val restResponse = konteringService.sendKontering(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
+
+    restResponse.statusCode shouldBe HttpStatus.NOT_FOUND
+  }
+
+  private fun opprettOppdragOptionalForPeriode(periodeFra: LocalDate, periodeTil: LocalDate): Optional<Oppdrag> {
+    return Optional.of(
+      Oppdrag(
+        oppdragId = oppdragsId,
+        stonadType = StonadType.BIDRAG.toString(),
+        kravhaverIdent = "123456789",
+        skyldnerIdent = "987654321",
+        sakId = 123456,
+        oppdragsperioder = listOf(opprettOppdragsperiode(periodeFra, periodeTil))
+      )
+    )
+  }
+
+  private fun opprettOppdragsperiode(periodeFra: LocalDate, periodeTil: LocalDate): Oppdragsperiode {
+    return Oppdragsperiode(
+      oppdragsperiodeId = oppdragsperiodeId,
+      vedtakId = 123,
+      gjelderIdent = genererPersonnummer(),
+      mottakerIdent = genererPersonnummer(),
+      belop = 7500,
+      valuta = "NOK",
+      periodeFra = periodeFra,
+      periodeTil = periodeTil,
+      vedtaksdato = now,
+      opprettetAv = "MEG",
+      delytelseId = "DelytelsesId"
+    )
+  }
 }

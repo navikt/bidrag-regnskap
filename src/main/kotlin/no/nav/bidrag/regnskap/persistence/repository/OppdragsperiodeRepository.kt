@@ -5,8 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface OppdragsperiodeRepository: JpaRepository<Oppdragsperiode, Int> {
 
-  fun findAllByOppdragId(oppdragId: Int): List<Oppdragsperiode>
-
-  fun findAllByOppdragIdAndAktivIsTrue(oppdragId: Int): List<Oppdragsperiode>
+  fun findAllByOppdragsperiodeId(oppdragsperiodeId: Int): List<Oppdragsperiode>
 
 }

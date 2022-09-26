@@ -15,13 +15,13 @@ data class Oppdrag(
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "oppdrag_id")
-  var oppdragId: Int? = null,
+  val oppdragId: Int? = null,
 
   @Column(name = "stonad_type")
   val stonadType: String,
 
   @Column(name = "kravhaver_ident")
-  val kravhaverIdent: String?,
+  val kravhaverIdent: String? = null,
 
   @Column(name = "skyldner_ident")
   val skyldnerIdent: String,
@@ -30,11 +30,11 @@ data class Oppdrag(
   val sakId: Int,
 
   @Column(name = "referanse")
-  val referanse: String?,
+  val referanse: String? = null,
 
   @Column(name = "utsatt_til_dato")
-  val utsattTilDato: LocalDate?,
+  val utsattTilDato: LocalDate? = null,
 
-  @OneToMany(mappedBy = "oppdragId", cascade = [CascadeType.ALL])
-  val oppdragsperioder: List<Oppdragsperiode>? = null
+  @OneToMany(mappedBy = "oppdrag", cascade = [CascadeType.ALL])
+  var oppdragsperioder: List<Oppdragsperiode>? = null
 )

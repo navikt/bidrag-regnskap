@@ -5,7 +5,6 @@ import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
-import io.mockk.verify
 import no.nav.bidrag.behandling.felles.enums.StonadType
 import no.nav.bidrag.regnskap.dto.OppdragRequest
 import no.nav.bidrag.regnskap.utils.TestDataGenerator.genererPersonnummer
@@ -26,12 +25,9 @@ class OppdragServiceTest {
     val oppdragRequest = opprettOppdragRequest()
 
     every { persistenceService.lagreOppdrag(any()) } returns 1
-    every { persistenceService.lagreOppdragsperiode(any()) } returns 1
-    every { persistenceService.lagreKontering(any()) } returns Unit
 
     val oppdragId = oppdragService.lagreOppdrag(oppdragRequest)
 
-    verify(exactly = 12) { persistenceService.lagreKontering(any()) }
     oppdragId shouldBe 1
   }
 
@@ -41,7 +37,6 @@ class OppdragServiceTest {
       kravhaverIdent = genererPersonnummer(),
       skyldnerIdent = genererPersonnummer(),
       saksId = 123456,
-      referanse = null,
       vedtakId = 654321,
       gjelderIdent = genererPersonnummer(),
       mottakerIdent = genererPersonnummer(),
@@ -51,9 +46,7 @@ class OppdragServiceTest {
       periodeTil = LocalDate.now().plusMonths(6).withDayOfMonth(1),
       vedtaksdato = LocalDate.now(),
       opprettetAv = "SaksbehandlerId",
-      delytelseId = "DelytelsesId",
-      utsattTilDato = null,
-      tekst = null
+      delytelseId = "DelytelsesId"
     )
     return oppdragRequest
   }

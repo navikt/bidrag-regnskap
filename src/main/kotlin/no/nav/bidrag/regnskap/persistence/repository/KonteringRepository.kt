@@ -5,6 +5,4 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface KonteringRepository: JpaRepository<Kontering, Int> {
 
-  fun findAllByOppdragsperiodeId(oppdragsperiodeId: Int): List<Kontering>
-
 }

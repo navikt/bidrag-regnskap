@@ -7,6 +7,8 @@ import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
+import javax.persistence.JoinColumn
+import javax.persistence.ManyToOne
 import javax.persistence.OneToMany
 
 @Entity(name = "oppdragsperioder")
@@ -17,8 +19,9 @@ data class Oppdragsperiode(
   @Column(name = "oppdragsperiode_id")
   val oppdragsperiodeId: Int? = null,
 
-  @Column(name = "oppdrag_id")
-  val oppdragId: Int? = null,
+  @ManyToOne
+  @JoinColumn(name = "oppdrag_id")
+  val oppdrag: Oppdrag? = null,
 
   @Column(name = "vedtak_id")
   val vedtakId: Int,
@@ -57,8 +60,8 @@ data class Oppdragsperiode(
   val erstatterPeriode: Int? = null,
 
   @Column(name = "tekst")
-  val tekst: String?,
+  val tekst: String? = null,
 
-  @OneToMany(mappedBy = "oppdragsperiodeId", cascade = [CascadeType.ALL])
-  val konteringer: List<Kontering>? = null,
+  @OneToMany(mappedBy = "oppdragsperiode", cascade = [CascadeType.ALL])
+  var konteringer: List<Kontering>? = null,
 )
