@@ -12,6 +12,5 @@ CREATE TABLE IF NOT EXISTS konteringer
 
     CONSTRAINT kontering_pkey PRIMARY KEY (kontering_id),
     CONSTRAINT kontering_oppdragsperiode_fkey FOREIGN KEY (oppdragsperiode_id)
-        REFERENCES oppdragsperioder (oppdragsperiode_id) MATCH SIMPLE,
-    UNIQUE (kontering_id, oppdragsperiode_id)
+        REFERENCES oppdragsperioder (oppdragsperiode_id) MATCH SIMPLE
 );

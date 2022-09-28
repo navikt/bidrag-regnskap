@@ -18,6 +18,7 @@ import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import java.util.*
 import java.util.stream.Collectors
 import java.util.stream.Stream
 
@@ -193,10 +194,14 @@ class OppdragService(
       periodeTil = oppdragRequest.periodeTil,
       vedtaksdato = oppdragRequest.vedtaksdato,
       opprettetAv = oppdragRequest.opprettetAv,
-      delytelseId = oppdragRequest.delytelseId,
+      delytelseId = oppdragRequest.delytelseId ?: genererRandomUUID(),
       tekst = oppdragRequest.tekst,
       oppdrag = oppdrag
     )
+  }
+
+  private fun genererRandomUUID(): String {
+    return UUID.randomUUID().toString()
   }
 
   private fun opprettKonteringer(oppdragRequest: OppdragRequest, oppdragsperiode: Oppdragsperiode): List<Kontering> {

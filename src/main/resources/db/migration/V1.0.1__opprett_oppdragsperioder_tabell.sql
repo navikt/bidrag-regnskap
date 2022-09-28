@@ -19,5 +19,5 @@ CREATE TABLE IF NOT EXISTS oppdragsperioder
     CONSTRAINT oppdragsperiode_pkey PRIMARY KEY (oppdragsperiode_id),
     CONSTRAINT oppdragsperiode_oppdrag_fkey FOREIGN KEY (oppdrag_id)
         REFERENCES oppdrag (oppdrag_id) MATCH SIMPLE,
-    UNIQUE (oppdragsperiode_id, oppdrag_id)
+    CONSTRAINT delytelses_id_unique UNIQUE (delytelses_id)
 );

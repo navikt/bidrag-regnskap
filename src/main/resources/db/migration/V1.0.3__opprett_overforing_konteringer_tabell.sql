@@ -9,6 +9,5 @@ CREATE TABLE IF NOT EXISTS overforing_konteringer
 
     CONSTRAINT feil_pkey PRIMARY KEY (overforing_id),
     CONSTRAINT feil_kontering_fkey FOREIGN KEY (kontering_id)
-        REFERENCES konteringer (kontering_id) MATCH SIMPLE,
-    UNIQUE (overforing_id, kontering_id)
+        REFERENCES konteringer (kontering_id) MATCH SIMPLE
 );

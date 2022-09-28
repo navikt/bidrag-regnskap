@@ -118,10 +118,8 @@ data class OppdragRequest(
     description = "Unik referanse til oppdragsperioden i vedtaket angitt som String. " +
         "I bidragssaken kan en oppdragsperiode strekke over flere måneder, og samme referanse blir da benyttet for alle månedene. " +
         "Samme referanse kan ikke benyttes to ganger for samme transaksjonskode i samme måned.",
-    example = "qwerty123456",
-    required = true
-  )
-  val delytelseId: String,
+    example = "qwerty123456")
+  val delytelseId: String?,
 
   @field:Schema(
     description = "Om ønskelig kan saksbehandler velge å utsette sending av faktura for et vedtak. " +
