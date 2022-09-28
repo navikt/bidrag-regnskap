@@ -37,7 +37,7 @@ data class OppdragRequest(
     description = "SaksId for bidragssaken.",
     example = "123456",
     required = true)
-  val saksId: Int,
+  val sakId: Int,
 
   @field:Schema(
     description = "Referanse til gebyr.",

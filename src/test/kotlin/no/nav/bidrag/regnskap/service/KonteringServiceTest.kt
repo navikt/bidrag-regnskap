@@ -85,7 +85,6 @@ class KonteringServiceTest {
         stonadType = StonadType.BIDRAG.toString(),
         kravhaverIdent = "123456789",
         skyldnerIdent = "987654321",
-        sakId = 123456,
         oppdragsperioder = listOf(
           opprettOppdragsperiode(now.minusMonths(3), now.plusMonths(1)),
           opprettOppdragsperiode(now.minusMonths(2), now.plusMonths(1))
@@ -114,7 +113,6 @@ class KonteringServiceTest {
         stonadType = StonadType.BIDRAG.toString(),
         kravhaverIdent = "123456789",
         skyldnerIdent = "987654321",
-        sakId = 123456,
         oppdragsperioder = listOf(opprettOppdragsperiode(periodeFra, periodeTil))
       )
     )
@@ -124,6 +122,7 @@ class KonteringServiceTest {
     return Oppdragsperiode(
       oppdragsperiodeId = oppdragsperiodeId,
       vedtakId = 123,
+      sakId = 123456,
       gjelderIdent = genererPersonnummer(),
       mottakerIdent = genererPersonnummer(),
       belop = 7500,

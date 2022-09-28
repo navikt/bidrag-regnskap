@@ -23,6 +23,9 @@ data class Oppdragsperiode(
   @JoinColumn(name = "oppdrag_id")
   val oppdrag: Oppdrag? = null,
 
+  @Column(name = "sak_id")
+  val sakId: Int,
+
   @Column(name = "vedtak_id")
   val vedtakId: Int,
 
@@ -53,8 +56,8 @@ data class Oppdragsperiode(
   @Column(name = "delytelses_id")
   val delytelseId: String,
 
-  @Column(name = "aktiv")
-  val aktiv: Boolean = true,
+  @Column(name = "aktiv_til")
+  var aktivTil: LocalDate? = null,
 
   @Column(name = "erstatter_periode")
   val erstatterPeriode: Int? = null,
@@ -64,4 +67,8 @@ data class Oppdragsperiode(
 
   @OneToMany(mappedBy = "oppdragsperiode", cascade = [CascadeType.ALL])
   var konteringer: List<Kontering>? = null,
-)
+) {
+  override fun toString(): String {
+    return ""
+  }
+}

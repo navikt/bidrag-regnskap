@@ -1,5 +1,8 @@
 package no.nav.bidrag.regnskap.aop
 
+import no.nav.bidrag.regnskap.SECURE_LOGGER
+import no.nav.bidrag.regnskap.exception.RestFeilResponseException
+import no.nav.bidrag.regnskap.exception.OppdragFinnesAlleredeException
 import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
@@ -33,11 +36,32 @@ class DefaultRestControllerAdvice {
     }
 
     @ResponseBody
+    @ExceptionHandler(RestFeilResponseException::class)
+    fun handleFlereAktivePerioderException(exception: RestFeilResponseException): ResponseEntity<*> {
+        LOGGER.error(exception.message)
+        return ResponseEntity.status(exception.httpStatus).body(exception.message)
+    }
+
+    @ResponseBody
     @ExceptionHandler(NoSuchElementException::class)
     fun handleNoSuchElementException(exception: java.util.NoSuchElementException): ResponseEntity<*> {
         LOGGER.info("Fant ingen gyldig verdi.", exception)
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
             .build<Any>()
+    }
+
+    @ResponseBody
+    @ExceptionHandler(OppdragFinnesAlleredeException::class)
+    fun handleOppdragFinnesAlleredeException(exception: OppdragFinnesAlleredeException): ResponseEntity<*> {
+        LOGGER.info(exception.message + " For mer informasjon se secure logg.")
+        SECURE_LOGGER.info(exception.message + " " +
+            "Oppdrag med stonadType: ${exception.oppdrag.stonadType}, " +
+            "kravhaverIdent: ${exception.oppdrag.kravhaverIdent}, " +
+            "skyldnerIdent: ${exception.oppdrag.skyldnerIdent}, " +
+            "referanse: ${exception.oppdrag.referanse} " +
+            "eksisterer allerede."
+        )
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.message)
     }
 
 }

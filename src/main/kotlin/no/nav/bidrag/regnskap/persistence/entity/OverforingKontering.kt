@@ -29,4 +29,8 @@ data class OverforingKontering(
 
   @Column(name = "kanal")
   val kanal: String?
-)
+) {
+  override fun toString(): String {
+    return ""
+  }
+}

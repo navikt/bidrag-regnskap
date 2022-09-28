@@ -1,5 +1,7 @@
 package no.nav.bidrag.regnskap.service
 
+import no.nav.bidrag.behandling.felles.enums.StonadType
+import no.nav.bidrag.regnskap.SECURE_LOGGER
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
 import no.nav.bidrag.regnskap.persistence.repository.KonteringRepository
@@ -25,9 +27,19 @@ class PersistenceService(
     return oppdragRepository.findById(oppdragId)
   }
 
-  fun hentOppdragsperiodePaOppdragsperiodeId(oppdragsperiodeId: Int): List<Oppdragsperiode> {
-    LOGGER.info("Henter aktive oppdragsperioder på oppdragsID: $oppdragsperiodeId")
-    return oppdragsperiodeRepository.findAllByOppdragsperiodeId(oppdragsperiodeId)
+  fun hentOppdragPaUnikeIdentifikatorer(
+    sakId: Int, stonadType: StonadType, kravhaverIdent: String, skyldnerIdent: String, referanse: String?
+  ): Optional<Oppdrag> {
+    SECURE_LOGGER.info(
+      "Henter oppdrag med stonadType: $stonadType, kravhaverIdent: $kravhaverIdent, skyldnerIdent: $skyldnerIdent, referanse: $referanse"
+    )
+    return oppdragRepository.findByStonadTypeAndKravhaverIdentAndSkyldnerIdentAndReferanse(
+      stonadType.toString(), kravhaverIdent, skyldnerIdent, referanse
+    )
+  }
+
+  fun lagreOppdragsperiode(oppdragsperiode: Oppdragsperiode) {
+    oppdragsperiodeRepository.save(oppdragsperiode)
   }
 
   fun lagreOppdrag(oppdrag: Oppdrag): Int? {

@@ -8,6 +8,7 @@ import no.nav.bidrag.regnskap.dto.OppdragResponse
 import no.nav.bidrag.regnskap.dto.OppdragsperiodeResponse
 import no.nav.bidrag.regnskap.dto.Transaksjonskode
 import no.nav.bidrag.regnskap.dto.Type
+import no.nav.bidrag.regnskap.exception.OppdragFinnesAlleredeException
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
@@ -22,7 +23,7 @@ import java.util.stream.Stream
 
 @Service
 class OppdragService(
-  val persistenceService: PersistenceService
+  val persistenceService: PersistenceService, val konteringService: KonteringService
 ) {
 
   fun hentOppdrag(oppdragId: Int): OppdragResponse {
@@ -33,14 +34,17 @@ class OppdragService(
       stonadType = StonadType.valueOf(oppdrag.stonadType),
       kravhaverIdent = oppdrag.kravhaverIdent,
       skyldnerIdent = oppdrag.skyldnerIdent,
-      saksId = oppdrag.sakId,
       referanse = oppdrag.referanse,
+      sistOversendtePeriode = oppdrag.sistOversendtePeriode,
+      endretTidspunkt = oppdrag.endretTidspunkt,
       oppdragsperioder = hentPerioderMedKonteringer(oppdrag)
     )
   }
 
   @Transactional
   fun lagreOppdrag(oppdragRequest: OppdragRequest): Int {
+    sjekkOmOppdragErOpprettet(oppdragRequest)
+
     val oppdrag = opprettOppdrag(oppdragRequest)
     val oppdragsperiode = opprettOppdragsperiode(oppdragRequest, oppdrag)
     val konteringer = opprettKonteringer(oppdragRequest, oppdragsperiode)
@@ -53,11 +57,73 @@ class OppdragService(
     return oppdragId!!
   }
 
+  @Transactional
+  fun oppdaterOppdrag(oppdragRequest: OppdragRequest): Int {
+    val oppdrag = persistenceService.hentOppdragPaUnikeIdentifikatorer(
+      oppdragRequest.sakId,
+      oppdragRequest.stonadType,
+      oppdragRequest.kravhaverIdent,
+      oppdragRequest.skyldnerIdent,
+      oppdragRequest.referanse
+    ).get()
+
+    //TODO: Håndtere oppdatering av skyldnerIdent/kravhaver
+
+    val oppdragsperiode = opprettOppdragsperiode(oppdragRequest, oppdrag)
+
+    setGamleOppdragsperioderTilInaktiv(oppdrag.oppdragsperioder, oppdragRequest)
+
+    val konteringer = opprettKonteringer(oppdragRequest, oppdragsperiode)
+    val perioderMedOverforteKonteringerListe = finnAllePerioderMedOverforteKontering(oppdrag)
+
+    oppdragsperiode.konteringer = konteringer
+    oppdrag.oppdragsperioder = arrayListOf(oppdragsperiode)
+
+    val oppdragId = persistenceService.lagreOppdrag(oppdrag)!!
+
+    perioderMedOverforteKonteringerListe.forEach { periode ->
+      konteringService.sendKontering(oppdragId, periode)
+    }
+
+    return oppdragId
+  }
+
+  private fun sjekkOmOppdragErOpprettet(oppdragRequest: OppdragRequest) {
+    val oppdragOptional = persistenceService.hentOppdragPaUnikeIdentifikatorer(
+      oppdragRequest.sakId,
+      oppdragRequest.stonadType,
+      oppdragRequest.kravhaverIdent,
+      oppdragRequest.skyldnerIdent,
+      oppdragRequest.referanse
+    )
+
+    if (oppdragOptional.isPresent) {
+      throw OppdragFinnesAlleredeException(
+        "Kombinasjonen av stonadType, kravhaverIdent, skyldnerIdent og referanse viser til et allerede opprettet oppdrag med id: ${oppdragOptional.get().oppdragId}!",
+        oppdragOptional.get())
+    }
+  }
+
+  private fun finnAllePerioderMedOverforteKontering(oppdrag: Oppdrag): List<YearMonth> {
+    val periodeListe = mutableListOf<YearMonth>()
+    oppdrag.oppdragsperioder?.forEach { oppdragsperiode ->
+      oppdragsperiode.konteringer?.forEach { kontering ->
+        if (kontering.overforingstidspunkt != null) periodeListe.add(YearMonth.parse(kontering.overforingsperiode))
+      }
+    }
+    return periodeListe
+  }
+
+  private fun setGamleOppdragsperioderTilInaktiv(oppdragsperioder: List<Oppdragsperiode>?, oppdragRequest: OppdragRequest) {
+    oppdragsperioder?.forEach { oppdragsperiode ->
+      oppdragsperiode.aktivTil = if (oppdragRequest.periodeFra.isBefore(oppdragsperiode.periodeFra)) oppdragsperiode.periodeFra else oppdragRequest.periodeFra
+      persistenceService.lagreOppdragsperiode(oppdragsperiode) }
+  }
+
   private fun opprettOppdrag(oppdragRequest: OppdragRequest) = Oppdrag(
     stonadType = oppdragRequest.stonadType.toString(),
     kravhaverIdent = oppdragRequest.kravhaverIdent,
     skyldnerIdent = oppdragRequest.skyldnerIdent,
-    sakId = oppdragRequest.saksId,
     referanse = oppdragRequest.referanse,
     utsattTilDato = oppdragRequest.utsattTilDato
   )
@@ -70,6 +136,7 @@ class OppdragService(
         OppdragsperiodeResponse(
           oppdragsperiodeId = oppdragsperiode.oppdragsperiodeId,
           oppdragId = oppdragsperiode.oppdrag!!.oppdragId,
+          sakId = oppdragsperiode.sakId,
           vedtakId = oppdragsperiode.vedtakId,
           gjelderIdent = oppdragsperiode.gjelderIdent,
           mottakerIdent = oppdragsperiode.mottakerIdent,
@@ -80,7 +147,7 @@ class OppdragService(
           vedtaksdato = oppdragsperiode.vedtaksdato.toString(),
           opprettetAv = oppdragsperiode.opprettetAv,
           delytelseId = oppdragsperiode.delytelseId,
-          aktiv = oppdragsperiode.aktiv,
+          aktivTil = oppdragsperiode.aktivTil,
           erstatterPeriode = oppdragsperiode.erstatterPeriode,
           konteringer = hentKonteringer(oppdrag)
         )
@@ -114,16 +181,10 @@ class OppdragService(
     return konteringResponser
   }
 
-  private fun hentPerioderForOppdrag(oppdragRequest: OppdragRequest): List<YearMonth> {
-    val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM")
-    return Stream.iterate(oppdragRequest.periodeFra) { date: LocalDate -> date.plusMonths(1) }
-      .limit(ChronoUnit.MONTHS.between(oppdragRequest.periodeFra, oppdragRequest.periodeTil))
-      .map { it.format(outputFormatter) }.map { YearMonth.parse(it) }.collect(Collectors.toList())
-  }
-
   private fun opprettOppdragsperiode(oppdragRequest: OppdragRequest, oppdrag: Oppdrag): Oppdragsperiode {
     return Oppdragsperiode(
       vedtakId = oppdragRequest.vedtakId,
+      sakId = oppdragRequest.sakId,
       gjelderIdent = oppdragRequest.gjelderIdent,
       mottakerIdent = oppdragRequest.mottakerIdent,
       belop = oppdragRequest.belop,
@@ -144,16 +205,24 @@ class OppdragService(
     val konteringsListe = mutableListOf<Kontering>()
 
     perioderForOppdrag.forEachIndexed { index, periode ->
-      konteringsListe.add(Kontering(
-        transaksjonskode = Transaksjonskode.A1.toString(), //TODO: Utlede denne
-        overforingsperiode = periode.toString(),
-        type = if (index == 0) Type.NY.toString() else Type.ENDRING.toString(),
-        justering = null, //TODO: Denne må inn på en eller annen måte
-        gebyrRolle = null, //TODO referanse?,
-        oppdragsperiode = oppdragsperiode
-      )
+      konteringsListe.add(
+        Kontering(
+          transaksjonskode = Transaksjonskode.A1.toString(), //TODO: Utlede denne
+          overforingsperiode = periode.toString(),
+          type = if (index == 0) Type.NY.toString() else Type.ENDRING.toString(),
+          justering = null, //TODO: Denne må inn på en eller annen måte
+          gebyrRolle = null, //TODO referanse?,
+          oppdragsperiode = oppdragsperiode
+        )
       )
     }
     return konteringsListe
+  }
+
+  private fun hentPerioderForOppdrag(oppdragRequest: OppdragRequest): List<YearMonth> {
+    val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM")
+    return Stream.iterate(oppdragRequest.periodeFra) { date: LocalDate -> date.plusMonths(1) }
+      .limit(ChronoUnit.MONTHS.between(oppdragRequest.periodeFra, oppdragRequest.periodeTil))
+      .map { it.format(outputFormatter) }.map { YearMonth.parse(it) }.collect(Collectors.toList())
   }
 }

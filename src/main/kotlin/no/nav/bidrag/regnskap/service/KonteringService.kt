@@ -6,6 +6,7 @@ import no.nav.bidrag.regnskap.dto.SkattKonteringerRequest
 import no.nav.bidrag.regnskap.dto.SkattKonteringerResponse
 import no.nav.bidrag.regnskap.dto.Transaksjonskode
 import no.nav.bidrag.regnskap.dto.Type
+import no.nav.bidrag.regnskap.exception.RestFeilResponseException
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
 import org.slf4j.LoggerFactory
@@ -27,21 +28,18 @@ class KonteringService(
 
     val oppdrag = persistenceService.hentOppdrag(oppdragId)
 
-    if (oppdrag.isEmpty) {
-      return ResponseEntity(HttpStatus.NOT_FOUND)
-    }
-
     val oppdragsPeriodeListe = hentOppdragsperioderForPeriode(oppdrag.get(), periode)
 
     when {
       oppdragsPeriodeListe.size > 1 -> {
-        LOGGER.error("Fant flere enn 1 aktiv periode for oppdrag: $oppdragId! Noe har gått galt..")
-        return ResponseEntity(HttpStatus.I_AM_A_TEAPOT) //TODO: Bedre feilhåndtering
+        throw RestFeilResponseException(
+          "Fant flere enn 1 aktiv periode for oppdrag: $oppdragId",
+          HttpStatus.INTERNAL_SERVER_ERROR
+        )
       }
 
       oppdragsPeriodeListe.isEmpty() -> {
-        LOGGER.info("Fant ingen aktive perioder for oppdrag: $oppdragId.")
-        return ResponseEntity(HttpStatus.NO_CONTENT)
+        throw RestFeilResponseException("Fant ingen aktive perioder for oppdrag: $oppdragId", HttpStatus.NO_CONTENT)
       }
     }
 
@@ -51,7 +49,8 @@ class KonteringService(
   }
 
   private fun opprettSkattKonteringerRequest(
-    oppdrag: Oppdrag, oppdragsperiode: Oppdragsperiode, periode: YearMonth): SkattKonteringerRequest {
+    oppdrag: Oppdrag, oppdragsperiode: Oppdragsperiode, periode: YearMonth
+  ): SkattKonteringerRequest {
 
     val skattKonteringerRequest = SkattKonteringerRequest(
       listOf(
@@ -81,10 +80,12 @@ class KonteringService(
   }
 
   private fun hentOppdragsperioderForPeriode(oppdrag: Oppdrag, periode: YearMonth): List<Oppdragsperiode> {
-    val oppdragsperiodeListe = oppdrag.oppdragsperioder!!.filter { oppdragsperiode -> oppdragsperiode.aktiv }
+    val oppdragsperiodeListe = oppdrag.oppdragsperioder!!.filter { oppdragsperiode ->
+      oppdragsperiode.aktivTil?.isBefore(LocalDate.of(periode.year, periode.month, 1)) ?: false
+    }
 
     return oppdragsperiodeListe.filter {
-      YearMonth.from(it.periodeFra).minusMonths(1).isBefore(periode) &&
-          YearMonth.from(it.periodeTil).isAfter(periode) }
+      YearMonth.from(it.periodeFra).minusMonths(1).isBefore(periode) && YearMonth.from(it.periodeTil).isAfter(periode)
+    }
   }
 }

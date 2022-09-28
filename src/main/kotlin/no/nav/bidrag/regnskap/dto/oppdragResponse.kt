@@ -2,6 +2,8 @@ package no.nav.bidrag.regnskap.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
 import no.nav.bidrag.behandling.felles.enums.StonadType
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Schema(
   name = "OppdragResponse",
@@ -36,16 +38,23 @@ data class OppdragResponse(
   val skyldnerIdent: String,
 
   @field:Schema(
-    description = "SaksId for bidragssaken.",
-    example = "123456"
-    )
-  val saksId: Int,
-
-  @field:Schema(
     description = "Referanse til gebyr.",
     example = "ABC123"
     )
   val referanse: String?,
+
+  @field:Schema(
+    description = "Sist overførte periode for kontering knyttet til oppdraget.",
+    example = "2022-01"
+  )
+  val sistOversendtePeriode: String?,
+
+  @field:Schema(
+    description = "Sist endret tidspunkt for oppdraget.",
+    type = "datetime",
+    example = "2022-01-01 00:00:00"
+  )
+  val endretTidspunkt: LocalDateTime?,
 
   @field:Schema(
     description = "Liste over alle oppdragsperioder til oppdraget.")
@@ -71,6 +80,12 @@ data class OppdragsperiodeResponse(
     example = "10"
     )
   val oppdragId: Int?,
+
+  @field:Schema(
+    description = "SakId for bidragssaken.",
+    example = "123456"
+  )
+  val sakId: Int,
 
   @field:Schema(
     description = "VedtaksId for vedtaket oppdraget gjelder for.",
@@ -140,10 +155,10 @@ data class OppdragsperiodeResponse(
   val delytelseId: String,
 
   @field:Schema(
-    description = "Felt for å se om oppdragsperioden er aktiv eller erstattet av en annen oppdragsperiode.",
-    example = "true"
+    description = "Felt for å se om oppdragsperioden er aktiv og da hvilken dato den er aktiv til.",
+    example = "2022-01-01"
     )
-  val aktiv: Boolean,
+  val aktivTil: LocalDate?,
 
   @field:Schema(
     description = "Om oppdragsperioden erstatter en gammel oppdragsperiode skal id til gamle oppdragsperioden settes her.",
