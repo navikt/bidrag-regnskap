@@ -8,8 +8,14 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.springframework.format.annotation.DateTimeFormat
 import java.time.YearMonth
 
-@Schema(name = "SkattKonteringerResponse", description = "Lister feil i et krav.")
-data class SkattKonteringerResponse(
+
+@Schema(name = "SkattVellykketKontering", description = "Svar ved en velykket overføring av kontering til skatt.")
+data class SkattVellykketKonteringResponse(
+  val batchUid: String
+)
+
+@Schema(name = "SkattFeiletKonteringerResponse", description = "Lister feil i et krav.")
+data class SkattFeiletKonteringerResponse(
   val konteringsfeil: List<Konteringsfeil>
 )
 

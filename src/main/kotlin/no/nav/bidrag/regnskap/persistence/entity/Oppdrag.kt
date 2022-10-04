@@ -34,10 +34,10 @@ data class Oppdrag(
   val utsattTilDato: LocalDate? = null,
 
   @Column(name = "sist_oversendte_periode")
-  val sistOversendtePeriode: String? = null,
+  var sistOversendtePeriode: String? = null,
 
   @Column(name = "endret_tidspunkt")
-  val endretTidspunkt: LocalDateTime? = null,
+  var endretTidspunkt: LocalDateTime? = null,
 
   @OneToMany(mappedBy = "oppdrag", cascade = [CascadeType.ALL])
   var oppdragsperioder: List<Oppdragsperiode>? = null

@@ -6,6 +6,8 @@ import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
+import javax.persistence.JoinColumn
+import javax.persistence.ManyToOne
 
 @Entity(name = "overforing_konteringer")
 data class OverforingKontering(
@@ -13,22 +15,23 @@ data class OverforingKontering(
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "overforing_id")
-  val overforingId: Int,
+  val overforingId: Int? = null,
 
-  @Column(name = "kontering_id")
-  val konteringId: Int,
+  @ManyToOne
+  @JoinColumn(name = "kontering_id")
+  val kontering: Kontering? = null,
 
   @Column(name = "referansekode")
-  val referansekode: String,
+  val referansekode: String? = null,
 
   @Column(name = "feilmelding")
-  val feilmelding: String,
+  val feilmelding: String? = null,
 
   @Column(name = "tidspunkt")
   val tidspunkt: LocalDateTime,
 
   @Column(name = "kanal")
-  val kanal: String?
+  val kanal: String
 ) {
   override fun toString(): String {
     return ""

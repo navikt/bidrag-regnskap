@@ -1,91 +1,91 @@
 package no.nav.bidrag.regnskap.service
 
-import no.nav.bidrag.regnskap.consumer.SkattConsumer
-import no.nav.bidrag.regnskap.dto.SkattKontering
-import no.nav.bidrag.regnskap.dto.SkattKonteringerRequest
-import no.nav.bidrag.regnskap.dto.SkattKonteringerResponse
+import no.nav.bidrag.regnskap.dto.Justering
+import no.nav.bidrag.regnskap.dto.KonteringResponse
 import no.nav.bidrag.regnskap.dto.Transaksjonskode
 import no.nav.bidrag.regnskap.dto.Type
-import no.nav.bidrag.regnskap.exception.RestFeilResponseException
+import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
-import org.slf4j.LoggerFactory
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 import java.time.YearMonth
 
-private val LOGGER = LoggerFactory.getLogger(KonteringService::class.java)
-
 @Service
-class KonteringService(
-  val skattConsumer: SkattConsumer, val persistenceService: PersistenceService
-) {
+class KonteringService {
 
-  fun sendKontering(oppdragId: Int, periode: YearMonth): ResponseEntity<SkattKonteringerResponse> {
-    LOGGER.info("Starter overføring av kontering til skatt..")
+  fun hentKonteringer(oppdrag: Oppdrag): List<KonteringResponse> {
+    val konteringResponser = mutableListOf<KonteringResponse>()
 
-    val oppdrag = persistenceService.hentOppdrag(oppdragId)
-
-    val oppdragsPeriodeListe = hentOppdragsperioderForPeriode(oppdrag.get(), periode)
-
-    when {
-      oppdragsPeriodeListe.size > 1 -> {
-        throw RestFeilResponseException(
-          "Fant flere enn 1 aktiv periode for oppdrag: $oppdragId",
-          HttpStatus.INTERNAL_SERVER_ERROR
+    oppdrag.oppdragsperioder?.forEach { oppdragsperiode ->
+      oppdragsperiode.konteringer?.forEach { kontering ->
+        konteringResponser.add(
+          KonteringResponse(
+            konteringId = kontering.konteringId,
+            oppdragsperiodeId = kontering.oppdragsperiode?.oppdragsperiodeId,
+            transaksjonskode = Transaksjonskode.valueOf(kontering.transaksjonskode),
+            overforingsperiode = kontering.overforingsperiode,
+            overforingstidspunkt = kontering.overforingstidspunkt.toString(),
+            type = Type.valueOf(kontering.type),
+            justering = kontering.justering?.let { Justering.valueOf(kontering.justering) },
+            gebyrRolle = kontering.gebyrRolle,
+            sendtIPalopsfil = kontering.sendtIPalopsfil
+          )
         )
-      }
-
-      oppdragsPeriodeListe.isEmpty() -> {
-        throw RestFeilResponseException("Fant ingen aktive perioder for oppdrag: $oppdragId", HttpStatus.NO_CONTENT)
       }
     }
 
-    val skattKonteringerRequest = opprettSkattKonteringerRequest(oppdrag.get(), oppdragsPeriodeListe.first(), periode)
-
-    return skattConsumer.sendKontering(skattKonteringerRequest)
+    return konteringResponser
   }
 
-  private fun opprettSkattKonteringerRequest(
-    oppdrag: Oppdrag, oppdragsperiode: Oppdragsperiode, periode: YearMonth
-  ): SkattKonteringerRequest {
+  fun opprettNyeKonteringer(
+    nyePerioderForOppdrag: List<YearMonth>, oppdragsperiode: Oppdragsperiode, oppdatering: Boolean = false
+  ): List<Kontering> {
+    val konteringsListe = mutableListOf<Kontering>()
 
-    val skattKonteringerRequest = SkattKonteringerRequest(
-      listOf(
-        SkattKontering(
-          transaksjonskode = Transaksjonskode.A1, //TODO
-          type = Type.NY, //TODO
-          justering = null, //TODO
-          gebyrRolle = null, //TODO
-          gjelderIdent = oppdragsperiode.gjelderIdent,
-          kravhaverIdent = oppdrag.kravhaverIdent,
-          mottakerIdent = oppdragsperiode.mottakerIdent,
-          skyldnerIdent = oppdrag.skyldnerIdent,
-          belop = oppdragsperiode.belop,
-          valuta = oppdragsperiode.valuta,
-          periode = periode,
-          vedtaksdato = oppdragsperiode.vedtaksdato,
-          kjoredato = LocalDate.now(),
-          saksbehandlerId = oppdragsperiode.opprettetAv,
-          attestantId = oppdragsperiode.opprettetAv,
-          tekst = oppdragsperiode.tekst,
-          fagsystemId = "Bidrag-regnskap", //TODO
-          delytelsesId = oppdragsperiode.delytelseId
+    nyePerioderForOppdrag.forEachIndexed { index, periode ->
+      konteringsListe.add(
+        Kontering(
+          transaksjonskode = Transaksjonskode.A1.toString(), //TODO: Utlede denne
+          overforingsperiode = periode.toString(),
+          type = if (index == 0 && !oppdatering) Type.NY.toString() else Type.ENDRING.toString(),
+          justering = null, //TODO: Denne må inn på en eller annen måte
+          gebyrRolle = null, //TODO referanse?,
+          oppdragsperiode = oppdragsperiode
         )
       )
-    )
-    return skattKonteringerRequest
+    }
+    return konteringsListe
   }
 
-  private fun hentOppdragsperioderForPeriode(oppdrag: Oppdrag, periode: YearMonth): List<Oppdragsperiode> {
-    val oppdragsperiodeListe = oppdrag.oppdragsperioder!!.filter { oppdragsperiode ->
-      oppdragsperiode.aktivTil?.isBefore(LocalDate.of(periode.year, periode.month, 1)) ?: false
+  fun opprettErstattendeKonteringer(
+    overforteKonteringerListe: List<Kontering>, nyePerioderForOppdrag: List<YearMonth>
+  ): List<Kontering> {
+    val nyeErstattendeKonteringer = mutableListOf<Kontering>()
+    overforteKonteringerListe.forEach { kontering ->
+      if (nyePerioderForOppdrag.contains(YearMonth.parse(kontering.overforingsperiode))
+        && Transaksjonskode.valueOf(kontering.transaksjonskode).korreksjonskode != null) {
+        nyeErstattendeKonteringer.add(
+          Kontering(
+            oppdragsperiode = kontering.oppdragsperiode,
+            overforingsperiode = kontering.overforingsperiode,
+            transaksjonskode = Transaksjonskode.valueOf(kontering.transaksjonskode).korreksjonskode!!,
+            type = Type.ENDRING.toString(),
+            justering = kontering.justering,
+            gebyrRolle = kontering.gebyrRolle
+          )
+        )
+      }
     }
+    return nyeErstattendeKonteringer
+  }
 
-    return oppdragsperiodeListe.filter {
-      YearMonth.from(it.periodeFra).minusMonths(1).isBefore(periode) && YearMonth.from(it.periodeTil).isAfter(periode)
+  fun finnAlleOverforteKontering(oppdrag: Oppdrag): List<Kontering> {
+    val periodeListe = mutableListOf<Kontering>()
+    oppdrag.oppdragsperioder?.forEach { oppdragsperiode ->
+      oppdragsperiode.konteringer?.forEach { kontering ->
+        if (kontering.overforingstidspunkt != null) periodeListe.add(kontering)
+      }
     }
+    return periodeListe
   }
 }

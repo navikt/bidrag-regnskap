@@ -1,8 +1,5 @@
 package no.nav.bidrag.regnskap.aop
 
-import no.nav.bidrag.regnskap.SECURE_LOGGER
-import no.nav.bidrag.regnskap.exception.RestFeilResponseException
-import no.nav.bidrag.regnskap.exception.OppdragFinnesAlleredeException
 import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
@@ -11,6 +8,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.client.HttpStatusCodeException
 
 @RestControllerAdvice
 class DefaultRestControllerAdvice {
@@ -36,10 +34,10 @@ class DefaultRestControllerAdvice {
     }
 
     @ResponseBody
-    @ExceptionHandler(RestFeilResponseException::class)
-    fun handleFlereAktivePerioderException(exception: RestFeilResponseException): ResponseEntity<*> {
+    @ExceptionHandler(HttpStatusCodeException::class)
+    fun handleFlereAktivePerioderException(exception: HttpStatusCodeException): ResponseEntity<*> {
         LOGGER.error(exception.message)
-        return ResponseEntity.status(exception.httpStatus).body(exception.message)
+        return ResponseEntity.status(exception.statusCode).body(exception.message)
     }
 
     @ResponseBody
@@ -48,20 +46,6 @@ class DefaultRestControllerAdvice {
         LOGGER.info("Fant ingen gyldig verdi.", exception)
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
             .build<Any>()
-    }
-
-    @ResponseBody
-    @ExceptionHandler(OppdragFinnesAlleredeException::class)
-    fun handleOppdragFinnesAlleredeException(exception: OppdragFinnesAlleredeException): ResponseEntity<*> {
-        LOGGER.info(exception.message + " For mer informasjon se secure logg.")
-        SECURE_LOGGER.info(exception.message + " " +
-            "Oppdrag med stonadType: ${exception.oppdrag.stonadType}, " +
-            "kravhaverIdent: ${exception.oppdrag.kravhaverIdent}, " +
-            "skyldnerIdent: ${exception.oppdrag.skyldnerIdent}, " +
-            "referanse: ${exception.oppdrag.referanse} " +
-            "eksisterer allerede."
-        )
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.message)
     }
 
 }

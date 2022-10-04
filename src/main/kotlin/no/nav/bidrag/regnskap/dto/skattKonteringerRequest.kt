@@ -178,25 +178,26 @@ data class SkattKontering(
   ) val delytelsesId: String
 )
 
-enum class Transaksjonskode(beskrivelse: String, korreksjonskode: Boolean) {
-  A1("Bidragsforskudd", false),
-  A3("Bidragsforskudd", true),
-  B1("Underholdsbidrag (m/u tilleggsbidrag)", false),
-  B3("Underholdsbidrag (m/u tilleggsbidrag)", true),
-  D1("18årsbidrag", false),
-  D3("18årsbidrag", true),
-  E1("Bidrag til særlige utgifter (særtilskudd)", false),
-  E3("Bidrag til særlige utgifter (særtilskudd)", true),
-  F1("Ektefellebidrag", false),
-  F3("Ektefellebidrag", true),
-  G1("Gebyr", false),
-  G3("Gebyr", true),
-  H1("Tilbakekreving", false),
-  H3("Tilbakekreving", true),
-  I1("Motregning", false),
-  K1("Ettergivelse", false),
-  K2("Direkte oppgjør (innbetalt beløp)", false),
-  K3("Tilbakekreving ettergivelse", false),
+enum class Transaksjonskode(val beskrivelse: String, val korreksjonskode: String?) {
+  A1("Bidragsforskudd", "A3"),
+  A3("Bidragsforskudd", null),
+  B1("Underholdsbidrag (m/u tilleggsbidrag)", "B3"),
+  B3("Underholdsbidrag (m/u tilleggsbidrag)", null),
+  D1("18årsbidrag", "D3"),
+  D3("18årsbidrag", null),
+  E1("Bidrag til særlige utgifter (særtilskudd)", "E3"),
+  E3("Bidrag til særlige utgifter (særtilskudd)", null),
+  F1("Ektefellebidrag", "F3"),
+  F3("Ektefellebidrag", null),
+  G1("Gebyr", "G3"),
+  G3("Gebyr", null),
+  H1("Tilbakekreving", "H3"),
+  H3("Tilbakekreving", null),
+  I1("Motregning", null),
+  K1("Ettergivelse", null),
+  K2("Direkte oppgjør (innbetalt beløp)", null),
+  K3("Tilbakekreving ettergivelse", null);
+
 }
 
 @Schema(description = "Konteringstypen er NY for nye konteringer for en stønad i en periode. " +

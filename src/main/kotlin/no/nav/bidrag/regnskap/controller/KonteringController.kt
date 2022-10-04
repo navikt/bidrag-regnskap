@@ -10,8 +10,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import no.nav.bidrag.regnskap.dto.KRAV_BESKRIVELSE
-import no.nav.bidrag.regnskap.dto.SkattKonteringerResponse
-import no.nav.bidrag.regnskap.service.KonteringService
+import no.nav.bidrag.regnskap.dto.SkattFeiletKonteringerResponse
+import no.nav.bidrag.regnskap.dto.SkattVellykketKonteringResponse
+import no.nav.bidrag.regnskap.service.OverforingTilSkattService
 import no.nav.security.token.support.core.api.Protected
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -22,7 +23,7 @@ import java.time.YearMonth
 @RestController
 @Protected
 class KonteringController(
-  var konteringService: KonteringService
+  var overforingTilSkattService: OverforingTilSkattService
 ) {
 
   @PostMapping("/sendKonteringTilSkatt")
@@ -32,10 +33,21 @@ class KonteringController(
   @ApiResponses(
     value = [ApiResponse(
       responseCode = "200",
-      description = "Alle konteringene i kravet er oppdatert OK. Responsen har tom body.\n\n" +
+      description = "Alle konteringene i kravet er oppdatert OK. " +
+          "Responsen inneholder BatchUid som er en referanse til batch kjøringen hos ELIN.\n\n" +
           "Det forventes også responskode 200 dersom kravet (og dermed konteringene) er overført tidligere. " +
           "Det forventes da at kravet ignoreres slik at ikke konteringene posteres dobbelt.",
-      content = [Content()]
+      content = [Content(
+        mediaType = "application/json",
+        array = ArraySchema(schema = Schema(implementation = SkattVellykketKonteringResponse::class))
+      )]
+    ), ApiResponse(
+      responseCode = "204",
+      description = "Dersom alle konteringer i kravet allerede er overført.",
+      content = [Content(
+        mediaType = "application/json",
+        array = ArraySchema(schema = Schema(implementation = String::class))
+      )]
     ), ApiResponse(
       responseCode = "400",
       description = "Dersom én av konteringene ikke går gjennom validering forkastes alle konteringene i kravet " +
@@ -43,7 +55,7 @@ class KonteringController(
           "Det er ingen garanti for at konteringer som ikke kommer med på listen over feilede konteringer er feilfrie.",
       content = [Content(
         mediaType = "application/json",
-        array = ArraySchema(schema = Schema(implementation = SkattKonteringerResponse::class))
+        array = ArraySchema(schema = Schema(implementation = SkattFeiletKonteringerResponse::class))
       )]
     ), ApiResponse(
       responseCode = "401",
@@ -66,8 +78,8 @@ class KonteringController(
       example = "2022-01"
     )]
   )
-  fun sendKonteringer(@RequestParam oppdragId: Int, @RequestParam periode: YearMonth): ResponseEntity<SkattKonteringerResponse> {
-    return konteringService.sendKontering(oppdragId, periode)
+  fun sendKonteringer(@RequestParam oppdragId: Int, @RequestParam periode: YearMonth): ResponseEntity<*> { //    val overforingTilSkattResponse: SkattVellykketKonteringResponse
+    return overforingTilSkattService.sendKontering(oppdragId, periode)
   }
 }
 

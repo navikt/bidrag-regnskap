@@ -4,24 +4,13 @@ import StubUtils
 import com.github.tomakehurst.wiremock.client.WireMock
 import no.nav.bidrag.commons.web.test.HttpHeaderTestRestTemplate
 import no.nav.bidrag.regnskap.BidragRegnskapLocal
-import no.nav.bidrag.regnskap.dto.KonteringId
-import no.nav.bidrag.regnskap.dto.Konteringsfeil
-import no.nav.bidrag.regnskap.dto.SkattKonteringerRequest
-import no.nav.bidrag.regnskap.dto.SkattKonteringerResponse
-import no.nav.bidrag.regnskap.dto.Transaksjonskode
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
-import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpMethod
-import org.springframework.http.HttpStatus
 import org.springframework.test.context.ActiveProfiles
-import java.time.YearMonth
 
 @ActiveProfiles("test")
 @SpringBootTest(
