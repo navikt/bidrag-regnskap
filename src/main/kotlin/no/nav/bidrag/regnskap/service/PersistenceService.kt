@@ -5,11 +5,14 @@ import no.nav.bidrag.regnskap.SECURE_LOGGER
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
 import no.nav.bidrag.regnskap.persistence.entity.OverforingKontering
+import no.nav.bidrag.regnskap.persistence.entity.Palop
 import no.nav.bidrag.regnskap.persistence.repository.OppdragRepository
 import no.nav.bidrag.regnskap.persistence.repository.OppdragsperiodeRepository
 import no.nav.bidrag.regnskap.persistence.repository.OverforingKonteringRepository
+import no.nav.bidrag.regnskap.persistence.repository.PalopRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.time.YearMonth
 import java.util.*
 
 private val LOGGER = LoggerFactory.getLogger(PersistenceService::class.java)
@@ -18,7 +21,8 @@ private val LOGGER = LoggerFactory.getLogger(PersistenceService::class.java)
 class PersistenceService(
   val oppdragRepository: OppdragRepository,
   val oppdragsperiodeRepository: OppdragsperiodeRepository,
-  val overforingKonteringRepository: OverforingKonteringRepository
+  val overforingKonteringRepository: OverforingKonteringRepository,
+  val palopRepository: PalopRepository
 ) {
 
   fun hentOppdrag(oppdragId: Int): Optional<Oppdrag> {
@@ -51,5 +55,19 @@ class PersistenceService(
     val lagretOverforingKontering = overforingKonteringRepository.save(overforingKontering)
     LOGGER.info("Lagret overforingKontering med ID: ${lagretOverforingKontering.overforingId}")
     return lagretOverforingKontering.overforingId
+  }
+
+  fun hentPalop(): List<Palop> {
+    return palopRepository.findAll()
+  }
+
+  fun lagrePalop(palop: Palop): Int? {
+    val lagretPalop = palopRepository.save(palop)
+    LOGGER.info("Lagret påløp med ID: ${lagretPalop.palopId}")
+    return lagretPalop.palopId
+  }
+
+  fun finnSisteOverfortePeriode(): YearMonth {
+    return YearMonth.parse(palopRepository.finnMax())
   }
 }

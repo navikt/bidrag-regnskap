@@ -45,7 +45,7 @@ data class Oppdragsperiode(
   val periodeFra: LocalDate,
 
   @Column(name = "periode_til")
-  val periodeTil: LocalDate,
+  val periodeTil: LocalDate?,
 
   @Column(name = "vedtaksdato")
   val vedtaksdato: LocalDate,

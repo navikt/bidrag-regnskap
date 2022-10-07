@@ -130,7 +130,7 @@ class OppdragServiceTest {
         )
       } returns Optional.of(oppdrag)
       every {
-        oppdragsperiodeService.setGamleOppdragsperiodeTilInaktivOgOpprettNyOppdragsperiode(
+        oppdragsperiodeService.setAktivTilDatoPaOppdragsperiodeOgOpprettNyOppdragsperiode(
           any(),
           any()
         )

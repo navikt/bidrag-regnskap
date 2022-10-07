@@ -5,9 +5,9 @@ import no.nav.bidrag.regnskap.SECURE_LOGGER
 import no.nav.bidrag.regnskap.consumer.SkattConsumer
 import no.nav.bidrag.regnskap.dto.GebyrRolle
 import no.nav.bidrag.regnskap.dto.Justering
+import no.nav.bidrag.regnskap.dto.SkattFeiletKonteringerResponse
 import no.nav.bidrag.regnskap.dto.SkattKontering
 import no.nav.bidrag.regnskap.dto.SkattKonteringerRequest
-import no.nav.bidrag.regnskap.dto.SkattFeiletKonteringerResponse
 import no.nav.bidrag.regnskap.dto.SkattVellykketKonteringResponse
 import no.nav.bidrag.regnskap.dto.Transaksjonskode
 import no.nav.bidrag.regnskap.dto.Type
@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
-import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.HttpServerErrorException
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -38,15 +37,17 @@ class OverforingTilSkattService(
     LOGGER.info("Starter overføring av kontering til skatt..")
 
     val oppdrag = persistenceService.hentOppdrag(oppdragId).get()
-    val oppdragsperiode = hentOgValiderOppdragsperiode(oppdrag, periode, oppdragId)
+    val oppdragsperioderMedUsendteKonteringer = hentOppdragsperioderMedUsendteKonteringer(oppdrag)
 
-    val skattKonteringerListe = opprettSkattKonteringerRequest(oppdragsperiode, periode)
-    val alleIkkeOverforteKonteringer = finnAlleIkkeOverforteKonteringer(oppdragsperiode)
-
-    if (alleIkkeOverforteKonteringer.isEmpty()) {
+    if (oppdragsperioderMedUsendteKonteringer.isEmpty()) {
       LOGGER.info("Alle konteringer er allerede overført for oppdrag $oppdragId i periode $periode")
-      return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Alle konteringer er allerede overført for oppdrag $oppdragId i periode $periode")
+      return ResponseEntity.status(HttpStatus.NO_CONTENT)
+        .body("Alle konteringer er allerede overført for oppdrag $oppdragId i periode $periode")
     }
+
+    val alleIkkeOverforteKonteringer = finnAlleIkkeOverforteKonteringer(oppdragsperioderMedUsendteKonteringer)
+    val skattKonteringerListe = opprettSkattKonteringerRequest(alleIkkeOverforteKonteringer, periode)
+
 
     val skattResponse = skattConsumer.sendKontering(SkattKonteringerRequest(skattKonteringerListe))
 
@@ -57,7 +58,9 @@ class OverforingTilSkattService(
 
         val skattVellykketKonteringResponse =
           objectMapper.readValue(skattResponse.body, SkattVellykketKonteringResponse::class.java)
-        lagreVellykketOverforingAvKonteringer(alleIkkeOverforteKonteringer, skattVellykketKonteringResponse, oppdrag, periode)
+        lagreVellykketOverforingAvKonteringer(
+          alleIkkeOverforteKonteringer, skattVellykketKonteringResponse, oppdrag, periode
+        )
         return ResponseEntity.ok(skattVellykketKonteringResponse)
       }
 
@@ -91,27 +94,6 @@ class OverforingTilSkattService(
     }
   }
 
-  private fun hentOgValiderOppdragsperiode(
-    oppdrag: Oppdrag, periode: YearMonth, oppdragId: Int
-  ): Oppdragsperiode {
-    val oppdragsPeriodeListe = hentOppdragsperioderForPeriode(oppdrag, periode)
-
-    when {
-      oppdragsPeriodeListe.size > 1 -> {
-        throw HttpServerErrorException(
-          HttpStatus.INTERNAL_SERVER_ERROR, "Fant flere enn 1 aktiv periode for oppdrag: $oppdragId"
-        )
-      }
-
-      oppdragsPeriodeListe.isEmpty() -> {
-        throw HttpClientErrorException(
-          HttpStatus.NOT_FOUND, "Fant ingen aktive perioder for oppdrag: $oppdragId"
-        )
-      }
-    }
-    return oppdragsPeriodeListe.first()
-  }
-
   private fun lagreVellykketOverforingAvKonteringer(
     alleIkkeOverforteKonteringer: List<Kontering>,
     skattVellykketKonteringResponse: SkattVellykketKonteringResponse,
@@ -141,7 +123,10 @@ class OverforingTilSkattService(
     alleIkkeOverforteKonteringer.forEach { kontering ->
       persistenceService.lagreOverforingKontering(
         opprettOverforingKontering(
-          kontering = kontering, tidspunkt = LocalDateTime.now(), feilmelding = skattFeiletKonteringerResponse, kanal = "REST"
+          kontering = kontering,
+          tidspunkt = LocalDateTime.now(),
+          feilmelding = skattFeiletKonteringerResponse,
+          kanal = "REST"
         )
       )
     }
@@ -164,47 +149,64 @@ class OverforingTilSkattService(
   }
 
   private fun opprettSkattKonteringerRequest(
-    oppdragsperiode: Oppdragsperiode, periode: YearMonth
+    konteringerListe: List<Kontering>, periode: YearMonth
   ): List<SkattKontering> {
     val skattKonteringerListe = mutableListOf<SkattKontering>()
-    finnAlleIkkeOverforteKonteringer(oppdragsperiode).forEach { kontering ->
+    konteringerListe.forEach { kontering ->
       skattKonteringerListe.add(
         SkattKontering(
           transaksjonskode = Transaksjonskode.valueOf(kontering.transaksjonskode),
           type = Type.valueOf(kontering.type),
           justering = kontering.justering?.let { Justering.valueOf(kontering.justering) },
           gebyrRolle = kontering.gebyrRolle?.let { GebyrRolle.valueOf(kontering.gebyrRolle) },
-          gjelderIdent = oppdragsperiode.gjelderIdent,
-          kravhaverIdent = oppdragsperiode.oppdrag!!.kravhaverIdent,
-          mottakerIdent = oppdragsperiode.mottakerIdent,
-          skyldnerIdent = oppdragsperiode.oppdrag.skyldnerIdent,
-          belop = oppdragsperiode.belop,
-          valuta = oppdragsperiode.valuta,
+          gjelderIdent = kontering.oppdragsperiode!!.gjelderIdent,
+          kravhaverIdent = kontering.oppdragsperiode.oppdrag!!.kravhaverIdent,
+          mottakerIdent = kontering.oppdragsperiode.mottakerIdent,
+          skyldnerIdent = kontering.oppdragsperiode.oppdrag.skyldnerIdent,
+          belop = kontering.oppdragsperiode.belop,
+          valuta = kontering.oppdragsperiode.valuta,
           periode = periode,
-          vedtaksdato = oppdragsperiode.vedtaksdato,
+          vedtaksdato = kontering.oppdragsperiode.vedtaksdato,
           kjoredato = LocalDate.now(),
-          saksbehandlerId = oppdragsperiode.opprettetAv,
-          attestantId = oppdragsperiode.opprettetAv,
-          tekst = oppdragsperiode.tekst,
+          saksbehandlerId = kontering.oppdragsperiode.opprettetAv,
+          attestantId = kontering.oppdragsperiode.opprettetAv,
+          tekst = kontering.oppdragsperiode.tekst,
           fagsystemId = "Bidrag-regnskap", //TODO hvordan finne denne?
-          delytelsesId = oppdragsperiode.delytelseId
+          delytelsesId = kontering.oppdragsperiode.delytelseId
         )
       )
     }
     return skattKonteringerListe
   }
 
-  private fun finnAlleIkkeOverforteKonteringer(oppdragsperiode: Oppdragsperiode) =
-    oppdragsperiode.konteringer!!.filter { kontering -> kontering.overforingstidspunkt == null }
+  private fun hentOppdragsperioderMedUsendteKonteringer(
+    oppdrag: Oppdrag
+  ): List<Oppdragsperiode> {
+    val oppdragsperioder = mutableListOf<Oppdragsperiode>()
 
-  private fun hentOppdragsperioderForPeriode(oppdrag: Oppdrag, periode: YearMonth): List<Oppdragsperiode> {
-    val oppdragsperiodeListe = oppdrag.oppdragsperioder!!.filter { oppdragsperiode ->
-      oppdragsperiode.aktivTil == null || LocalDate.of(periode.year, periode.month, 1)
-        .isBefore(oppdragsperiode.aktivTil)
+    oppdrag.oppdragsperioder?.forEach { oppdragsperiode ->
+      if (finnesDetIkkeOverforteKonteringer(oppdragsperiode)) oppdragsperioder.add(oppdragsperiode)
     }
+    return oppdragsperioder
+  }
 
-    return oppdragsperiodeListe.filter {
-      YearMonth.from(it.periodeFra).minusMonths(1).isBefore(periode) && YearMonth.from(it.periodeTil).isAfter(periode)
+  private fun finnesDetIkkeOverforteKonteringer(oppdragsperiode: Oppdragsperiode): Boolean {
+    oppdragsperiode.konteringer?.forEach { kontering ->
+      if (kontering.overforingstidspunkt == null) {
+        return true
+      }
     }
+    return false
+  }
+
+  private fun finnAlleIkkeOverforteKonteringer(oppdragsperioder: List<Oppdragsperiode>): List<Kontering> {
+    val konteringer = mutableListOf<Kontering>()
+
+    oppdragsperioder.forEach { oppdragsperiode ->
+      konteringer.addAll(oppdragsperiode.konteringer!!.filter { kontering ->
+        kontering.overforingstidspunkt == null
+      })
+    }
+    return konteringer
   }
 }

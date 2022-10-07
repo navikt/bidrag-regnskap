@@ -5,6 +5,7 @@ import no.nav.bidrag.regnskap.SECURE_LOGGER
 import no.nav.bidrag.regnskap.dto.OppdragRequest
 import no.nav.bidrag.regnskap.dto.OppdragResponse
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
+import no.nav.bidrag.regnskap.queue.OversendingAvKonteringerQueue
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -23,9 +24,9 @@ private val LOGGER = LoggerFactory.getLogger(OppdragService::class.java)
 @Service
 class OppdragService(
   val persistenceService: PersistenceService,
-  val overforingTilSkattService: OverforingTilSkattService,
   val oppdragsperiodeService: OppdragsperiodeService,
-  val konteringService: KonteringService
+  val konteringService: KonteringService,
+  val oversendingAvKonteringerQueue: OversendingAvKonteringerQueue
 ) {
 
   fun hentOppdrag(oppdragId: Int): OppdragResponse {
@@ -49,16 +50,17 @@ class OppdragService(
 
     val oppdrag = opprettOppdrag(oppdragRequest)
     val oppdragsperiode = oppdragsperiodeService.opprettNyOppdragsperiode(oppdragRequest, oppdrag)
-    val konteringer = konteringService.opprettNyeKonteringer(hentNyePerioderForOppdrag(oppdragRequest), oppdragsperiode)
+    val perioderForOppdrag = hentPeriodeForOppdrag(oppdragRequest)
+    val konteringer = konteringService.opprettNyeKonteringer(perioderForOppdrag, oppdragsperiode)
 
     oppdrag.oppdragsperioder = listOf(oppdragsperiode)
     oppdragsperiode.konteringer = konteringer
 
-    val oppdragId = persistenceService.lagreOppdrag(oppdrag)
+    val oppdragId = persistenceService.lagreOppdrag(oppdrag)!!
 
-    //TODO: Legge til oversending av kontering
+    oversendingAvKonteringerQueue.leggTil(oppdragId)
 
-    return oppdragId!!
+    return oppdragId
   }
 
   @Transactional
@@ -69,30 +71,34 @@ class OppdragService(
 
     //TODO: Håndtere oppdatering av skyldnerIdent/kravhaver
 
-    val nyePerioderForOppdrag = hentNyePerioderForOppdrag(oppdragRequest)
     val overforteKonteringerListe = konteringService.finnAlleOverforteKontering(oppdrag)
-    val erstattendeKonteringer =
-      konteringService.opprettErstattendeKonteringer(overforteKonteringerListe, nyePerioderForOppdrag)
+    val erstattendeKonteringer = konteringService.opprettErstattendeKonteringer(
+      overforteKonteringerListe,
+      hentAllePerioderForOppdragRequest(oppdragRequest)
+    )
 
-    val erstattendeOppdragsperiode =
-      oppdragsperiodeService.setGamleOppdragsperiodeTilInaktivOgOpprettNyOppdragsperiode(
-        oppdrag.oppdragsperioder,
-        oppdragRequest
-      )
+    val erstattendeOppdragsperiode = oppdragsperiodeService.setAktivTilDatoPaOppdragsperiodeOgOpprettNyOppdragsperiode(
+      oppdrag.oppdragsperioder, oppdragRequest
+    )
 
-    val nyeKonteringer = konteringService.opprettNyeKonteringer(nyePerioderForOppdrag, erstattendeOppdragsperiode, true)
+    val nyeKonteringer =
+      konteringService.opprettNyeKonteringer(hentPeriodeForOppdrag(oppdragRequest), erstattendeOppdragsperiode, true)
 
     erstattendeOppdragsperiode.konteringer = erstattendeKonteringer + nyeKonteringer
     oppdrag.oppdragsperioder = arrayListOf(erstattendeOppdragsperiode)
     oppdrag.endretTidspunkt = LocalDateTime.now()
 
     val oppdragId = persistenceService.lagreOppdrag(oppdrag)!!
-
-    nyePerioderForOppdrag.forEach { periode ->
-      overforingTilSkattService.sendKontering(oppdragId, periode) //TODO: Endre til asynkron oversending og forhindre fremtidige sendes over
-    }
+    oversendingAvKonteringerQueue.leggTil(oppdragId)
 
     return oppdragId
+  }
+
+  private fun hentPeriodeForOppdrag(oppdragRequest: OppdragRequest): List<YearMonth> {
+    val allePeriodeForOppdrag = hentAllePerioderForOppdragRequest(oppdragRequest)
+    val sisteOverfortePeriodeForPalop = persistenceService.finnSisteOverfortePeriode()
+
+    return allePeriodeForOppdrag.filter { it.isBefore(sisteOverfortePeriodeForPalop.plusMonths(1)) }
   }
 
   private fun sjekkOmOppdragAlleredeErOpprettet(oppdragRequest: OppdragRequest) {
@@ -108,8 +114,7 @@ class OppdragService(
         feilmelding + " " + "Oppdrag med stonadType: ${oppdragOptional.get().stonadType}, " + "kravhaverIdent: ${oppdragOptional.get().kravhaverIdent}, " + "skyldnerIdent: ${oppdragOptional.get().skyldnerIdent}, " + "referanse: ${oppdragOptional.get().referanse} " + "eksisterer allerede."
       )
       throw HttpClientErrorException(
-        HttpStatus.BAD_REQUEST,
-        feilmelding
+        HttpStatus.BAD_REQUEST, feilmelding
       )
     }
   }
@@ -122,10 +127,17 @@ class OppdragService(
     utsattTilDato = oppdragRequest.utsattTilDato
   )
 
-  private fun hentNyePerioderForOppdrag(oppdragRequest: OppdragRequest): List<YearMonth> {
-    val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM")
+  private fun hentAllePerioderForOppdragRequest(oppdragRequest: OppdragRequest): List<YearMonth> {
+    var periodeTil = oppdragRequest.periodeTil
+
+    if (periodeTil == null) {
+      val sisteOverfortePeriode = persistenceService.finnSisteOverfortePeriode()
+      periodeTil = LocalDate.of(sisteOverfortePeriode.year, sisteOverfortePeriode.month, 1).plusMonths(1)
+    }
+
     return Stream.iterate(oppdragRequest.periodeFra) { date: LocalDate -> date.plusMonths(1) }
-      .limit(ChronoUnit.MONTHS.between(oppdragRequest.periodeFra, oppdragRequest.periodeTil))
-      .map { it.format(outputFormatter) }.map { YearMonth.parse(it) }.collect(Collectors.toList())
+      .limit(ChronoUnit.MONTHS.between(oppdragRequest.periodeFra, periodeTil))
+      .map { it.format(DateTimeFormatter.ofPattern("yyyy-MM")) }.map { YearMonth.parse(it) }
+      .collect(Collectors.toList())
   }
 }

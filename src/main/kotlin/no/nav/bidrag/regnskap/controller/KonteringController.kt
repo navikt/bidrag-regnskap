@@ -9,11 +9,13 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import no.nav.bidrag.regnskap.dto.KRAV_BESKRIVELSE
+import no.nav.bidrag.regnskap.dto.SKATT_SENDT_KONTERING_BESKRIVELSE
 import no.nav.bidrag.regnskap.dto.SkattFeiletKonteringerResponse
 import no.nav.bidrag.regnskap.dto.SkattVellykketKonteringResponse
 import no.nav.bidrag.regnskap.service.OverforingTilSkattService
+import no.nav.bidrag.regnskap.service.PersistenceService
 import no.nav.security.token.support.core.api.Protected
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -23,12 +25,13 @@ import java.time.YearMonth
 @RestController
 @Protected
 class KonteringController(
-  var overforingTilSkattService: OverforingTilSkattService
+  val overforingTilSkattService: OverforingTilSkattService,
+  val persistenceService: PersistenceService
 ) {
 
   @PostMapping("/sendKonteringTilSkatt")
   @Operation(
-    description = KRAV_BESKRIVELSE, security = [SecurityRequirement(name = "bearer-key")]
+    description = SKATT_SENDT_KONTERING_BESKRIVELSE, security = [SecurityRequirement(name = "bearer-key")]
   )
   @ApiResponses(
     value = [ApiResponse(
@@ -78,7 +81,11 @@ class KonteringController(
       example = "2022-01"
     )]
   )
-  fun sendKonteringer(@RequestParam oppdragId: Int, @RequestParam periode: YearMonth): ResponseEntity<*> { //    val overforingTilSkattResponse: SkattVellykketKonteringResponse
+  fun sendKonteringer(@RequestParam oppdragId: Int, @RequestParam periode: YearMonth): ResponseEntity<*> {
+    val sisteOverfortePeriode = persistenceService.finnSisteOverfortePeriode()
+    if (sisteOverfortePeriode.isBefore(periode)) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Påløpsfil er ikke kjørt for $periode. Siste kjørte påløpsperiode er $sisteOverfortePeriode")
+    }
     return overforingTilSkattService.sendKontering(oppdragId, periode)
   }
 }

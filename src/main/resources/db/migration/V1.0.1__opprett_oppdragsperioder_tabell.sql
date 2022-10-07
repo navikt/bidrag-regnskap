@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS oppdragsperioder
     belop              integer NOT NULL,
     valuta             text    NOT NULL,
     periode_fra        date    NOT NULL,
-    periode_til        date    NOT NULL,
+    periode_til        date,
     vedtaksdato        date    NOT NULL,
     opprettet_av       text    NOT NULL,
     delytelses_id      text    NOT NULL,

@@ -90,13 +90,14 @@ data class OppdragRequest(
   val periodeFra: LocalDate,
 
   @field:Schema(
-    description = "Datoen utbetalingen skal opphøre.",
+    description = "Datoen utbetalingen skal opphøre. Kan være null.",
     format = "date",
     example = "2022-02-01",
-    required = true
+    required = true,
+    nullable = true
   )
   @field:DateTimeFormat(pattern = "yyyy-MM-dd")
-  val periodeTil: LocalDate,
+  val periodeTil: LocalDate?,
 
   @field:Schema(
     description = "Datoen vedtaket ble fattet.",

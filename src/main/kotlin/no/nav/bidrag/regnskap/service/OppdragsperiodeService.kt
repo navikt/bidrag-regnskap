@@ -60,7 +60,7 @@ class OppdragsperiodeService(
     )
   }
 
-  fun setGamleOppdragsperiodeTilInaktivOgOpprettNyOppdragsperiode(
+  fun setAktivTilDatoPaOppdragsperiodeOgOpprettNyOppdragsperiode(
     oppdragsperioder: List<Oppdragsperiode>?, oppdragRequest: OppdragRequest
   ): Oppdragsperiode {
     oppdragsperioder?.forEach { gamleOppdragsperiode ->

@@ -62,13 +62,18 @@ class KonteringService {
   ): List<Kontering> {
     val nyeErstattendeKonteringer = mutableListOf<Kontering>()
     overforteKonteringerListe.forEach { kontering ->
-      if (nyePerioderForOppdrag.contains(YearMonth.parse(kontering.overforingsperiode))
-        && Transaksjonskode.valueOf(kontering.transaksjonskode).korreksjonskode != null) {
+      val korreksjonskode = Transaksjonskode.valueOf(kontering.transaksjonskode).korreksjonskode
+      if (nyePerioderForOppdrag.contains(YearMonth.parse(kontering.overforingsperiode)) &&
+        korreksjonskode != null &&
+        !erOverfortKonteringAlleredeKorrigert(
+          kontering, overforteKonteringerListe
+        )
+      ) {
         nyeErstattendeKonteringer.add(
           Kontering(
             oppdragsperiode = kontering.oppdragsperiode,
             overforingsperiode = kontering.overforingsperiode,
-            transaksjonskode = Transaksjonskode.valueOf(kontering.transaksjonskode).korreksjonskode!!,
+            transaksjonskode = korreksjonskode,
             type = Type.ENDRING.toString(),
             justering = kontering.justering,
             gebyrRolle = kontering.gebyrRolle
@@ -77,6 +82,17 @@ class KonteringService {
       }
     }
     return nyeErstattendeKonteringer
+  }
+
+  private fun erOverfortKonteringAlleredeKorrigert(
+    kontering: Kontering, overforteKonteringerListe: List<Kontering>
+  ): Boolean {
+    if (overforteKonteringerListe.any {
+        it.transaksjonskode == Transaksjonskode.valueOf(kontering.transaksjonskode).korreksjonskode && it.oppdragsperiode == kontering.oppdragsperiode && it.overforingsperiode == kontering.overforingsperiode
+      }) {
+      return true
+    }
+    return false
   }
 
   fun finnAlleOverforteKontering(oppdrag: Oppdrag): List<Kontering> {

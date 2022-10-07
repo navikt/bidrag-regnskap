@@ -9,7 +9,7 @@ import org.springframework.format.annotation.DateTimeFormat
 import java.time.LocalDate
 import java.time.YearMonth
 
-const val KRAV_BESKRIVELSE =
+const val SKATT_SENDT_KONTERING_BESKRIVELSE =
   "Operasjon for å levere krav fra NAV til regnskapet hos Skatteetaten. " +
       "Et krav består av en liste med konteringer. Det forventes at disse konteringen behandles samlet. " +
       "Det vil si at hvis én av konteringene feiler, skal ingen av konteringene i kravet benyttes.\n" + "\n" +

@@ -91,7 +91,7 @@ class OppdragsperiodeServiceTest {
 
       val oppdragRequest = TestData.opprettOppdragRequest()
 
-      val nyOppdragsperiode = oppdragsperiodeService.setGamleOppdragsperiodeTilInaktivOgOpprettNyOppdragsperiode(
+      val nyOppdragsperiode = oppdragsperiodeService.setAktivTilDatoPaOppdragsperiodeOgOpprettNyOppdragsperiode(
         oppdragsperioder,
         oppdragRequest
       )
@@ -113,7 +113,7 @@ class OppdragsperiodeServiceTest {
       val oppdragRequest = TestData.opprettOppdragRequest()
 
       val exception = shouldThrow<IllegalStateException> {
-        oppdragsperiodeService.setGamleOppdragsperiodeTilInaktivOgOpprettNyOppdragsperiode(
+        oppdragsperiodeService.setAktivTilDatoPaOppdragsperiodeOgOpprettNyOppdragsperiode(
           oppdragsperioder,
           oppdragRequest
         )
