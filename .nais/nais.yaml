@@ -32,6 +32,11 @@ spec:
     requests:
       cpu: 500m
       memory: 1024Mi
+  maskinporten:
+    enabled: true
+    scopes:
+      consumes:
+        - name: "skatt:some.scope" #TODO: Legge til scope når vi vet
   ingresses:
   {{#each ingresses as |url|}}
     - {{url}}

@@ -58,7 +58,7 @@ class OppdragService(
 
     val oppdragId = persistenceService.lagreOppdrag(oppdrag)!!
 
-//    oversendingAvKonteringerQueue.leggTil(oppdragId)
+    sendKonteringerQueue.leggTil(oppdragId)
 
     return oppdragId
   }

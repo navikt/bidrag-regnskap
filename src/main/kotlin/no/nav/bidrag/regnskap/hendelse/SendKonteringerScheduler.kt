@@ -34,6 +34,7 @@ class SendKonteringerScheduler(
     }
 
     oppdragMedIkkeOverforteKonteringer.forEach {
+      // TODO: Feilhåndtering?, hvordan går vi frem om en feiler? Skal resten sendes?
       overforingTilSkattService.sendKontering(it, persistenceService.finnSisteOverfortePeriode())
     }
     LOGGER.info("Alle oppdrag med unsendte konteringer er nå overført til skatt.")

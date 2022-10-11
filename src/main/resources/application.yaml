@@ -10,6 +10,15 @@ scheduler:
 
 springdoc:
   packages-to-scan: no.nav.bidrag.regnskap.controller
+  swagger-ui:
+    path: /
+
+maskinporten:
+  tokenUrl: https://maskinporten.no/token
+  audience: https://maskinporten.no/
+  issuer: ${MASKINPORTEN_CLIENT_ID}
+  scope: ${MASKINPORTEN_SCOPES}
+  privateKey: ${MASKINPORTEN_CLIENT_JWK}
 
 spring.config.activate.on-profile: nais,local
 

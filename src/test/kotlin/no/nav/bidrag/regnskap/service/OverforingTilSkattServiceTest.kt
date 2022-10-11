@@ -7,17 +7,15 @@ import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.verify
-import no.nav.bidrag.behandling.felles.enums.StonadType
 import no.nav.bidrag.regnskap.consumer.SkattConsumer
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
-import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
-import no.nav.bidrag.regnskap.utils.TestDataGenerator.genererPersonnummer
+import no.nav.bidrag.regnskap.utils.TestData
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.client.HttpClientErrorException
-import org.springframework.web.client.HttpServerErrorException
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.YearMonth
 import java.util.*
 
@@ -33,10 +31,10 @@ class OverforingTilSkattServiceTest {
   @InjectMockKs
   private lateinit var overforingTilSkattService: OverforingTilSkattService
 
-  val oppdragsperiodeId = 1
   val oppdragsId = 1
   val now = LocalDate.now()
-  val batchUid = "BatchUid123"
+  val batchUid = "{\"batchUid\":\"asijdk-32546s-jhsjhs\"}"
+
 
   @Test
   @Suppress("NonAsciiCharacters")
@@ -44,63 +42,58 @@ class OverforingTilSkattServiceTest {
     every { persistenceService.hentOppdrag(oppdragsId) } returns opprettOppdragOptionalForPeriode(
       now.minusMonths(3), now.plusMonths(1)
     )
-    every { skattConsumer.sendKontering(any()) } returns ResponseEntity.ok(batchUid)
+    every { skattConsumer.sendKontering(any()) } returns ResponseEntity.accepted().body(batchUid)
+    every { persistenceService.lagreOverforingKontering(any()) } returns 1
+    every { persistenceService.lagreOppdrag(any()) } returns 1
 
-    val restResponse = overforingTilSkattService.sendKontering(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
+    val restResponse =
+      overforingTilSkattService.sendKontering(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
 
     verify(exactly = 1) { skattConsumer.sendKontering(any()) }
 
-    restResponse shouldBe batchUid
+    restResponse.statusCode shouldBe HttpStatus.OK
   }
 
   @Test
   @Suppress("NonAsciiCharacters")
   fun `skal sende kontering om perioden kun er for en måned`() {
-
     every { persistenceService.hentOppdrag(oppdragsId) } returns opprettOppdragOptionalForPeriode(
       now, now.plusMonths(1)
     )
-    every { skattConsumer.sendKontering(any()) } returns ResponseEntity.ok(batchUid)
+    every { skattConsumer.sendKontering(any()) } returns ResponseEntity.accepted().body(batchUid)
+    every { persistenceService.lagreOverforingKontering(any()) } returns 1
+    every { persistenceService.lagreOppdrag(any()) } returns 1
 
-    val restResponse = overforingTilSkattService.sendKontering(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
+    val restResponse =
+      overforingTilSkattService.sendKontering(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
 
-    restResponse shouldBe batchUid
+    restResponse.statusCode shouldBe HttpStatus.OK
   }
 
   @Test
   @Suppress("NonAsciiCharacters")
-  fun `skal ikke sende kontering til skatt når oppdragsperioden er utenfor innsendt periode`() {
-    every { persistenceService.hentOppdrag(oppdragsId) } returns opprettOppdragOptionalForPeriode(
-      now.minusMonths(3), now.minusMonths(1)
-    )
-
-    shouldThrow<HttpClientErrorException> {
-      overforingTilSkattService.sendKontering(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
-    }
-  }
-
-  @Test
-  fun `skal ikke sende kontering om det finnes flere aktive perioder`() {
+  fun `skal ikke sende kontering til skatt når kontering allerede er overført`() {
     every { persistenceService.hentOppdrag(oppdragsId) } returns Optional.of(
-      Oppdrag(
-        oppdragId = oppdragsId,
-        stonadType = StonadType.BIDRAG.toString(),
-        kravhaverIdent = "123456789",
-        skyldnerIdent = "987654321",
+      TestData.opprettOppdrag(
         oppdragsperioder = listOf(
-          opprettOppdragsperiode(now.minusMonths(3), now.plusMonths(1)),
-          opprettOppdragsperiode(now.minusMonths(2), now.plusMonths(1))
+          TestData.opprettOppdragsperiode(
+            konteringer = listOf(
+              TestData.opprettKontering(
+                overforingstidspunkt = LocalDateTime.now()
+              )
+            )
+          )
         )
       )
     )
 
-    shouldThrow<HttpServerErrorException> {
-      overforingTilSkattService.sendKontering(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
-    }
+    val restResponse = overforingTilSkattService.sendKontering(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
+
+    restResponse.statusCode shouldBe HttpStatus.NO_CONTENT
   }
 
   @Test
-  fun `skal ikke sende kontering om oppdrag ikke finens`() {
+  fun `skal ikke sende kontering om oppdrag ikke finnes`() {
     every { persistenceService.hentOppdrag(oppdragsId) } returns Optional.empty()
 
     shouldThrow<NoSuchElementException> {
@@ -110,30 +103,19 @@ class OverforingTilSkattServiceTest {
 
   private fun opprettOppdragOptionalForPeriode(periodeFra: LocalDate, periodeTil: LocalDate): Optional<Oppdrag> {
     return Optional.of(
-      Oppdrag(
-        oppdragId = oppdragsId,
-        stonadType = StonadType.BIDRAG.toString(),
-        kravhaverIdent = "123456789",
-        skyldnerIdent = "987654321",
-        oppdragsperioder = listOf(opprettOppdragsperiode(periodeFra, periodeTil))
+      TestData.opprettOppdrag(
+        oppdragsperioder = listOf(
+          TestData.opprettOppdragsperiode(
+            periodeTil = periodeTil, periodeFra = periodeFra, konteringer = listOf(
+              TestData.opprettKontering(
+                oppdragsperiode = TestData.opprettOppdragsperiode(
+                  oppdrag = TestData.opprettOppdrag()
+                )
+              )
+            )
+          )
+        )
       )
-    )
-  }
-
-  private fun opprettOppdragsperiode(periodeFra: LocalDate, periodeTil: LocalDate): Oppdragsperiode {
-    return Oppdragsperiode(
-      oppdragsperiodeId = oppdragsperiodeId,
-      vedtakId = 123,
-      sakId = 123456,
-      gjelderIdent = genererPersonnummer(),
-      mottakerIdent = genererPersonnummer(),
-      belop = 7500,
-      valuta = "NOK",
-      periodeFra = periodeFra,
-      periodeTil = periodeTil,
-      vedtaksdato = now,
-      opprettetAv = "MEG",
-      delytelseId = "DelytelsesId"
     )
   }
 }

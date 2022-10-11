@@ -9,15 +9,16 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.verify
 import no.nav.bidrag.behandling.felles.enums.StonadType
+import no.nav.bidrag.regnskap.hendelse.SendKonteringerQueue
 import no.nav.bidrag.regnskap.utils.TestData
 import no.nav.bidrag.regnskap.utils.TestDataGenerator.genererPersonnummer
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.springframework.http.ResponseEntity
 import org.springframework.web.client.HttpClientErrorException
 import java.time.LocalDate
+import java.time.YearMonth
 import java.util.*
 
 @ExtendWith(MockKExtension::class)
@@ -25,15 +26,12 @@ class OppdragServiceTest {
 
   @MockK
   private lateinit var persistenceService: PersistenceService
-
-  @MockK
-  private lateinit var overforingTilSkattService: OverforingTilSkattService
-
   @MockK
   private lateinit var oppdragsperiodeService: OppdragsperiodeService
-
   @MockK
   private lateinit var konteringService: KonteringService
+  @MockK
+  private lateinit var sendKonteringerQueue: SendKonteringerQueue
 
   @InjectMockKs
   private lateinit var oppdragService: OppdragService
@@ -88,6 +86,8 @@ class OppdragServiceTest {
       } returns Optional.empty()
       every { oppdragsperiodeService.opprettNyOppdragsperiode(any(), any()) } returns TestData.opprettOppdragsperiode()
       every { konteringService.opprettNyeKonteringer(any(), any()) } returns listOf(TestData.opprettKontering())
+      every { persistenceService.finnSisteOverfortePeriode() } returns YearMonth.now()
+      every { sendKonteringerQueue.leggTil(any()) } returns Unit
 
       val oppdragId = oppdragService.lagreOppdrag(oppdragRequest)
 
@@ -123,7 +123,6 @@ class OppdragServiceTest {
       every { konteringService.finnAlleOverforteKontering(any()) } returns listOf(TestData.opprettKontering())
       every { konteringService.opprettErstattendeKonteringer(any(), any()) } returns listOf(TestData.opprettKontering())
       every { konteringService.opprettNyeKonteringer(any(), any(), any()) } returns listOf(TestData.opprettKontering())
-      every { overforingTilSkattService.sendKontering(any(), any()) } returns ResponseEntity.ok().build<Any>()
       every {
         persistenceService.hentOppdragPaUnikeIdentifikatorer(
           any(), any(), any(), any()
@@ -135,6 +134,8 @@ class OppdragServiceTest {
           any()
         )
       } returns TestData.opprettOppdragsperiode()
+      every { persistenceService.finnSisteOverfortePeriode() } returns YearMonth.now()
+      every { sendKonteringerQueue.leggTil(any()) } returns Unit
 
       oppdragService.oppdaterOppdrag(
         TestData.opprettOppdragRequest(

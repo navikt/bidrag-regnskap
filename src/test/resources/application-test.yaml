@@ -7,6 +7,7 @@ NAIS_APP_NAME: bidrag-regnskap
 TOPIC_VEDTAK: bidrag.vedtak-feature
 KAFKA_BOOTSTRAP_SERVERS: localhost:9092
 KAFKA_BROKERS: localhost:9092
+scheduler.interval.cron: "*/30 * * * * *" #Hvert 30. sekund
 
 no.nav.security.jwt:
   client:
