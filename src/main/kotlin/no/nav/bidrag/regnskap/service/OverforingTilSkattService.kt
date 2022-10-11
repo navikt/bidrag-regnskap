@@ -34,7 +34,7 @@ class OverforingTilSkattService(
 ) {
 
   fun sendKontering(oppdragId: Int, periode: YearMonth): ResponseEntity<*> {
-    LOGGER.info("Starter overføring av kontering til skatt..")
+    LOGGER.info("Starter overføring av kontering til skatt for oppdragId: $oppdragId")
 
     val oppdrag = persistenceService.hentOppdrag(oppdragId).get()
     val oppdragsperioderMedUsendteKonteringer = hentOppdragsperioderMedUsendteKonteringer(oppdrag)

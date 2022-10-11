@@ -1,6 +1,5 @@
-package no.nav.bidrag.regnskap.queue
+package no.nav.bidrag.regnskap.hendelse
 
-import no.nav.bidrag.regnskap.hendelse.KonteringPublisher
 import no.nav.bidrag.regnskap.service.OverforingTilSkattService
 import no.nav.bidrag.regnskap.service.PersistenceService
 import org.slf4j.LoggerFactory
@@ -8,10 +7,10 @@ import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import java.util.concurrent.LinkedBlockingQueue
 
-private val LOGGER = LoggerFactory.getLogger(OversendingAvKonteringerQueue::class.java)
+private val LOGGER = LoggerFactory.getLogger(SendKonteringerQueue::class.java)
 
 @Component
-class OversendingAvKonteringerQueue(
+class SendKonteringerQueue(
   val persistenceService: PersistenceService,
   val overforingTilSkattService: OverforingTilSkattService,
   val konteringPublisher: KonteringPublisher,

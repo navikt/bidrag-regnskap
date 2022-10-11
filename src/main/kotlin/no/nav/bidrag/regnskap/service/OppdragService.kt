@@ -5,7 +5,7 @@ import no.nav.bidrag.regnskap.SECURE_LOGGER
 import no.nav.bidrag.regnskap.dto.OppdragRequest
 import no.nav.bidrag.regnskap.dto.OppdragResponse
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
-import no.nav.bidrag.regnskap.queue.OversendingAvKonteringerQueue
+import no.nav.bidrag.regnskap.hendelse.SendKonteringerQueue
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -26,7 +26,7 @@ class OppdragService(
   val persistenceService: PersistenceService,
   val oppdragsperiodeService: OppdragsperiodeService,
   val konteringService: KonteringService,
-  val oversendingAvKonteringerQueue: OversendingAvKonteringerQueue
+  val sendKonteringerQueue: SendKonteringerQueue
 ) {
 
   fun hentOppdrag(oppdragId: Int): OppdragResponse {
@@ -58,7 +58,7 @@ class OppdragService(
 
     val oppdragId = persistenceService.lagreOppdrag(oppdrag)!!
 
-    oversendingAvKonteringerQueue.leggTil(oppdragId)
+//    oversendingAvKonteringerQueue.leggTil(oppdragId)
 
     return oppdragId
   }
@@ -89,7 +89,7 @@ class OppdragService(
     oppdrag.endretTidspunkt = LocalDateTime.now()
 
     val oppdragId = persistenceService.lagreOppdrag(oppdrag)!!
-    oversendingAvKonteringerQueue.leggTil(oppdragId)
+    sendKonteringerQueue.leggTil(oppdragId)
 
     return oppdragId
   }

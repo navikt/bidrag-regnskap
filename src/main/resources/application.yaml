@@ -4,6 +4,10 @@ management:
       exposure:
         include: "prometheus,health"
 
+scheduler:
+  interval:
+    cron: "0 */10 * * * *" #Hvert 10. minutt
+
 springdoc:
   packages-to-scan: no.nav.bidrag.regnskap.controller
 

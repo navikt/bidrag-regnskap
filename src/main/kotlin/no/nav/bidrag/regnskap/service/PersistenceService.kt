@@ -2,10 +2,12 @@ package no.nav.bidrag.regnskap.service
 
 import no.nav.bidrag.behandling.felles.enums.StonadType
 import no.nav.bidrag.regnskap.SECURE_LOGGER
+import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
 import no.nav.bidrag.regnskap.persistence.entity.OverforingKontering
 import no.nav.bidrag.regnskap.persistence.entity.Palop
+import no.nav.bidrag.regnskap.persistence.repository.KonteringRepository
 import no.nav.bidrag.regnskap.persistence.repository.OppdragRepository
 import no.nav.bidrag.regnskap.persistence.repository.OppdragsperiodeRepository
 import no.nav.bidrag.regnskap.persistence.repository.OverforingKonteringRepository
@@ -22,6 +24,7 @@ class PersistenceService(
   val oppdragRepository: OppdragRepository,
   val oppdragsperiodeRepository: OppdragsperiodeRepository,
   val overforingKonteringRepository: OverforingKonteringRepository,
+  val konteringRepository: KonteringRepository,
   val palopRepository: PalopRepository
 ) {
 
@@ -68,6 +71,13 @@ class PersistenceService(
   }
 
   fun finnSisteOverfortePeriode(): YearMonth {
-    return YearMonth.parse(palopRepository.finnMax())
+    LOGGER.info("Henter siste overforte periode.")
+    val sisteOverfortePeriode = YearMonth.parse(palopRepository.finnMax())
+    LOGGER.info("Siste overforte periode var: $sisteOverfortePeriode.")
+    return sisteOverfortePeriode
+  }
+
+  fun hentAlleIkkeOverforteKonteringer(): List<Kontering> {
+    return konteringRepository.hentAlleIkkeOverforteKonteringer()
   }
 }

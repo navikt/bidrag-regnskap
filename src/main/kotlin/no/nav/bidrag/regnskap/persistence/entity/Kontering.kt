@@ -29,7 +29,7 @@ data class Kontering(
   @Column(name = "overforingsperiode")
   val overforingsperiode: String,
 
-  @Column(name = "overforinstidspunkt")
+  @Column(name = "overforingstidspunkt")
   var overforingstidspunkt: LocalDateTime? = null,
 
   @Column(name = "type")
