@@ -9,4 +9,3 @@ kafka:
 kafka-topic-vedtak: bidrag.vedtak-feature
 database:
   navn: bidrag-regnskap-feature
-  autoResize: false

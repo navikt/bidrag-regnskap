@@ -54,7 +54,6 @@ spec:
     sqlInstances:
       - name: {{ database.navn }}
         type: POSTGRES_14
-        diskAutoresize: { { database.autoResize } }
         databases:
           - name: bidrag-regnskap-db
             envVarPrefix: DB
