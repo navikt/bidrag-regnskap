@@ -37,6 +37,7 @@ spec:
     scopes:
       consumes:
         - name: "nav:bidrag:aktoerregister.read" #TODO: Legge til scope når vi vet
+  webproxy: true
   ingresses:
   {{#each ingresses as |url|}}
     - {{url}}
