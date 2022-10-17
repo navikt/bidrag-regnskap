@@ -35,7 +35,7 @@ class SkattConsumerTest {
     WireMock.resetToDefault()
   }
 
-//  @Test TODO: Vurdere om wiremock er hensiktsmessig å ta i bruk
+//  @Test TODO(): Vurdere om wiremock er hensiktsmessig å ta i bruk
 //  fun `Skal lagre krav konteringer hos Skatteetaten`() {
 //    stubUtils.stubKravResponse(null, HttpStatus.OK)
 //

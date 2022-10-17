@@ -22,6 +22,11 @@ Disse kan hentes ved å kjøre kan hentes ved å kjøre
 kubectl exec --tty deployment/bidrag-regnskap-feature -- printenv | grep -e AZURE_APP_CLIENT_ID -e AZURE_APP_CLIENT_SECRET
 ```
 
+For å hente ut gyldig maskinporten JWT-Token må maskinporten.privateKey legges inn i application-local.yaml. Denne hemmeligheten kan hentes med:
+```bash
+kubectl exec --tty deployment/bidrag-regnskap-feature -- printenv | grep -e MASKINPORTEN_CLIENT_JWK
+```
+
 #### Lokal database
 Dette blir opprettet når du kjører på root mappen
 ```bash

@@ -24,6 +24,7 @@ maskinporten:
   issuer: <MASKINPORTEN_CLIENT_ID>
   scope: <MASKINPORTEN_SCOPES>
   privateKey: <MASKINPORTEN_CLIENT_JWK>
+  validInSeconds: 120 #120 er maks antall sekunder et maskinporten Jwt-token kan være gyldig.
 
 spring:
   flyway:

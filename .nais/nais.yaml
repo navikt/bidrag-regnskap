@@ -36,7 +36,7 @@ spec:
     enabled: true
     scopes:
       consumes:
-        - name: "skatt:some.scope" #TODO: Legge til scope når vi vet
+        - name: "nav:bidrag:aktoerregister.read" #TODO: Legge til scope når vi vet
   ingresses:
   {{#each ingresses as |url|}}
     - {{url}}

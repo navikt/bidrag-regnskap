@@ -1,5 +1,6 @@
 package no.nav.bidrag.regnskap.aop
 
+import no.nav.bidrag.regnskap.maskinporten.MaskinportenClientException
 import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
@@ -46,6 +47,14 @@ class DefaultRestControllerAdvice {
         LOGGER.info("Fant ingen gyldig verdi.", exception)
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
             .build<Any>()
+    }
+
+    @ResponseBody
+    @ExceptionHandler(MaskinportenClientException::class)
+    fun handleMaskinportenClientExcpetion(exception: MaskinportenClientException): ResponseEntity<*> {
+        LOGGER.info("Noe gikk galt ved kall til maskinporten.", exception)
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(exception.message)
     }
 
 }
