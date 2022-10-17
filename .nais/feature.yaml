@@ -9,3 +9,6 @@ kafka:
 kafka-topic-vedtak: bidrag.vedtak-feature
 database:
   navn: bidrag-regnskap-feature
+env:
+  - name: SPRING_PROFILES_ACTIVE
+    value: feature

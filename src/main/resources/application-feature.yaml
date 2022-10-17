@@ -1,0 +1,3 @@
+maskinporten:
+  tokenUrl: https://ver2.maskinporten.no/token
+  audience: https://ver2.maskinporten.no/
