@@ -14,8 +14,8 @@ springdoc:
     path: /
 
 maskinporten:
-  tokenUrl: https://maskinporten.no/token
-  audience: https://maskinporten.no/
+  tokenUrl: ${MASKINPORTEN_TOKEN_ENDPOINT}
+  audience: ${MASKINPORTEN_ISSUER}
   issuer: ${MASKINPORTEN_CLIENT_ID}
   scope: ${MASKINPORTEN_SCOPES}
   privateKey: ${MASKINPORTEN_CLIENT_JWK}
