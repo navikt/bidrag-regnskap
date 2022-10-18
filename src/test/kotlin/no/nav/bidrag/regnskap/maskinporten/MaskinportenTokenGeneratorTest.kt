@@ -40,7 +40,7 @@ class MaskinportenTokenGeneratorTest {
     val signedJWT = SignedJWT.parse(generator.genererJwtToken(scopes))
 
     signedJWT.jwtClaimsSet.audience[0] shouldBe config.audience
-    signedJWT.jwtClaimsSet.issuer shouldBe config.issuer
+    signedJWT.jwtClaimsSet.issuer shouldBe config.clientId
     signedJWT.jwtClaimsSet.getStringClaim("scope").split(' ') shouldBe scopes
   }
 

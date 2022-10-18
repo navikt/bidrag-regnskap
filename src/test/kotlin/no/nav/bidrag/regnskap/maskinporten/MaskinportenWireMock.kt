@@ -20,7 +20,7 @@ class MaskinportenWireMock {
     internal fun createMaskinportenConfig() = MaskinportenConfig(
       tokenUrl = MASKINPORTEN_MOCK_HOST + TOKEN_PATH,
       audience = MASKINPORTEN_MOCK_HOST,
-      issuer = "17b3e4e8-8203-4463-a947-5c24021b7742",
+      clientId = "17b3e4e8-8203-4463-a947-5c24021b7742",
       privateKey = RSAKeyGenerator(2048).keyID("123").generate().toString(),
       validInSeconds = 120,
       scope = "skatt:testscope.read skatt:testscope.write"

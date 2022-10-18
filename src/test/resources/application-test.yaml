@@ -12,7 +12,7 @@ scheduler.interval.cron: "*/30 * * * * *" #Hvert 30. sekund
 maskinporten:
   tokenUrl: https://ver2.maskinporten.no/token
   audience: https://ver2.maskinporten.no/
-  issuer: <MASKINPORTEN_CLIENT_ID>
+  clientId: <MASKINPORTEN_CLIENT_ID>
   scope: <MASKINPORTEN_SCOPES>
   privateKey: <MASKINPORTEN_CLIENT_JWK>
   validInSeconds: 120 #120 er maks antall sekunder et maskinporten Jwt-token kan være gyldig.

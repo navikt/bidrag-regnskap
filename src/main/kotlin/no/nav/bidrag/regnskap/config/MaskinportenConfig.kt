@@ -12,8 +12,8 @@ data class MaskinportenConfig(
   @Value("\${maskinporten.audience}")
   val audience: String,
 
-  @Value("\${maskinporten.issuer}")
-  val issuer: String,
+  @Value("\${maskinporten.clientId}")
+  val clientId: String,
 
   @Value("\${maskinporten.scope}")
   val scope: String,
