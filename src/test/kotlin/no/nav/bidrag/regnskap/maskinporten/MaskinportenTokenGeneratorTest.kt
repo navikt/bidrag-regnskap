@@ -58,6 +58,6 @@ class MaskinportenTokenGeneratorTest {
     Date() plusSekunder config.validInSeconds likInnenEtSekund expirationTime shouldBe true
   }
 
-  private infix fun Date.likInnenEtSekund(date: Date): Boolean = (time - date.time).absoluteValue - 2000 < 1000L
-  private infix fun Date.plusSekunder(seconds: Int): Date = Date(time - 2000 + seconds * 1000)
+  private infix fun Date.likInnenEtSekund(date: Date): Boolean = (time - date.time).absoluteValue < 1000L
+  private infix fun Date.plusSekunder(seconds: Int): Date = Date(time + seconds * 1000)
 }

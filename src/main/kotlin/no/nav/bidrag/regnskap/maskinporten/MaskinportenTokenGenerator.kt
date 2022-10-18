@@ -24,8 +24,8 @@ class MaskinportenTokenGenerator(
       audience(maskinportenConfig.audience)
       issuer(maskinportenConfig.clientId)
       claim("scope", scopes.joinToString(" "))
-      issueTime(Date(Date().time - 2000))
-      expirationTime(Date(Date().time + (maskinportenConfig.validInSeconds * 1000) - 2000))
+      issueTime(Date(Date().time))
+      expirationTime(Date(Date().time + (maskinportenConfig.validInSeconds * 1000)))
     }.build()
   }
 
