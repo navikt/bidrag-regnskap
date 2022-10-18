@@ -21,7 +21,7 @@ springdoc:
 maskinporten:
   tokenUrl: https://ver2.maskinporten.no/token
   audience: https://ver2.maskinporten.no/
-  issuer: <MASKINPORTEN_CLIENT_ID>
+  clientId: 0f5c38e8-e0bb-4708-96aa-7b30da8bcc3b
   scope: <MASKINPORTEN_SCOPES>
   privateKey: <MASKINPORTEN_CLIENT_JWK>
   validInSeconds: 120 #120 er maks antall sekunder et maskinporten Jwt-token kan være gyldig.
