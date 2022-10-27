@@ -24,7 +24,7 @@ data class Oppdragsperiode(
   val oppdrag: Oppdrag? = null,
 
   @Column(name = "sak_id")
-  val sakId: Int,
+  val sakId: String,
 
   @Column(name = "vedtak_id")
   val vedtakId: Int,
@@ -59,16 +59,25 @@ data class Oppdragsperiode(
   @Column(name = "aktiv_til")
   var aktivTil: LocalDate? = null,
 
-  @Column(name = "erstatter_periode")
-  val erstatterPeriode: Int? = null,
-
-  @Column(name = "tekst")
-  val tekst: String? = null,
-
   @OneToMany(mappedBy = "oppdragsperiode", cascade = [CascadeType.ALL])
   var konteringer: List<Kontering>? = null,
 ) {
   override fun toString(): String {
-    return ""
+    return "Oppdragsperiode(" +
+        "oppdragsperiodeId=$oppdragsperiodeId, " +
+        "oppdragId=${oppdrag?.oppdragId}, " +
+        "sakId=$sakId, " +
+        "vedtakId=$vedtakId, " +
+        "gjelderIdent=$gjelderIdent, " +
+        "mottakerIdent=$mottakerIdent, " +
+        "belop=$belop, " +
+        "valuta=$valuta, " +
+        "periodeFra=$periodeFra, " +
+        "periodeTil=$periodeTil, " +
+        "vedtaksdato=$vedtaksdato, " +
+        "opprettetAv=$opprettetAv, " +
+        "delytelseId=$delytelseId, " +
+        "aktivTil=$aktivTil, " +
+        "konteringer=$konteringer)"
   }
 }

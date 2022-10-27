@@ -20,7 +20,7 @@ import java.time.YearMonth
 import java.util.*
 
 @ExtendWith(MockKExtension::class)
-class OverforingTilSkattServiceTest {
+class KravServiceTest {
 
   @MockK
   private lateinit var persistenceService: PersistenceService
@@ -29,7 +29,7 @@ class OverforingTilSkattServiceTest {
   private lateinit var skattConsumer: SkattConsumer
 
   @InjectMockKs
-  private lateinit var overforingTilSkattService: OverforingTilSkattService
+  private lateinit var kravService: KravService
 
   val oppdragsId = 1
   val now = LocalDate.now()
@@ -42,14 +42,13 @@ class OverforingTilSkattServiceTest {
     every { persistenceService.hentOppdrag(oppdragsId) } returns opprettOppdragOptionalForPeriode(
       now.minusMonths(3), now.plusMonths(1)
     )
-    every { skattConsumer.sendKontering(any()) } returns ResponseEntity.accepted().body(batchUid)
+    every { skattConsumer.sendKrav(any()) } returns ResponseEntity.accepted().body(batchUid)
     every { persistenceService.lagreOverforingKontering(any()) } returns 1
     every { persistenceService.lagreOppdrag(any()) } returns 1
 
-    val restResponse =
-      overforingTilSkattService.sendKontering(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
+    val restResponse = kravService.sendKrav(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
 
-    verify(exactly = 1) { skattConsumer.sendKontering(any()) }
+    verify(exactly = 1) { skattConsumer.sendKrav(any()) }
 
     restResponse.statusCode shouldBe HttpStatus.OK
   }
@@ -60,12 +59,11 @@ class OverforingTilSkattServiceTest {
     every { persistenceService.hentOppdrag(oppdragsId) } returns opprettOppdragOptionalForPeriode(
       now, now.plusMonths(1)
     )
-    every { skattConsumer.sendKontering(any()) } returns ResponseEntity.accepted().body(batchUid)
+    every { skattConsumer.sendKrav(any()) } returns ResponseEntity.accepted().body(batchUid)
     every { persistenceService.lagreOverforingKontering(any()) } returns 1
     every { persistenceService.lagreOppdrag(any()) } returns 1
 
-    val restResponse =
-      overforingTilSkattService.sendKontering(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
+    val restResponse = kravService.sendKrav(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
 
     restResponse.statusCode shouldBe HttpStatus.OK
   }
@@ -87,7 +85,7 @@ class OverforingTilSkattServiceTest {
       )
     )
 
-    val restResponse = overforingTilSkattService.sendKontering(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
+    val restResponse = kravService.sendKrav(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
 
     restResponse.statusCode shouldBe HttpStatus.NO_CONTENT
   }
@@ -97,7 +95,7 @@ class OverforingTilSkattServiceTest {
     every { persistenceService.hentOppdrag(oppdragsId) } returns Optional.empty()
 
     shouldThrow<NoSuchElementException> {
-      overforingTilSkattService.sendKontering(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
+      kravService.sendKrav(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
     }
   }
 

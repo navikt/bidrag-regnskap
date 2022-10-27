@@ -2,23 +2,20 @@ package no.nav.bidrag.regnskap.service
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.string.shouldStartWith
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.verify
+import no.nav.bidrag.behandling.felles.enums.EngangsbelopType
 import no.nav.bidrag.behandling.felles.enums.StonadType
-import no.nav.bidrag.regnskap.hendelse.SendKonteringerQueue
+import no.nav.bidrag.regnskap.hendelse.krav.SendKravQueue
 import no.nav.bidrag.regnskap.utils.TestData
 import no.nav.bidrag.regnskap.utils.TestDataGenerator.genererPersonnummer
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.springframework.web.client.HttpClientErrorException
-import java.time.LocalDate
-import java.time.YearMonth
 import java.util.*
 
 @ExtendWith(MockKExtension::class)
@@ -26,12 +23,15 @@ class OppdragServiceTest {
 
   @MockK
   private lateinit var persistenceService: PersistenceService
+
   @MockK
   private lateinit var oppdragsperiodeService: OppdragsperiodeService
+
   @MockK
   private lateinit var konteringService: KonteringService
+
   @MockK
-  private lateinit var sendKonteringerQueue: SendKonteringerQueue
+  private lateinit var sendKravQueue: SendKravQueue
 
   @InjectMockKs
   private lateinit var oppdragService: OppdragService
@@ -46,15 +46,14 @@ class OppdragServiceTest {
 
       every { persistenceService.hentOppdrag(any()) } returns Optional.of(
         TestData.opprettOppdrag(
-          stonadType = stonadType,
-          skyldnerIdent = skyldnerIdent
+          stonadType = stonadType, skyldnerIdent = skyldnerIdent
         )
       )
       every { oppdragsperiodeService.hentOppdragsperioderMedKonteringer(any()) } returns emptyList()
 
       val oppdragResponse = oppdragService.hentOppdrag(1)
 
-      oppdragResponse.stonadType shouldBe stonadType
+      oppdragResponse.type shouldBe stonadType
       oppdragResponse.skyldnerIdent shouldBe skyldnerIdent
     }
 
@@ -67,10 +66,7 @@ class OppdragServiceTest {
 
 
   @Nested
-  inner class LagreOppdrag {
-
-    val oppdragRequest = TestData.opprettOppdragRequest()
-
+  inner class OpprettOppdrag {
     @BeforeEach
     fun setUp() {
       every { persistenceService.lagreOppdrag(any()) } returns 1
@@ -78,32 +74,29 @@ class OppdragServiceTest {
 
     @Test
     fun `skal opprette oppdrag`() {
+      val hendelse = TestData.opprettHendelse()
 
-      every {
-        persistenceService.hentOppdragPaUnikeIdentifikatorer(
-          any(), any(), any(), any()
-        )
-      } returns Optional.empty()
-      every { oppdragsperiodeService.opprettNyOppdragsperiode(any(), any()) } returns TestData.opprettOppdragsperiode()
-      every { konteringService.opprettNyeKonteringer(any(), any()) } returns listOf(TestData.opprettKontering())
-      every { persistenceService.finnSisteOverfortePeriode() } returns YearMonth.now()
-      every { sendKonteringerQueue.leggTil(any()) } returns Unit
+      every { oppdragsperiodeService.opprettNyeOppdragsperioder(any(), any()) } returns listOf(TestData.opprettOppdragsperiode())
+      every { konteringService.opprettNyeKonteringerPaOppdragsperioder(any(), any(), any()) } returns Unit
+      every { sendKravQueue.leggTil(any()) } returns Unit
 
-      val oppdragId = oppdragService.lagreOppdrag(oppdragRequest)
+      val oppdragId = oppdragService.opprettNyttOppdrag(hendelse)
 
       oppdragId shouldBe 1
     }
 
     @Test
-    fun `skal ikke opprette oppdrag om det allerede eksisterer`() {
-      every {
-        persistenceService.hentOppdragPaUnikeIdentifikatorer(
-          any(), any(), any(), any()
-        )
-      } returns Optional.of(TestData.opprettOppdrag())
+    @Suppress("NonAscIICharacters")
+    fun `skal opprette oppdrag med engangsbeløpId satt`() {
+      val hendelse = TestData.opprettHendelse(engangsbelopId = 123, type = EngangsbelopType.GEBYR_MOTTAKER.name)
 
-      val exception = shouldThrow<HttpClientErrorException> { oppdragService.lagreOppdrag(oppdragRequest) }
-      exception.message shouldStartWith "400 Kombinasjonen av stonadType, kravhaverIdent, " + "skyldnerIdent og referanse viser til et allerede opprettet oppdrag"
+      every { oppdragsperiodeService.opprettNyeOppdragsperioder(any(), any()) } returns listOf(TestData.opprettOppdragsperiode())
+      every { konteringService.opprettNyeKonteringerPaOppdragsperioder(any(), any(), any()) } returns Unit
+      every { sendKravQueue.leggTil(any()) } returns Unit
+
+      val oppdragId = oppdragService.opprettNyttOppdrag(hendelse)
+
+      oppdragId shouldBe 1
     }
   }
 
@@ -111,38 +104,18 @@ class OppdragServiceTest {
   @Nested
   inner class OppdaterOppdrag {
 
-    @BeforeEach
-    fun setUp() {
-      every { persistenceService.lagreOppdrag(any()) } returns 1
-    }
-
     @Test
     fun `skal oppdatere oppdrag`() {
+      val hendelse = TestData.opprettHendelse()
       val oppdrag = TestData.opprettOppdrag()
 
-      every { konteringService.finnAlleOverforteKontering(any()) } returns listOf(TestData.opprettKontering())
-      every { konteringService.opprettErstattendeKonteringer(any(), any()) } returns listOf(TestData.opprettKontering())
-      every { konteringService.opprettNyeKonteringer(any(), any(), any()) } returns listOf(TestData.opprettKontering())
-      every {
-        persistenceService.hentOppdragPaUnikeIdentifikatorer(
-          any(), any(), any(), any()
-        )
-      } returns Optional.of(oppdrag)
-      every {
-        oppdragsperiodeService.setAktivTilDatoPaOppdragsperiodeOgOpprettNyOppdragsperiode(
-          any(),
-          any()
-        )
-      } returns TestData.opprettOppdragsperiode()
-      every { persistenceService.finnSisteOverfortePeriode() } returns YearMonth.now()
-      every { sendKonteringerQueue.leggTil(any()) } returns Unit
+      every { oppdragsperiodeService.opprettNyeOppdragsperioder(any(), any()) } returns listOf(TestData.opprettOppdragsperiode())
+      every { konteringService.opprettKorreksjonskonteringerForAlleredeOversendteKonteringer(any(), any()) } returns Unit
+      every { konteringService.opprettNyeKonteringerPaOppdragsperioder(any(), any(), any()) } returns Unit
+      every { sendKravQueue.leggTil(any()) } returns Unit
+      every { persistenceService.lagreOppdrag(oppdrag) } returns 1
 
-      oppdragService.oppdaterOppdrag(
-        TestData.opprettOppdragRequest(
-          periodeFra = LocalDate.now().minusMonths(4).withDayOfMonth(1),
-          periodeTil = LocalDate.now().plusMonths(4).withDayOfMonth(1)
-        )
-      )
+      oppdragService.oppdaterOppdrag(hendelse, oppdrag)
 
       verify { persistenceService.lagreOppdrag(oppdrag) }
     }

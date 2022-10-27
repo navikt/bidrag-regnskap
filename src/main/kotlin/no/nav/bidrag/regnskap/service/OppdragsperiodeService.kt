@@ -1,16 +1,15 @@
 package no.nav.bidrag.regnskap.service
 
-import no.nav.bidrag.regnskap.SECURE_LOGGER
-import no.nav.bidrag.regnskap.dto.OppdragRequest
 import no.nav.bidrag.regnskap.dto.OppdragsperiodeResponse
+import no.nav.bidrag.regnskap.hendelse.vedtak.Hendelse
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
 import org.springframework.stereotype.Service
+import java.math.RoundingMode
 import java.util.*
 
 @Service
 class OppdragsperiodeService(
-  val persistenceService: PersistenceService,
   val konteringService: KonteringService
 ) {
 
@@ -33,8 +32,7 @@ class OppdragsperiodeService(
           vedtaksdato = oppdragsperiode.vedtaksdato.toString(),
           opprettetAv = oppdragsperiode.opprettetAv,
           delytelseId = oppdragsperiode.delytelseId,
-          aktivTil = oppdragsperiode.aktivTil,
-          erstatterPeriode = oppdragsperiode.erstatterPeriode,
+          aktivTil = oppdragsperiode.aktivTil.toString(),
           konteringer = konteringService.hentKonteringer(oppdrag)
         )
       )
@@ -42,58 +40,32 @@ class OppdragsperiodeService(
     return oppdragsperiodeResponser
   }
 
-  fun opprettNyOppdragsperiode(oppdragRequest: OppdragRequest, oppdrag: Oppdrag): Oppdragsperiode {
-    return Oppdragsperiode(
-      vedtakId = oppdragRequest.vedtakId,
-      sakId = oppdragRequest.sakId,
-      gjelderIdent = oppdragRequest.gjelderIdent,
-      mottakerIdent = oppdragRequest.mottakerIdent,
-      belop = oppdragRequest.belop,
-      valuta = oppdragRequest.valuta,
-      periodeFra = oppdragRequest.periodeFra,
-      periodeTil = oppdragRequest.periodeTil,
-      vedtaksdato = oppdragRequest.vedtaksdato,
-      opprettetAv = oppdragRequest.opprettetAv,
-      delytelseId = oppdragRequest.delytelseId ?: genererRandomUUID(),
-      tekst = oppdragRequest.tekst,
-      oppdrag = oppdrag
-    )
-  }
+  fun opprettNyeOppdragsperioder(
+    hendelse: Hendelse, oppdrag: Oppdrag
+  ): List<Oppdragsperiode> {
+    val oppdragsperiodeListe = mutableListOf<Oppdragsperiode>()
 
-  fun setAktivTilDatoPaOppdragsperiodeOgOpprettNyOppdragsperiode(
-    oppdragsperioder: List<Oppdragsperiode>?, oppdragRequest: OppdragRequest
-  ): Oppdragsperiode {
-    oppdragsperioder?.forEach { gamleOppdragsperiode ->
-      if (gamleOppdragsperiode.aktivTil == null) {
-        gamleOppdragsperiode.aktivTil =
-          if (oppdragRequest.periodeFra.isBefore(gamleOppdragsperiode.periodeFra)) gamleOppdragsperiode.periodeFra
-          else oppdragRequest.periodeFra
-        persistenceService.lagreOppdragsperiode(gamleOppdragsperiode)
-
-        return Oppdragsperiode(
-          vedtakId = oppdragRequest.vedtakId,
-          sakId = oppdragRequest.sakId,
-          gjelderIdent = oppdragRequest.gjelderIdent,
-          mottakerIdent = oppdragRequest.mottakerIdent,
-          belop = oppdragRequest.belop,
-          valuta = oppdragRequest.valuta,
-          periodeFra = oppdragRequest.periodeFra,
-          periodeTil = oppdragRequest.periodeTil,
-          vedtaksdato = oppdragRequest.vedtaksdato,
-          opprettetAv = oppdragRequest.opprettetAv,
-          delytelseId = oppdragRequest.delytelseId ?: genererRandomUUID(),
-          tekst = oppdragRequest.tekst,
-          oppdrag = gamleOppdragsperiode.oppdrag,
-          erstatterPeriode = gamleOppdragsperiode.oppdragsperiodeId
+    hendelse.periodeListe.forEachIndexed { index, periode ->
+      oppdragsperiodeListe.add(
+        Oppdragsperiode(
+          vedtakId = hendelse.vedtakId,
+          sakId = hendelse.sakId,
+          gjelderIdent = "22222222226", //TODO() Avklare med skatt. Dummynr per nå
+          mottakerIdent = hendelse.mottakerIdent,
+          belop = periode.belop.setScale(0, RoundingMode.HALF_UP).intValueExact(),
+          valuta = periode.valutakode,
+          periodeFra = periode.periodeFomDato,
+          periodeTil = periode.periodeTilDato,
+          vedtaksdato = hendelse.vedtakDato,
+          opprettetAv = hendelse.opprettetAv,
+          delytelseId = periode.referanse ?: genererRandomUUID(),
+          aktivTil = periode.periodeTilDato,
+          oppdrag = oppdrag
         )
-      }
+      )
     }
-    SECURE_LOGGER.error("Fant ingen aktiv oppdragsperiode på oppdrag med " +
-        "stonadType: ${oppdragRequest.stonadType}, " +
-        "kravhaverIdent: ${oppdragRequest.kravhaverIdent} " +
-        "skyldnerIdent: ${oppdragRequest.skyldnerIdent} " +
-        "referanse: ${oppdragRequest.referanse}")
-    throw IllegalStateException("Fant ingen aktiv oppdragsperiode på oppdraget.")
+
+    return oppdragsperiodeListe
   }
 
   private fun genererRandomUUID(): String {

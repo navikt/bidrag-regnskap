@@ -19,14 +19,16 @@ class MaskinportenController(
   @Operation(
     summary = "Hent Maskinporten-token med gitte scopes",
     description = "Gyldig Maskinporten-token returneres dersom alle oppgitte scopes finnes i konfigurasjonen til klienten."
-  ) @ApiResponses(
+  )
+  @ApiResponses(
     ApiResponse(
       responseCode = "200", description = "Gyldig token returnert"
     ), ApiResponse(
       responseCode = "400",
       description = "Noen eller alle oppgitte scopes finnes ikke i konfigurasjonen",
     )
-  ) @GetMapping(value = ["/token"])
+  )
+  @GetMapping(value = ["/token"])
   fun hentToken(scopes: String): ResponseEntity<SignedJWT> {
     return ResponseEntity.ok(maskinportenClient.hentMaskinportenToken(scopes))
   }

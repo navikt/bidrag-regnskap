@@ -1,7 +1,7 @@
 package no.nav.bidrag.regnskap.service
 
-import no.nav.bidrag.regnskap.dto.PalopRequest
-import no.nav.bidrag.regnskap.dto.PalopResponse
+import no.nav.bidrag.regnskap.dto.palopRequest
+import no.nav.bidrag.regnskap.dto.palopResponse
 import no.nav.bidrag.regnskap.persistence.entity.Palop
 import org.springframework.stereotype.Service
 
@@ -10,14 +10,14 @@ class PalopService(
   val persistenceService: PersistenceService,
 ) {
 
-  fun hentPalop(): List<PalopResponse> {
+  fun hentPalop(): List<palopResponse> {
     val palopListe = persistenceService.hentPalop()
 
-    val palopResponseListe = mutableListOf<PalopResponse>()
+    val palopResponseListe = mutableListOf<palopResponse>()
 
     palopListe.forEach { palop ->
       palopResponseListe.add(
-        PalopResponse(
+        palopResponse(
           palopId = palop.palopId,
           kjoredato = palop.kjoredato.toString(),
           fullfortTidspunkt = palop.fullfortTidspunkt.toString(),
@@ -29,10 +29,9 @@ class PalopService(
     return palopResponseListe
   }
 
-  fun lagrePalop(palopRequest: PalopRequest): Int {
+  fun lagrePalop(palopRequest: palopRequest): Int {
     val palop = Palop(
-      kjoredato = palopRequest.kjoredato,
-      forPeriode = palopRequest.forPeriode.toString()
+      kjoredato = palopRequest.kjoredato, forPeriode = palopRequest.forPeriode.toString()
     )
 
     return persistenceService.lagrePalop(palop)!!

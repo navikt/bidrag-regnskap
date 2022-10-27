@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.OneToMany
+import javax.persistence.Version
 
 @Entity(name = "oppdrag")
 data class Oppdrag(
@@ -27,8 +28,8 @@ data class Oppdrag(
   @Column(name = "skyldner_ident")
   val skyldnerIdent: String,
 
-  @Column(name = "referanse")
-  val referanse: String? = null,
+  @Column(name = "ekstern_referanse")
+  val eksternReferanse: String? = null,
 
   @Column(name = "utsatt_til_dato")
   val utsattTilDato: LocalDate? = null,
@@ -37,12 +38,26 @@ data class Oppdrag(
   var sistOversendtePeriode: String? = null,
 
   @Column(name = "endret_tidspunkt")
+  @Version
   var endretTidspunkt: LocalDateTime? = null,
+
+  @Column(name = "engangsbelop_id")
+  val engangsbelopId: Int? = null,
 
   @OneToMany(mappedBy = "oppdrag", cascade = [CascadeType.ALL])
   var oppdragsperioder: List<Oppdragsperiode>? = null
 ) {
   override fun toString(): String {
-    return ""
+    return "Oppdrag(" +
+        "oppdragId=$oppdragId, " +
+        "stonadType='$stonadType, " +
+        "kravhaverIdent=$kravhaverIdent, " +
+        "skyldnerIdent=$skyldnerIdent, " +
+        "eksternReferanse=$eksternReferanse, " +
+        "utsattTilDato=$utsattTilDato, " +
+        "sistOversendtePeriode=$sistOversendtePeriode, " +
+        "endretTidspunkt=$endretTidspunkt, " +
+        "engangsbelopId=$engangsbelopId, " +
+        "oppdragsperioder=$oppdragsperioder)"
   }
 }

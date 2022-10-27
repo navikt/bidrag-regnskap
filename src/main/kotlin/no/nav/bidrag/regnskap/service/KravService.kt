@@ -5,10 +5,10 @@ import no.nav.bidrag.regnskap.SECURE_LOGGER
 import no.nav.bidrag.regnskap.consumer.SkattConsumer
 import no.nav.bidrag.regnskap.dto.GebyrRolle
 import no.nav.bidrag.regnskap.dto.Justering
-import no.nav.bidrag.regnskap.dto.SkattFeiletKonteringerResponse
+import no.nav.bidrag.regnskap.dto.SkattFeiletKravResponse
 import no.nav.bidrag.regnskap.dto.SkattKontering
-import no.nav.bidrag.regnskap.dto.SkattKonteringerRequest
-import no.nav.bidrag.regnskap.dto.SkattVellykketKonteringResponse
+import no.nav.bidrag.regnskap.dto.SkattKravRequest
+import no.nav.bidrag.regnskap.dto.SkattVellykketKravResponse
 import no.nav.bidrag.regnskap.dto.Transaksjonskode
 import no.nav.bidrag.regnskap.dto.Type
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
@@ -25,16 +25,16 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
 
-private val LOGGER = LoggerFactory.getLogger(OverforingTilSkattService::class.java)
+private val LOGGER = LoggerFactory.getLogger(KravService::class.java)
 private val objectMapper = jacksonObjectMapper()
 
 @Service
-class OverforingTilSkattService(
+class KravService(
   val skattConsumer: SkattConsumer, val persistenceService: PersistenceService
 ) {
 
-  fun sendKontering(oppdragId: Int, periode: YearMonth): ResponseEntity<*> {
-    LOGGER.info("Starter overføring av kontering til skatt for oppdragId: $oppdragId")
+  fun sendKrav(oppdragId: Int, periode: YearMonth): ResponseEntity<*> {
+    LOGGER.info("Starter overføring av krav til skatt for oppdragId: $oppdragId")
 
     val oppdrag = persistenceService.hentOppdrag(oppdragId).get()
     val oppdragsperioderMedUsendteKonteringer = hentOppdragsperioderMedUsendteKonteringer(oppdrag)
@@ -46,45 +46,40 @@ class OverforingTilSkattService(
     }
 
     val alleIkkeOverforteKonteringer = finnAlleIkkeOverforteKonteringer(oppdragsperioderMedUsendteKonteringer)
-    val skattKonteringerListe = opprettSkattKonteringerRequest(alleIkkeOverforteKonteringer, periode)
+    val skattKravRequest = opprettSkattKravRequest(alleIkkeOverforteKonteringer, periode)
 
-
-    val skattResponse = skattConsumer.sendKontering(SkattKonteringerRequest(skattKonteringerListe))
+    val skattResponse = skattConsumer.sendKrav(skattKravRequest)
 
     when (skattResponse.statusCode) {
 
       HttpStatus.ACCEPTED -> {
         SECURE_LOGGER.info("Mottok svar fra skatt: \n${skattResponse}")
 
-        val skattVellykketKonteringResponse =
-          objectMapper.readValue(skattResponse.body, SkattVellykketKonteringResponse::class.java)
-        lagreVellykketOverforingAvKonteringer(
-          alleIkkeOverforteKonteringer, skattVellykketKonteringResponse, oppdrag, periode
-        )
-        return ResponseEntity.ok(skattVellykketKonteringResponse)
+        val skattVellykketKravResponse = objectMapper.readValue(skattResponse.body, SkattVellykketKravResponse::class.java)
+        lagreVellykketOverforingAvKrav(alleIkkeOverforteKonteringer, skattVellykketKravResponse, oppdrag, periode)
+        return ResponseEntity.ok(skattVellykketKravResponse)
       }
 
       HttpStatus.BAD_REQUEST -> {
-        LOGGER.info("En eller flere konteringer har ikke gått gjennom validering. Se secure log for mer informasjon.")
-        SECURE_LOGGER.info("En eller flere konteringer har ikke gått gjennom validering, ${skattResponse.body}")
+        LOGGER.error("En eller flere konteringer har ikke gått gjennom validering. Se secure log for mer informasjon.")
+        SECURE_LOGGER.error("En eller flere konteringer har ikke gått gjennom validering, ${skattResponse.body}")
 
-        val skattFeiletKonteringResponse =
-          objectMapper.readValue(skattResponse.body, SkattFeiletKonteringerResponse::class.java)
-        lagreFeiletOverforingAvKonteringer(alleIkkeOverforteKonteringer, skattFeiletKonteringResponse.toString())
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(skattFeiletKonteringResponse)
+        val skattFeiletKravResponse = objectMapper.readValue(skattResponse.body, SkattFeiletKravResponse::class.java)
+        lagreFeiletOverforingAvKrav(alleIkkeOverforteKonteringer, skattFeiletKravResponse.toString())
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(skattFeiletKravResponse)
       }
 
       HttpStatus.SERVICE_UNAVAILABLE -> {
         LOGGER.info("Tjenesten hos skatt er slått av. Dette kan skje enten ved innlesing av påløpsfil eller ved andre uventede feil.")
 
-        lagreFeiletOverforingAvKonteringer(alleIkkeOverforteKonteringer, skattResponse.statusCode.toString())
+        lagreFeiletOverforingAvKrav(alleIkkeOverforteKonteringer, skattResponse.statusCode.toString())
         throw HttpServerErrorException(skattResponse.statusCode)
       }
 
       HttpStatus.UNAUTHORIZED, HttpStatus.FORBIDDEN -> {
         LOGGER.info("Bidrag-Regnskap er ikke autorisert eller mangler rettigheter for kallet mot skatt.")
 
-        lagreFeiletOverforingAvKonteringer(alleIkkeOverforteKonteringer, skattResponse.statusCode.toString())
+        lagreFeiletOverforingAvKrav(alleIkkeOverforteKonteringer, skattResponse.statusCode.toString())
         throw JwtTokenUnauthorizedException()
       }
 
@@ -94,9 +89,9 @@ class OverforingTilSkattService(
     }
   }
 
-  private fun lagreVellykketOverforingAvKonteringer(
+  private fun lagreVellykketOverforingAvKrav(
     alleIkkeOverforteKonteringer: List<Kontering>,
-    skattVellykketKonteringResponse: SkattVellykketKonteringResponse,
+    skattVellykketKravResponse: SkattVellykketKravResponse,
     oppdrag: Oppdrag,
     periode: YearMonth
   ) {
@@ -106,10 +101,7 @@ class OverforingTilSkattService(
 
       persistenceService.lagreOverforingKontering(
         opprettOverforingKontering(
-          kontering = kontering,
-          referanseKode = skattVellykketKonteringResponse.batchUid,
-          tidspunkt = now,
-          kanal = "REST"
+          kontering = kontering, referanseKode = skattVellykketKravResponse.batchUid, tidspunkt = now, kanal = "REST"
         )
       )
     }
@@ -117,40 +109,29 @@ class OverforingTilSkattService(
     persistenceService.lagreOppdrag(oppdrag)
   }
 
-  private fun lagreFeiletOverforingAvKonteringer(
-    alleIkkeOverforteKonteringer: List<Kontering>, skattFeiletKonteringerResponse: String
+  private fun lagreFeiletOverforingAvKrav(
+    alleIkkeOverforteKonteringer: List<Kontering>, skattFeiletKravResponse: String
   ) {
     alleIkkeOverforteKonteringer.forEach { kontering ->
       persistenceService.lagreOverforingKontering(
         opprettOverforingKontering(
-          kontering = kontering,
-          tidspunkt = LocalDateTime.now(),
-          feilmelding = skattFeiletKonteringerResponse,
-          kanal = "REST"
+          kontering = kontering, tidspunkt = LocalDateTime.now(), feilmelding = skattFeiletKravResponse, kanal = "REST"
         )
       )
     }
   }
 
   private fun opprettOverforingKontering(
-    kontering: Kontering,
-    referanseKode: String? = null,
-    tidspunkt: LocalDateTime,
-    feilmelding: String? = null,
-    kanal: String
+    kontering: Kontering, referanseKode: String? = null, tidspunkt: LocalDateTime, feilmelding: String? = null, kanal: String
   ): OverforingKontering {
     return OverforingKontering(
-      kontering = kontering,
-      referansekode = referanseKode,
-      feilmelding = feilmelding,
-      tidspunkt = tidspunkt,
-      kanal = kanal
+      kontering = kontering, referansekode = referanseKode, feilmelding = feilmelding, tidspunkt = tidspunkt, kanal = kanal
     )
   }
 
-  private fun opprettSkattKonteringerRequest(
+  private fun opprettSkattKravRequest(
     konteringerListe: List<Kontering>, periode: YearMonth
-  ): List<SkattKontering> {
+  ): SkattKravRequest {
     val skattKonteringerListe = mutableListOf<SkattKontering>()
     konteringerListe.forEach { kontering ->
       skattKonteringerListe.add(
@@ -170,13 +151,13 @@ class OverforingTilSkattService(
           kjoredato = LocalDate.now(),
           saksbehandlerId = kontering.oppdragsperiode.opprettetAv,
           attestantId = kontering.oppdragsperiode.opprettetAv,
-          tekst = kontering.oppdragsperiode.tekst,
-          fagsystemId = "Bidrag-regnskap", //TODO hvordan finne denne?
+          tekst = kontering.oppdragsperiode.oppdrag.eksternReferanse,
+          fagsystemId = kontering.oppdragsperiode.sakId,
           delytelsesId = kontering.oppdragsperiode.delytelseId
         )
       )
     }
-    return skattKonteringerListe
+    return SkattKravRequest(skattKonteringerListe)
   }
 
   private fun hentOppdragsperioderMedUsendteKonteringer(

@@ -2,14 +2,18 @@ package no.nav.bidrag.regnskap.service
 
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
+import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
+import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
+import io.mockk.verify
 import no.nav.bidrag.regnskap.dto.Transaksjonskode
 import no.nav.bidrag.regnskap.dto.Type
 import no.nav.bidrag.regnskap.utils.TestData
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
 
@@ -18,6 +22,9 @@ class KonteringServiceTest {
 
   @InjectMockKs
   private lateinit var konteringService: KonteringService
+
+  @MockK
+  private lateinit var persistenceService: PersistenceService
 
 
   @Nested
@@ -65,48 +72,68 @@ class KonteringServiceTest {
   inner class OpprettKontering {
     @Test
     fun `Skal opprette nye konteringer`() {
-      val perioderForOppdrag = listOf<YearMonth>(YearMonth.now().minusMonths(1), YearMonth.now())
-      val oppdragsperiode = TestData.opprettOppdragsperiode()
+      val oppdragsperiode = listOf(
+        TestData.opprettOppdragsperiode(
+          konteringer = emptyList(), periodeFra = LocalDate.now().minusMonths(3), periodeTil = LocalDate.now().minusMonths(1)
+        )
+      )
+      val hendelse = TestData.opprettHendelse()
 
-      val nyeKonteringer = konteringService.opprettNyeKonteringer(perioderForOppdrag, oppdragsperiode)
+      every { persistenceService.finnSisteOverfortePeriode() } returns YearMonth.of(
+        LocalDate.now().year, LocalDate.now().month
+      )
 
-      nyeKonteringer[0].overforingsperiode shouldBe YearMonth.now().minusMonths(1).toString()
-      nyeKonteringer[1].overforingsperiode shouldBe YearMonth.now().toString()
-      nyeKonteringer[0].type shouldBe Type.NY.toString()
-      nyeKonteringer[1].type shouldBe Type.ENDRING.toString()
+      konteringService.opprettNyeKonteringerPaOppdragsperioder(oppdragsperiode, hendelse)
+
+      oppdragsperiode[0].konteringer!! shouldHaveSize 2
     }
 
     @Test
-    fun `Skal opprette erstattende konteringer`() {
+    fun `Skal opprette korreksjonskonteringer`() {
+      val now = LocalDate.now()
       val transaksjonskode = Transaksjonskode.B1
-      val overforingsperiode = YearMonth.now()
-
+      val overforingsperiode = YearMonth.of(now.year, now.month)
       val konteringer = listOf(
         TestData.opprettKontering(
           konteringId = 1,
           transaksjonskode = transaksjonskode.toString(),
           overforingsperiode = overforingsperiode.toString(),
-          type = Type.NY.toString()
+          type = Type.NY.toString(),
+          overforingstidspunkt = LocalDateTime.now()
         ), TestData.opprettKontering(
           konteringId = 2,
           transaksjonskode = transaksjonskode.toString(),
           overforingsperiode = overforingsperiode.plusMonths(1).toString(),
-          type = Type.ENDRING.toString()
+          type = Type.ENDRING.toString(),
+          overforingstidspunkt = LocalDateTime.now()
+        )
+      )
+      val nyOppdragsperiode = TestData.opprettOppdragsperiode(periodeFra = now, periodeTil = now.plusMonths(2))
+      val oppdrag = TestData.opprettOppdrag(
+        oppdragsperioder = listOf(
+          TestData.opprettOppdragsperiode(
+            konteringer = konteringer
+          )
         )
       )
 
-      val erstattendeKontering = konteringService.opprettErstattendeKonteringer(konteringer, listOf(overforingsperiode))
+      every { persistenceService.finnSisteOverfortePeriode() } returns YearMonth.of(
+        now.year, now.month
+      ).plusMonths(5)
+      every { persistenceService.lagreKontering(any()) } returns 1
 
-      erstattendeKontering shouldHaveSize 1
-      erstattendeKontering[0].overforingsperiode shouldBe overforingsperiode.toString()
-      erstattendeKontering[0].transaksjonskode shouldBe transaksjonskode.korreksjonskode
-      erstattendeKontering[0].type shouldBe Type.ENDRING.toString()
+      konteringService.opprettKorreksjonskonteringerForAlleredeOversendteKonteringer(
+        oppdrag, listOf(nyOppdragsperiode)
+      )
+
+      verify(exactly = 2) { persistenceService.lagreKontering(any()) }
     }
 
     @Test
-    fun `Skal ikke opprette erstattende konteringer for korreksjoner`() {
+    fun `Skal ikke opprette korreksjonskonteringer for allerede korrigerte konteringer`() {
+      val now = LocalDate.now()
+      val overforingsperiode = YearMonth.of(now.year, now.month)
       val transaksjonskode = Transaksjonskode.B3
-      val overforingsperiode = YearMonth.now()
 
       val konteringer = listOf(
         TestData.opprettKontering(
@@ -117,9 +144,25 @@ class KonteringServiceTest {
         )
       )
 
-      val erstattendeKontering = konteringService.opprettErstattendeKonteringer(konteringer, listOf(overforingsperiode))
+      val nyOppdragsperiode = TestData.opprettOppdragsperiode(periodeFra = now, periodeTil = now.plusMonths(2))
+      val oppdrag = TestData.opprettOppdrag(
+        oppdragsperioder = listOf(
+          TestData.opprettOppdragsperiode(
+            konteringer = konteringer
+          )
+        )
+      )
 
-      erstattendeKontering shouldHaveSize 0
+      every { persistenceService.finnSisteOverfortePeriode() } returns YearMonth.of(
+        now.year, now.month
+      ).plusMonths(5)
+      every { persistenceService.lagreKontering(any()) } returns 1
+
+      konteringService.opprettKorreksjonskonteringerForAlleredeOversendteKonteringer(
+        oppdrag, listOf(nyOppdragsperiode)
+      )
+
+      verify(exactly = 0) { persistenceService.lagreKontering(any()) }
     }
   }
 

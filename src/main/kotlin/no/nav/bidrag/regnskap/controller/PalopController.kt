@@ -5,8 +5,8 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import no.nav.bidrag.regnskap.dto.PalopRequest
-import no.nav.bidrag.regnskap.dto.PalopResponse
+import no.nav.bidrag.regnskap.dto.palopRequest
+import no.nav.bidrag.regnskap.dto.palopResponse
 import no.nav.bidrag.regnskap.service.PalopService
 import no.nav.security.token.support.core.api.Protected
 import org.springframework.http.ResponseEntity
@@ -39,7 +39,7 @@ class PalopController(
       content = [Content()]
     )]
   )
-  fun hentPalop(): ResponseEntity<List<PalopResponse>> {
+  fun hentPalop(): ResponseEntity<List<palopResponse>> {
     return ResponseEntity.ok(palopService.hentPalop())
   }
 
@@ -62,7 +62,7 @@ class PalopController(
       content = [Content()]
     )]
   )
-  fun lagrePalop(palopRequest: PalopRequest): ResponseEntity<Int> {
+  fun lagrePalop(palopRequest: palopRequest): ResponseEntity<Int> {
     return ResponseEntity.ok(palopService.lagrePalop(palopRequest))
   }
 }

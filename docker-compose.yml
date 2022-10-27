@@ -21,24 +21,9 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-
-  topics:
-    image: confluentinc/cp-kafka:latest
-    depends_on:
-      - kafka
-    entrypoint: [ '/bin/sh', '-c' ]
-    command: |
-      "
-      echo -e 'Waiting until Kafka is ready'
-      kafka-topics --bootstrap-server kafka:29092 --list
-      echo -e 'Creating Kafka topic(s)'
-      kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists --topic bidrag-vedtak --replication-factor 1 --partitions 1
-      echo -e 'The following topic(s) are now available'
-      kafka-topics --bootstrap-server kafka:29092 --list
-      echo -e 'Ready to go!'
-      "
 
   database:
       image: postgres:latest

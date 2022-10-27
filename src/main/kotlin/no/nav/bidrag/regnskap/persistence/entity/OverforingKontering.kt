@@ -34,6 +34,12 @@ data class OverforingKontering(
   val kanal: String
 ) {
   override fun toString(): String {
-    return ""
+    return "OverforingKontering(" +
+        "overforingId=$overforingId, " +
+        "konteringId=${kontering?.konteringId}, " +
+        "referansekode=$referansekode, " +
+        "feilmelding=$feilmelding, " +
+        "tidspunkt=$tidspunkt, " +
+        "kanal=$kanal)"
   }
 }

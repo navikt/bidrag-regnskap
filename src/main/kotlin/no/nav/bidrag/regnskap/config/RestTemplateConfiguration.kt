@@ -18,22 +18,22 @@ import org.springframework.web.client.RestTemplate
 @Configuration
 @EnableSecurityConfiguration
 class RestTemplateConfiguration {
-    @Bean
-    @Scope("prototype")
-    fun baseRestTemplate(@Value("\${NAIS_APP_NAME}") naisAppName: String, metricsRestTemplateCustomizer: MetricsRestTemplateCustomizer ): RestTemplate {
-        val restTemplate = HttpHeaderRestTemplate()
-        restTemplate.requestFactory = HttpComponentsClientHttpRequestFactory()
-        restTemplate.withDefaultHeaders()
-        restTemplate.addHeaderGenerator("Nav-Callid") { CorrelationId.fetchCorrelationIdForThread() }
-        restTemplate.addHeaderGenerator("Nav-Consumer-Id") { naisAppName }
-        metricsRestTemplateCustomizer.customize(restTemplate)
-        return restTemplate
-    }
+  @Bean
+  @Scope("prototype")
+  fun baseRestTemplate(
+    @Value("\${NAIS_APP_NAME}") naisAppName: String, metricsRestTemplateCustomizer: MetricsRestTemplateCustomizer
+  ): RestTemplate {
+    val restTemplate = HttpHeaderRestTemplate()
+    restTemplate.requestFactory = HttpComponentsClientHttpRequestFactory()
+    restTemplate.withDefaultHeaders()
+    restTemplate.addHeaderGenerator("Nav-Callid") { CorrelationId.fetchCorrelationIdForThread() }
+    restTemplate.addHeaderGenerator("Nav-Consumer-Id") { naisAppName }
+    metricsRestTemplateCustomizer.customize(restTemplate)
+    return restTemplate
+  }
 
-    @Bean
-    fun jackson2ObjectMapperBuilder(): Jackson2ObjectMapperBuilder {
-        return Jackson2ObjectMapperBuilder()
-            .serializationInclusion(JsonInclude.Include.NON_NULL)
-            .modulesToInstall(JavaTimeModule())
-    }
+  @Bean
+  fun jackson2ObjectMapperBuilder(): Jackson2ObjectMapperBuilder {
+    return Jackson2ObjectMapperBuilder().serializationInclusion(JsonInclude.Include.NON_NULL).modulesToInstall(JavaTimeModule())
+  }
 }

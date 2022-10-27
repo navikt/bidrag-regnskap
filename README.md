@@ -26,6 +26,7 @@ For å hente ut gyldig maskinporten JWT-Token må maskinporten.privateKey legges
 ```bash
 kubectl exec --tty deployment/bidrag-regnskap-feature -- printenv | grep -e MASKINPORTEN_CLIENT_JWK
 ```
+Merk: For å få client_jwk til å tolkes riktig i application-local-yaml må alle gåseøyne (") escapes slik (\") og hele nøkkelen må omringes med et sett med gåseøyne.
 
 #### Lokal database
 Dette blir opprettet når du kjører på root mappen
@@ -47,19 +48,10 @@ password: admin
 Start kafka lokalt i en docker container samtidig som databasen
 
 Bruk `kafkacat` til å sende meldinger til kafka topic.
-#### Windows 
-Kafkacat må installeres via wsl (Windows Subsystem for Windows).
 ```bash
-wsl kafkacat -b localhost:9092 -t bidrag.vedtak-feature -P -K:
-```
-#### MacOS
-```bash
-kcat -b localhost:9092 -t bidrag-journalpost -P -K:
+docker run -it --rm --network=host confluentinc/cp-kafkacat kafkacat -b 0.0.0.0:9092 -t bidrag.vedtak-feature -P
 ```
 og lim inn:
-```bash
-TODO
-```
 ```bash
 TODO
 ```

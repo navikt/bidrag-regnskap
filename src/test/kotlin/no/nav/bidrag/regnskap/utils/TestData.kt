@@ -1,59 +1,26 @@
 package no.nav.bidrag.regnskap.utils
 
+import no.nav.bidrag.behandling.felles.dto.vedtak.Engangsbelop
+import no.nav.bidrag.behandling.felles.dto.vedtak.Periode
+import no.nav.bidrag.behandling.felles.dto.vedtak.Stonadsendring
+import no.nav.bidrag.behandling.felles.dto.vedtak.VedtakHendelse
+import no.nav.bidrag.behandling.felles.enums.EngangsbelopType
 import no.nav.bidrag.behandling.felles.enums.StonadType
-import no.nav.bidrag.regnskap.dto.OppdragRequest
+import no.nav.bidrag.behandling.felles.enums.VedtakType
 import no.nav.bidrag.regnskap.dto.Transaksjonskode
 import no.nav.bidrag.regnskap.dto.Type
+import no.nav.bidrag.regnskap.hendelse.vedtak.Hendelse
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
 import no.nav.bidrag.regnskap.persistence.entity.OverforingKontering
+import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
+import java.util.*
 
 object TestData {
-
-  fun opprettOppdragRequest(
-    stonadType: StonadType = StonadType.BIDRAG,
-    kravhaverIdent: String = TestDataGenerator.genererPersonnummer(),
-    skyldnerIdent: String = TestDataGenerator.genererPersonnummer(),
-    sakId: Int = 123456,
-    vedtakId: Int = 654321,
-    gjelderIdent: String = TestDataGenerator.genererPersonnummer(),
-    mottakerIdent: String = TestDataGenerator.genererPersonnummer(),
-    belop: Int = 7500,
-    valuta: String = "NOK",
-    periodeFra: LocalDate = LocalDate.now().minusMonths(6).withDayOfMonth(1),
-    periodeTil: LocalDate = LocalDate.now().plusMonths(6).withDayOfMonth(1),
-    vedtakDato: LocalDate = LocalDate.now(),
-    opprettetAv: String = "SaksbehandlerId",
-    delytelseId: String? = null,
-    referanse: String? = null,
-    utsattTilDato: LocalDate? = null,
-    tekst: String? = null
-
-  ): OppdragRequest {
-    return OppdragRequest(
-      stonadType = stonadType,
-      kravhaverIdent = kravhaverIdent,
-      skyldnerIdent = skyldnerIdent,
-      sakId = sakId,
-      vedtakId = vedtakId,
-      gjelderIdent = gjelderIdent,
-      mottakerIdent = mottakerIdent,
-      belop = belop,
-      valuta = valuta,
-      periodeFra = periodeFra,
-      periodeTil = periodeTil,
-      vedtaksdato = vedtakDato,
-      opprettetAv = opprettetAv,
-      delytelseId = delytelseId,
-      referanse = referanse,
-      utsattTilDato = utsattTilDato,
-      tekst = tekst
-    )
-  }
 
   fun opprettOppdrag(
     oppdragId: Int? = null,
@@ -61,7 +28,6 @@ object TestData {
     skyldnerIdent: String = TestDataGenerator.genererPersonnummer(),
     oppdragsperioder: List<Oppdragsperiode>? = listOf(opprettOppdragsperiode()),
     kravhaverIdent: String = TestDataGenerator.genererPersonnummer(),
-    referanse: String? = null,
     utsattTilDato: LocalDate? = null,
     sistOversendtePeriode: String? = null,
     endretTidspunkt: LocalDateTime? = null
@@ -72,17 +38,136 @@ object TestData {
       skyldnerIdent = skyldnerIdent,
       oppdragsperioder = oppdragsperioder,
       kravhaverIdent = kravhaverIdent,
-      referanse = referanse,
       utsattTilDato = utsattTilDato,
       sistOversendtePeriode = sistOversendtePeriode,
       endretTidspunkt = endretTidspunkt
     )
   }
 
+  fun opprettVedtakhendelse(
+    vedtakType: VedtakType = VedtakType.MANUELT,
+    vedtakId: Int = 12345,
+    vedtakDato: LocalDate = LocalDate.now(),
+    enhetId: String = "Oslo 2",
+    eksternReferanse: String = "Utenlandsavdeling notat",
+    utsattTilDato: LocalDate = LocalDate.now().plusDays(3),
+    opprettetAv: String = "Saksbehandler",
+    opprettetTidspunkt: LocalDateTime = LocalDateTime.now(),
+    stonadsendringListe: List<Stonadsendring> = listOf(opprettStonadsending()),
+    engangsbelopListe: List<Engangsbelop> = listOf(opprettEngangsbelop())
+  ): VedtakHendelse {
+    return VedtakHendelse(
+      vedtakType = vedtakType,
+      vedtakId = vedtakId,
+      vedtakDato = vedtakDato,
+      enhetId = enhetId,
+      eksternReferanse = eksternReferanse,
+      utsattTilDato = utsattTilDato,
+      opprettetAv = opprettetAv,
+      opprettetTidspunkt = opprettetTidspunkt,
+      stonadsendringListe = stonadsendringListe,
+      engangsbelopListe = engangsbelopListe
+    )
+  }
+
+  fun opprettEngangsbelop(
+    engangsbelopId: Int = 123,
+    type: EngangsbelopType = EngangsbelopType.GEBYR_SKYLDNER,
+    sakId: String = "Sak123",
+    skyldnerId: String = TestDataGenerator.genererPersonnummer(),
+    kravhaverId: String = TestDataGenerator.genererPersonnummer(),
+    mottakerId: String = TestDataGenerator.genererPersonnummer(),
+    belop: BigDecimal = BigDecimal.valueOf(1200),
+    valutakode: String = "NOK",
+    resultatkode: String = "KOS",
+    referanse: String = UUID.randomUUID().toString()
+  ): Engangsbelop {
+    return Engangsbelop(
+      engangsbelopId = engangsbelopId,
+      type = type,
+      sakId = sakId,
+      skyldnerId = skyldnerId,
+      kravhaverId = kravhaverId,
+      mottakerId = mottakerId,
+      belop = belop,
+      valutakode = valutakode,
+      resultatkode = resultatkode,
+      referanse = referanse
+    )
+  }
+
+  fun opprettStonadsending(
+    stonadType: StonadType = StonadType.BIDRAG,
+    sakId: String = "SAK1",
+    skyldnerId: String = TestDataGenerator.genererPersonnummer(),
+    kravhaverId: String = TestDataGenerator.genererPersonnummer(),
+    mottakerId: String = TestDataGenerator.genererPersonnummer(),
+    periodeListe: List<Periode> = listOf(opprettPeriode())
+  ): Stonadsendring {
+    return Stonadsendring(
+      stonadType = stonadType,
+      sakId = sakId,
+      skyldnerId = skyldnerId,
+      kravhaverId = kravhaverId,
+      mottakerId = mottakerId,
+      periodeListe = periodeListe
+    )
+  }
+
+  fun opprettPeriode(
+    periodeFomDato: LocalDate = LocalDate.now().minusMonths(2).withDayOfMonth(1),
+    periodeTilDato: LocalDate = LocalDate.now(),
+    belop: BigDecimal = BigDecimal.valueOf(7500),
+    valutakode: String = "NOK",
+    resultatkode: String = "ABC",
+    referanse: String? = UUID.randomUUID().toString()
+  ): Periode {
+    return Periode(
+      periodeFomDato = periodeFomDato,
+      periodeTilDato = periodeTilDato,
+      belop = belop,
+      valutakode = valutakode,
+      resultatkode = resultatkode,
+      referanse = referanse
+    )
+  }
+
+  fun opprettHendelse(
+    engangsbelopId: Int? = null,
+    type: String = StonadType.BIDRAG.name,
+    vedtakType: VedtakType = VedtakType.MANUELT,
+    kravhaverIdent: String = TestDataGenerator.genererPersonnummer(),
+    skyldnerIdent: String = TestDataGenerator.genererPersonnummer(),
+    mottakerIdent: String = TestDataGenerator.genererPersonnummer(),
+    sakId: String = "Sak123",
+    vedtakId: Int = 12345,
+    vedtakDato: LocalDate = LocalDate.now(),
+    opprettetAv: String = "SaksbehandlerId",
+    eksternReferanse: String? = "UTENLANDSREFERANSE",
+    utsattTilDato: LocalDate? = LocalDate.now().plusDays(7),
+    periodeListe: List<Periode> = listOf(opprettPeriode())
+  ): Hendelse {
+    return Hendelse(
+      engangsbelopId = engangsbelopId,
+      type = type,
+      vedtakType = vedtakType,
+      kravhaverIdent = kravhaverIdent,
+      skyldnerIdent = skyldnerIdent,
+      mottakerIdent = mottakerIdent,
+      sakId = sakId,
+      vedtakId = vedtakId,
+      vedtakDato = vedtakDato,
+      opprettetAv = opprettetAv,
+      eksternReferanse = eksternReferanse,
+      utsattTilDato = utsattTilDato,
+      periodeListe = periodeListe
+    )
+  }
+
   fun opprettOppdragsperiode(
     oppdragsperiodeId: Int? = null,
     oppdrag: Oppdrag? = null,
-    sakId: Int = 123456,
+    sakId: String = "123456",
     vedtakId: Int = 654321,
     gjelderIdent: String = TestDataGenerator.genererPersonnummer(),
     mottakerIdent: String = TestDataGenerator.genererPersonnummer(),
@@ -94,8 +179,6 @@ object TestData {
     opprettetAv: String = "Saksbehandler",
     delytelseId: String = "DelytelseId",
     aktivTil: LocalDate? = null,
-    erstatterPeriode: Int? = null,
-    tekst: String? = null,
     konteringer: List<Kontering> = listOf(opprettKontering())
 
   ): Oppdragsperiode {
@@ -114,8 +197,6 @@ object TestData {
       opprettetAv = opprettetAv,
       delytelseId = delytelseId,
       aktivTil = aktivTil,
-      erstatterPeriode = erstatterPeriode,
-      tekst = tekst,
       konteringer = konteringer
     )
   }
@@ -132,7 +213,7 @@ object TestData {
     sendtIPalopsfil: Boolean = false,
     overforingKontering: List<OverforingKontering> = listOf(opprettOverforingKontering())
 
-    ): Kontering {
+  ): Kontering {
     return Kontering(
       konteringId = konteringId,
       oppdragsperiode = oppdragsperiode,

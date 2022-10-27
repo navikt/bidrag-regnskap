@@ -9,13 +9,13 @@ import org.springframework.format.annotation.DateTimeFormat
 import java.time.YearMonth
 
 
-@Schema(name = "SkattVellykketKontering", description = "Svar ved en velykket overføring av kontering til skatt.")
-data class SkattVellykketKonteringResponse(
+@Schema(name = "SkattVellykketKravResponse", description = "Svar ved en velykket overføring av krav til skatt.")
+data class SkattVellykketKravResponse(
   val batchUid: String
 )
 
-@Schema(name = "SkattFeiletKonteringerResponse", description = "Lister feil i et krav.")
-data class SkattFeiletKonteringerResponse(
+@Schema(name = "SkattFeiletKravResponse", description = "Lister feil i et krav.")
+data class SkattFeiletKravResponse(
   val konteringsfeil: List<Konteringsfeil>
 )
 
@@ -25,13 +25,15 @@ data class Konteringsfeil(
   @field:Schema(
     description = "En kode som angir type feil som har oppstått. " +
         "Feilkoden er ment å kunne brukes til å maskinelt sortere feil.",
-    example = "TOLKNING")
+    example = "TOLKNING"
+  )
   val feilkode: String,
 
   @field:Schema(
     description = "En beskrivelse av feilen som har oppstått. " +
         "Feilmeldingen er ment å være forståelig for et menneske ved manuell gjennomgang.",
-    example = "Tolkning feilet i Elin.")
+    example = "Tolkning feilet i Elin."
+  )
   val feilmelding: String,
 
   @field:Schema(description = "Identifiserer hvilken kontering som førte til feilen.")
@@ -56,10 +58,12 @@ data class KonteringId(
   @field:JsonDeserialize(using = YearMonthDeserializer::class)
   val periode: YearMonth,
 
-  @field:Schema(description = "Unik referanse til oppdragsperioden i vedtaket. " +
-      "I bidragssaken kan en oppdragsperiode strekke over flere måneder, og samme referanse blir da benyttet for alle månedene. " +
-      "Samme referanse kan ikke benyttes to ganger for samme transaksjonskode i samme måned.",
+  @field:Schema(
+    description = "Unik referanse til oppdragsperioden i vedtaket. " +
+        "I bidragssaken kan en oppdragsperiode strekke over flere måneder, og samme referanse blir da benyttet for alle månedene. " +
+        "Samme referanse kan ikke benyttes to ganger for samme transaksjonskode i samme måned.",
     example = "123456789",
-    required = true)
+    required = true
+  )
   val delytelsesId: String
 )

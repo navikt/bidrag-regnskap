@@ -1,10 +1,8 @@
 package no.nav.bidrag.regnskap.service
 
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import io.kotest.matchers.string.shouldStartWith
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
@@ -13,13 +11,11 @@ import no.nav.bidrag.regnskap.utils.TestData
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import java.math.BigDecimal
 import java.time.LocalDate
 
 @ExtendWith(MockKExtension::class)
 class OppdragsperiodeServiceTest {
-
-  @MockK
-  private lateinit var persistenceService: PersistenceService
 
   @MockK
   private lateinit var konteringService: KonteringService
@@ -48,78 +44,47 @@ class OppdragsperiodeServiceTest {
   inner class OpprettOppdragsperioder {
 
     @Test
-    fun `Skal opprette ny oppdragsperiode`() {
-      val oppdragsRequest = TestData.opprettOppdragRequest()
-      val oppdrag = TestData.opprettOppdrag(
-        oppdragId = 123, oppdragsperioder = null
+    fun `Skal opprette nye oppdragsperioder`() {
+      val now = LocalDate.now()
+      val hendelse = TestData.opprettHendelse(
+        periodeListe = listOf(
+          TestData.opprettPeriode(
+            periodeFomDato = now.minusMonths(5), periodeTilDato = now.minusMonths(3), belop = BigDecimal.valueOf(7500)
+          ), TestData.opprettPeriode(
+            periodeFomDato = now.minusMonths(3), periodeTilDato = now, belop = BigDecimal.valueOf(7600)
+          )
+        )
       )
+      val oppdrag = TestData.opprettOppdrag()
 
-      val nyOppdragsperiode = oppdragsperiodeService.opprettNyOppdragsperiode(oppdragsRequest, oppdrag)
 
-      nyOppdragsperiode.oppdrag?.oppdragId shouldBe 123
-      nyOppdragsperiode.gjelderIdent shouldBe oppdragsRequest.gjelderIdent
-      nyOppdragsperiode.mottakerIdent shouldBe oppdragsRequest.mottakerIdent
-      nyOppdragsperiode.opprettetAv shouldBe oppdragsRequest.opprettetAv
-      nyOppdragsperiode.sakId shouldBe oppdragsRequest.sakId
-      nyOppdragsperiode.belop shouldBe oppdragsRequest.belop
-      nyOppdragsperiode.valuta shouldBe oppdragsRequest.valuta
+      val nyeOppdragsperioder = oppdragsperiodeService.opprettNyeOppdragsperioder(hendelse, oppdrag)
+
+      nyeOppdragsperioder[0].mottakerIdent shouldBe hendelse.mottakerIdent
+      nyeOppdragsperioder[0].belop shouldBe hendelse.periodeListe[0].belop.intValueExact()
+      nyeOppdragsperioder[0].periodeFra shouldBe hendelse.periodeListe[0].periodeFomDato
+      nyeOppdragsperioder[0].periodeTil shouldBe hendelse.periodeListe[0].periodeTilDato
+      nyeOppdragsperioder[1].mottakerIdent shouldBe hendelse.mottakerIdent
+      nyeOppdragsperioder[1].belop shouldBe hendelse.periodeListe[1].belop.intValueExact()
+      nyeOppdragsperioder[1].periodeFra shouldBe hendelse.periodeListe[1].periodeFomDato
+      nyeOppdragsperioder[1].periodeTil shouldBe hendelse.periodeListe[1].periodeTilDato
     }
 
     @Test
     fun `Skal opprette randomUUID om delytelseId ikke er angitt`() {
-      val oppdragsRequest = TestData.opprettOppdragRequest(delytelseId = null)
+      val hendelse = TestData.opprettHendelse(
+        periodeListe = listOf(
+          TestData.opprettPeriode(
+            referanse = null
+          )
+        )
+      )
       val oppdrag = TestData.opprettOppdrag()
 
-      val nyOppdragsperiode = oppdragsperiodeService.opprettNyOppdragsperiode(oppdragsRequest, oppdrag)
 
-      nyOppdragsperiode.delytelseId shouldNotBe null
-    }
+      val nyeOppdragsperioder = oppdragsperiodeService.opprettNyeOppdragsperioder(hendelse, oppdrag)
 
-  }
-
-  @Nested
-  inner class SettGammelOppdragsperiodeTilInaktiv {
-
-    @Test
-    fun `Skal sette gamle oppdragsperioder til inaktiv og opprette ny oppdragsperiode`() {
-
-      every { persistenceService.lagreOppdragsperiode(any()) } returns Unit
-
-      val oppdragsperioder = listOf(
-        TestData.opprettOppdragsperiode(aktivTil = null), TestData.opprettOppdragsperiode(aktivTil = LocalDate.now())
-      )
-
-      val oppdragRequest = TestData.opprettOppdragRequest()
-
-      val nyOppdragsperiode = oppdragsperiodeService.setAktivTilDatoPaOppdragsperiodeOgOpprettNyOppdragsperiode(
-        oppdragsperioder,
-        oppdragRequest
-      )
-
-      oppdragsperioder shouldHaveSize 2
-      oppdragsperioder[0].aktivTil shouldNotBe null
-      oppdragsperioder[1].aktivTil shouldNotBe null
-      nyOppdragsperiode.aktivTil shouldBe null
-    }
-
-    @Test
-    @Suppress("NonAsciiCharacters")
-    fun `Skal returnere feil om ingen aktive oppdragsperioder finnes på oppdraget`() {
-      val oppdragsperioder = listOf(
-        TestData.opprettOppdragsperiode(aktivTil = LocalDate.now()),
-        TestData.opprettOppdragsperiode(aktivTil = LocalDate.now())
-      )
-
-      val oppdragRequest = TestData.opprettOppdragRequest()
-
-      val exception = shouldThrow<IllegalStateException> {
-        oppdragsperiodeService.setAktivTilDatoPaOppdragsperiodeOgOpprettNyOppdragsperiode(
-          oppdragsperioder,
-          oppdragRequest
-        )
-      }
-
-      exception.message shouldStartWith "Fant ingen aktiv oppdragsperiode på oppdraget."
+      nyeOppdragsperioder[0].delytelseId shouldNotBe null
     }
   }
 }

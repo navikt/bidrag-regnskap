@@ -5,11 +5,13 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.datatype.jsr310.deser.YearMonthDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.YearMonthSerializer
 import io.swagger.v3.oas.annotations.media.Schema
+import no.nav.bidrag.behandling.felles.enums.EngangsbelopType
+import no.nav.bidrag.behandling.felles.enums.StonadType
 import org.springframework.format.annotation.DateTimeFormat
 import java.time.LocalDate
 import java.time.YearMonth
 
-const val SKATT_SENDT_KONTERING_BESKRIVELSE =
+const val SKATT_SEND_KRAV_BESKRIVELSE =
   "Operasjon for å levere krav fra NAV til regnskapet hos Skatteetaten. " +
       "Et krav består av en liste med konteringer. Det forventes at disse konteringen behandles samlet. " +
       "Det vil si at hvis én av konteringene feiler, skal ingen av konteringene i kravet benyttes.\n" + "\n" +
@@ -23,8 +25,8 @@ const val SKATT_SENDT_KONTERING_BESKRIVELSE =
       "Ved månedlig påløp skal ikke dette grensesnittet benyttes. " + "Tilsvarende krav legges i stedet inn i en fil som overføres til Skatteetaten gjennom filslusa.\n" + "\n" +
       "Formatet på påløpsfilen skal være tilsvarende det nye grensesnittet, men hvor hvert krav legges inn på egen linje."
 
-@Schema(name = "SkattKonteringRequest", description = "Et krav består av en liste med konteringer.")
-data class SkattKonteringerRequest(
+@Schema(name = "SkattKravRequest", description = "Et krav består av en liste med konteringer.")
+data class SkattKravRequest(
   val konteringer: List<SkattKontering>
 )
 
@@ -198,10 +200,32 @@ enum class Transaksjonskode(val beskrivelse: String, val korreksjonskode: String
   K2("Direkte oppgjør (innbetalt beløp)", null),
   K3("Tilbakekreving ettergivelse", null);
 
+  companion object {
+
+    fun hentTransaksjonskodeForType(type: String): Transaksjonskode {
+      return when (type) {
+        StonadType.FORSKUDD.name -> A1
+        StonadType.BIDRAG.name -> B1
+        StonadType.BIDRAG18AAR.name -> D1
+        StonadType.EKTEFELLEBIDRAG.name -> F1
+        StonadType.MOTREGNING.name -> I1
+        EngangsbelopType.SAERTILSKUDD.name -> E1
+        EngangsbelopType.GEBYR_MOTTAKER.name -> G1
+        EngangsbelopType.GEBYR_SKYLDNER.name -> G1
+        EngangsbelopType.TILBAKEKREVING.name -> H1
+        EngangsbelopType.ETTERGIVELSE.name -> K1
+        EngangsbelopType.DIREKTE_OPPGJOR.name -> K2
+        EngangsbelopType.ETTERGIVELSE_TILBAKEKREVING.name -> K3
+        else -> throw IllegalStateException("Ugyldig type for transaksjonskode funnet!")
+      }
+    }
+  }
 }
 
-@Schema(description = "Konteringstypen er NY for nye konteringer for en stønad i en periode. " +
-    "Deretter skal alle konteringer for samme stønad i samme periode markere ENDRING, altså B3-konteringen og for alle påfølgende B1-konteringer.")
+@Schema(
+  description = "Konteringstypen er NY for nye konteringer for en stønad i en periode. " +
+      "Deretter skal alle konteringer for samme stønad i samme periode markere ENDRING, altså B3-konteringen og for alle påfølgende B1-konteringer."
+)
 enum class Type {
   NY, ENDRING
 }

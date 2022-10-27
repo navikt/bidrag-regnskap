@@ -1,38 +1,38 @@
-package no.nav.bidrag.regnskap.hendelse
+package no.nav.bidrag.regnskap.hendelse.krav
 
-import no.nav.bidrag.regnskap.service.OverforingTilSkattService
+import no.nav.bidrag.regnskap.service.KravService
 import no.nav.bidrag.regnskap.service.PersistenceService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import java.util.concurrent.LinkedBlockingQueue
 
-private val LOGGER = LoggerFactory.getLogger(SendKonteringerQueue::class.java)
+private val LOGGER = LoggerFactory.getLogger(SendKravQueue::class.java)
 
 @Component
-class SendKonteringerQueue(
+class SendKravQueue(
   val persistenceService: PersistenceService,
-  val overforingTilSkattService: OverforingTilSkattService,
-  val konteringPublisher: KonteringPublisher,
+  val kravService: KravService,
+  val kravPublisher: KravPublisher,
 ) {
 
   val linkedBlockingQueue = LinkedBlockingQueue<Int>()
 
   fun leggTil(oppdragId: Int) {
     linkedBlockingQueue.add(oppdragId)
-    konteringPublisher.publishKonteringEvent(oppdragId.toString())
+    kravPublisher.publishKravEvent(oppdragId.toString())
   }
 
   @Transactional
   fun send() {
     while (linkedBlockingQueue.isNotEmpty()) {
       val oppdragId = linkedBlockingQueue.peek()
-      LOGGER.info("Fant id $oppdragId i queuen. Starter oversending..")
+      LOGGER.debug("Fant id $oppdragId i queuen. Starter oversending av krav..")
 
       val sisteOverfortePeriodeForPalop = persistenceService.finnSisteOverfortePeriode()
 
-      overforingTilSkattService.sendKontering(oppdragId, sisteOverfortePeriodeForPalop)
-      // TODO: Feilhåndtering, hvordan går vi frem om det feiler gjenntatte ganger
+      kravService.sendKrav(oppdragId, sisteOverfortePeriodeForPalop)
+      // TODO(): Feilhåndtering, hvordan går vi frem om det feiler gjenntatte ganger
       linkedBlockingQueue.remove()
     }
   }

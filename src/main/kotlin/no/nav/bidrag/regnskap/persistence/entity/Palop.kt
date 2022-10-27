@@ -1,6 +1,5 @@
 package no.nav.bidrag.regnskap.persistence.entity
 
-import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -17,7 +16,7 @@ data class Palop(
   val palopId: Int? = null,
 
   @Column(name = "kjoredato")
-  val kjoredato: LocalDate,
+  val kjoredato: LocalDateTime,
 
   @Column(name = "fullfort_tidspunkt")
   val fullfortTidspunkt: LocalDateTime? = null,

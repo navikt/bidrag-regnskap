@@ -2,7 +2,7 @@ package no.nav.bidrag.regnskap.hendelse
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import no.nav.bidrag.regnskap.BidragRegnskapLocal
-import no.nav.bidrag.regnskap.service.BehandleHendelseService
+import no.nav.bidrag.regnskap.hendelse.vedtak.VedtakHendelseListener
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import org.junit.jupiter.api.Assertions.assertDoesNotThrow
 import org.junit.jupiter.api.DisplayName
@@ -17,9 +17,6 @@ import org.springframework.test.context.ActiveProfiles
 @ActiveProfiles("test")
 @EnableMockOAuth2Server
 class VedtakHendelseListenerTest {
-
-  @Autowired
-  private lateinit var behandleHendelseService: BehandleHendelseService
 
   @Autowired
   private lateinit var vedtakHendelseListener: VedtakHendelseListener

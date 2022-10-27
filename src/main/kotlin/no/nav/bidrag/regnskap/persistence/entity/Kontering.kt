@@ -46,6 +46,20 @@ data class Kontering(
 
   @OneToMany(mappedBy = "kontering", cascade = [CascadeType.ALL])
   var overforingKontering: List<OverforingKontering>? = null
-)
+) {
+  override fun toString(): String {
+    return "Kontering(" +
+        "konteringId=$konteringId, " +
+        "oppdragsperiodeId=${oppdragsperiode?.oppdragsperiodeId}, " +
+        "transaksjonskode=$transaksjonskode, " +
+        "overforingsperiode=$overforingsperiode, " +
+        "overforingstidspunkt=$overforingstidspunkt, " +
+        "type=$type, " +
+        "justering=$justering, " +
+        "gebyrRolle=$gebyrRolle, " +
+        "sendtIPalopsfil=$sendtIPalopsfil, " +
+        "overforingKontering=$overforingKontering)"
+  }
+}
 
 
