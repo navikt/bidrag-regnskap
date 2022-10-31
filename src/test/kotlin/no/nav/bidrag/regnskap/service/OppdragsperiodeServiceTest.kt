@@ -3,7 +3,6 @@ package no.nav.bidrag.regnskap.service
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
@@ -17,7 +16,7 @@ import java.time.LocalDate
 @ExtendWith(MockKExtension::class)
 class OppdragsperiodeServiceTest {
 
-  @MockK
+  @MockK(relaxed = true)
   private lateinit var konteringService: KonteringService
 
   @InjectMockKs
@@ -30,9 +29,6 @@ class OppdragsperiodeServiceTest {
     @Test
     fun `Skal hente oppdragsperiode`() {
       val oppdrag = TestData.opprettOppdrag()
-
-      every { konteringService.hentKonteringer(any()) } returns emptyList()
-
       val opprettetOppdragsperiodeListe = oppdragsperiodeService.hentOppdragsperioderMedKonteringer(oppdrag)
 
       opprettetOppdragsperiodeListe shouldHaveSize oppdrag.oppdragsperioder!!.size
@@ -61,11 +57,11 @@ class OppdragsperiodeServiceTest {
       val nyeOppdragsperioder = oppdragsperiodeService.opprettNyeOppdragsperioder(hendelse, oppdrag)
 
       nyeOppdragsperioder[0].mottakerIdent shouldBe hendelse.mottakerIdent
-      nyeOppdragsperioder[0].belop shouldBe hendelse.periodeListe[0].belop.intValueExact()
+      nyeOppdragsperioder[0].beløp shouldBe hendelse.periodeListe[0].belop.intValueExact()
       nyeOppdragsperioder[0].periodeFra shouldBe hendelse.periodeListe[0].periodeFomDato
       nyeOppdragsperioder[0].periodeTil shouldBe hendelse.periodeListe[0].periodeTilDato
       nyeOppdragsperioder[1].mottakerIdent shouldBe hendelse.mottakerIdent
-      nyeOppdragsperioder[1].belop shouldBe hendelse.periodeListe[1].belop.intValueExact()
+      nyeOppdragsperioder[1].beløp shouldBe hendelse.periodeListe[1].belop.intValueExact()
       nyeOppdragsperioder[1].periodeFra shouldBe hendelse.periodeListe[1].periodeFomDato
       nyeOppdragsperioder[1].periodeTil shouldBe hendelse.periodeListe[1].periodeTilDato
     }

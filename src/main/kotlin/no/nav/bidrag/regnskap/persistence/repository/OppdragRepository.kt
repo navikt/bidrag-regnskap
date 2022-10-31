@@ -5,13 +5,13 @@ import org.springframework.data.jpa.repository.JpaRepository
 import java.util.*
 
 interface OppdragRepository : JpaRepository<Oppdrag, Int> {
-  fun findByStonadTypeAndKravhaverIdentAndSkyldnerIdentAndEksternReferanse(
-    stonadType: String,
+  fun findByStønadTypeAndKravhaverIdentAndSkyldnerIdentAndEksternReferanse(
+    stønadType: String,
     kravhaverIdent: String,
     skyldnerIdent: String,
     eksternReferanse: String?
   ): Optional<Oppdrag>
 
-  fun findByEngangsbelopId(engangsbelopId: Int): Optional<Oppdrag>
+  fun findByEngangsbeløpId(engangsbeløpId: Int): Optional<Oppdrag>
 
 }

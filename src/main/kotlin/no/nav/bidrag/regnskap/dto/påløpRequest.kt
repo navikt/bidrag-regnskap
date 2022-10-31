@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 import java.time.YearMonth
 
 @Schema(description = "Et påløp representerer en kjøring av overføring av påløpsfil til skatt.")
-data class palopRequest(
+data class påløpRequest(
 
   @field:Schema(
     description = "Dato paløpet skal kjøre.",

@@ -20,7 +20,10 @@ data class Oppdrag(
   val oppdragId: Int? = null,
 
   @Column(name = "stonad_type")
-  val stonadType: String,
+  val stønadType: String,
+
+  @Column(name = "vedtak_type")
+  val vedtakType: String,
 
   @Column(name = "kravhaver_ident")
   val kravhaverIdent: String? = null,
@@ -42,7 +45,7 @@ data class Oppdrag(
   var endretTidspunkt: LocalDateTime? = null,
 
   @Column(name = "engangsbelop_id")
-  val engangsbelopId: Int? = null,
+  var engangsbeløpId: Int? = null,
 
   @OneToMany(mappedBy = "oppdrag", cascade = [CascadeType.ALL])
   var oppdragsperioder: List<Oppdragsperiode>? = null
@@ -50,14 +53,14 @@ data class Oppdrag(
   override fun toString(): String {
     return "Oppdrag(" +
         "oppdragId=$oppdragId, " +
-        "stonadType='$stonadType, " +
+        "stønadType='$stønadType, " +
         "kravhaverIdent=$kravhaverIdent, " +
         "skyldnerIdent=$skyldnerIdent, " +
         "eksternReferanse=$eksternReferanse, " +
         "utsattTilDato=$utsattTilDato, " +
         "sistOversendtePeriode=$sistOversendtePeriode, " +
         "endretTidspunkt=$endretTidspunkt, " +
-        "engangsbelopId=$engangsbelopId, " +
+        "engangsbeløpId=$engangsbeløpId, " +
         "oppdragsperioder=$oppdragsperioder)"
   }
 }

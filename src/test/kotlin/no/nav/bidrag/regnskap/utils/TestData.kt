@@ -13,7 +13,8 @@ import no.nav.bidrag.regnskap.hendelse.vedtak.Hendelse
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
-import no.nav.bidrag.regnskap.persistence.entity.OverforingKontering
+import no.nav.bidrag.regnskap.persistence.entity.OverføringKontering
+import no.nav.bidrag.regnskap.persistence.entity.Påløp
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -25,6 +26,7 @@ object TestData {
   fun opprettOppdrag(
     oppdragId: Int? = null,
     stonadType: StonadType = StonadType.BIDRAG,
+    vedtakType: VedtakType = VedtakType.MANUELT,
     skyldnerIdent: String = TestDataGenerator.genererPersonnummer(),
     oppdragsperioder: List<Oppdragsperiode>? = listOf(opprettOppdragsperiode()),
     kravhaverIdent: String = TestDataGenerator.genererPersonnummer(),
@@ -34,7 +36,8 @@ object TestData {
   ): Oppdrag {
     return Oppdrag(
       oppdragId = oppdragId,
-      stonadType = stonadType.toString(),
+      stønadType = stonadType.toString(),
+      vedtakType = vedtakType.toString(),
       skyldnerIdent = skyldnerIdent,
       oppdragsperioder = oppdragsperioder,
       kravhaverIdent = kravhaverIdent,
@@ -71,7 +74,8 @@ object TestData {
   }
 
   fun opprettEngangsbelop(
-    engangsbelopId: Int = 123,
+    engangsbeløpId: Int = 123,
+    endrerEngangsbeløpId: Int? = null,
     type: EngangsbelopType = EngangsbelopType.GEBYR_SKYLDNER,
     sakId: String = "Sak123",
     skyldnerId: String = TestDataGenerator.genererPersonnummer(),
@@ -83,7 +87,8 @@ object TestData {
     referanse: String = UUID.randomUUID().toString()
   ): Engangsbelop {
     return Engangsbelop(
-      engangsbelopId = engangsbelopId,
+      engangsbelopId = engangsbeløpId,
+      endrerEngangsbelopId = endrerEngangsbeløpId,
       type = type,
       sakId = sakId,
       skyldnerId = skyldnerId,
@@ -189,7 +194,7 @@ object TestData {
       vedtakId = vedtakId,
       gjelderIdent = gjelderIdent,
       mottakerIdent = mottakerIdent,
-      belop = belop,
+      beløp = belop,
       valuta = valuta,
       periodeFra = periodeFra,
       periodeTil = periodeTil,
@@ -211,38 +216,52 @@ object TestData {
     justering: String? = null,
     gebyrRolle: String? = null,
     sendtIPalopsfil: Boolean = false,
-    overforingKontering: List<OverforingKontering> = listOf(opprettOverforingKontering())
+    overføringKontering: List<OverføringKontering> = listOf(opprettOverføringKontering())
 
   ): Kontering {
     return Kontering(
       konteringId = konteringId,
       oppdragsperiode = oppdragsperiode,
       transaksjonskode = transaksjonskode,
-      overforingsperiode = overforingsperiode,
-      overforingstidspunkt = overforingstidspunkt,
+      overføringsperiode = overforingsperiode,
+      overføringstidspunkt = overforingstidspunkt,
       type = type,
       justering = justering,
       gebyrRolle = gebyrRolle,
-      sendtIPalopsfil = sendtIPalopsfil,
-      overforingKontering = overforingKontering
+      sendtIPåløpsfil = sendtIPalopsfil,
+      overføringKontering = overføringKontering
     )
   }
 
-  private fun opprettOverforingKontering(
-    overforingId: Int? = null,
+  fun opprettOverføringKontering(
+    overføringId: Int? = null,
     kontering: Kontering? = null,
     referansekode: String? = null,
     feilmelding: String? = null,
     tidspunkt: LocalDateTime = LocalDateTime.now(),
     kanal: String = "REST"
-  ): OverforingKontering {
-    return OverforingKontering(
-      overforingId = overforingId,
+  ): OverføringKontering {
+    return OverføringKontering(
+      overføringId = overføringId,
       kontering = kontering,
       referansekode = referansekode,
       feilmelding = feilmelding,
       tidspunkt = tidspunkt,
       kanal = kanal
+    )
+  }
+
+  fun opprettPåløp(
+    påløpId: Int? = 123,
+    kjøredato: LocalDateTime = LocalDateTime.now(),
+    fullførtTidspunkt: LocalDateTime? = null,
+    forPeriode: String = "2022-01"
+  ): Påløp {
+    return Påløp(
+      påløpId = påløpId,
+      kjøredato = kjøredato,
+      fullførtTidspunkt = fullførtTidspunkt,
+      forPeriode = forPeriode
     )
   }
 }

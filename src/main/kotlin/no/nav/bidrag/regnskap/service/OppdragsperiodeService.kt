@@ -25,7 +25,7 @@ class OppdragsperiodeService(
           vedtakId = oppdragsperiode.vedtakId,
           gjelderIdent = oppdragsperiode.gjelderIdent,
           mottakerIdent = oppdragsperiode.mottakerIdent,
-          belop = oppdragsperiode.belop,
+          belop = oppdragsperiode.beløp,
           valuta = oppdragsperiode.valuta,
           periodeFra = oppdragsperiode.periodeFra.toString(),
           periodeTil = oppdragsperiode.periodeTil.toString(),
@@ -52,20 +52,32 @@ class OppdragsperiodeService(
           sakId = hendelse.sakId,
           gjelderIdent = "22222222226", //TODO() Avklare med skatt. Dummynr per nå
           mottakerIdent = hendelse.mottakerIdent,
-          belop = periode.belop.setScale(0, RoundingMode.HALF_UP).intValueExact(),
+          beløp = periode.belop.setScale(0, RoundingMode.HALF_UP).intValueExact(),
           valuta = periode.valutakode,
           periodeFra = periode.periodeFomDato,
           periodeTil = periode.periodeTilDato,
           vedtaksdato = hendelse.vedtakDato,
           opprettetAv = hendelse.opprettetAv,
           delytelseId = periode.referanse ?: genererRandomUUID(),
-          aktivTil = periode.periodeTilDato,
           oppdrag = oppdrag
         )
       )
     }
 
     return oppdragsperiodeListe
+  }
+
+  fun settAktivTilDatoPåEksisterendeOppdragsperioder(oppdrag: Oppdrag, nyeOppdragsperioder: List<Oppdragsperiode>) {
+    oppdrag.oppdragsperioder?.filter { it.aktivTil == null }?.forEach {
+      val periodeFra = nyeOppdragsperioder.first().periodeFra
+      if (periodeFra.isAfter(it.periodeTil)) {
+        it.aktivTil = it.periodeTil
+      } else if (periodeFra.isBefore(it.periodeFra)) {
+        it.aktivTil = it.periodeFra
+      } else {
+        it.aktivTil = periodeFra
+      }
+    }
   }
 
   private fun genererRandomUUID(): String {

@@ -12,7 +12,6 @@ import no.nav.bidrag.behandling.felles.enums.StonadType
 import no.nav.bidrag.regnskap.hendelse.krav.SendKravQueue
 import no.nav.bidrag.regnskap.utils.TestData
 import no.nav.bidrag.regnskap.utils.TestDataGenerator.genererPersonnummer
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -21,16 +20,16 @@ import java.util.*
 @ExtendWith(MockKExtension::class)
 class OppdragServiceTest {
 
-  @MockK
+  @MockK(relaxed = true)
   private lateinit var persistenceService: PersistenceService
 
-  @MockK
+  @MockK(relaxed = true)
   private lateinit var oppdragsperiodeService: OppdragsperiodeService
 
-  @MockK
+  @MockK(relaxed = true)
   private lateinit var konteringService: KonteringService
 
-  @MockK
+  @MockK(relaxed = true)
   private lateinit var sendKravQueue: SendKravQueue
 
   @InjectMockKs
@@ -49,11 +48,10 @@ class OppdragServiceTest {
           stonadType = stonadType, skyldnerIdent = skyldnerIdent
         )
       )
-      every { oppdragsperiodeService.hentOppdragsperioderMedKonteringer(any()) } returns emptyList()
 
       val oppdragResponse = oppdragService.hentOppdrag(1)
 
-      oppdragResponse.type shouldBe stonadType
+      oppdragResponse.type shouldBe stonadType.name
       oppdragResponse.skyldnerIdent shouldBe skyldnerIdent
     }
 
@@ -67,36 +65,27 @@ class OppdragServiceTest {
 
   @Nested
   inner class OpprettOppdrag {
-    @BeforeEach
-    fun setUp() {
-      every { persistenceService.lagreOppdrag(any()) } returns 1
-    }
 
     @Test
     fun `skal opprette oppdrag`() {
       val hendelse = TestData.opprettHendelse()
 
       every { oppdragsperiodeService.opprettNyeOppdragsperioder(any(), any()) } returns listOf(TestData.opprettOppdragsperiode())
-      every { konteringService.opprettNyeKonteringerPaOppdragsperioder(any(), any(), any()) } returns Unit
-      every { sendKravQueue.leggTil(any()) } returns Unit
 
       val oppdragId = oppdragService.opprettNyttOppdrag(hendelse)
 
-      oppdragId shouldBe 1
+      oppdragId shouldBe 0
     }
 
     @Test
-    @Suppress("NonAscIICharacters")
     fun `skal opprette oppdrag med engangsbeløpId satt`() {
       val hendelse = TestData.opprettHendelse(engangsbelopId = 123, type = EngangsbelopType.GEBYR_MOTTAKER.name)
 
       every { oppdragsperiodeService.opprettNyeOppdragsperioder(any(), any()) } returns listOf(TestData.opprettOppdragsperiode())
-      every { konteringService.opprettNyeKonteringerPaOppdragsperioder(any(), any(), any()) } returns Unit
-      every { sendKravQueue.leggTil(any()) } returns Unit
 
       val oppdragId = oppdragService.opprettNyttOppdrag(hendelse)
 
-      oppdragId shouldBe 1
+      oppdragId shouldBe 0
     }
   }
 
@@ -110,10 +99,6 @@ class OppdragServiceTest {
       val oppdrag = TestData.opprettOppdrag()
 
       every { oppdragsperiodeService.opprettNyeOppdragsperioder(any(), any()) } returns listOf(TestData.opprettOppdragsperiode())
-      every { konteringService.opprettKorreksjonskonteringerForAlleredeOversendteKonteringer(any(), any()) } returns Unit
-      every { konteringService.opprettNyeKonteringerPaOppdragsperioder(any(), any(), any()) } returns Unit
-      every { sendKravQueue.leggTil(any()) } returns Unit
-      every { persistenceService.lagreOppdrag(oppdrag) } returns 1
 
       oppdragService.oppdaterOppdrag(hendelse, oppdrag)
 

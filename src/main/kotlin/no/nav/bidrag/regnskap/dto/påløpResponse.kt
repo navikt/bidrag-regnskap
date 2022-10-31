@@ -3,10 +3,10 @@ package no.nav.bidrag.regnskap.dto
 import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(description = "Et påløp representerer en kjøring av overføring av påløpsfil til skatt.")
-data class palopResponse(
+data class påløpResponse(
 
   @field:Schema(description = "Id for påløpet.")
-  val palopId: Int? = null,
+  val påløpId: Int? = null,
 
   @field:Schema(
     description = "Dato paløpet skal kjøre.",

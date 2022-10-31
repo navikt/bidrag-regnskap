@@ -25,13 +25,13 @@ class OppdragService(
 
     return OppdragResponse(
       oppdragId = oppdrag.oppdragId,
-      type = oppdrag.stonadType,
+      type = oppdrag.stønadType,
       kravhaverIdent = oppdrag.kravhaverIdent,
       skyldnerIdent = oppdrag.skyldnerIdent,
       referanse = oppdrag.eksternReferanse,
       sistOversendtePeriode = oppdrag.sistOversendtePeriode,
       endretTidspunkt = oppdrag.endretTidspunkt.toString(),
-      engangsbelopId = oppdrag.engangsbelopId,
+      engangsbelopId = oppdrag.engangsbeløpId,
       oppdragsperioder = oppdragsperiodeService.hentOppdragsperioderMedKonteringer(oppdrag)
     )
   }
@@ -39,8 +39,8 @@ class OppdragService(
   @Transactional
   fun lagreHendelse(hendelse: Hendelse): Int {
     val oppdragOptional: Optional<Oppdrag>
-    if (hendelse.engangsbelopId != null) {
-      oppdragOptional = persistenceService.hentOppdragPaEngangsbelopId(hendelse.engangsbelopId)
+    if (hendelse.endretEngangsbelopId != null) {
+      oppdragOptional = persistenceService.hentOppdragPåEngangsbeløpId(hendelse.endretEngangsbelopId)
     } else {
       oppdragOptional = persistenceService.hentOppdragPaUnikeIdentifikatorer(
         hendelse.type, hendelse.kravhaverIdent, hendelse.skyldnerIdent, hendelse.eksternReferanse
@@ -64,16 +64,17 @@ class OppdragService(
     hendelse: Hendelse
   ): Int {
     val oppdrag = Oppdrag(
-      stonadType = hendelse.type,
+      stønadType = hendelse.type,
+      vedtakType = hendelse.vedtakType.toString(),
       kravhaverIdent = hendelse.kravhaverIdent,
       skyldnerIdent = hendelse.skyldnerIdent,
       eksternReferanse = hendelse.eksternReferanse,
       utsattTilDato = hendelse.utsattTilDato,
-      engangsbelopId = hendelse.engangsbelopId
+      engangsbeløpId = hendelse.engangsbelopId
     )
 
     val oppdragsperioder = oppdragsperiodeService.opprettNyeOppdragsperioder(hendelse, oppdrag)
-    konteringService.opprettNyeKonteringerPaOppdragsperioder(oppdragsperioder, hendelse)
+    konteringService.opprettNyeKonteringerPåOppdragsperioder(oppdragsperioder, hendelse)
 
     oppdrag.oppdragsperioder = oppdragsperioder
 
@@ -87,13 +88,18 @@ class OppdragService(
   fun oppdaterOppdrag(
     hendelse: Hendelse, oppdrag: Oppdrag
   ): Int {
-    val nyeOppdragsperioder = oppdragsperiodeService.opprettNyeOppdragsperioder(hendelse, oppdrag)
-    konteringService.opprettKorreksjonskonteringerForAlleredeOversendteKonteringer(oppdrag, nyeOppdragsperioder)
-    konteringService.opprettNyeKonteringerPaOppdragsperioder(
-      nyeOppdragsperioder, hendelse, true
-    )
 
     //TODO: Håndtere oppdatering av skyldnerIdent/kravhaver, egentlig alt som ligger på oppdrag nivå.
+    if (hendelse.endretEngangsbelopId != null) {
+      oppdrag.engangsbeløpId = hendelse.engangsbelopId
+    }
+
+    val nyeOppdragsperioder = oppdragsperiodeService.opprettNyeOppdragsperioder(hendelse, oppdrag)
+    konteringService.opprettKorreksjonskonteringerForAlleredeOversendteKonteringer(oppdrag, nyeOppdragsperioder)
+    oppdragsperiodeService.settAktivTilDatoPåEksisterendeOppdragsperioder(oppdrag, nyeOppdragsperioder)
+    konteringService.opprettNyeKonteringerPåOppdragsperioder(
+      nyeOppdragsperioder, hendelse, true
+    )
 
     oppdrag.oppdragsperioder = nyeOppdragsperioder
     oppdrag.endretTidspunkt = LocalDateTime.now()

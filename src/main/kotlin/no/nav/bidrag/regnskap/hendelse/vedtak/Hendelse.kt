@@ -6,6 +6,7 @@ import java.time.LocalDate
 
 data class Hendelse(
   val engangsbelopId: Int? = null,
+  val endretEngangsbelopId: Int? = null,
   val type: String,
   val vedtakType: VedtakType,
   val kravhaverIdent: String,

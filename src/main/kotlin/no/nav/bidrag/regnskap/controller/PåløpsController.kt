@@ -5,9 +5,10 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import no.nav.bidrag.regnskap.dto.palopRequest
-import no.nav.bidrag.regnskap.dto.palopResponse
-import no.nav.bidrag.regnskap.service.PalopService
+import io.swagger.v3.oas.annotations.tags.Tag
+import no.nav.bidrag.regnskap.dto.påløpRequest
+import no.nav.bidrag.regnskap.dto.påløpResponse
+import no.nav.bidrag.regnskap.service.PåløpsService
 import no.nav.security.token.support.core.api.Protected
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -16,12 +17,14 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @Protected
-class PalopController(
-  val palopService: PalopService
+@Tag(name = "Påløp")
+class PåløpsController(
+  val påløpsService: PåløpsService
 ) {
 
   @GetMapping("/palop")
   @Operation(
+    summary = "Hent påløp",
     description = "Operasjon for å hente planlagte og gjennomførte påløpskjøringer.",
     security = [SecurityRequirement(name = "bearer-key")]
   )
@@ -39,12 +42,13 @@ class PalopController(
       content = [Content()]
     )]
   )
-  fun hentPalop(): ResponseEntity<List<palopResponse>> {
-    return ResponseEntity.ok(palopService.hentPalop())
+  fun hentPåløp(): ResponseEntity<List<påløpResponse>> {
+    return ResponseEntity.ok(påløpsService.hentPåløp())
   }
 
   @PostMapping("/palop")
   @Operation(
+    summary = "Lagre nytt påløp",
     description = "Operasjon for å lagre planlagte og gjennomførte påløpskjøringer.",
     security = [SecurityRequirement(name = "bearer-key")]
   )
@@ -54,15 +58,15 @@ class PalopController(
       description = "Lagret påløp."
     ), ApiResponse(
       responseCode = "401",
-      description = "Dersom klienten ikke er autentisert.",
+      description = "Klienten ikke er autentisert.",
       content = [Content()]
     ), ApiResponse(
       responseCode = "403",
-      description = "Dersom klienten ikke har tilgang.",
+      description = "Klienten ikke har tilgang.",
       content = [Content()]
     )]
   )
-  fun lagrePalop(palopRequest: palopRequest): ResponseEntity<Int> {
-    return ResponseEntity.ok(palopService.lagrePalop(palopRequest))
+  fun lagrePåløp(påløpRequest: påløpRequest): ResponseEntity<Int> {
+    return ResponseEntity.ok(påløpsService.lagrePåløp(påløpRequest))
   }
 }

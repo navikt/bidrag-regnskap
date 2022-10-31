@@ -6,8 +6,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
-import no.nav.bidrag.regnskap.dto.OppdragResponse
-import no.nav.bidrag.regnskap.service.OppdragService
+import no.nav.bidrag.regnskap.service.PåløpskjøringService
 import no.nav.security.token.support.core.api.Protected
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -15,26 +14,25 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @Protected
-@Tag(name = "Oppdrag")
-class OppdragController(
-  val oppdragService: OppdragService
+@Tag(name = "Påløpskjøring")
+class PåløpskjøringController(
+  private val påløpskjøringService: PåløpskjøringService
 ) {
 
-  @GetMapping("/oppdrag")
+  @GetMapping("/palopskjoring")
   @Operation(
-    summary = "Hent lagret oppdrag",
-    description = "Operasjon for å hente lagrede oppdrag med tilhørende oppdragsperioder og konteringer. " +
-        "Oppdraget returneres med alle historiske konteringer og oppdragsperioder. " +
-        "Dette endepunktet er ment til bruk ved feilsøking.",
+    summary = "Start manuel generering av påløpsfil",
+    description = "Operasjon for å starte påløpskjøring. Vil starte eldste ikke gjennomførte påløp i 'palop' tabellen. " +
+        "Informasjon om påløp kan hentes fra \"/palop\" endepunktet.",
     security = [SecurityRequirement(name = "bearer-key")]
   )
   @ApiResponses(
     value = [ApiResponse(
-      responseCode = "200",
-      description = "Returnerer oppdragets ID.",
+      responseCode = "201",
+      description = "Påløpskjøringen har startet. Returnerer ID'en til påløpet."
     ), ApiResponse(
       responseCode = "204",
-      description = "Oppdraget finnes ikke.",
+      description = "Det finnes ingen ikke gjennomførte påløp.",
       content = [Content()]
     ), ApiResponse(
       responseCode = "401",
@@ -46,8 +44,8 @@ class OppdragController(
       content = [Content()]
     )]
   )
-  fun hentOppdrag(oppdragId: Int): ResponseEntity<OppdragResponse> {
-    return ResponseEntity.ok(oppdragService.hentOppdrag(oppdragId))
+  fun startPåløpskjøring(): ResponseEntity<Int> {
+    return påløpskjøringService.startPåløpskjøring()
   }
-}
 
+}

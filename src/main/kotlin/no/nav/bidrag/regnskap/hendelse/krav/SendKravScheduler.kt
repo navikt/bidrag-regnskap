@@ -39,7 +39,7 @@ class SendKravScheduler(
     }
 
     oppdragMedIkkeOverforteKonteringer.forEach {
-      kravService.sendKrav(it, persistenceService.finnSisteOverfortePeriode())
+      kravService.sendKrav(it, persistenceService.finnSisteOverførtePeriode())
     }
     LOGGER.debug("Alle oppdrag med unsendte konteringer er nå overført til skatt.")
   }
@@ -48,7 +48,7 @@ class SendKravScheduler(
     return false // TODO()
   }
 
-  private fun hentOppdragMedIkkeOverforteKonteringer() = persistenceService.hentAlleIkkeOverforteKonteringer().flatMap {
+  private fun hentOppdragMedIkkeOverforteKonteringer() = persistenceService.hentAlleIkkeOverførteKonteringer().flatMap {
     listOf(it.oppdragsperiode?.oppdrag?.oppdragId)
   }.distinct().filterNotNull()
 }

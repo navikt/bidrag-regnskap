@@ -201,7 +201,6 @@ enum class Transaksjonskode(val beskrivelse: String, val korreksjonskode: String
   K3("Tilbakekreving ettergivelse", null);
 
   companion object {
-
     fun hentTransaksjonskodeForType(type: String): Transaksjonskode {
       return when (type) {
         StonadType.FORSKUDD.name -> A1

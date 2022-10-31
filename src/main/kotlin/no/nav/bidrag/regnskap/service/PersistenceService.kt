@@ -3,15 +3,18 @@ package no.nav.bidrag.regnskap.service
 import no.nav.bidrag.regnskap.SECURE_LOGGER
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
-import no.nav.bidrag.regnskap.persistence.entity.OverforingKontering
-import no.nav.bidrag.regnskap.persistence.entity.Palop
+import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
+import no.nav.bidrag.regnskap.persistence.entity.OverføringKontering
+import no.nav.bidrag.regnskap.persistence.entity.Påløp
 import no.nav.bidrag.regnskap.persistence.repository.KonteringRepository
 import no.nav.bidrag.regnskap.persistence.repository.OppdragRepository
-import no.nav.bidrag.regnskap.persistence.repository.OverforingKonteringRepository
-import no.nav.bidrag.regnskap.persistence.repository.PalopRepository
+import no.nav.bidrag.regnskap.persistence.repository.OppdragsperiodeRepository
+import no.nav.bidrag.regnskap.persistence.repository.OverføringKonteringRepository
+import no.nav.bidrag.regnskap.persistence.repository.PåløpRepository
 import org.slf4j.LoggerFactory
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 import java.time.YearMonth
 import java.util.*
 
@@ -20,9 +23,10 @@ private val LOGGER = LoggerFactory.getLogger(PersistenceService::class.java)
 @Service
 class PersistenceService(
   val oppdragRepository: OppdragRepository,
-  val overforingKonteringRepository: OverforingKonteringRepository,
+  val overføringKonteringRepository: OverføringKonteringRepository,
   val konteringRepository: KonteringRepository,
-  val palopRepository: PalopRepository
+  val påløpRepository: PåløpRepository,
+  val oppdragsperiodeRepository: OppdragsperiodeRepository
 ) {
 
   fun hentOppdrag(oppdragId: Int): Optional<Oppdrag> {
@@ -31,19 +35,19 @@ class PersistenceService(
   }
 
   fun hentOppdragPaUnikeIdentifikatorer(
-    stonadType: String, kravhaverIdent: String, skyldnerIdent: String, referanse: String?
+    stønadType: String, kravhaverIdent: String, skyldnerIdent: String, referanse: String?
   ): Optional<Oppdrag> {
     SECURE_LOGGER.info(
-      "Henter oppdrag med stonadType: $stonadType, kravhaverIdent: $kravhaverIdent, skyldnerIdent: $skyldnerIdent, referanse: $referanse"
+      "Henter oppdrag med stønadType: $stønadType, kravhaverIdent: $kravhaverIdent, skyldnerIdent: $skyldnerIdent, referanse: $referanse"
     )
-    return oppdragRepository.findByStonadTypeAndKravhaverIdentAndSkyldnerIdentAndEksternReferanse(
-      stonadType, kravhaverIdent, skyldnerIdent, referanse
+    return oppdragRepository.findByStønadTypeAndKravhaverIdentAndSkyldnerIdentAndEksternReferanse(
+      stønadType, kravhaverIdent, skyldnerIdent, referanse
     )
   }
 
-  fun hentOppdragPaEngangsbelopId(engangsbelopId: Int): Optional<Oppdrag> {
-    LOGGER.debug("Henter oppdrag på engangsbelopId: $engangsbelopId")
-    return oppdragRepository.findByEngangsbelopId(engangsbelopId)
+  fun hentOppdragPåEngangsbeløpId(engangsbeløpId: Int): Optional<Oppdrag> {
+    LOGGER.debug("Henter oppdrag på engangsbeløpId: $engangsbeløpId")
+    return oppdragRepository.findByEngangsbeløpId(engangsbeløpId)
   }
 
   fun lagreOppdrag(oppdrag: Oppdrag): Int? {
@@ -52,41 +56,54 @@ class PersistenceService(
     return lagretOppdrag.oppdragId
   }
 
-  fun lagreOverforingKontering(overforingKontering: OverforingKontering): Int? {
-    val lagretOverforingKontering = overforingKonteringRepository.save(overforingKontering)
-    LOGGER.debug("Lagret overforingKontering med ID: ${lagretOverforingKontering.overforingId}")
-    return lagretOverforingKontering.overforingId
+  fun lagreOverføringKontering(overføringKontering: OverføringKontering): Int? {
+    val lagretOverføringKontering = overføringKonteringRepository.save(overføringKontering)
+    LOGGER.debug("Lagret overforingKontering med ID: ${lagretOverføringKontering.overføringId}")
+    return lagretOverføringKontering.overføringId
   }
 
-  fun hentPalop(): List<Palop> {
-    return palopRepository.findAll()
+  fun hentPåløp(): List<Påløp> {
+    return påløpRepository.findAll()
   }
 
-  fun lagrePalop(palop: Palop): Int? {
-    val lagretPalop = palopRepository.save(palop)
-    LOGGER.debug("Lagret påløp med ID: ${lagretPalop.palopId}")
-    return lagretPalop.palopId
+  fun lagrePåløp(påløp: Påløp): Int? {
+    val lagretPåløp = påløpRepository.save(påløp)
+    LOGGER.debug("Lagret påløp med ID: ${lagretPåløp.påløpId}")
+    return lagretPåløp.påløpId
   }
 
-  fun finnSisteOverfortePeriode(): YearMonth {
-    LOGGER.debug("Henter siste overforte periode.")
+  fun finnSisteOverførtePeriode(): YearMonth {
+    LOGGER.debug("Henter siste overførte periode.")
     try {
-      val sisteOverfortePeriode = YearMonth.parse(palopRepository.finnMax())
-      LOGGER.debug("Siste overforte periode var: $sisteOverfortePeriode.")
-      return sisteOverfortePeriode
+      val sisteOverførtePeriode = YearMonth.parse(påløpRepository.finnSisteOverførtePeriodeForPåløp())
+      LOGGER.debug("Siste overførte periode var: $sisteOverførtePeriode.")
+      return sisteOverførtePeriode
     } catch (e: EmptyResultDataAccessException) {
       LOGGER.error("Det finnes ingen overførte påløp. Minst et påløp må være opprettet og overført før REST kan tas i bruk.")
       throw e
     }
   }
 
-  fun hentAlleIkkeOverforteKonteringer(): List<Kontering> {
-    return konteringRepository.hentAlleIkkeOverforteKonteringer()
+  fun hentAlleIkkeOverførteKonteringer(): List<Kontering> {
+    return konteringRepository.hentAlleIkkeOverførteKonteringer()
   }
 
   fun lagreKontering(kontering: Kontering): Int? {
     val lagretKontering = konteringRepository.save(kontering)
     LOGGER.debug("Lagret kontering med ID: ${lagretKontering.konteringId}")
     return lagretKontering.konteringId
+  }
+
+  fun hentIkkeKjørtePåløp(): List<Påløp> {
+    LOGGER.debug("Henter alle ikke kjørte påløp.")
+    return påløpRepository.findAllByFullførtTidspunktIsNull()
+  }
+
+  fun hentAlleOppdragsperioderSomErAktiveForPeriode(periode: LocalDate): List<Oppdragsperiode> {
+    return oppdragsperiodeRepository.hentAlleOppdragsperioderSomErAktiveForPeriode(periode)
+  }
+
+  fun lagreOppdragsperiode(oppdragsperiode: Oppdragsperiode): Int? {
+    return oppdragsperiodeRepository.save(oppdragsperiode).oppdragsperiodeId
   }
 }

@@ -29,7 +29,7 @@ class SendKravQueue(
       val oppdragId = linkedBlockingQueue.peek()
       LOGGER.debug("Fant id $oppdragId i queuen. Starter oversending av krav..")
 
-      val sisteOverfortePeriodeForPalop = persistenceService.finnSisteOverfortePeriode()
+      val sisteOverfortePeriodeForPalop = persistenceService.finnSisteOverførtePeriode()
 
       kravService.sendKrav(oppdragId, sisteOverfortePeriodeForPalop)
       // TODO(): Feilhåndtering, hvordan går vi frem om det feiler gjenntatte ganger

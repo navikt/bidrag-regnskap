@@ -10,12 +10,12 @@ import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
 
 @Entity(name = "overforing_konteringer")
-data class OverforingKontering(
+data class OverføringKontering(
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "overforing_id")
-  val overforingId: Int? = null,
+  val overføringId: Int? = null,
 
   @ManyToOne
   @JoinColumn(name = "kontering_id")
@@ -34,8 +34,8 @@ data class OverforingKontering(
   val kanal: String
 ) {
   override fun toString(): String {
-    return "OverforingKontering(" +
-        "overforingId=$overforingId, " +
+    return "OverføringKontering(" +
+        "overføringId=$overføringId, " +
         "konteringId=${kontering?.konteringId}, " +
         "referansekode=$referansekode, " +
         "feilmelding=$feilmelding, " +

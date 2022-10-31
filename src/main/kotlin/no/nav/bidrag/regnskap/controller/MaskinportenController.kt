@@ -4,6 +4,7 @@ import com.nimbusds.jwt.SignedJWT
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.bidrag.regnskap.maskinporten.MaskinportenClient
 import no.nav.security.token.support.core.api.Protected
 import org.springframework.http.ResponseEntity
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @Protected
+@Tag(name = "Maskinporten")
 class MaskinportenController(
   val maskinportenClient: MaskinportenClient
 ) {

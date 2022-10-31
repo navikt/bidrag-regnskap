@@ -27,7 +27,6 @@ internal class MaskinportenClientTest {
   }
 
   @Test
-  @Suppress("NonAscIICharacters")
   fun `Skal gjennbruke token fra maskinporten om det ikke har utgått`() {
     maskinportenWireMock.medGyldigResponseForKunEtKall()
 

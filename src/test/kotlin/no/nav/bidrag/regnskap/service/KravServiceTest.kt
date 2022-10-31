@@ -22,10 +22,10 @@ import java.util.*
 @ExtendWith(MockKExtension::class)
 class KravServiceTest {
 
-  @MockK
+  @MockK(relaxed = true)
   private lateinit var persistenceService: PersistenceService
 
-  @MockK
+  @MockK(relaxed = true)
   private lateinit var skattConsumer: SkattConsumer
 
   @InjectMockKs
@@ -37,14 +37,11 @@ class KravServiceTest {
 
 
   @Test
-  @Suppress("NonAsciiCharacters")
   fun `skal sende kontering til skatt når oppdragsperioden er innenfor innsendt periode`() {
     every { persistenceService.hentOppdrag(oppdragsId) } returns opprettOppdragOptionalForPeriode(
       now.minusMonths(3), now.plusMonths(1)
     )
     every { skattConsumer.sendKrav(any()) } returns ResponseEntity.accepted().body(batchUid)
-    every { persistenceService.lagreOverforingKontering(any()) } returns 1
-    every { persistenceService.lagreOppdrag(any()) } returns 1
 
     val restResponse = kravService.sendKrav(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
 
@@ -54,14 +51,11 @@ class KravServiceTest {
   }
 
   @Test
-  @Suppress("NonAsciiCharacters")
   fun `skal sende kontering om perioden kun er for en måned`() {
     every { persistenceService.hentOppdrag(oppdragsId) } returns opprettOppdragOptionalForPeriode(
       now, now.plusMonths(1)
     )
     every { skattConsumer.sendKrav(any()) } returns ResponseEntity.accepted().body(batchUid)
-    every { persistenceService.lagreOverforingKontering(any()) } returns 1
-    every { persistenceService.lagreOppdrag(any()) } returns 1
 
     val restResponse = kravService.sendKrav(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
 
@@ -69,7 +63,6 @@ class KravServiceTest {
   }
 
   @Test
-  @Suppress("NonAsciiCharacters")
   fun `skal ikke sende kontering til skatt når kontering allerede er overført`() {
     every { persistenceService.hentOppdrag(oppdragsId) } returns Optional.of(
       TestData.opprettOppdrag(

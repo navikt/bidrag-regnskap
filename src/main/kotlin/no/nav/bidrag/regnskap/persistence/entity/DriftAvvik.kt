@@ -17,7 +17,7 @@ data class DriftAvvik(
   val avvikId: Int,
 
   @Column(name = "palop_id")
-  val palopId: Int?,
+  val påløpId: Int?,
 
   @Column(name = "tidspunkt_fra")
   val tidspunktFra: LocalDateTime,
@@ -29,5 +29,5 @@ data class DriftAvvik(
   val opprettetAv: String?,
 
   @Column(name = "arsak")
-  val arsak: String?
+  val årsak: String?
 )

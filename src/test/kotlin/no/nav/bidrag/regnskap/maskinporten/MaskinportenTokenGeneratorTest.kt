@@ -33,7 +33,6 @@ class MaskinportenTokenGeneratorTest {
   }
 
   @Test
-  @Suppress("NonAscIICharacters")
   fun `Skal sjekke at scope claims er lagt til i token body`() {
     val config = MaskinportenWireMock.createMaskinportenConfig()
     val generator = MaskinportenTokenGenerator(config)
@@ -45,7 +44,6 @@ class MaskinportenTokenGeneratorTest {
   }
 
   @Test
-  @Suppress("NonAscIICharacters")
   fun `Skal sjekke at timestamps blir satt riktig på token body`() {
     val config = MaskinportenWireMock.createMaskinportenConfig()
     val generator = MaskinportenTokenGenerator(config)

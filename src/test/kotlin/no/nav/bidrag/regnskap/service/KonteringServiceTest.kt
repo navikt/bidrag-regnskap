@@ -23,14 +23,13 @@ class KonteringServiceTest {
   @InjectMockKs
   private lateinit var konteringService: KonteringService
 
-  @MockK
+  @MockK(relaxed = true)
   private lateinit var persistenceService: PersistenceService
 
 
   @Nested
   inner class HentKonteringer {
     @Test
-    @Suppress("NonAsciiCharacters")
     fun `Skal hente alle kontering på et oppdrag`() {
       val transaksjonskode = Transaksjonskode.B1
       val overforingsperiode = YearMonth.now()
@@ -74,16 +73,18 @@ class KonteringServiceTest {
     fun `Skal opprette nye konteringer`() {
       val oppdragsperiode = listOf(
         TestData.opprettOppdragsperiode(
-          konteringer = emptyList(), periodeFra = LocalDate.now().minusMonths(3), periodeTil = LocalDate.now().minusMonths(1)
+          konteringer = emptyList(),
+          periodeFra = LocalDate.now().minusMonths(3).withDayOfMonth(1),
+          periodeTil = LocalDate.now().minusMonths(1).withDayOfMonth(1)
         )
       )
       val hendelse = TestData.opprettHendelse()
 
-      every { persistenceService.finnSisteOverfortePeriode() } returns YearMonth.of(
+      every { persistenceService.finnSisteOverførtePeriode() } returns YearMonth.of(
         LocalDate.now().year, LocalDate.now().month
       )
 
-      konteringService.opprettNyeKonteringerPaOppdragsperioder(oppdragsperiode, hendelse)
+      konteringService.opprettNyeKonteringerPåOppdragsperioder(oppdragsperiode, hendelse)
 
       oppdragsperiode[0].konteringer!! shouldHaveSize 2
     }
@@ -117,10 +118,9 @@ class KonteringServiceTest {
         )
       )
 
-      every { persistenceService.finnSisteOverfortePeriode() } returns YearMonth.of(
+      every { persistenceService.finnSisteOverførtePeriode() } returns YearMonth.of(
         now.year, now.month
       ).plusMonths(5)
-      every { persistenceService.lagreKontering(any()) } returns 1
 
       konteringService.opprettKorreksjonskonteringerForAlleredeOversendteKonteringer(
         oppdrag, listOf(nyOppdragsperiode)
@@ -153,10 +153,9 @@ class KonteringServiceTest {
         )
       )
 
-      every { persistenceService.finnSisteOverfortePeriode() } returns YearMonth.of(
+      every { persistenceService.finnSisteOverførtePeriode() } returns YearMonth.of(
         now.year, now.month
       ).plusMonths(5)
-      every { persistenceService.lagreKontering(any()) } returns 1
 
       konteringService.opprettKorreksjonskonteringerForAlleredeOversendteKonteringer(
         oppdrag, listOf(nyOppdragsperiode)
@@ -191,11 +190,11 @@ class KonteringServiceTest {
         )
       )
 
-      val overforteKonteringerListe = konteringService.finnAlleOverforteKontering(oppdrag)
+      val overforteKonteringerListe = konteringService.finnAlleOverførteKontering(oppdrag)
 
       overforteKonteringerListe shouldHaveSize 2
-      overforteKonteringerListe[0].overforingstidspunkt shouldBe overforingstidspunkt
-      overforteKonteringerListe[1].overforingstidspunkt shouldBe overforingstidspunkt.minusMonths(1)
+      overforteKonteringerListe[0].overføringstidspunkt shouldBe overforingstidspunkt
+      overforteKonteringerListe[1].overføringstidspunkt shouldBe overforingstidspunkt.minusMonths(1)
     }
   }
 }

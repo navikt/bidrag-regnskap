@@ -36,7 +36,7 @@ data class Oppdragsperiode(
   val mottakerIdent: String,
 
   @Column(name = "belop")
-  val belop: Int,
+  val beløp: Int,
 
   @Column(name = "valuta")
   val valuta: String,
@@ -70,7 +70,7 @@ data class Oppdragsperiode(
         "vedtakId=$vedtakId, " +
         "gjelderIdent=$gjelderIdent, " +
         "mottakerIdent=$mottakerIdent, " +
-        "belop=$belop, " +
+        "beløp=$beløp, " +
         "valuta=$valuta, " +
         "periodeFra=$periodeFra, " +
         "periodeTil=$periodeTil, " +

@@ -27,10 +27,10 @@ data class Kontering(
   val transaksjonskode: String,
 
   @Column(name = "overforingsperiode")
-  val overforingsperiode: String,
+  val overføringsperiode: String,
 
   @Column(name = "overforingstidspunkt")
-  var overforingstidspunkt: LocalDateTime? = null,
+  var overføringstidspunkt: LocalDateTime? = null,
 
   @Column(name = "type")
   val type: String,
@@ -42,23 +42,23 @@ data class Kontering(
   val gebyrRolle: String?,
 
   @Column(name = "sendt_i_palopsfil")
-  var sendtIPalopsfil: Boolean = false,
+  var sendtIPåløpsfil: Boolean = false,
 
   @OneToMany(mappedBy = "kontering", cascade = [CascadeType.ALL])
-  var overforingKontering: List<OverforingKontering>? = null
+  var overføringKontering: List<OverføringKontering>? = null
 ) {
   override fun toString(): String {
     return "Kontering(" +
         "konteringId=$konteringId, " +
         "oppdragsperiodeId=${oppdragsperiode?.oppdragsperiodeId}, " +
         "transaksjonskode=$transaksjonskode, " +
-        "overforingsperiode=$overforingsperiode, " +
-        "overforingstidspunkt=$overforingstidspunkt, " +
+        "overføringsperiode=$overføringsperiode, " +
+        "overføringstidspunkt=$overføringstidspunkt, " +
         "type=$type, " +
         "justering=$justering, " +
         "gebyrRolle=$gebyrRolle, " +
-        "sendtIPalopsfil=$sendtIPalopsfil, " +
-        "overforingKontering=$overforingKontering)"
+        "sendtIPåløpsfil=$sendtIPåløpsfil, " +
+        "overføringKontering=$overføringKontering)"
   }
 }
 
