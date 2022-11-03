@@ -1,5 +1,6 @@
 package no.nav.bidrag.regnskap.service
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -13,6 +14,7 @@ import no.nav.bidrag.behandling.felles.enums.StonadType
 import no.nav.bidrag.regnskap.hendelse.vedtak.Hendelse
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(MockKExtension::class)
@@ -48,6 +50,52 @@ class VedtakHendelseServiceTest {
     verify(exactly = 2) { oppdragService.lagreHendelse(any()) }
     hendelseCaptor[0].type shouldBe StonadType.BIDRAG.name
     hendelseCaptor[1].type shouldBe EngangsbelopType.GEBYR_SKYLDNER.name
+  }
+
+  @Test
+  fun `Skal lese vedtakshendelse uten feil`() {
+    assertDoesNotThrow {
+      vedtakHendelseService.mapVedtakHendelse(
+        """
+        {
+          "vedtakType":"AUTOMATISK_INDEKSREGULERING",
+          "vedtakId":"779",
+          "vedtakDato":"2022-06-03",
+          "enhetId":"4812",
+          "opprettetAv":"B101173",
+          "opprettetTidspunkt":"2022-10-19T16:00:23.254988482",
+          "stonadsendringListe":[
+          ],
+          "engangsbelopListe":[
+          ]
+        }
+      """.trimIndent()
+      )
+    }
+  }
+
+  @Test
+  fun `Skal lese vedtakshendelse med feil`() {
+    assertThrows<InvalidFormatException> {
+      vedtakHendelseService.mapVedtakHendelse(
+        """
+        {
+          "vedtakType":"ÅRSAVGIFT",
+          "vedtakDato":"2022-01-01",
+          "vedtakId":"123",
+          "enhetId":"enhetid",
+          "stonadType":"BIDRAG",
+          "sakId":"",
+          "skyldnerId":"",
+          "kravhaverId":"",
+          "mottakerId":"",
+          "opprettetAv":"",
+          "opprettetTidspunkt":"2022-01-11T10:00:00.000001",
+          "periodeListe":[]
+        }
+      """.trimIndent()
+      )
+    }
   }
 
   private fun opprettVedtakshendelse(): String {

@@ -1,7 +1,6 @@
 package no.nav.bidrag.regnskap.service
 
-import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
+import io.kotest.matchers.types.shouldBeSameInstanceAs
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
@@ -11,7 +10,6 @@ import no.nav.bidrag.regnskap.utils.TestData
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.springframework.http.HttpStatus
 import java.time.LocalDate
 
 @ExtendWith(MockKExtension::class)
@@ -33,24 +31,10 @@ class PåløpskjøringServiceTest {
     val påløpListe = listOf(påløp1, påløp2)
 
     every { persistenceService.hentIkkeKjørtePåløp() } returns påløpListe
-    every { persistenceService.hentAlleOppdragsperioderSomErAktiveForPeriode(any()) } returns emptyList()
 
-    val response = påløpskjøringService.startPåløpskjøring()
+    val påløp = påløpskjøringService.hentPåløp()
 
-    response.statusCode shouldBe HttpStatus.CREATED
-    verify { persistenceService.lagrePåløp(påløp1) }
-    verify(exactly = 0) { persistenceService.lagrePåløp(påløp2) }
-    påløp1.fullførtTidspunkt shouldNotBe null
-    påløp2.fullførtTidspunkt shouldBe null
-  }
-
-  @Test
-  fun `skal om det ikke finnes ikke kjørte påløpsperioder returnere 204`() {
-    every { persistenceService.hentIkkeKjørtePåløp() } returns emptyList()
-
-    val response = påløpskjøringService.startPåløpskjøring()
-
-    response.statusCode shouldBe HttpStatus.NO_CONTENT
+    påløp shouldBeSameInstanceAs påløp1
   }
 
   @Test
@@ -64,7 +48,7 @@ class PåløpskjøringServiceTest {
 
     every { persistenceService.hentAlleOppdragsperioderSomErAktiveForPeriode(any()) } returns oppdragsperioder
 
-    påløpskjøringService.startPåløpskjøring(påløp)
+    påløpskjøringService.startPåløpskjøring(påløp, false)
 
     verify { persistenceService.lagreOppdragsperiode(utgåttOppdragsperiode) }
     verify { konteringService.opprettLøpendeKonteringerPåOppdragsperioder(emptyList(), påløp.forPeriode) }
@@ -81,7 +65,7 @@ class PåløpskjøringServiceTest {
 
     every { persistenceService.hentAlleOppdragsperioderSomErAktiveForPeriode(any()) } returns oppdragsperioder
 
-    påløpskjøringService.startPåløpskjøring(påløp)
+    påløpskjøringService.startPåløpskjøring(påløp, false)
 
     verify(exactly = 0) { persistenceService.lagreOppdragsperiode(any()) }
     verify { konteringService.opprettLøpendeKonteringerPåOppdragsperioder(oppdragsperioder, påløp.forPeriode) }

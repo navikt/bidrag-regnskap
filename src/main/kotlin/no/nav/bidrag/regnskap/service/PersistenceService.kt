@@ -1,11 +1,13 @@
 package no.nav.bidrag.regnskap.service
 
 import no.nav.bidrag.regnskap.SECURE_LOGGER
+import no.nav.bidrag.regnskap.persistence.entity.Driftsavvik
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
 import no.nav.bidrag.regnskap.persistence.entity.OverføringKontering
 import no.nav.bidrag.regnskap.persistence.entity.Påløp
+import no.nav.bidrag.regnskap.persistence.repository.DriftsavvikRepository
 import no.nav.bidrag.regnskap.persistence.repository.KonteringRepository
 import no.nav.bidrag.regnskap.persistence.repository.OppdragRepository
 import no.nav.bidrag.regnskap.persistence.repository.OppdragsperiodeRepository
@@ -15,6 +17,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.YearMonth
 import java.util.*
 
@@ -26,7 +29,8 @@ class PersistenceService(
   val overføringKonteringRepository: OverføringKonteringRepository,
   val konteringRepository: KonteringRepository,
   val påløpRepository: PåløpRepository,
-  val oppdragsperiodeRepository: OppdragsperiodeRepository
+  val oppdragsperiodeRepository: OppdragsperiodeRepository,
+  val driftsavvikRepository: DriftsavvikRepository
 ) {
 
   fun hentOppdrag(oppdragId: Int): Optional<Oppdrag> {
@@ -72,6 +76,11 @@ class PersistenceService(
     return lagretPåløp.påløpId
   }
 
+  fun hentIkkeKjørtePåløp(): List<Påløp> {
+    LOGGER.debug("Henter alle ikke kjørte påløp.")
+    return påløpRepository.findAllByFullførtTidspunktIsNull()
+  }
+
   fun finnSisteOverførtePeriode(): YearMonth {
     LOGGER.debug("Henter siste overførte periode.")
     try {
@@ -94,16 +103,27 @@ class PersistenceService(
     return lagretKontering.konteringId
   }
 
-  fun hentIkkeKjørtePåløp(): List<Påløp> {
-    LOGGER.debug("Henter alle ikke kjørte påløp.")
-    return påløpRepository.findAllByFullførtTidspunktIsNull()
-  }
-
   fun hentAlleOppdragsperioderSomErAktiveForPeriode(periode: LocalDate): List<Oppdragsperiode> {
     return oppdragsperiodeRepository.hentAlleOppdragsperioderSomErAktiveForPeriode(periode)
   }
 
   fun lagreOppdragsperiode(oppdragsperiode: Oppdragsperiode): Int? {
     return oppdragsperiodeRepository.save(oppdragsperiode).oppdragsperiodeId
+  }
+
+  fun lagreDriftsavvik(driftsavvik: Driftsavvik): Driftsavvik {
+    return driftsavvikRepository.save(driftsavvik)
+  }
+
+  fun finnesAktivtDriftsavvik(): Boolean {
+    return driftsavvikRepository.findAllByTidspunktTilAfterOrTidspunktTilIsNull(LocalDateTime.now()).isNotEmpty()
+  }
+
+  fun hentAlleAktiveDriftsavvik(): List<Driftsavvik> {
+    return driftsavvikRepository.findAllByTidspunktTilAfterOrTidspunktTilIsNull(LocalDateTime.now())
+  }
+
+  fun hentDriftsavvikForPåløp(påløpId: Int): Driftsavvik? {
+    return driftsavvikRepository.findByPåløpId(påløpId)
   }
 }

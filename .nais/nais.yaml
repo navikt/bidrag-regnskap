@@ -50,6 +50,8 @@ spec:
       value: {{ azure.skatt_scope }}
     - name: TOPIC_VEDTAK
       value: {{ kafka-topic-vedtak }}
+    - name: BUCKET_NAME
+      value: {{ bucket.navn }}
   gcp:
     sqlInstances:
       - name: {{ database.navn }}
@@ -57,3 +59,5 @@ spec:
         databases:
           - name: bidrag-regnskap-db
             envVarPrefix: DB
+    buckets:
+      - name: { { bucket.navn } }

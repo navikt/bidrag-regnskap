@@ -70,7 +70,7 @@ class OppdragsperiodeService(
   fun settAktivTilDatoPåEksisterendeOppdragsperioder(oppdrag: Oppdrag, nyeOppdragsperioder: List<Oppdragsperiode>) {
     oppdrag.oppdragsperioder?.filter { it.aktivTil == null }?.forEach {
       val periodeFra = nyeOppdragsperioder.first().periodeFra
-      if (periodeFra.isAfter(it.periodeTil)) {
+      if (it.periodeTil != null && periodeFra.isAfter(it.periodeTil)) {
         it.aktivTil = it.periodeTil
       } else if (periodeFra.isBefore(it.periodeFra)) {
         it.aktivTil = it.periodeFra

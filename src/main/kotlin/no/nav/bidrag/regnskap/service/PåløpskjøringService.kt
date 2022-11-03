@@ -1,45 +1,100 @@
 package no.nav.bidrag.regnskap.service
 
+import no.nav.bidrag.regnskap.persistence.entity.Driftsavvik
+import no.nav.bidrag.regnskap.persistence.entity.Kontering
+import no.nav.bidrag.regnskap.persistence.entity.OverføringKontering
 import no.nav.bidrag.regnskap.persistence.entity.Påløp
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
-import org.springframework.scheduling.annotation.Async
+import no.nav.bidrag.regnskap.påløpsgenerering.PåløpsfilGenerator
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.transaction.Transactional
 
+private val LOGGER = LoggerFactory.getLogger(PåløpskjøringService::class.java)
+
 @Service
-@Transactional
 class PåløpskjøringService(
-  private val persistenceService: PersistenceService,
-  private val konteringService: KonteringService,
+  private val persistenceService: PersistenceService, private val konteringService: KonteringService
 ) {
 
-  fun startPåløpskjøring(): ResponseEntity<Int> {
-    val påløp = persistenceService.hentIkkeKjørtePåløp().minByOrNull { it.forPeriode }
-      ?: return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
-
-    startPåløpskjøring(påløp)
-
-    return ResponseEntity.status(HttpStatus.CREATED).body(påløp.påløpId)
+  fun startPåløpskjøring(påløp: Påløp, schedulertKjøring: Boolean) {
+    validerDriftsavvik(påløp, schedulertKjøring)
+    opprettKonteringerForAlleAktiveOppdrag(påløp)
+    genererPåløpsfil(påløp)
+    fullførPåløp(påløp)
+    avsluttDriftsavvik(påløp)
   }
 
-  @Async
-  fun startPåløpskjøring(påløp: Påløp) {
-    //Opprett driftavvik for å sperre opprettelse oversendelse av nye konteringer
+  @Transactional
+  fun hentPåløp() = persistenceService.hentIkkeKjørtePåløp().minByOrNull { it.forPeriode }
 
-    opprettKonteringerForAlleAktiveOppdrag(påløp)
+  @Transactional
+  fun genererPåløpsfil(påløp: Påløp) {
+    val konteringer = persistenceService.hentAlleIkkeOverførteKonteringer()
+    PåløpsfilGenerator().skrivPåløpsfil(konteringer)
 
-    //Hent alle ikke oversendte konteringer
+    //Last opp fil til filsluse
 
-    //Skriv alle ikke oversendte konteringer til fil og sett de som oversendte
+    settKonteringTilOverførtOgOpprettOverføringKontering(konteringer, påløp)
+  }
 
+  private fun settKonteringTilOverførtOgOpprettOverføringKontering(konteringer: List<Kontering>, påløp: Påløp) {
+    val timestamp = LocalDateTime.now()
+    konteringer.forEach {
+      it.overføringstidspunkt = timestamp
+      it.oppdragsperiode?.oppdrag?.sistOversendtePeriode = påløp.forPeriode
+
+      persistenceService.lagreKontering(it)
+
+      persistenceService.lagreOverføringKontering(
+        OverføringKontering(
+          kontering = it, tidspunkt = timestamp, kanal = "Påløpsfil"
+        )
+      )
+    }
+  }
+
+  @Transactional
+  fun fullførPåløp(påløp: Påløp) {
     påløp.fullførtTidspunkt = LocalDateTime.now()
     persistenceService.lagrePåløp(påløp)
   }
 
-  private fun opprettKonteringerForAlleAktiveOppdrag(påløp: Påløp) {
+  @Transactional
+  fun avsluttDriftsavvik(påløp: Påløp) {
+    val driftsavvik = persistenceService.hentDriftsavvikForPåløp(påløp.påløpId!!)!!
+    driftsavvik.tidspunktTil = LocalDateTime.now()
+    persistenceService.lagreDriftsavvik(driftsavvik)
+  }
+
+  @Transactional
+  fun validerDriftsavvik(påløp: Påløp, schedulertKjøring: Boolean) {
+    val driftsavvikListe = persistenceService.hentAlleAktiveDriftsavvik()
+    if (driftsavvikListe.any { it.påløpId != påløp.påløpId }) {
+      LOGGER.error("Det finnes aktive driftsavvik som ikke er knyttet til påløpet! Kan derfor ikke starte påløpskjøring!")
+      //Todo() Bedre feilhåndtering
+      throw IllegalStateException("Det finnes aktive driftsavvik som ikke er knyttet til påløpet! Kan derfor ikke starte påløpskjøring!")
+    }
+    if (driftsavvikListe.isEmpty()) persistenceService.lagreDriftsavvik(
+      opprettDriftsavvik(
+        påløp, schedulertKjøring
+      )
+    )
+  }
+
+
+  private fun opprettDriftsavvik(
+    påløp: Påløp, schedulertKjøring: Boolean
+  ) = Driftsavvik(
+    påløpId = påløp.påløpId,
+    tidspunktFra = LocalDateTime.now(),
+    opprettetAv = if (schedulertKjøring) "Automatisk påløpskjøringer" else "Manuel påløpskjøring (REST)",
+    årsak = "Påløpskjøring"
+  )
+
+  @Transactional
+  fun opprettKonteringerForAlleAktiveOppdrag(påløp: Påløp) {
     val periode = LocalDate.parse(påløp.forPeriode + "-01")
     val oppdragsperioder = persistenceService.hentAlleOppdragsperioderSomErAktiveForPeriode(periode)
 
@@ -52,6 +107,10 @@ class PåløpskjøringService(
       persistenceService.lagreOppdragsperiode(it)
     }
 
-    konteringService.opprettLøpendeKonteringerPåOppdragsperioder(løpendeOppdragsperioder, påløp.forPeriode)
+    konteringService.opprettLøpendeKonteringerPåOppdragsperioder(
+      løpendeOppdragsperioder.filter {
+        periode.plusMonths(1).isAfter(it.periodeFra)
+      }, påløp.forPeriode
+    )
   }
 }

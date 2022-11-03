@@ -26,7 +26,7 @@ class SendKravScheduler(
   fun skedulertOverforingAvKrav() {
     LockAssert.assertLocked()
     if (harAktiveDriftAvvik()) {
-      LOGGER.error("Det finnes aktive driftsavvik. Starter derfor ikke batchen.")
+      LOGGER.error("Det finnes aktive driftsavvik. Starter derfor ikke overføring av konteringer.")
       return
     }
 
@@ -45,7 +45,7 @@ class SendKravScheduler(
   }
 
   private fun harAktiveDriftAvvik(): Boolean {
-    return false // TODO()
+    return persistenceService.finnesAktivtDriftsavvik()
   }
 
   private fun hentOppdragMedIkkeOverforteKonteringer() = persistenceService.hentAlleIkkeOverførteKonteringer().flatMap {

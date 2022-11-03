@@ -8,26 +8,26 @@ import javax.persistence.GenerationType
 import javax.persistence.Id
 
 
-@Entity(name = "drift_avvik")
-data class DriftAvvik(
+@Entity(name = "driftsavvik")
+data class Driftsavvik(
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "avvik_id")
-  val avvikId: Int,
+  @Column(name = "driftsavvik_id")
+  val driftsavvikId: Int? = null,
 
   @Column(name = "palop_id")
-  val påløpId: Int?,
+  val påløpId: Int? = null,
 
   @Column(name = "tidspunkt_fra")
   val tidspunktFra: LocalDateTime,
 
   @Column(name = "tidspunkt_til")
-  val tidspunktTil: LocalDateTime?,
+  var tidspunktTil: LocalDateTime? = null,
 
   @Column(name = "opprettet_av")
-  val opprettetAv: String?,
+  val opprettetAv: String? = null,
 
   @Column(name = "arsak")
-  val årsak: String?
+  val årsak: String? = null
 )

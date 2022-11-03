@@ -25,6 +25,10 @@ class SendKravQueue(
 
   @Transactional
   fun send() {
+    if(harAktiveDriftAvvik()) {
+      LOGGER.error("Det finnes aktive driftsavvik. Starter derfor ikke overføring av kontering.")
+      return
+    }
     while (linkedBlockingQueue.isNotEmpty()) {
       val oppdragId = linkedBlockingQueue.peek()
       LOGGER.debug("Fant id $oppdragId i queuen. Starter oversending av krav..")
@@ -35,5 +39,9 @@ class SendKravQueue(
       // TODO(): Feilhåndtering, hvordan går vi frem om det feiler gjenntatte ganger
       linkedBlockingQueue.remove()
     }
+  }
+
+  private fun harAktiveDriftAvvik(): Boolean {
+    return persistenceService.finnesAktivtDriftsavvik()
   }
 }

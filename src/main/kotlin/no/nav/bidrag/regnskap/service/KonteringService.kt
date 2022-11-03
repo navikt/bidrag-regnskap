@@ -96,7 +96,7 @@ class KonteringService(
   }
 
   private fun vurderType(oppdragsperiode: Oppdragsperiode): String {
-    if(oppdragsperiode.oppdrag?.oppdragsperioder?.filter { it.konteringer?.isEmpty() == true }?.isEmpty() == true) {
+    if(oppdragsperiode.oppdrag?.oppdragsperioder?.filter { it.konteringer?.isNotEmpty() == true }?.isEmpty() == true) {
       return Type.NY.name
     }
     return Type.ENDRING.name
@@ -172,6 +172,10 @@ class KonteringService(
       periodeTil = LocalDate.of(
         sisteOverførtePeriode.year, sisteOverførtePeriode.month, 1
       ).plusMonths(1)
+    }
+
+    if (periodeTil!!.isBefore(oppdragsperiode.periodeFra)) {
+      return emptyList()
     }
 
     // Finner alle perioder som er mellom fra og med periodeFra og til og med periodeTil (Om den eksisterer, ellers brukes siste overførte periode)

@@ -9,3 +9,5 @@ kafka:
 kafka-topic-vedtak: bidrag.vedtak
 database:
   navn: bidrag-regnskap-main
+bucket:
+  navn: bidrag-regnskap-dev
