@@ -1,6 +1,7 @@
 package no.nav.bidrag.regnskap.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
+import java.math.BigDecimal
 
 @Schema(
   name = "OppdragResponse",
@@ -116,7 +117,7 @@ data class OppdragsperiodeResponse(
     description = "Beløpet oppdraget er på.",
     example = "7500"
   )
-  val belop: Int,
+  val belop: BigDecimal,
 
   @field:Schema(
     description = "Valutaen beløpet er i.",

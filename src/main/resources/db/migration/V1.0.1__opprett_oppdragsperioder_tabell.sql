@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS oppdragsperioder
     vedtak_id          integer NOT NULL,
     gjelder_ident      text    NOT NULL,
     mottaker_ident     text    NOT NULL,
-    belop              integer NOT NULL,
+    belop              decimal NOT NULL,
     valuta             text    NOT NULL,
     periode_fra        date    NOT NULL,
     periode_til        date,

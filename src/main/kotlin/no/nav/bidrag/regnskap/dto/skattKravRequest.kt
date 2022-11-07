@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import no.nav.bidrag.behandling.felles.enums.EngangsbelopType
 import no.nav.bidrag.behandling.felles.enums.StonadType
 import org.springframework.format.annotation.DateTimeFormat
+import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -117,7 +118,7 @@ data class SkattKontering(
     description = "Konteringens beløp. Positive beløp og 0 regnes som tillegg, negative beløp som fradrag.",
     example = "2000",
     required = true
-  ) val belop: Int,
+  ) val belop: BigDecimal,
 
   @field:Schema(
     description = "Valutakoden for beløpet.", example = "NOK", required = true

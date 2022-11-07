@@ -5,7 +5,6 @@ import no.nav.bidrag.regnskap.hendelse.vedtak.Hendelse
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
 import org.springframework.stereotype.Service
-import java.math.RoundingMode
 import java.util.*
 
 @Service
@@ -52,7 +51,7 @@ class OppdragsperiodeService(
           sakId = hendelse.sakId,
           gjelderIdent = "22222222226", //TODO() Avklare med skatt. Dummynr per nå
           mottakerIdent = hendelse.mottakerIdent,
-          beløp = periode.belop.setScale(0, RoundingMode.HALF_UP).intValueExact(),
+          beløp = periode.belop,
           valuta = periode.valutakode,
           periodeFra = periode.periodeFomDato,
           periodeTil = periode.periodeTilDato,

@@ -1,8 +1,10 @@
 package no.nav.bidrag.regnskap.påløpsgenerering
 
 import io.mockk.impl.annotations.InjectMockKs
+import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import no.nav.bidrag.regnskap.dto.Transaksjonskode
+import no.nav.bidrag.regnskap.persistence.bucket.PåløpsfilBucket
 import no.nav.bidrag.regnskap.utils.TestData
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -10,6 +12,9 @@ import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(MockKExtension::class)
 class PåløpsfilGeneratorTest {
+
+  @MockK(relaxed = true)
+  private lateinit var påløpsfilBucket: PåløpsfilBucket
 
   @InjectMockKs
   private lateinit var påløpsfilGenerator: PåløpsfilGenerator
@@ -42,7 +47,9 @@ class PåløpsfilGeneratorTest {
     oppdrag2.oppdragsperioder = listOf(oppdragsperiode2)
     oppdragsperiode2.konteringer = konteringer2
 
+    val påløp = TestData.opprettPåløp()
 
-    påløpsfilGenerator.skrivPåløpsfil(konteringer + konteringer2)
+
+    påløpsfilGenerator.skrivPåløpsfil(konteringer + konteringer2, påløp)
   }
 }

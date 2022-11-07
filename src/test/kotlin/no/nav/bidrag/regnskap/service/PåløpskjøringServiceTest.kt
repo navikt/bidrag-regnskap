@@ -6,6 +6,7 @@ import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.verify
+import no.nav.bidrag.regnskap.påløpsgenerering.PåløpsfilGenerator
 import no.nav.bidrag.regnskap.utils.TestData
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -20,6 +21,9 @@ class PåløpskjøringServiceTest {
 
   @MockK(relaxed = true)
   private lateinit var konteringService: KonteringService
+
+  @MockK(relaxed = true)
+  private lateinit var påløpsfilGenerator: PåløpsfilGenerator
 
   @InjectMockKs
   private lateinit var påløpskjøringService: PåløpskjøringService

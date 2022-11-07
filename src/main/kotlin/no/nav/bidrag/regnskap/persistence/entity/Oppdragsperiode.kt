@@ -1,5 +1,6 @@
 package no.nav.bidrag.regnskap.persistence.entity
 
+import java.math.BigDecimal
 import java.time.LocalDate
 import javax.persistence.CascadeType
 import javax.persistence.Column
@@ -36,7 +37,7 @@ data class Oppdragsperiode(
   val mottakerIdent: String,
 
   @Column(name = "belop")
-  val beløp: Int,
+  val beløp: BigDecimal,
 
   @Column(name = "valuta")
   val valuta: String,

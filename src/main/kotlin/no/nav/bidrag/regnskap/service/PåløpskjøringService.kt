@@ -15,7 +15,9 @@ private val LOGGER = LoggerFactory.getLogger(PåløpskjøringService::class.java
 
 @Service
 class PåløpskjøringService(
-  private val persistenceService: PersistenceService, private val konteringService: KonteringService
+  private val persistenceService: PersistenceService,
+  private val konteringService: KonteringService,
+  private val påløpsfilGenerator: PåløpsfilGenerator
 ) {
 
   fun startPåløpskjøring(påløp: Påløp, schedulertKjøring: Boolean) {
@@ -32,7 +34,7 @@ class PåløpskjøringService(
   @Transactional
   fun genererPåløpsfil(påløp: Påløp) {
     val konteringer = persistenceService.hentAlleIkkeOverførteKonteringer()
-    PåløpsfilGenerator().skrivPåløpsfil(konteringer)
+    påløpsfilGenerator.skrivPåløpsfil(konteringer, påløp)
 
     //Last opp fil til filsluse
 

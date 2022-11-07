@@ -57,11 +57,11 @@ class OppdragsperiodeServiceTest {
       val nyeOppdragsperioder = oppdragsperiodeService.opprettNyeOppdragsperioder(hendelse, oppdrag)
 
       nyeOppdragsperioder[0].mottakerIdent shouldBe hendelse.mottakerIdent
-      nyeOppdragsperioder[0].beløp shouldBe hendelse.periodeListe[0].belop.intValueExact()
+      nyeOppdragsperioder[0].beløp shouldBe hendelse.periodeListe[0].belop
       nyeOppdragsperioder[0].periodeFra shouldBe hendelse.periodeListe[0].periodeFomDato
       nyeOppdragsperioder[0].periodeTil shouldBe hendelse.periodeListe[0].periodeTilDato
       nyeOppdragsperioder[1].mottakerIdent shouldBe hendelse.mottakerIdent
-      nyeOppdragsperioder[1].beløp shouldBe hendelse.periodeListe[1].belop.intValueExact()
+      nyeOppdragsperioder[1].beløp shouldBe hendelse.periodeListe[1].belop
       nyeOppdragsperioder[1].periodeFra shouldBe hendelse.periodeListe[1].periodeFomDato
       nyeOppdragsperioder[1].periodeTil shouldBe hendelse.periodeListe[1].periodeTilDato
     }

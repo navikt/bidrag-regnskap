@@ -176,7 +176,7 @@ object TestData {
     vedtakId: Int = 654321,
     gjelderIdent: String = TestDataGenerator.genererPersonnummer(),
     mottakerIdent: String = TestDataGenerator.genererPersonnummer(),
-    belop: Int = 7500,
+    belop: BigDecimal = BigDecimal(7500),
     valuta: String = "NOK",
     periodeFra: LocalDate = LocalDate.now().minusMonths(1),
     periodeTil: LocalDate = LocalDate.now().plusMonths(1),

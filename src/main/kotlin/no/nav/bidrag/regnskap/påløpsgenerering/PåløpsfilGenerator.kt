@@ -1,12 +1,17 @@
 package no.nav.bidrag.regnskap.påløpsgenerering
 
 import no.nav.bidrag.regnskap.dto.Transaksjonskode
+import no.nav.bidrag.regnskap.persistence.bucket.PåløpsfilBucket
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
+import no.nav.bidrag.regnskap.persistence.entity.Påløp
 import org.slf4j.LoggerFactory
+import org.springframework.stereotype.Component
 import org.w3c.dom.Document
 import org.w3c.dom.Element
-import java.io.FileOutputStream
+import java.io.ByteArrayOutputStream
+import java.math.BigDecimal
 import java.time.LocalDate
+import java.time.YearMonth
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerFactory
@@ -15,18 +20,29 @@ import javax.xml.transform.stream.StreamResult
 
 private val LOGGER = LoggerFactory.getLogger(PåløpsfilGenerator::class.java)
 
-class PåløpsfilGenerator {
+@Component
+class PåløpsfilGenerator(
+  private val påløpsfilBucket: PåløpsfilBucket
+) {
+
+  companion object {
+    const val BATCH_BESKRIVELSE = "Kravtransaksjoner fra Bidrag-Regnskap til Predator"
+    val now = LocalDate.now()
+  }
 
   private val documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
 
-  fun skrivPåløpsfil(konteringer: List<Kontering>) {
+  fun skrivPåløpsfil(konteringer: List<Kontering>, påløp: Påløp) {
     val dokument = documentBuilder.newDocument()
     dokument.setXmlStandalone(true)
 
     val rootElement = dokument.createElementNS("http://www.trygdeetaten.no/skjema/bidrag-reskonto", "bidrag-reskonto")
     dokument.appendChild(rootElement)
 
+    opprettStartBatchBr01(dokument, rootElement, påløp)
+
     var index = 0
+    var sum = BigDecimal.ZERO
     finnAlleOppdragFraKonteringer(konteringer).forEach { (_, konteringerForOppdrag) ->
 
       if(index % 100 == 0) {
@@ -38,6 +54,8 @@ class PåløpsfilGenerator {
 
       konteringerForOppdrag.forEach { kontering ->
         opprettKonteringBr10(dokument, oppdragElement, kontering)
+
+        sum += kontering.oppdragsperiode!!.beløp
       }
       //opprettIdentrecordBr20(dokument, oppdragElement)
       //opprettPersionDataBr30(dokument, oppdragElement)
@@ -46,8 +64,28 @@ class PåløpsfilGenerator {
 
       index++
     }
+
+    opprettStoppBatchBr99(dokument, rootElement, sum, konteringer.size) //TODO() summer
+
     skrivXml(dokument)
     LOGGER.info("Påløpskjøring: Påløpsfil er ferdig skrevet med ${konteringer.size} konteringer og lastet opp til filsluse.")
+  }
+
+  private fun opprettStartBatchBr01(dokument: Document, rootElement: Element, påløp: Påløp) {
+    val startBatchBr01 = dokument.createElement("start-batch-br01")
+    rootElement.appendChild(startBatchBr01)
+
+    val beskrivelse = dokument.createElement("beskrivelse")
+    beskrivelse.textContent = BATCH_BESKRIVELSE
+    startBatchBr01.appendChild(beskrivelse)
+
+    val kjorenr = dokument.createElement("kjorenr")
+    kjorenr.textContent = påløp.påløpId.toString()
+    startBatchBr01.appendChild(kjorenr)
+
+    val dato = dokument.createElement("dato")
+    dato.textContent = now.toString()
+    startBatchBr01.appendChild(dato)
   }
 
   private fun opprettKonteringBr10(dokument: Document, oppdragElement: Element, kontering: Kontering) {
@@ -55,8 +93,8 @@ class PåløpsfilGenerator {
     oppdragElement.appendChild(konteringBr10Element)
 
     //Ikke i bruk, genereres tom
-    //val kodeFagomraade = dokument.createElement("kodeFagomraade")
-    //konteringBr10Element.appendChild(kodeFagomraade)
+    val kodeFagomraade = dokument.createElement("kodeFagomraade")
+    konteringBr10Element.appendChild(kodeFagomraade)
 
     val transKode = dokument.createElement("transKode")
     transKode.textContent = kontering.transaksjonskode
@@ -71,12 +109,12 @@ class PåløpsfilGenerator {
     konteringBr10Element.appendChild(soknadType)
 
     //Ikke i bruk, genereres tom
-    //val eierEnhet = dokument.createElement("eierEnhet")
-    //konteringBr10Element.appendChild(eierEnhet)
+    val eierEnhet = dokument.createElement("eierEnhet")
+    konteringBr10Element.appendChild(eierEnhet)
 
     //Ikke i bruk, genereres tom
-    //val behandlEnhet = dokument.createElement("behandlEnhet")
-    //konteringBr10Element.appendChild(behandlEnhet)
+    val behandlEnhet = dokument.createElement("behandlEnhet")
+    konteringBr10Element.appendChild(behandlEnhet)
 
     val fagsystemId = dokument.createElement("fagsystemId")
     fagsystemId.textContent = kontering.oppdragsperiode?.sakId
@@ -104,17 +142,21 @@ class PåløpsfilGenerator {
 
     val fradragTillegg = dokument.createElement("fradragTillegg")
     fradragTillegg.textContent =
-      if (Transaksjonskode.valueOf(kontering.transaksjonskode).korreksjonskode != null) "F" else "T" //TODO() Aner ikke om dette stemmer.. Direkte oppgjør?
+      if (Transaksjonskode.valueOf(kontering.transaksjonskode).korreksjonskode != null) "F" else "T" //TODO() Direkte oppgjør?
     konteringBr10Element.appendChild(fradragTillegg)
 
+    val valutaKode = dokument.createElement("valutaKode")
+    valutaKode.textContent = kontering.oppdragsperiode?.valuta
+    konteringBr10Element.appendChild(valutaKode)
+
+    val yearMonth = YearMonth.parse(kontering.overføringsperiode)
+
     val datoBeregnFom = dokument.createElement("datoBeregnFom")
-    datoBeregnFom.textContent =
-      kontering.overføringsperiode + "-01"
+    datoBeregnFom.textContent = LocalDate.of(yearMonth.year, yearMonth.month, 1).toString()
     konteringBr10Element.appendChild(datoBeregnFom)
 
     val datoBeregnTom = dokument.createElement("datoBeregnTom")
-    datoBeregnTom.textContent =
-      kontering.overføringsperiode + "-01" //TODO() Denne skal være siste dag i mnd hurra
+    datoBeregnTom.textContent = LocalDate.of(yearMonth.year, yearMonth.month, yearMonth.lengthOfMonth()).toString()
     konteringBr10Element.appendChild(datoBeregnTom)
 
     val datoVedtak = dokument.createElement("datoVedtak")
@@ -155,7 +197,7 @@ class PåløpsfilGenerator {
     oppdragElement.appendChild(identrecordBr20Element)
 
     //Ikke i bruk, genereres tom
-    val ident = dokument.createElement("Ident")
+    val ident = dokument.createElement("ident")
     identrecordBr20Element.appendChild(ident)
 
     //Ikke i bruk, genereres tom
@@ -228,27 +270,27 @@ class PåløpsfilGenerator {
     oppdragElement.appendChild(kontaktInfoBr40)
 
     //Ikke i bruk, genereres tom
-    val ident = dokument.createElement("Ident")
+    val ident = dokument.createElement("ident")
     kontaktInfoBr40.appendChild(ident)
 
     //Ikke i bruk, genereres tom
-    val kontaktperson = dokument.createElement("Kontaktperson")
+    val kontaktperson = dokument.createElement("kontaktperson")
     kontaktInfoBr40.appendChild(kontaktperson)
 
     //Ikke i bruk, genereres tom
-    val epost = dokument.createElement("e-post")
+    val epost = dokument.createElement("ePost")
     kontaktInfoBr40.appendChild(epost)
 
     //Ikke i bruk, genereres tom
-    val tlfPrivat = dokument.createElement("Tlf-privat")
+    val tlfPrivat = dokument.createElement("tlfPrivat")
     kontaktInfoBr40.appendChild(tlfPrivat)
 
     //Ikke i bruk, genereres tom
-    val tlfMobil = dokument.createElement("Tlf-mobil")
+    val tlfMobil = dokument.createElement("tlfMobil")
     kontaktInfoBr40.appendChild(tlfMobil)
 
     //Ikke i bruk, genereres tom
-    val tlfArbeid = dokument.createElement("Tlf-arbeid")
+    val tlfArbeid = dokument.createElement("tlfArbeid")
     kontaktInfoBr40.appendChild(tlfArbeid)
   }
 
@@ -297,6 +339,19 @@ class PåløpsfilGenerator {
     adresseInfoBr50.appendChild(landnavn)
   }
 
+  private fun opprettStoppBatchBr99(dokument: Document, rootElement: Element, sum: BigDecimal, antall: Int) {
+    val stopBatchBr99 = dokument.createElement("stopp-batch-br99")
+    rootElement.appendChild(stopBatchBr99)
+
+    val sumBelop = dokument.createElement("sumBelop")
+    sumBelop.textContent = sum.toString()
+    stopBatchBr99.appendChild(sumBelop)
+
+    val antallRecords = dokument.createElement("antallRecords")
+    antallRecords.textContent = antall.toString()
+    stopBatchBr99.appendChild(antallRecords)
+  }
+
   private fun finnAlleOppdragFraKonteringer(konteringer: List<Kontering>): HashMap<Int, ArrayList<Kontering>> {
     val oppdragsMap = HashMap<Int, ArrayList<Kontering>>()
 
@@ -317,7 +372,7 @@ class PåløpsfilGenerator {
 
     //Pretty print
     transformer.setOutputProperty(OutputKeys.INDENT, "yes")
-    transformer.setOutputProperty(OutputKeys.ENCODING, "ISO-8859-1");
+    transformer.setOutputProperty(OutputKeys.ENCODING, "ISO-8859-1")
 
     val source = DOMSource(dokument)
     val out = System.out
@@ -326,5 +381,14 @@ class PåløpsfilGenerator {
     val result = StreamResult(out)
 
     transformer.transform(source, result)
+
+    val transformer2 = TransformerFactory.newInstance().newTransformer()
+
+    val byteArrayStream = ByteArrayOutputStream()
+    val streamResult = StreamResult(byteArrayStream)
+    transformer2.transform(source, streamResult)
+    val byteArray = byteArrayStream.toByteArray()
+
+    påløpsfilBucket.lagreFil("påløp/påløpsfil.xml", byteArray)
   }
 }
