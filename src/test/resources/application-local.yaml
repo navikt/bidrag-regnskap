@@ -8,7 +8,7 @@ NAIS_APP_NAME: bidrag-regnskap
 TOPIC_VEDTAK: bidrag.vedtak-feature
 KAFKA_BOOTSTRAP_SERVERS: localhost:9092
 KAFKA_BROKERS: localhost:9092
-BUCKET_NAME: bidrag-regnskap-dev
+BUCKET_NAME: bidrag-regnskap-feature
 
 scheduler:
   interval:
