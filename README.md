@@ -51,11 +51,23 @@ Bruk `kafkacat` til å sende meldinger til kafka topic.
 ```bash
 docker run -it --rm --network=host confluentinc/cp-kafkacat kafkacat -b 0.0.0.0:9092 -t bidrag.vedtak-feature -P
 ```
-og lim inn:
+Lim inn gyldig melding fra bidrag.vedtak topicen og deretter trykk Enter. 
+Da vil meldingen bli sendt til topic bidrag.vedtak-feature
+
+#### Opprette påløpsfil lokalt
+Ved generering av påløpsfil blir filen streamet til en GCP Bucket før den overføres til en filsluse.
+For å kunne gjøre dette lokalt så må en key-fil legges inn under test/resources og navnet på key-filen
+legge inn under GOOGLE_APPLICATION_CREDENTIALS i application-local.yaml.
+
+Key-fil kan opprettes [her.](https://console.cloud.google.com/iam-admin/serviceaccounts/details/107405300865899647398/keys?project=bidrag-dev-45a9&supportedpurview=project)
+
+### Maskinporten
+For å kunne koble seg til maskinporten lokalt må maskinportens privateKey legges inn i application-local.yaml.
+Denne variablen kan hentes med:
 ```bash
-TODO
+ kubectl exec --tty deployment/bidrag-regnskap-feature -- printenv | grep -e MASKINPORTEN_CLIENT_JWK
 ```
-og deretter trykk Enter og Ctrl+D. Da vil meldingen bli sendt til topic bidrag.vedtak-feature
+NB: JWK-tokenet må omringes med tødler og alle eksisterende tødler må escapes slik \"
 
 ### JWT-Token
 JWT-Token kan hentes ved hjelp at skriptet her: [hentJwtToken](https://github.com/navikt/bidrag-dev/blob/main/scripts/hentJwtToken.sh).
