@@ -1,9 +1,10 @@
 package no.nav.bidrag.regnskap.persistence.bucket
 
 import com.google.api.gax.retrying.RetrySettings
+import com.google.cloud.WriteChannel
 import com.google.cloud.storage.BlobInfo
-import com.google.cloud.storage.Bucket
 import com.google.cloud.storage.StorageOptions
+import no.nav.bidrag.regnskap.påløpsgenerering.ByteArrayOutputStreamTilByteBuffer
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.threeten.bp.Duration
@@ -16,17 +17,21 @@ class PåløpsfilBucket(
   private val retrySetting = RetrySettings.newBuilder().setTotalTimeout(Duration.ofMillis(3000)).build()
   private val storage = StorageOptions.newBuilder().setRetrySettings(retrySetting).build().service
 
-  fun hentBucket(): Bucket {
-    return storage.get(bucketNavn) ?: throw RuntimeException("Fant ikke bøtte ved navn $bucketNavn")
+  fun lagreFil(filnavn: String, byteArrayStream: ByteArrayOutputStreamTilByteBuffer) {
+    hentWriteChannel(filnavn).use { it.write(byteArrayStream.toByteBuffer()) }
   }
 
-  fun lagreFil(filnavn: String, fil: ByteArray) {
-    storage.create(lagBlobinfo(filnavn), fil)
+  fun finnesFil(filnavn: String): Boolean {
+    return storage.get(lagBlobinfo(filnavn).blobId) != null
   }
 
-  fun lagBlobinfo(filnavn: String): BlobInfo {
+  private fun hentWriteChannel(filnavn: String): WriteChannel {
+    return storage.writer(lagBlobinfo(filnavn))
+  }
+
+  private fun lagBlobinfo(filnavn: String): BlobInfo {
     return BlobInfo.newBuilder(bucketNavn, filnavn)
-      .setContentType("text/plain")
+      .setContentType("text/xml")
       .build()
   }
 }

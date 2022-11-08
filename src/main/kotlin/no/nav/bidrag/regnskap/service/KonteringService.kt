@@ -77,21 +77,23 @@ class KonteringService(
     løpendeOppdragsperioder.forEachIndexed { indexOppdragsperiode, oppdragsperiode ->
 
       if (oppdragsperiode.konteringer?.filter { it.overføringsperiode == forPeriode }?.isNotEmpty() == true) {
-        LOGGER.debug("Kontering for periode: $forPeriode i oppdragsperiode: ${oppdragsperiode.oppdragsperiodeId} er allerede opprettet!" +
-            "Dette kan komme av tidligere kjøring av påløpsfil som har blitt avbrutt underveis.")
-      }
-
-      persistenceService.lagreKontering(
-        Kontering(
-          transaksjonskode = Transaksjonskode.hentTransaksjonskodeForType(oppdragsperiode.oppdrag!!.stønadType).name,
-          overføringsperiode = forPeriode,
-          type = vurderType(oppdragsperiode),
-          justering = oppdragsperiode.oppdrag.vedtakType.let { VedtakType.valueOf(it) }.let { vurderOmJustinger(it) },
-          gebyrRolle = vurderOmGebyrRolle(oppdragsperiode.oppdrag.stønadType),
-          oppdragsperiode = oppdragsperiode,
-          sendtIPåløpsfil = true
+        LOGGER.debug(
+          "Kontering for periode: $forPeriode i oppdragsperiode: ${oppdragsperiode.oppdragsperiodeId} er allerede opprettet!" +
+              "Dette kan komme av tidligere kjøring av påløpsfil som har blitt avbrutt underveis."
         )
-      )
+      } else {
+        persistenceService.lagreKontering(
+          Kontering(
+            transaksjonskode = Transaksjonskode.hentTransaksjonskodeForType(oppdragsperiode.oppdrag!!.stønadType).name,
+            overføringsperiode = forPeriode,
+            type = vurderType(oppdragsperiode),
+            justering = oppdragsperiode.oppdrag.vedtakType.let { VedtakType.valueOf(it) }.let { vurderOmJustinger(it) },
+            gebyrRolle = vurderOmGebyrRolle(oppdragsperiode.oppdrag.stønadType),
+            oppdragsperiode = oppdragsperiode,
+            sendtIPåløpsfil = true
+          )
+        )
+      }
     }
   }
 

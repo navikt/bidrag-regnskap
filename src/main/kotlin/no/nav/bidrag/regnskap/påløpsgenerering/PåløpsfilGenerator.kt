@@ -10,8 +10,10 @@ import org.w3c.dom.Document
 import org.w3c.dom.Element
 import java.io.ByteArrayOutputStream
 import java.math.BigDecimal
+import java.nio.ByteBuffer
 import java.time.LocalDate
 import java.time.YearMonth
+import java.time.format.DateTimeFormatter
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerFactory
@@ -33,41 +35,49 @@ class PåløpsfilGenerator(
   private val documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
 
   fun skrivPåløpsfil(konteringer: List<Kontering>, påløp: Påløp) {
-    val dokument = documentBuilder.newDocument()
-    dokument.setXmlStandalone(true)
+    val påløpsfilnavn = "påløp/paaloop_D" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyMMdd")).toString() + ".xml"
+    //opprett navn på påløpsfil
 
-    val rootElement = dokument.createElementNS("http://www.trygdeetaten.no/skjema/bidrag-reskonto", "bidrag-reskonto")
-    dokument.appendChild(rootElement)
+    if (!påløpsfilBucket.finnesFil(påløpsfilnavn)) {
 
-    opprettStartBatchBr01(dokument, rootElement, påløp)
+      val dokument = documentBuilder.newDocument()
+      dokument.setXmlStandalone(true)
 
-    var index = 0
-    var sum = BigDecimal.ZERO
-    finnAlleOppdragFraKonteringer(konteringer).forEach { (_, konteringerForOppdrag) ->
+      val rootElement = dokument.createElementNS("http://www.trygdeetaten.no/skjema/bidrag-reskonto", "bidrag-reskonto")
+      dokument.appendChild(rootElement)
 
-      if(index % 100 == 0) {
-        LOGGER.info("Påløpskjøring: Har skrevet $index av ${konteringer.size} konteringer til påløpsfil.")
+      opprettStartBatchBr01(dokument, rootElement, påløp)
+
+      var index = 0
+      var sum = BigDecimal.ZERO
+      finnAlleOppdragFraKonteringer(konteringer).forEach { (_, konteringerForOppdrag) ->
+
+        if (index % 100 == 0) {
+          LOGGER.info("Påløpskjøring: Har skrevet $index av ${konteringer.size} konteringer til påløpsfil.")
+        }
+
+        val oppdragElement = dokument.createElement("oppdrag")
+        rootElement.appendChild(oppdragElement)
+
+        konteringerForOppdrag.forEach { kontering ->
+          opprettKonteringBr10(dokument, oppdragElement, kontering)
+
+          sum += kontering.oppdragsperiode!!.beløp
+        }
+        //opprettIdentrecordBr20(dokument, oppdragElement)
+        //opprettPersionDataBr30(dokument, oppdragElement)
+        //opprettKontaktInfoBr40(dokument, oppdragElement)
+        //opprettAdresseInfoBr50(dokument, oppdragElement)
+
+        index++
       }
 
-      val oppdragElement = dokument.createElement("oppdrag")
-      rootElement.appendChild(oppdragElement)
+      opprettStoppBatchBr99(dokument, rootElement, sum, konteringer.size)
 
-      konteringerForOppdrag.forEach { kontering ->
-        opprettKonteringBr10(dokument, oppdragElement, kontering)
-
-        sum += kontering.oppdragsperiode!!.beløp
-      }
-      //opprettIdentrecordBr20(dokument, oppdragElement)
-      //opprettPersionDataBr30(dokument, oppdragElement)
-      //opprettKontaktInfoBr40(dokument, oppdragElement)
-      //opprettAdresseInfoBr50(dokument, oppdragElement)
-
-      index++
+      skrivXml(dokument, påløpsfilnavn)
     }
 
-    opprettStoppBatchBr99(dokument, rootElement, sum, konteringer.size) //TODO() summer
-
-    skrivXml(dokument)
+    //last opp på filsluse //TODO()
     LOGGER.info("Påløpskjøring: Påløpsfil er ferdig skrevet med ${konteringer.size} konteringer og lastet opp til filsluse.")
   }
 
@@ -367,28 +377,24 @@ class PåløpsfilGenerator(
     return oppdragsMap
   }
 
-  private fun skrivXml(dokument: Document) {
+  private fun skrivXml(dokument: Document, påløpsfilnavn: String) {
     val transformer = TransformerFactory.newInstance().newTransformer()
-
-    //Pretty print
-    transformer.setOutputProperty(OutputKeys.INDENT, "yes")
     transformer.setOutputProperty(OutputKeys.ENCODING, "ISO-8859-1")
 
     val source = DOMSource(dokument)
-    val out = System.out
-//    val out = FileOutputStream("C:\\Users\\H165990\\Documents\\Dev\\bidrag-regnskap\\påløpsfil.xml")
-    //TODO() Filsluse. Hva, hvor, hvordan
-    val result = StreamResult(out)
+    val byteArrayStream = ByteArrayOutputStreamTilByteBuffer()
+    transformer.transform(source, StreamResult(byteArrayStream))
 
+    påløpsfilBucket.lagreFil(påløpsfilnavn, byteArrayStream)
+
+    // Output til console for testing
+    val result = StreamResult(System.out)
     transformer.transform(source, result)
+  }
+}
 
-    val transformer2 = TransformerFactory.newInstance().newTransformer()
-
-    val byteArrayStream = ByteArrayOutputStream()
-    val streamResult = StreamResult(byteArrayStream)
-    transformer2.transform(source, streamResult)
-    val byteArray = byteArrayStream.toByteArray()
-
-    påløpsfilBucket.lagreFil("påløp/påløpsfil.xml", byteArray)
+class ByteArrayOutputStreamTilByteBuffer : ByteArrayOutputStream() {
+  fun toByteBuffer(): ByteBuffer {
+    return ByteBuffer.wrap(buf, 0, count)
   }
 }
