@@ -43,6 +43,8 @@ spec:
   {{/each}}
   kafka:
     pool: {{ kafka.pool }}
+  envFrom:
+    - secret: bidrag-regnskap-sftp-private-key
   env:
     - name: SKATT_URL
       value: https://{{ azure.skatt_url }}
@@ -54,8 +56,6 @@ spec:
       value: {{ bucket.navn }}
     - name: SFTP_HOST
       value: {{ sftp.host }}
-  envFrom:
-    - secret: bidrag-regnskap-sftp-private-key
 
   gcp:
     sqlInstances:
