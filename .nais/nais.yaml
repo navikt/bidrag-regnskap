@@ -52,6 +52,11 @@ spec:
       value: {{ kafka-topic-vedtak }}
     - name: BUCKET_NAME
       value: {{ bucket.navn }}
+    - name: SFTP_HOST
+      value: {{ sftp.host }}
+  envFrom:
+    - secret: bidrag-regnskap-sftp-private-key
+
   gcp:
     sqlInstances:
       - name: {{ database.navn }}

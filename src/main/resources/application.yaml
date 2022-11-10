@@ -21,6 +21,12 @@ maskinporten:
   privateKey: ${MASKINPORTEN_CLIENT_JWK}
   validInSeconds: 120 #120 er maks antall sekunder et maskinporten Jwt-token kan være gyldig.
 
+sftp:
+  username: srvBidragRegnskap
+  host: ${SFTP_HOST}
+  port: 22
+  privateKey: ${SFTP_PRIVATE_KEY}
+
 spring.config.activate.on-profile: nais,local
 
 no.nav.security.jwt:

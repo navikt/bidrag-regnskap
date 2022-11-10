@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.nimbusds.jwt.SignedJWT
+import no.nav.bidrag.regnskap.config.MaskinportenConfig
 import org.springframework.stereotype.Service
 import java.net.URI
 import java.net.http.HttpClient

@@ -4,10 +4,12 @@ import com.google.api.gax.retrying.RetrySettings
 import com.google.cloud.WriteChannel
 import com.google.cloud.storage.BlobInfo
 import com.google.cloud.storage.StorageOptions
-import no.nav.bidrag.regnskap.påløpsgenerering.ByteArrayOutputStreamTilByteBuffer
+import no.nav.bidrag.regnskap.fil.ByteArrayOutputStreamTilByteBuffer
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.threeten.bp.Duration
+import java.io.InputStream
+import java.nio.channels.Channels
 
 @Component
 class PåløpsfilBucket(
@@ -23,6 +25,11 @@ class PåløpsfilBucket(
 
   fun finnesFil(filnavn: String): Boolean {
     return storage.get(lagBlobinfo(filnavn).blobId) != null
+  }
+
+  fun hentFil(filnavn: String): InputStream {
+    val reader = storage.reader(lagBlobinfo(filnavn).blobId)
+    return Channels.newInputStream(reader)
   }
 
   private fun hentWriteChannel(filnavn: String): WriteChannel {

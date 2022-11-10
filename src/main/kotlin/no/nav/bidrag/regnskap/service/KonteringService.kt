@@ -74,7 +74,7 @@ class KonteringService(
   }
 
   fun opprettLøpendeKonteringerPåOppdragsperioder(løpendeOppdragsperioder: List<Oppdragsperiode>, forPeriode: String) {
-    løpendeOppdragsperioder.forEachIndexed { indexOppdragsperiode, oppdragsperiode ->
+    løpendeOppdragsperioder.forEach { oppdragsperiode ->
 
       if (oppdragsperiode.konteringer?.filter { it.overføringsperiode == forPeriode }?.isNotEmpty() == true) {
         LOGGER.debug(

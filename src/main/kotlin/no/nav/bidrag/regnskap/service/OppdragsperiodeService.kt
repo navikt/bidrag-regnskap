@@ -44,7 +44,7 @@ class OppdragsperiodeService(
   ): List<Oppdragsperiode> {
     val oppdragsperiodeListe = mutableListOf<Oppdragsperiode>()
 
-    hendelse.periodeListe.forEachIndexed { index, periode ->
+    hendelse.periodeListe.forEach { periode ->
       oppdragsperiodeListe.add(
         Oppdragsperiode(
           vedtakId = hendelse.vedtakId,

@@ -11,3 +11,5 @@ database:
   navn: bidrag-regnskap-main
 bucket:
   navn: bidrag-regnskap-main
+sftp:
+  host: sftp-q.nav.no

@@ -4,7 +4,7 @@ import no.nav.bidrag.regnskap.persistence.entity.Driftsavvik
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.OverføringKontering
 import no.nav.bidrag.regnskap.persistence.entity.Påløp
-import no.nav.bidrag.regnskap.påløpsgenerering.PåløpsfilGenerator
+import no.nav.bidrag.regnskap.fil.PåløpsfilGenerator
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDate

@@ -1,6 +1,7 @@
-package no.nav.bidrag.regnskap.påløpsgenerering
+package no.nav.bidrag.regnskap.fil
 
 import no.nav.bidrag.regnskap.dto.Transaksjonskode
+import no.nav.bidrag.regnskap.fil.overføring.FiloverføringTilElinKlient
 import no.nav.bidrag.regnskap.persistence.bucket.PåløpsfilBucket
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.Påløp
@@ -24,7 +25,8 @@ private val LOGGER = LoggerFactory.getLogger(PåløpsfilGenerator::class.java)
 
 @Component
 class PåløpsfilGenerator(
-  private val påløpsfilBucket: PåløpsfilBucket
+  private val påløpsfilBucket: PåløpsfilBucket,
+  private val filoverføringTilElinKlient: FiloverføringTilElinKlient
 ) {
 
   companion object {
@@ -35,10 +37,10 @@ class PåløpsfilGenerator(
   private val documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
 
   fun skrivPåløpsfil(konteringer: List<Kontering>, påløp: Påløp) {
-    val påløpsfilnavn = "påløp/paaloop_D" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyMMdd")).toString() + ".xml"
-    //opprett navn på påløpsfil
+    val påløpsMappe = "påløp/"
+    val påløpsfilnavn = "paaloop_D" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyMMdd")).toString() + ".xml"
 
-    if (!påløpsfilBucket.finnesFil(påløpsfilnavn)) {
+    if (!påløpsfilBucket.finnesFil(påløpsMappe + påløpsfilnavn)) {
 
       val dokument = documentBuilder.newDocument()
       dokument.setXmlStandalone(true)
@@ -52,7 +54,7 @@ class PåløpsfilGenerator(
       var sum = BigDecimal.ZERO
       finnAlleOppdragFraKonteringer(konteringer).forEach { (_, konteringerForOppdrag) ->
 
-        if (index % 100 == 0) {
+        if (++index % 100 == 0) {
           LOGGER.info("Påløpskjøring: Har skrevet $index av ${konteringer.size} konteringer til påløpsfil.")
         }
 
@@ -69,15 +71,17 @@ class PåløpsfilGenerator(
         //opprettKontaktInfoBr40(dokument, oppdragElement)
         //opprettAdresseInfoBr50(dokument, oppdragElement)
 
-        index++
       }
+
+      LOGGER.info("Påløpskjøring: Har skrevet ${konteringer.size} av ${konteringer.size} konteringer til påløpsfil.")
 
       opprettStoppBatchBr99(dokument, rootElement, sum, konteringer.size)
 
-      skrivXml(dokument, påløpsfilnavn)
+      skrivXml(dokument, påløpsMappe + påløpsfilnavn)
     }
 
-    //last opp på filsluse //TODO()
+    filoverføringTilElinKlient.lastOppFilTilFilsluse(påløpsMappe, påløpsfilnavn)
+
     LOGGER.info("Påløpskjøring: Påløpsfil er ferdig skrevet med ${konteringer.size} konteringer og lastet opp til filsluse.")
   }
 

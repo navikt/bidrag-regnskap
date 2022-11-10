@@ -28,8 +28,17 @@ services:
   database:
     image: postgres:latest
     ports:
-      - 5432:5432
+      - "5432:5432"
     environment:
       POSTGRES_USER: cloudsqliamuser
       POSTGRES_PASSWORD: admin
       POSTGRES_DB: default_database
+
+  sftp:
+    volumes:
+      - /$HOME/Documents/Dev/bidrag-regnskap/sftp-server-storage
+      - ./src/test/resources/ssh/ssh_host_rsa_key.pub:/home/bruker/.ssh/keys/id_rsa.pub:ro
+    ports:
+      - "22:22"
+    image: atmoz/sftp
+    command: bruker:passord:::inbound

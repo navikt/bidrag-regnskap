@@ -4,6 +4,7 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.stubbing.Scenario
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator
+import no.nav.bidrag.regnskap.config.MaskinportenConfig
 import no.nav.bidrag.regnskap.maskinporten.MaskinportenTestUtils.opprettMaskinportenToken
 
 class MaskinportenWireMock {
