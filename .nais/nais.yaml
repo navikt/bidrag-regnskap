@@ -36,7 +36,7 @@ spec:
     enabled: true
     scopes:
       consumes:
-        - name: "nav:bidrag:aktoerregister.read" #TODO: Legge til scope når vi vet
+        - name: "nav:bidrag/v1/bidragskrav"
   ingresses:
   {{#each ingresses as |url|}}
     - {{url}}
