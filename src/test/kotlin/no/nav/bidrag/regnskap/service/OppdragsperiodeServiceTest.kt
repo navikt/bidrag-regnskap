@@ -44,10 +44,10 @@ class OppdragsperiodeServiceTest {
       val now = LocalDate.now()
       val hendelse = TestData.opprettHendelse(
         periodeListe = listOf(
-          TestData.opprettPeriode(
-            periodeFomDato = now.minusMonths(5), periodeTilDato = now.minusMonths(3), belop = BigDecimal.valueOf(7500)
-          ), TestData.opprettPeriode(
-            periodeFomDato = now.minusMonths(3), periodeTilDato = now, belop = BigDecimal.valueOf(7600)
+          TestData.opprettPeriodeDomene(
+            periodeFomDato = now.minusMonths(5), periodeTilDato = now.minusMonths(3), beløp = BigDecimal.valueOf(7500)
+          ), TestData.opprettPeriodeDomene(
+            periodeFomDato = now.minusMonths(3), periodeTilDato = now, beløp = BigDecimal.valueOf(7600)
           )
         )
       )
@@ -57,11 +57,11 @@ class OppdragsperiodeServiceTest {
       val nyeOppdragsperioder = oppdragsperiodeService.opprettNyeOppdragsperioder(hendelse, oppdrag)
 
       nyeOppdragsperioder[0].mottakerIdent shouldBe hendelse.mottakerIdent
-      nyeOppdragsperioder[0].beløp shouldBe hendelse.periodeListe[0].belop
+      nyeOppdragsperioder[0].beløp shouldBe hendelse.periodeListe[0].beløp
       nyeOppdragsperioder[0].periodeFra shouldBe hendelse.periodeListe[0].periodeFomDato
       nyeOppdragsperioder[0].periodeTil shouldBe hendelse.periodeListe[0].periodeTilDato
       nyeOppdragsperioder[1].mottakerIdent shouldBe hendelse.mottakerIdent
-      nyeOppdragsperioder[1].beløp shouldBe hendelse.periodeListe[1].belop
+      nyeOppdragsperioder[1].beløp shouldBe hendelse.periodeListe[1].beløp
       nyeOppdragsperioder[1].periodeFra shouldBe hendelse.periodeListe[1].periodeFomDato
       nyeOppdragsperioder[1].periodeTil shouldBe hendelse.periodeListe[1].periodeTilDato
     }
@@ -70,7 +70,7 @@ class OppdragsperiodeServiceTest {
     fun `Skal opprette randomUUID om delytelseId ikke er angitt`() {
       val hendelse = TestData.opprettHendelse(
         periodeListe = listOf(
-          TestData.opprettPeriode(
+          TestData.opprettPeriodeDomene(
             referanse = null
           )
         )

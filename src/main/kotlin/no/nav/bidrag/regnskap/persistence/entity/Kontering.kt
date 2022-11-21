@@ -35,11 +35,8 @@ data class Kontering(
   @Column(name = "type")
   val type: String,
 
-  @Column(name = "justering")
-  val justering: String?,
-
-  @Column(name = "gebyr_rolle")
-  val gebyrRolle: String?,
+  @Column(name = "soknad_type")
+  val søknadType: String,
 
   @Column(name = "sendt_i_palopsfil")
   var sendtIPåløpsfil: Boolean = false,
@@ -55,8 +52,7 @@ data class Kontering(
         "overføringsperiode=$overføringsperiode, " +
         "overføringstidspunkt=$overføringstidspunkt, " +
         "type=$type, " +
-        "justering=$justering, " +
-        "gebyrRolle=$gebyrRolle, " +
+        "søknadType=$søknadType, " +
         "sendtIPåløpsfil=$sendtIPåløpsfil, " +
         "overføringKontering=$overføringKontering)"
   }

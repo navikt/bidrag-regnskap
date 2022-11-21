@@ -6,8 +6,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
-import no.nav.bidrag.regnskap.dto.påløpRequest
-import no.nav.bidrag.regnskap.dto.påløpResponse
+import no.nav.bidrag.regnskap.dto.påløp.PåløpRequest
+import no.nav.bidrag.regnskap.dto.påløp.PåløpResponse
 import no.nav.bidrag.regnskap.service.PåløpsService
 import no.nav.security.token.support.core.api.Protected
 import org.springframework.http.ResponseEntity
@@ -42,7 +42,7 @@ class PåløpsController(
       content = [Content()]
     )]
   )
-  fun hentPåløp(): ResponseEntity<List<påløpResponse>> {
+  fun hentPåløp(): ResponseEntity<List<PåløpResponse>> {
     return ResponseEntity.ok(påløpsService.hentPåløp())
   }
 
@@ -66,7 +66,7 @@ class PåløpsController(
       content = [Content()]
     )]
   )
-  fun lagrePåløp(påløpRequest: påløpRequest): ResponseEntity<Int> {
+  fun lagrePåløp(påløpRequest: PåløpRequest): ResponseEntity<Int> {
     return ResponseEntity.ok(påløpsService.lagrePåløp(påløpRequest))
   }
 }

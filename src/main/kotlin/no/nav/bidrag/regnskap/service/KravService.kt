@@ -3,14 +3,13 @@ package no.nav.bidrag.regnskap.service
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.bidrag.regnskap.SECURE_LOGGER
 import no.nav.bidrag.regnskap.consumer.SkattConsumer
-import no.nav.bidrag.regnskap.dto.GebyrRolle
-import no.nav.bidrag.regnskap.dto.Justering
-import no.nav.bidrag.regnskap.dto.SkattFeiletKravResponse
-import no.nav.bidrag.regnskap.dto.SkattKontering
-import no.nav.bidrag.regnskap.dto.SkattKravRequest
-import no.nav.bidrag.regnskap.dto.SkattVellykketKravResponse
-import no.nav.bidrag.regnskap.dto.Transaksjonskode
-import no.nav.bidrag.regnskap.dto.Type
+import no.nav.bidrag.regnskap.dto.enumer.SøknadType
+import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
+import no.nav.bidrag.regnskap.dto.enumer.Type
+import no.nav.bidrag.regnskap.dto.krav.Krav
+import no.nav.bidrag.regnskap.dto.krav.KravKontering
+import no.nav.bidrag.regnskap.dto.krav.KravResponse
+import no.nav.bidrag.regnskap.dto.krav.Kravfeil
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
@@ -55,18 +54,18 @@ class KravService(
       HttpStatus.ACCEPTED -> {
         SECURE_LOGGER.info("Mottok svar fra skatt: \n${skattResponse}")
 
-        val skattVellykketKravResponse = objectMapper.readValue(skattResponse.body, SkattVellykketKravResponse::class.java)
-        lagreVellykketOverføringAvKrav(alleIkkeOverførteKonteringer, skattVellykketKravResponse, oppdrag, periode)
-        return ResponseEntity.ok(skattVellykketKravResponse)
+        val kravResponse = objectMapper.readValue(skattResponse.body, KravResponse::class.java)
+        lagreVellykketOverføringAvKrav(alleIkkeOverførteKonteringer, kravResponse, oppdrag, periode)
+        return ResponseEntity.ok(kravResponse)
       }
 
       HttpStatus.BAD_REQUEST -> {
         LOGGER.error("En eller flere konteringer har ikke gått gjennom validering. Se secure log for mer informasjon.")
         SECURE_LOGGER.error("En eller flere konteringer har ikke gått gjennom validering, ${skattResponse.body}")
 
-        val skattFeiletKravResponse = objectMapper.readValue(skattResponse.body, SkattFeiletKravResponse::class.java)
-        lagreFeiletOverføringAvKrav(alleIkkeOverførteKonteringer, skattFeiletKravResponse.toString())
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(skattFeiletKravResponse)
+        val kravfeil = objectMapper.readValue(skattResponse.body, Kravfeil::class.java)
+        lagreFeiletOverføringAvKrav(alleIkkeOverførteKonteringer, kravfeil.toString())
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(kravfeil)
       }
 
       HttpStatus.SERVICE_UNAVAILABLE -> {
@@ -89,7 +88,7 @@ class KravService(
 
   private fun lagreVellykketOverføringAvKrav(
     alleIkkeOverforteKonteringer: List<Kontering>,
-    skattVellykketKravResponse: SkattVellykketKravResponse,
+    kravResponse: KravResponse,
     oppdrag: Oppdrag,
     periode: YearMonth
   ) {
@@ -99,7 +98,7 @@ class KravService(
 
       persistenceService.lagreOverføringKontering(
         opprettOverføringKontering(
-          kontering = kontering, referanseKode = skattVellykketKravResponse.batchUid, tidspunkt = now, kanal = "REST"
+          kontering = kontering, referanseKode = kravResponse.batchUid, tidspunkt = now, kanal = "REST"
         )
       )
     }
@@ -129,15 +128,14 @@ class KravService(
 
   private fun opprettSkattKravRequest(
     konteringerListe: List<Kontering>, periode: YearMonth
-  ): SkattKravRequest {
-    val skattKonteringerListe = mutableListOf<SkattKontering>()
+  ): Krav {
+    val kravKonteringerListe = mutableListOf<KravKontering>()
     konteringerListe.forEach { kontering ->
-      skattKonteringerListe.add(
-        SkattKontering(
+      kravKonteringerListe.add(
+        KravKontering(
           transaksjonskode = Transaksjonskode.valueOf(kontering.transaksjonskode),
           type = Type.valueOf(kontering.type),
-          justering = kontering.justering?.let { Justering.valueOf(kontering.justering) },
-          gebyrRolle = kontering.gebyrRolle?.let { GebyrRolle.valueOf(kontering.gebyrRolle) },
+          soknadType = SøknadType.valueOf(kontering.søknadType),
           gjelderIdent = kontering.oppdragsperiode!!.gjelderIdent,
           kravhaverIdent = kontering.oppdragsperiode.oppdrag!!.kravhaverIdent,
           mottakerIdent = kontering.oppdragsperiode.mottakerIdent,
@@ -155,7 +153,7 @@ class KravService(
         )
       )
     }
-    return SkattKravRequest(skattKonteringerListe)
+    return Krav(kravKonteringerListe)
   }
 
   private fun hentOppdragsperioderMedIkkeOverførteKonteringer(

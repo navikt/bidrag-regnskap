@@ -1,12 +1,11 @@
 package no.nav.bidrag.regnskap.service
 
-import no.nav.bidrag.behandling.felles.enums.EngangsbelopType
 import no.nav.bidrag.behandling.felles.enums.VedtakType
-import no.nav.bidrag.regnskap.dto.Justering
-import no.nav.bidrag.regnskap.dto.KonteringResponse
-import no.nav.bidrag.regnskap.dto.Transaksjonskode
-import no.nav.bidrag.regnskap.dto.Type
-import no.nav.bidrag.regnskap.hendelse.vedtak.Hendelse
+import no.nav.bidrag.regnskap.dto.enumer.SøknadType
+import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
+import no.nav.bidrag.regnskap.dto.enumer.Type
+import no.nav.bidrag.regnskap.dto.oppdrag.KonteringResponse
+import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
@@ -39,8 +38,7 @@ class KonteringService(
             overforingsperiode = kontering.overføringsperiode,
             overforingstidspunkt = kontering.overføringstidspunkt.toString(),
             type = Type.valueOf(kontering.type),
-            justering = kontering.justering?.let { Justering.valueOf(kontering.justering) },
-            gebyrRolle = kontering.gebyrRolle,
+            soknadType = SøknadType.valueOf(kontering.søknadType),
             sendtIPalopsfil = kontering.sendtIPåløpsfil
           )
         )
@@ -63,8 +61,7 @@ class KonteringService(
             transaksjonskode = Transaksjonskode.hentTransaksjonskodeForType(hendelse.type).name,
             overføringsperiode = periode.toString(),
             type = vurderOmNyEllerEndring(indexOppdragsperiode, indexPeriode, oppdatering),
-            justering = vurderOmJustinger(hendelse.vedtakType),
-            gebyrRolle = vurderOmGebyrRolle(hendelse.type),
+            søknadType = finnSøknadsType(hendelse),
             oppdragsperiode = oppdragsperiode
           )
         )
@@ -87,8 +84,7 @@ class KonteringService(
             transaksjonskode = Transaksjonskode.hentTransaksjonskodeForType(oppdragsperiode.oppdrag!!.stønadType).name,
             overføringsperiode = forPeriode,
             type = vurderType(oppdragsperiode),
-            justering = oppdragsperiode.oppdrag.vedtakType.let { VedtakType.valueOf(it) }.let { vurderOmJustinger(it) },
-            gebyrRolle = vurderOmGebyrRolle(oppdragsperiode.oppdrag.stønadType),
+            søknadType = SøknadType.EN.name,
             oppdragsperiode = oppdragsperiode,
             sendtIPåløpsfil = true
           )
@@ -125,8 +121,7 @@ class KonteringService(
               overføringsperiode = kontering.overføringsperiode,
               transaksjonskode = korreksjonskode,
               type = Type.ENDRING.toString(),
-              justering = kontering.justering,
-              gebyrRolle = kontering.gebyrRolle
+              søknadType = kontering.søknadType
             )
           )
         }
@@ -138,19 +133,15 @@ class KonteringService(
     return if (indexOppdragsperiode == 0 && indexPeriode == 0 && !oppdatering) Type.NY.toString() else Type.ENDRING.toString()
   }
 
-  private fun vurderOmJustinger(vedtakType: VedtakType): String? {
-    return when (vedtakType) {
-      VedtakType.AUTOMATISK_INDEKSREGULERING -> Justering.INDEKSREGULERING.name
-      VedtakType.AUTOMATISK_REVURDERING_FORSKUDD_11_AAR -> Justering.ALDERSJUSTERING.name
-      else -> null
-    }
-  }
-
-  private fun vurderOmGebyrRolle(type: String): String? {
-    return when (type) {
-      EngangsbelopType.GEBYR_SKYLDNER.name -> "BIDRAGSPLIKTIG"
-      EngangsbelopType.GEBYR_MOTTAKER.name -> "BIDRAGSMOTTAKER"
-      else -> null
+  private fun finnSøknadsType(hendelse: Hendelse): String {
+    return if (hendelse.vedtakType == VedtakType.AUTOMATISK_INDEKSREGULERING) {
+      SøknadType.IN.name
+    } else if (hendelse.type == "BIDRAGSMOTTAKER") {
+      SøknadType.FABM.name
+    } else if (hendelse.type == "BIDRAGSPLIKTIG") {
+      SøknadType.FABP.name
+    } else {
+      SøknadType.EN.name
     }
   }
 

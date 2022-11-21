@@ -1,7 +1,7 @@
 package no.nav.bidrag.regnskap.service
 
-import no.nav.bidrag.regnskap.dto.OppdragsperiodeResponse
-import no.nav.bidrag.regnskap.hendelse.vedtak.Hendelse
+import no.nav.bidrag.regnskap.dto.oppdrag.OppdragsperiodeResponse
+import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
 import org.springframework.stereotype.Service
@@ -51,8 +51,8 @@ class OppdragsperiodeService(
           sakId = hendelse.sakId,
           gjelderIdent = "22222222226", //TODO() Avklare med skatt. Dummynr per nå
           mottakerIdent = hendelse.mottakerIdent,
-          beløp = periode.belop,
-          valuta = periode.valutakode,
+          beløp = periode.beløp!!,
+          valuta = periode.valutakode!!,
           periodeFra = periode.periodeFomDato,
           periodeTil = periode.periodeTilDato,
           vedtaksdato = hendelse.vedtakDato,

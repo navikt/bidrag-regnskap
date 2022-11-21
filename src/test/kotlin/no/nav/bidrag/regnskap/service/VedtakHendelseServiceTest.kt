@@ -11,7 +11,7 @@ import io.mockk.junit5.MockKExtension
 import io.mockk.verify
 import no.nav.bidrag.behandling.felles.enums.EngangsbelopType
 import no.nav.bidrag.behandling.felles.enums.StonadType
-import no.nav.bidrag.regnskap.hendelse.vedtak.Hendelse
+import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows

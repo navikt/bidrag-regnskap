@@ -1,8 +1,8 @@
 package no.nav.bidrag.regnskap.service
 
-import no.nav.bidrag.regnskap.dto.OppdragResponse
+import no.nav.bidrag.regnskap.dto.oppdrag.OppdragResponse
+import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
 import no.nav.bidrag.regnskap.hendelse.krav.SendKravQueue
-import no.nav.bidrag.regnskap.hendelse.vedtak.Hendelse
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service

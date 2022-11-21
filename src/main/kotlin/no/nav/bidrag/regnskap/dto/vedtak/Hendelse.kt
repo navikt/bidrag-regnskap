@@ -1,6 +1,5 @@
-package no.nav.bidrag.regnskap.hendelse.vedtak
+package no.nav.bidrag.regnskap.dto.vedtak
 
-import no.nav.bidrag.behandling.felles.dto.vedtak.Periode
 import no.nav.bidrag.behandling.felles.enums.VedtakType
 import java.time.LocalDate
 

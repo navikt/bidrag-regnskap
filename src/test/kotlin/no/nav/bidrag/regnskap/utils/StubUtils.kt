@@ -6,7 +6,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.aResponse
 import com.github.tomakehurst.wiremock.client.WireMock.anyUrl
 import com.github.tomakehurst.wiremock.client.WireMock.post
 import com.github.tomakehurst.wiremock.client.WireMock.stubFor
-import no.nav.bidrag.regnskap.dto.SkattFeiletKravResponse
+import no.nav.bidrag.regnskap.dto.krav.Kravfeil
 import org.junit.Assert
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -21,12 +21,12 @@ class StubUtils {
     }
   }
 
-  fun stubKravResponse(skattFeiletKravResponse: SkattFeiletKravResponse?, httpStatus: HttpStatus) {
+  fun stubKravResponse(kravfeil: Kravfeil?, httpStatus: HttpStatus) {
     try {
       stubFor(
         post(anyUrl()).willReturn(
           aClosedJsonResponse().withStatus(httpStatus.value())
-            .withBody(ObjectMapper().registerModule(JavaTimeModule()).writeValueAsString(skattFeiletKravResponse))
+            .withBody(ObjectMapper().registerModule(JavaTimeModule()).writeValueAsString(kravfeil))
         )
       )
     } catch (e: JsonProcessingException) {

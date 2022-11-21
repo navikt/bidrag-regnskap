@@ -4,11 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import no.nav.bidrag.behandling.felles.dto.vedtak.Engangsbelop
-import no.nav.bidrag.behandling.felles.dto.vedtak.Periode
 import no.nav.bidrag.behandling.felles.dto.vedtak.Stonadsendring
 import no.nav.bidrag.behandling.felles.dto.vedtak.VedtakHendelse
 import no.nav.bidrag.regnskap.SECURE_LOGGER
-import no.nav.bidrag.regnskap.hendelse.vedtak.Hendelse
+import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
+import no.nav.bidrag.regnskap.dto.vedtak.Periode
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
@@ -60,7 +60,7 @@ class VedtakHendelseService(
       opprettetAv = vedtakHendelse.opprettetAv,
       eksternReferanse = vedtakHendelse.eksternReferanse,
       utsattTilDato = vedtakHendelse.utsattTilDato,
-      periodeListe = stonadsendring.periodeListe
+      periodeListe = mapPeriodelisteTilDomene(stonadsendring.periodeListe)
     )
     oppdragService.lagreHendelse(hendelse)
   }
@@ -85,13 +85,28 @@ class VedtakHendelseService(
         Periode(
           periodeFomDato = vedtakHendelse.vedtakDato.withDayOfMonth(1),
           periodeTilDato = vedtakHendelse.vedtakDato.withDayOfMonth(1).plusMonths(1),
-          belop = engangsbelop.belop,
+          beløp = engangsbelop.belop,
           valutakode = engangsbelop.valutakode,
-          resultatkode = engangsbelop.resultatkode,
           referanse = engangsbelop.referanse
         )
       )
     )
     oppdragService.lagreHendelse(hendelse)
+  }
+
+  private fun mapPeriodelisteTilDomene(periodeListe: List<no.nav.bidrag.behandling.felles.dto.vedtak.Periode>): List<Periode> {
+    val perioder = mutableListOf<Periode>()
+    periodeListe.forEach {
+      perioder.add(
+        Periode(
+          beløp = it.belop,
+          valutakode = it.valutakode,
+          periodeFomDato = it.periodeFomDato,
+          periodeTilDato = it.periodeTilDato,
+          referanse = it.referanse
+        )
+      )
+    }
+    return perioder
   }
 }

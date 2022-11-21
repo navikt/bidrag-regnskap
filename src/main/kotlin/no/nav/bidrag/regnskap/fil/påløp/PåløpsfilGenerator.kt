@@ -1,17 +1,16 @@
 package no.nav.bidrag.regnskap.fil
 
-import no.nav.bidrag.regnskap.dto.Transaksjonskode
+import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
 import no.nav.bidrag.regnskap.fil.overføring.FiloverføringTilElinKlient
-import no.nav.bidrag.regnskap.persistence.bucket.PåløpsfilBucket
+import no.nav.bidrag.regnskap.persistence.bucket.GcpFilBucket
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.Påløp
+import no.nav.bidrag.regnskap.util.ByteArrayOutputStreamTilByteBuffer
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.w3c.dom.Document
 import org.w3c.dom.Element
-import java.io.ByteArrayOutputStream
 import java.math.BigDecimal
-import java.nio.ByteBuffer
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
@@ -21,15 +20,14 @@ import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 
-private val LOGGER = LoggerFactory.getLogger(PåløpsfilGenerator::class.java)
-
 @Component
 class PåløpsfilGenerator(
-  private val påløpsfilBucket: PåløpsfilBucket,
+  private val gcpFilBucket: GcpFilBucket,
   private val filoverføringTilElinKlient: FiloverføringTilElinKlient
 ) {
 
   companion object {
+    private val LOGGER = LoggerFactory.getLogger(PåløpsfilGenerator::class.java)
     const val BATCH_BESKRIVELSE = "Kravtransaksjoner fra Bidrag-Regnskap til Predator"
     val now = LocalDate.now()
   }
@@ -38,9 +36,9 @@ class PåløpsfilGenerator(
 
   fun skrivPåløpsfil(konteringer: List<Kontering>, påløp: Påløp) {
     val påløpsMappe = "påløp/"
-    val påløpsfilnavn = "paaloop_D" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyMMdd")).toString() + ".xml"
+    val påløpsfilnavn = "paaloop_D" + now.format(DateTimeFormatter.ofPattern("yyMMdd")).toString() + ".xml"
 
-    if (!påløpsfilBucket.finnesFil(påløpsMappe + påløpsfilnavn)) {
+    if (!gcpFilBucket.finnesFil(påløpsMappe + påløpsfilnavn)) {
 
       val dokument = documentBuilder.newDocument()
       dokument.setXmlStandalone(true)
@@ -82,6 +80,8 @@ class PåløpsfilGenerator(
 
     filoverføringTilElinKlient.lastOppFilTilFilsluse(påløpsMappe, påløpsfilnavn)
 
+    //TODO() Overføring kontering for alle konteringer :)
+
     LOGGER.info("Påløpskjøring: Påløpsfil er ferdig skrevet med ${konteringer.size} konteringer og lastet opp til filsluse.")
   }
 
@@ -119,7 +119,7 @@ class PåløpsfilGenerator(
     konteringBr10Element.appendChild(endring)
 
     val soknadType = dokument.createElement("soknadType")
-    soknadType.textContent = kontering.justering
+    soknadType.textContent = kontering.søknadType
     konteringBr10Element.appendChild(soknadType)
 
     //Ikke i bruk, genereres tom
@@ -389,16 +389,10 @@ class PåløpsfilGenerator(
     val byteArrayStream = ByteArrayOutputStreamTilByteBuffer()
     transformer.transform(source, StreamResult(byteArrayStream))
 
-    påløpsfilBucket.lagreFil(påløpsfilnavn, byteArrayStream)
+    gcpFilBucket.lagreFil(påløpsfilnavn, byteArrayStream)
 
     // Output til console for testing
-    val result = StreamResult(System.out)
-    transformer.transform(source, result)
-  }
-}
-
-class ByteArrayOutputStreamTilByteBuffer : ByteArrayOutputStream() {
-  fun toByteBuffer(): ByteBuffer {
-    return ByteBuffer.wrap(buf, 0, count)
+//    val result = StreamResult(System.out)
+//    transformer.transform(source, result)
   }
 }

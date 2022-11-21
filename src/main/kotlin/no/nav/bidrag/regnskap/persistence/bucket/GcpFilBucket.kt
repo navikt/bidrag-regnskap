@@ -4,7 +4,7 @@ import com.google.api.gax.retrying.RetrySettings
 import com.google.cloud.WriteChannel
 import com.google.cloud.storage.BlobInfo
 import com.google.cloud.storage.StorageOptions
-import no.nav.bidrag.regnskap.fil.ByteArrayOutputStreamTilByteBuffer
+import no.nav.bidrag.regnskap.util.ByteArrayOutputStreamTilByteBuffer
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.threeten.bp.Duration
@@ -12,7 +12,7 @@ import java.io.InputStream
 import java.nio.channels.Channels
 
 @Component
-class PåløpsfilBucket(
+class GcpFilBucket(
   @Value("\${BUCKET_NAME}") private val bucketNavn: String
 ) {
 

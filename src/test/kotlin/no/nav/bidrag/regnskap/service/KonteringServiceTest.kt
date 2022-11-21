@@ -7,8 +7,8 @@ import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.verify
-import no.nav.bidrag.regnskap.dto.Transaksjonskode
-import no.nav.bidrag.regnskap.dto.Type
+import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
+import no.nav.bidrag.regnskap.dto.enumer.Type
 import no.nav.bidrag.regnskap.utils.TestData
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test

@@ -1,4 +1,4 @@
-package no.nav.bidrag.regnskap.dto
+package no.nav.bidrag.regnskap.dto.påløp
 
 import io.swagger.v3.oas.annotations.media.Schema
 import org.springframework.format.annotation.DateTimeFormat
@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 import java.time.YearMonth
 
 @Schema(description = "Et påløp representerer en kjøring av overføring av påløpsfil til skatt.")
-data class påløpRequest(
+data class PåløpRequest(
 
   @field:Schema(
     description = "Dato paløpet skal kjøre.",

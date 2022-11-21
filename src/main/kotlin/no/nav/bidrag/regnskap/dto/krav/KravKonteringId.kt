@@ -1,47 +1,16 @@
-package no.nav.bidrag.regnskap.dto
+package no.nav.bidrag.regnskap.dto.krav
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.datatype.jsr310.deser.YearMonthDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.YearMonthSerializer
 import io.swagger.v3.oas.annotations.media.Schema
+import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
 import org.springframework.format.annotation.DateTimeFormat
 import java.time.YearMonth
 
-
-@Schema(name = "SkattVellykketKravResponse", description = "Svar ved en velykket overføring av krav til skatt.")
-data class SkattVellykketKravResponse(
-  val batchUid: String
-)
-
-@Schema(name = "SkattFeiletKravResponse", description = "Lister feil i et krav.")
-data class SkattFeiletKravResponse(
-  val konteringsfeil: List<Konteringsfeil>
-)
-
-@Schema(name = "Konteringsfeil", description = "Beskriver feil i en enkelt kontering.")
-data class Konteringsfeil(
-
-  @field:Schema(
-    description = "En kode som angir type feil som har oppstått. " +
-        "Feilkoden er ment å kunne brukes til å maskinelt sortere feil.",
-    example = "TOLKNING"
-  )
-  val feilkode: String,
-
-  @field:Schema(
-    description = "En beskrivelse av feilen som har oppstått. " +
-        "Feilmeldingen er ment å være forståelig for et menneske ved manuell gjennomgang.",
-    example = "Tolkning feilet i Elin."
-  )
-  val feilmelding: String,
-
-  @field:Schema(description = "Identifiserer hvilken kontering som førte til feilen.")
-  val konteringId: KonteringId
-)
-
 @Schema(name = "KonteringId", description = "Identifiserer en kontering unikt.")
-data class KonteringId(
+data class KravKonteringId(
 
   @field:Schema(description = "Type transaksjon.", example = "B1", required = true)
   val transaksjonskode: Transaksjonskode,

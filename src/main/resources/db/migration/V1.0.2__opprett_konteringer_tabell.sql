@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS konteringer
     overforingsperiode   text    NOT NULL,
     overforingstidspunkt timestamp,
     type                 text    NOT NULL,
-    justering            text,
+    soknad_type          text,
     gebyr_rolle          text,
     sendt_i_palopsfil    boolean NOT NULL
 );

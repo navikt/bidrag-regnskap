@@ -1,15 +1,16 @@
 package no.nav.bidrag.regnskap.utils
 
 import no.nav.bidrag.behandling.felles.dto.vedtak.Engangsbelop
-import no.nav.bidrag.behandling.felles.dto.vedtak.Periode
 import no.nav.bidrag.behandling.felles.dto.vedtak.Stonadsendring
 import no.nav.bidrag.behandling.felles.dto.vedtak.VedtakHendelse
 import no.nav.bidrag.behandling.felles.enums.EngangsbelopType
 import no.nav.bidrag.behandling.felles.enums.StonadType
 import no.nav.bidrag.behandling.felles.enums.VedtakType
-import no.nav.bidrag.regnskap.dto.Transaksjonskode
-import no.nav.bidrag.regnskap.dto.Type
-import no.nav.bidrag.regnskap.hendelse.vedtak.Hendelse
+import no.nav.bidrag.regnskap.dto.enumer.SøknadType
+import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
+import no.nav.bidrag.regnskap.dto.enumer.Type
+import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
+import no.nav.bidrag.regnskap.dto.vedtak.Periode
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
@@ -107,7 +108,9 @@ object TestData {
     skyldnerId: String = TestDataGenerator.genererPersonnummer(),
     kravhaverId: String = TestDataGenerator.genererPersonnummer(),
     mottakerId: String = TestDataGenerator.genererPersonnummer(),
-    periodeListe: List<Periode> = listOf(opprettPeriode())
+    periodeListe: List<no.nav.bidrag.behandling.felles.dto.vedtak.Periode> = listOf(opprettPeriode()),
+    indeksreguleringAar: String? = null,
+    opphortFra: LocalDate? = null
   ): Stonadsendring {
     return Stonadsendring(
       stonadType = stonadType,
@@ -115,19 +118,21 @@ object TestData {
       skyldnerId = skyldnerId,
       kravhaverId = kravhaverId,
       mottakerId = mottakerId,
-      periodeListe = periodeListe
+      periodeListe = periodeListe,
+      indeksreguleringAar = indeksreguleringAar,
+      opphortFra = opphortFra
     )
   }
 
   fun opprettPeriode(
     periodeFomDato: LocalDate = LocalDate.now().minusMonths(2).withDayOfMonth(1),
-    periodeTilDato: LocalDate = LocalDate.now(),
+    periodeTilDato: LocalDate? = LocalDate.now(),
     belop: BigDecimal = BigDecimal.valueOf(7500),
     valutakode: String = "NOK",
     resultatkode: String = "ABC",
     referanse: String? = UUID.randomUUID().toString()
-  ): Periode {
-    return Periode(
+  ): no.nav.bidrag.behandling.felles.dto.vedtak.Periode {
+    return no.nav.bidrag.behandling.felles.dto.vedtak.Periode(
       periodeFomDato = periodeFomDato,
       periodeTilDato = periodeTilDato,
       belop = belop,
@@ -150,7 +155,7 @@ object TestData {
     opprettetAv: String = "SaksbehandlerId",
     eksternReferanse: String? = "UTENLANDSREFERANSE",
     utsattTilDato: LocalDate? = LocalDate.now().plusDays(7),
-    periodeListe: List<Periode> = listOf(opprettPeriode())
+    periodeListe: List<Periode> = listOf(opprettPeriodeDomene())
   ): Hendelse {
     return Hendelse(
       engangsbelopId = engangsbelopId,
@@ -166,6 +171,22 @@ object TestData {
       eksternReferanse = eksternReferanse,
       utsattTilDato = utsattTilDato,
       periodeListe = periodeListe
+    )
+  }
+
+  fun opprettPeriodeDomene(
+    beløp: BigDecimal? = BigDecimal.valueOf(7500.0),
+    valutakode: String? = "NOK",
+    periodeFomDato: LocalDate = LocalDate.now().minusMonths(2).withDayOfMonth(1),
+    periodeTilDato: LocalDate? = LocalDate.now(),
+    referanse: String? = UUID.randomUUID().toString()
+  ): Periode {
+    return Periode(
+      beløp = beløp,
+      valutakode = valutakode,
+      periodeFomDato = periodeFomDato,
+      periodeTilDato = periodeTilDato,
+      referanse = referanse
     )
   }
 
@@ -213,8 +234,7 @@ object TestData {
     overforingsperiode: String = YearMonth.now().toString(),
     overforingstidspunkt: LocalDateTime? = null,
     type: String = Type.NY.toString(),
-    justering: String? = null,
-    gebyrRolle: String? = null,
+    søknadType: String = SøknadType.EN.name,
     sendtIPalopsfil: Boolean = false,
     overføringKontering: List<OverføringKontering> = listOf(opprettOverføringKontering())
 
@@ -226,8 +246,7 @@ object TestData {
       overføringsperiode = overforingsperiode,
       overføringstidspunkt = overforingstidspunkt,
       type = type,
-      justering = justering,
-      gebyrRolle = gebyrRolle,
+      søknadType = søknadType,
       sendtIPåløpsfil = sendtIPalopsfil,
       overføringKontering = overføringKontering
     )
