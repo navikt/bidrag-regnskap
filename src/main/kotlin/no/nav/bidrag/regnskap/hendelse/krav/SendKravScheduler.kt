@@ -20,7 +20,7 @@ class SendKravScheduler(
   val persistenceService: PersistenceService, val kravService: KravService
 ) {
 
-  @Scheduled(cron = "\${scheduler.interval.cron}")
+  @Scheduled(cron = "\${scheduler.sendkrav.cron}")
   @SchedulerLock(name = "skedulertOverforingAvKrav")
   @Transactional
   fun skedulertOverforingAvKrav() {

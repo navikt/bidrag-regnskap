@@ -1,5 +1,6 @@
 package no.nav.bidrag.regnskap.service
 
+import no.nav.bidrag.behandling.felles.enums.EngangsbelopType
 import no.nav.bidrag.behandling.felles.enums.VedtakType
 import no.nav.bidrag.regnskap.dto.enumer.SøknadType
 import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
@@ -136,9 +137,9 @@ class KonteringService(
   private fun finnSøknadsType(hendelse: Hendelse): String {
     return if (hendelse.vedtakType == VedtakType.AUTOMATISK_INDEKSREGULERING) {
       SøknadType.IN.name
-    } else if (hendelse.type == "BIDRAGSMOTTAKER") {
+    } else if (hendelse.type == EngangsbelopType.GEBYR_MOTTAKER.name) {
       SøknadType.FABM.name
-    } else if (hendelse.type == "BIDRAGSPLIKTIG") {
+    } else if (hendelse.type == EngangsbelopType.GEBYR_SKYLDNER.name) {
       SøknadType.FABP.name
     } else {
       SøknadType.EN.name

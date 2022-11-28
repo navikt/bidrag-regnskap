@@ -29,24 +29,24 @@ class PåløpsfilGenerator(
   companion object {
     private val LOGGER = LoggerFactory.getLogger(PåløpsfilGenerator::class.java)
     const val BATCH_BESKRIVELSE = "Kravtransaksjoner fra Bidrag-Regnskap til Predator"
-    val now = LocalDate.now()
   }
 
   private val documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
 
   fun skrivPåløpsfil(konteringer: List<Kontering>, påløp: Påløp) {
+    val now = LocalDate.now()
     val påløpsMappe = "påløp/"
     val påløpsfilnavn = "paaloop_D" + now.format(DateTimeFormatter.ofPattern("yyMMdd")).toString() + ".xml"
 
     if (!gcpFilBucket.finnesFil(påløpsMappe + påløpsfilnavn)) {
 
       val dokument = documentBuilder.newDocument()
-      dokument.setXmlStandalone(true)
+      dokument.xmlStandalone = true
 
       val rootElement = dokument.createElementNS("http://www.trygdeetaten.no/skjema/bidrag-reskonto", "bidrag-reskonto")
       dokument.appendChild(rootElement)
 
-      opprettStartBatchBr01(dokument, rootElement, påløp)
+      opprettStartBatchBr01(dokument, rootElement, påløp, now)
 
       var index = 0
       var sum = BigDecimal.ZERO
@@ -60,15 +60,10 @@ class PåløpsfilGenerator(
         rootElement.appendChild(oppdragElement)
 
         konteringerForOppdrag.forEach { kontering ->
-          opprettKonteringBr10(dokument, oppdragElement, kontering)
+          opprettKonteringBr10(dokument, oppdragElement, kontering, now)
 
           sum += kontering.oppdragsperiode!!.beløp
         }
-        //opprettIdentrecordBr20(dokument, oppdragElement)
-        //opprettPersionDataBr30(dokument, oppdragElement)
-        //opprettKontaktInfoBr40(dokument, oppdragElement)
-        //opprettAdresseInfoBr50(dokument, oppdragElement)
-
       }
 
       LOGGER.info("Påløpskjøring: Har skrevet ${konteringer.size} av ${konteringer.size} konteringer til påløpsfil.")
@@ -85,7 +80,7 @@ class PåløpsfilGenerator(
     LOGGER.info("Påløpskjøring: Påløpsfil er ferdig skrevet med ${konteringer.size} konteringer og lastet opp til filsluse.")
   }
 
-  private fun opprettStartBatchBr01(dokument: Document, rootElement: Element, påløp: Påløp) {
+  private fun opprettStartBatchBr01(dokument: Document, rootElement: Element, påløp: Påløp, now: LocalDate) {
     val startBatchBr01 = dokument.createElement("start-batch-br01")
     rootElement.appendChild(startBatchBr01)
 
@@ -102,7 +97,7 @@ class PåløpsfilGenerator(
     startBatchBr01.appendChild(dato)
   }
 
-  private fun opprettKonteringBr10(dokument: Document, oppdragElement: Element, kontering: Kontering) {
+  private fun opprettKonteringBr10(dokument: Document, oppdragElement: Element, kontering: Kontering, now: LocalDate) {
     val konteringBr10Element = dokument.createElement("kontering-br10")
     oppdragElement.appendChild(konteringBr10Element)
 
@@ -151,7 +146,7 @@ class PåløpsfilGenerator(
     konteringBr10Element.appendChild(utbetalesTilId)
 
     val belop = dokument.createElement("belop")
-    belop.textContent = kontering.oppdragsperiode?.beløp.toString() //TODO() Denne må være bigInteger
+    belop.textContent = kontering.oppdragsperiode?.beløp.toString()
     konteringBr10Element.appendChild(belop)
 
     val fradragTillegg = dokument.createElement("fradragTillegg")
@@ -178,7 +173,7 @@ class PåløpsfilGenerator(
     konteringBr10Element.appendChild(datoVedtak)
 
     val datoKjores = dokument.createElement("datoKjores")
-    datoKjores.textContent = LocalDate.now().toString()
+    datoKjores.textContent = now.toString()
     konteringBr10Element.appendChild(datoKjores)
 
     val saksbehId = dokument.createElement("saksbehId")
@@ -204,153 +199,6 @@ class PåløpsfilGenerator(
     val refDelytelseId = dokument.createElement("refDelytelseId")
     refDelytelseId.textContent = kontering.oppdragsperiode?.delytelseId //TODO() Hvorfor er denne to ganger
     konteringBr10Element.appendChild(refDelytelseId)
-  }
-
-  private fun opprettIdentrecordBr20(dokument: Document, oppdragElement: Element) {
-    val identrecordBr20Element = dokument.createElement("identrecord-br20")
-    oppdragElement.appendChild(identrecordBr20Element)
-
-    //Ikke i bruk, genereres tom
-    val ident = dokument.createElement("ident")
-    identrecordBr20Element.appendChild(ident)
-
-    //Ikke i bruk, genereres tom
-    val kodeAltIdenttype = dokument.createElement("Kode-alt-identtype")
-    identrecordBr20Element.appendChild(kodeAltIdenttype)
-
-    //Ikke i bruk, genereres tom
-    val IdAlternativ = dokument.createElement("ID-alternativ")
-    identrecordBr20Element.appendChild(IdAlternativ)
-  }
-
-  private fun opprettPersionDataBr30(dokument: Document, oppdragElement: Element) {
-    val personDataBr30 = dokument.createElement("person-data-br30")
-    oppdragElement.appendChild(personDataBr30)
-
-    val ident = dokument.createElement("ident") //TODO() Ny part? Skal noe inn her?
-    personDataBr30.appendChild(ident)
-
-    //Ikke i bruk, genereres tom
-    val sammensattNavn = dokument.createElement("sammensattNavn")
-    personDataBr30.appendChild(sammensattNavn)
-
-    //Ikke i bruk, genereres tom
-    val forNavn = dokument.createElement("forNavn")
-    personDataBr30.appendChild(forNavn)
-
-    //Ikke i bruk, genereres tom
-    val mellomNavn = dokument.createElement("mellomNavn")
-    personDataBr30.appendChild(mellomNavn)
-
-    //Ikke i bruk, genereres tom
-    val etterNavn = dokument.createElement("etterNavn")
-    personDataBr30.appendChild(etterNavn)
-
-    //Ikke i bruk, genereres tom
-    val kodeSpraak = dokument.createElement("kodeSpraak")
-    personDataBr30.appendChild(kodeSpraak)
-
-    //Ikke i bruk, genereres tom
-    val kodeSivilstand = dokument.createElement("kodeSivilstand")
-    personDataBr30.appendChild(kodeSivilstand)
-
-    //Ikke i bruk, genereres tom
-    val tekstSivilstand = dokument.createElement("tekstSivilstand")
-    personDataBr30.appendChild(tekstSivilstand)
-
-    //Ikke i bruk, genereres tom
-    val kodeStatsborgerskap = dokument.createElement("kodeStatsborgerskap")
-    personDataBr30.appendChild(kodeStatsborgerskap)
-
-    //Ikke i bruk, genereres tom
-    val tekstStatsborgerskap = dokument.createElement("tekstStatsborgerskap")
-    personDataBr30.appendChild(tekstStatsborgerskap)
-
-    //Ikke i bruk, genereres tom
-    val diskresjonskode = dokument.createElement("diskresjonskode")
-    personDataBr30.appendChild(diskresjonskode)
-
-    //Ikke i bruk, genereres tom
-    val gironrInnland = dokument.createElement("gironrInnland")
-    personDataBr30.appendChild(gironrInnland)
-
-    //Ikke i bruk, genereres tom
-    val gironrUtland = dokument.createElement("gironrUtland")
-    personDataBr30.appendChild(gironrUtland)
-  }
-
-  private fun opprettKontaktInfoBr40(dokument: Document, oppdragElement: Element) {
-    val kontaktInfoBr40 = dokument.createElement("kontakt-info-br40")
-    oppdragElement.appendChild(kontaktInfoBr40)
-
-    //Ikke i bruk, genereres tom
-    val ident = dokument.createElement("ident")
-    kontaktInfoBr40.appendChild(ident)
-
-    //Ikke i bruk, genereres tom
-    val kontaktperson = dokument.createElement("kontaktperson")
-    kontaktInfoBr40.appendChild(kontaktperson)
-
-    //Ikke i bruk, genereres tom
-    val epost = dokument.createElement("ePost")
-    kontaktInfoBr40.appendChild(epost)
-
-    //Ikke i bruk, genereres tom
-    val tlfPrivat = dokument.createElement("tlfPrivat")
-    kontaktInfoBr40.appendChild(tlfPrivat)
-
-    //Ikke i bruk, genereres tom
-    val tlfMobil = dokument.createElement("tlfMobil")
-    kontaktInfoBr40.appendChild(tlfMobil)
-
-    //Ikke i bruk, genereres tom
-    val tlfArbeid = dokument.createElement("tlfArbeid")
-    kontaktInfoBr40.appendChild(tlfArbeid)
-  }
-
-  private fun opprettAdresseInfoBr50(dokument: Document, oppdragElement: Element) {
-    val adresseInfoBr50 = dokument.createElement("adresse-info-br50")
-    oppdragElement.appendChild(adresseInfoBr50)
-
-    //Ikke i bruk, genereres tom
-    val ident = dokument.createElement("ident")
-    adresseInfoBr50.appendChild(ident)
-
-    //Ikke i bruk, genereres tom
-    val adressetype = dokument.createElement("adressetype")
-    adresseInfoBr50.appendChild(adressetype)
-
-    //Ikke i bruk, genereres tom
-    val adresse1 = dokument.createElement("adresse1")
-    adresseInfoBr50.appendChild(adresse1)
-
-    //Ikke i bruk, genereres tom
-    val adresse2 = dokument.createElement("adresse2")
-    adresseInfoBr50.appendChild(adresse2)
-
-    //Ikke i bruk, genereres tom
-    val adresse3 = dokument.createElement("adresse3")
-    adresseInfoBr50.appendChild(adresse3)
-
-    //Ikke i bruk, genereres tom
-    val adresse4 = dokument.createElement("adresse4")
-    adresseInfoBr50.appendChild(adresse4)
-
-    //Ikke i bruk, genereres tom
-    val postnr = dokument.createElement("postnr")
-    adresseInfoBr50.appendChild(postnr)
-
-    //Ikke i bruk, genereres tom
-    val poststed = dokument.createElement("poststed")
-    adresseInfoBr50.appendChild(poststed)
-
-    //Ikke i bruk, genereres tom
-    val landkode = dokument.createElement("landkode")
-    adresseInfoBr50.appendChild(landkode)
-
-    //Ikke i bruk, genereres tom
-    val landnavn = dokument.createElement("landnavn")
-    adresseInfoBr50.appendChild(landnavn)
   }
 
   private fun opprettStoppBatchBr99(dokument: Document, rootElement: Element, sum: BigDecimal, antall: Int) {

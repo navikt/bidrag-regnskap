@@ -11,8 +11,10 @@ KAFKA_BROKERS: localhost:9092
 BUCKET_NAME: bidrag-regnskap-dev
 
 scheduler:
-  interval:
+  sendkrav:
     cron: "*/30 * * * * *" #Hvert 30. sekund
+  avstemning:
+    cron: "0 0 1 ? * 1/1 *" #Hver dag kl 01:00
 
 springdoc:
   packages-to-scan: no.nav.bidrag.regnskap.controller

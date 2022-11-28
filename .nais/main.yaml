@@ -2,7 +2,7 @@ name: bidrag-regnskap
 ingresses:
   - https://bidrag-regnskap.dev.intern.nav.no
 azure:
-  skatt_url: bidrag-stubs.dev.intern.nav.no #TODO: LEGGE INN URL
+  skatt_url: bidrag-stubs.dev.intern.nav.no/ekstern/skatt/api/krav
   skatt_scope: dev-gcp.bidrag.bidrag-stubs
 kafka:
   pool: nav-dev

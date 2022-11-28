@@ -45,7 +45,7 @@ class KravService(
     }
 
     val alleIkkeOverførteKonteringer = finnAlleIkkeOverførteKonteringer(oppdragsperioderMedIkkeOverførteKonteringer)
-    val skattKravRequest = opprettSkattKravRequest(alleIkkeOverførteKonteringer, periode)
+    val skattKravRequest = opprettSkattKravRequest(alleIkkeOverførteKonteringer)
 
     val skattResponse = skattConsumer.sendKrav(skattKravRequest)
 
@@ -126,9 +126,7 @@ class KravService(
     )
   }
 
-  private fun opprettSkattKravRequest(
-    konteringerListe: List<Kontering>, periode: YearMonth
-  ): Krav {
+  private fun opprettSkattKravRequest(konteringerListe: List<Kontering>): Krav {
     val kravKonteringerListe = mutableListOf<KravKontering>()
     konteringerListe.forEach { kontering ->
       kravKonteringerListe.add(
@@ -142,7 +140,7 @@ class KravService(
           skyldnerIdent = kontering.oppdragsperiode.oppdrag.skyldnerIdent,
           belop = kontering.oppdragsperiode.beløp,
           valuta = kontering.oppdragsperiode.valuta,
-          periode = periode,
+          periode = YearMonth.parse(kontering.overføringsperiode),
           vedtaksdato = kontering.oppdragsperiode.vedtaksdato,
           kjoredato = LocalDate.now(),
           saksbehandlerId = kontering.oppdragsperiode.opprettetAv,

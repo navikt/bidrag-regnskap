@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController
 @Protected
 @Tag(name = "Oppdrag")
 class OppdragController(
-  val oppdragService: OppdragService
+  private val oppdragService: OppdragService
 ) {
 
   @GetMapping("/oppdrag")

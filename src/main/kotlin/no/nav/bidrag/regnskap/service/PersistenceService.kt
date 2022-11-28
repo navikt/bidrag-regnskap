@@ -97,6 +97,10 @@ class PersistenceService(
     return konteringRepository.hentAlleIkkeOverførteKonteringer()
   }
 
+  fun hentAlleKonteringerForDato(dato: LocalDate): List<Kontering> {
+    return konteringRepository.hentAlleKonteringerForDato(dato)
+  }
+
   fun lagreKontering(kontering: Kontering): Int? {
     val lagretKontering = konteringRepository.save(kontering)
     LOGGER.debug("Lagret kontering med ID: ${lagretKontering.konteringId}")

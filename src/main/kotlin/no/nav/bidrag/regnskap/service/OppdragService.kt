@@ -41,6 +41,8 @@ class OppdragService(
     val oppdragOptional: Optional<Oppdrag>
     if (hendelse.endretEngangsbelopId != null) {
       oppdragOptional = persistenceService.hentOppdragPåEngangsbeløpId(hendelse.endretEngangsbelopId)
+    } else if (hendelse.engangsbelopId != null) {
+      return opprettNyttOppdrag(hendelse)
     } else {
       oppdragOptional = persistenceService.hentOppdragPaUnikeIdentifikatorer(
         hendelse.type, hendelse.kravhaverIdent, hendelse.skyldnerIdent, hendelse.eksternReferanse

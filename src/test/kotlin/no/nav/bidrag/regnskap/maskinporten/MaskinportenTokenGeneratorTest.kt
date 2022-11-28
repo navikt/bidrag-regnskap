@@ -44,7 +44,7 @@ class MaskinportenTokenGeneratorTest {
   }
 
   @Test
-  fun `Skal sjekke at timestamps blir satt riktig på token body`() {
+  fun `Skal sjekke at timestamps blir satt riktig på token body`() { //TODO() Tester feiler sporadisk på byggserver, burde endres!
     val config = MaskinportenWireMock.createMaskinportenConfig()
     val generator = MaskinportenTokenGenerator(config)
     val signedJWT = SignedJWT.parse(generator.genererJwtToken(scopes))
