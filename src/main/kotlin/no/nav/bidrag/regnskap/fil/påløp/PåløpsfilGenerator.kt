@@ -33,7 +33,7 @@ class PåløpsfilGenerator(
 
   private val documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
 
-  fun skrivPåløpsfil(konteringer: List<Kontering>, påløp: Påløp) {
+  fun skrivPåløpsfilOgLastOppPåFilsluse(konteringer: List<Kontering>, påløp: Påløp) {
     val now = LocalDate.now()
     val påløpsMappe = "påløp/"
     val påløpsfilnavn = "paaloop_D" + now.format(DateTimeFormatter.ofPattern("yyMMdd")).toString() + ".xml"
@@ -72,12 +72,7 @@ class PåløpsfilGenerator(
 
       skrivXml(dokument, påløpsMappe + påløpsfilnavn)
     }
-
     filoverføringTilElinKlient.lastOppFilTilFilsluse(påløpsMappe, påløpsfilnavn)
-
-    //TODO() Overføring kontering for alle konteringer :)
-
-    LOGGER.info("Påløpskjøring: Påløpsfil er ferdig skrevet med ${konteringer.size} konteringer og lastet opp til filsluse.")
   }
 
   private fun opprettStartBatchBr01(dokument: Document, rootElement: Element, påløp: Påløp, now: LocalDate) {

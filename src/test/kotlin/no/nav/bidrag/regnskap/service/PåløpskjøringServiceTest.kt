@@ -6,6 +6,7 @@ import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.verify
+import no.nav.bidrag.regnskap.consumer.SkattConsumer
 import no.nav.bidrag.regnskap.fil.PåløpsfilGenerator
 import no.nav.bidrag.regnskap.utils.TestData
 import org.junit.jupiter.api.Assertions.*
@@ -24,6 +25,9 @@ class PåløpskjøringServiceTest {
 
   @MockK(relaxed = true)
   private lateinit var påløpsfilGenerator: PåløpsfilGenerator
+
+  @MockK(relaxed = true)
+  private lateinit var skattConsumer: SkattConsumer
 
   @InjectMockKs
   private lateinit var påløpskjøringService: PåløpskjøringService

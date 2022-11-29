@@ -86,6 +86,10 @@ class KravService(
     }
   }
 
+  fun erVedlikeholdsmodusPåslått(): Boolean {
+    return skattConsumer.hentStatusPåVedlikeholdsmodus().statusCode == HttpStatus.SERVICE_UNAVAILABLE
+  }
+
   private fun lagreVellykketOverføringAvKrav(
     alleIkkeOverforteKonteringer: List<Kontering>,
     kravResponse: KravResponse,

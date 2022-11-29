@@ -26,7 +26,10 @@ class SendKravQueue(
   @Transactional
   fun send() {
     if(harAktiveDriftAvvik()) {
-      LOGGER.error("Det finnes aktive driftsavvik. Starter derfor ikke overføring av kontering.")
+      LOGGER.error("Det finnes aktive driftsavvik! Starter derfor ikke overføring av kontering.")
+      return
+    } else if (kravService.erVedlikeholdsmodusPåslått()) {
+      LOGGER.error("Vedlikeholdsmodus er påslått! Starter derfor ikke overføring av kontering.")
       return
     }
     while (linkedBlockingQueue.isNotEmpty()) {
@@ -36,7 +39,6 @@ class SendKravQueue(
       val sisteOverfortePeriodeForPalop = persistenceService.finnSisteOverførtePeriode()
 
       kravService.sendKrav(oppdragId, sisteOverfortePeriodeForPalop)
-      // TODO(): Feilhåndtering, hvordan går vi frem om det feiler gjenntatte ganger
       linkedBlockingQueue.remove()
     }
   }

@@ -1,6 +1,7 @@
 package no.nav.bidrag.regnskap.consumer
 
 import no.nav.bidrag.regnskap.dto.krav.Krav
+import no.nav.bidrag.regnskap.dto.påløp.Vedlikeholdsmodus
 import no.nav.bidrag.regnskap.maskinporten.MaskinportenClient
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpEntity
@@ -21,23 +22,49 @@ class SkattConsumer(
   private val maskinportenClient: MaskinportenClient
 ) {
 
+  companion object {
+    const val KRAV_PATH = "/ekstern/skatt/api/krav"
+    const val LIVENESS_PATH = "/ekstern/skatt/api/liveness"
+    const val VEDLIKEHOLDSMODUS_PATH = "/ekstern/skatt/api/vedlikeholdsmodus"
+  }
+
   fun sendKrav(krav: Krav): ResponseEntity<String> {
-    val skattKravResponse: ResponseEntity<String>
-    try {
-      skattKravResponse = restTemplate.exchange(opprettSkattUrl(), HttpMethod.POST, opprettHttpEntity(krav), String::class.java)
+    return try {
+      restTemplate.exchange(
+        opprettSkattUrl(KRAV_PATH),
+        HttpMethod.POST,
+        HttpEntity<Krav>(krav, opprettHttpHeaders()),
+        String::class.java
+      )
     } catch (e: HttpStatusCodeException) {
-      return ResponseEntity.status(e.statusCode).body(e.responseBodyAsString)
+      ResponseEntity.status(e.statusCode).body(e.responseBodyAsString)
     }
-
-    return skattKravResponse
   }
 
-  private fun opprettSkattUrl(): URI {
-    return URI.create(skattUrl)
+  fun oppdaterVedlikeholdsmodus(vedlikeholdsmodus: Vedlikeholdsmodus): ResponseEntity<Any> {
+    return restTemplate.exchange(
+        opprettSkattUrl(VEDLIKEHOLDSMODUS_PATH),
+        HttpMethod.POST,
+        HttpEntity<Vedlikeholdsmodus>(vedlikeholdsmodus, opprettHttpHeaders()),
+        Any::class.java
+      )
   }
 
-  private fun opprettHttpEntity(krav: Krav): HttpEntity<Krav> {
-    return HttpEntity<Krav>(krav, opprettHttpHeaders())
+  fun hentStatusPåVedlikeholdsmodus(): ResponseEntity<Any> {
+    return try {
+      restTemplate.exchange(
+        opprettSkattUrl(LIVENESS_PATH),
+        HttpMethod.GET,
+        HttpEntity<String>(opprettHttpHeaders()),
+        Any::class.java
+      )
+    } catch (e: HttpStatusCodeException) {
+      ResponseEntity.status(e.statusCode).body(e.responseBodyAsString)
+    }
+  }
+
+  private fun opprettSkattUrl(path: String): URI {
+    return URI.create(skattUrl + path)
   }
 
   private fun opprettHttpHeaders(): HttpHeaders {

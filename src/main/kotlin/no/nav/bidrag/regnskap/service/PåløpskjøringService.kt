@@ -1,5 +1,8 @@
 package no.nav.bidrag.regnskap.service
 
+import no.nav.bidrag.regnskap.consumer.SkattConsumer
+import no.nav.bidrag.regnskap.dto.enumer.ÅrsakKode
+import no.nav.bidrag.regnskap.dto.påløp.Vedlikeholdsmodus
 import no.nav.bidrag.regnskap.persistence.entity.Driftsavvik
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.OverføringKontering
@@ -17,14 +20,17 @@ private val LOGGER = LoggerFactory.getLogger(PåløpskjøringService::class.java
 class PåløpskjøringService(
   private val persistenceService: PersistenceService,
   private val konteringService: KonteringService,
-  private val påløpsfilGenerator: PåløpsfilGenerator
+  private val påløpsfilGenerator: PåløpsfilGenerator,
+  private val skattConsumer: SkattConsumer
 ) {
 
   fun startPåløpskjøring(påløp: Påløp, schedulertKjøring: Boolean) {
     validerDriftsavvik(påløp, schedulertKjøring)
+    endreElinVedlikeholdsmodus(ÅrsakKode.PAALOEP_GENERERES, "Påløp for ${påløp.forPeriode} genereres hos NAV.")
     opprettKonteringerForAlleAktiveOppdrag(påløp)
     genererPåløpsfil(påløp)
     fullførPåløp(påløp)
+    endreElinVedlikeholdsmodus(ÅrsakKode.PAALOEP_LEVERT, "Påløp for ${påløp.forPeriode} er ferdig generert fra NAV.")
     avsluttDriftsavvik(påløp)
   }
 
@@ -34,11 +40,9 @@ class PåløpskjøringService(
   @Transactional
   fun genererPåløpsfil(påløp: Påløp) {
     val konteringer = persistenceService.hentAlleIkkeOverførteKonteringer()
-    påløpsfilGenerator.skrivPåløpsfil(konteringer, påløp)
-
-    //Last opp fil til filsluse
-
+    påløpsfilGenerator.skrivPåløpsfilOgLastOppPåFilsluse(konteringer, påløp)
     settKonteringTilOverførtOgOpprettOverføringKontering(konteringer, påløp)
+    LOGGER.info("Påløpsfil er ferdig skrevet med ${konteringer.size} konteringer og lastet opp til filsluse.")
   }
 
   private fun settKonteringTilOverførtOgOpprettOverføringKontering(konteringer: List<Kontering>, påløp: Påløp) {
@@ -85,7 +89,6 @@ class PåløpskjøringService(
     )
   }
 
-
   private fun opprettDriftsavvik(
     påløp: Påløp, schedulertKjøring: Boolean
   ) = Driftsavvik(
@@ -114,5 +117,9 @@ class PåløpskjøringService(
         periode.plusMonths(1).isAfter(it.periodeFra)
       }, påløp.forPeriode
     )
+  }
+
+  private fun endreElinVedlikeholdsmodus(årsakKode: ÅrsakKode, kommentar: String) {
+    skattConsumer.oppdaterVedlikeholdsmodus(Vedlikeholdsmodus(true, årsakKode, kommentar))
   }
 }

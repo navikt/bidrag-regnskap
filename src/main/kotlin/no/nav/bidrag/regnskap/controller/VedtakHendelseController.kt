@@ -30,12 +30,13 @@ class VedtakHendelseController(
   @ApiResponses(
     value = [ApiResponse(
       responseCode = "200",
-      description = "Meldingen er lest vellykket."
+      description = "Meldingen er lest vellykket.",
+      content = [Content()]
     ), ApiResponse(
       responseCode = "400",
       description = "Noe er galt med meldingen.",
       content = [Content()]
-    ),ApiResponse(
+    ), ApiResponse(
       responseCode = "401",
       description = "Klienten ikke er autentisert.",
       content = [Content()]
@@ -45,8 +46,8 @@ class VedtakHendelseController(
       content = [Content()]
     )]
   )
-  fun opprettHendelse(hendelse: String): ResponseEntity<Any> {
-    vedtakHendelseService.behandleHendelse(hendelse)
+  fun opprettHendelse(vedtakHendelse: String): ResponseEntity<Any> {
+    vedtakHendelseService.behandleHendelse(vedtakHendelse)
     return ResponseEntity.ok().build()
   }
 }

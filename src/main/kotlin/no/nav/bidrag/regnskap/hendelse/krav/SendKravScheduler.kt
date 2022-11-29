@@ -25,23 +25,26 @@ class SendKravScheduler(
   @Transactional
   fun skedulertOverforingAvKrav() {
     LockAssert.assertLocked()
+    LOGGER.info("Starter schedulert overføring av alle konteringer som ikke har blitt overført.")
     if (harAktiveDriftAvvik()) {
       LOGGER.error("Det finnes aktive driftsavvik. Starter derfor ikke overføring av konteringer.")
       return
+    } else if (kravService.erVedlikeholdsmodusPåslått()) {
+      LOGGER.error("Vedlikeholdsmodus er påslått! Starter derfor ikke overføring av kontering.")
+      return
     }
 
-    LOGGER.debug("Henter alle oppdrag med konteringer som ikke har blitt overført.")
     val oppdragMedIkkeOverforteKonteringer = hentOppdragMedIkkeOverforteKonteringer()
 
     if (oppdragMedIkkeOverforteKonteringer.isEmpty()) {
-      LOGGER.debug("Det finnes ingen oppdrag med unsendte konteringer.")
+      LOGGER.info("Det finnes ingen oppdrag med unsendte konteringer.")
       return
     }
 
     oppdragMedIkkeOverforteKonteringer.forEach {
       kravService.sendKrav(it, persistenceService.finnSisteOverførtePeriode())
     }
-    LOGGER.debug("Alle oppdrag med unsendte konteringer er nå overført til skatt.")
+    LOGGER.info("Alle oppdrag(antall: ${oppdragMedIkkeOverforteKonteringer.size}) med unsendte konteringer er nå overført til skatt.")
   }
 
   private fun harAktiveDriftAvvik(): Boolean {

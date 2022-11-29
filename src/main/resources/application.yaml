@@ -8,7 +8,7 @@ scheduler:
   sendkrav:
     cron: "0 */10 * * * *" #Hvert 10. minutt
   avstemning:
-    cron: "0 0 1 ? * 1/1 *" #Hver dag kl 01:00
+    cron: "0 0 1 * * *" #Hver dag kl 01:00
 
 springdoc:
   packages-to-scan: no.nav.bidrag.regnskap.controller
