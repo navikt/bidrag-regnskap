@@ -5,7 +5,10 @@ import com.jcraft.jsch.JSch
 import com.jcraft.jsch.Session
 import no.nav.bidrag.regnskap.config.FiloverføringTilElinConfig
 import no.nav.bidrag.regnskap.persistence.bucket.GcpFilBucket
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+
+private val LOGGER = LoggerFactory.getLogger(FiloverføringTilElinKlient::class.java)
 
 @Service
 class FiloverføringTilElinKlient(
@@ -23,6 +26,7 @@ class FiloverføringTilElinKlient(
   }
 
   fun lastOppFilTilFilsluse(filmappe: String, filnavn: String) {
+    LOGGER.info("Start oppkobling mot filsluse...")
     var session: Session? = null
     val channel: ChannelSftp?
     try {
@@ -32,8 +36,10 @@ class FiloverføringTilElinKlient(
 
       channel = session.openChannel(FiloverføringTilElinConfig.JSCH_CHANNEL_TYPE_SFTP) as ChannelSftp
       channel.connect()
+      LOGGER.info("Oppkobling mot filsluse var vellykket! \nStarter opplasting av fil: $filnavn fra GCP-bucket...")
       channel.cd(config.directory)
       channel.put(gcpFilBucket.hentFil(filmappe + filnavn), filnavn)
+      LOGGER.info("Fil: $filnavn har blitt lastet opp på filsluse!")
     } finally {
       session?.disconnect()
     }

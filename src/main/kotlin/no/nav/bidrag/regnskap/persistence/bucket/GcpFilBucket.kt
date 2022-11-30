@@ -5,11 +5,14 @@ import com.google.cloud.WriteChannel
 import com.google.cloud.storage.BlobInfo
 import com.google.cloud.storage.StorageOptions
 import no.nav.bidrag.regnskap.util.ByteArrayOutputStreamTilByteBuffer
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.threeten.bp.Duration
 import java.io.InputStream
 import java.nio.channels.Channels
+
+private val LOGGER = LoggerFactory.getLogger(GcpFilBucket::class.java)
 
 @Component
 class GcpFilBucket(
@@ -20,11 +23,18 @@ class GcpFilBucket(
   private val storage = StorageOptions.newBuilder().setRetrySettings(retrySetting).build().service
 
   fun lagreFil(filnavn: String, byteArrayStream: ByteArrayOutputStreamTilByteBuffer) {
+    LOGGER.info("Starter overføring av fil: $filnavn til GCP-bucket: $bucketNavn...")
     hentWriteChannel(filnavn).use { it.write(byteArrayStream.toByteBuffer()) }
+    LOGGER.info("Fil: $filnavn har blitt lastet opp til GCP-bucket: $bucketNavn!")
   }
 
   fun finnesFil(filnavn: String): Boolean {
-    return storage.get(lagBlobinfo(filnavn).blobId) != null
+    if(storage.get(lagBlobinfo(filnavn).blobId) != null) {
+      LOGGER.info("Fil: $filnavn finnes allerede i GCP-bucket: $bucketNavn! Filen blir derfor ikke lastet opp. " +
+          "\nOm det er ønskelig å erstatte eksisterende fil må den manuelt slettes fra $bucketNavn.")
+      return true
+    }
+    return false
   }
 
   fun hentFil(filnavn: String): InputStream {

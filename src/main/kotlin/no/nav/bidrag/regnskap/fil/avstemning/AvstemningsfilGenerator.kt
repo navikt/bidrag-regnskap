@@ -53,7 +53,7 @@ class AvstemningsfilGenerator(
   ): ByteArrayOutputStreamTilByteBuffer {
     val avstemningsfilBuffer = ByteArrayOutputStreamTilByteBuffer()
 
-    konteringer.forEach { kontering ->
+    konteringer.forEachIndexed { index, kontering ->
       val transaksjonskodeSummering = summering[kontering.transaksjonskode]!!
       val periode = YearMonth.parse(kontering.overføringsperiode)
 
@@ -71,6 +71,10 @@ class AvstemningsfilGenerator(
             + "\n")
           .toByteArray()
       )
+
+      if (index+1 % 100 == 0) {
+        LOGGER.info("Påløpskjøring: Har skrevet $index av ${konteringer.size} konteringer til avstemningsfil...")
+      }
 
       transaksjonskodeSummering.sum += kontering.oppdragsperiode.beløp
       transaksjonskodeSummering.antallKonteringer++

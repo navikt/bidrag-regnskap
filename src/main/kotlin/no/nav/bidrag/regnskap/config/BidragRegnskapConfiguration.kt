@@ -14,7 +14,6 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy
 import org.springframework.jdbc.core.JdbcTemplate
 import javax.sql.DataSource
 
-
 @Configuration
 @EnableAspectJAutoProxy
 @ConfigurationPropertiesScan

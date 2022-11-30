@@ -53,7 +53,7 @@ class PåløpsfilGenerator(
       finnAlleOppdragFraKonteringer(konteringer).forEach { (_, konteringerForOppdrag) ->
 
         if (++index % 100 == 0) {
-          LOGGER.info("Påløpskjøring: Har skrevet $index av ${konteringer.size} konteringer til påløpsfil.")
+          LOGGER.info("Har skrevet $index av ${konteringer.size} konteringer til påløpsfil...")
         }
 
         val oppdragElement = dokument.createElement("oppdrag")

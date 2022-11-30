@@ -39,6 +39,7 @@ class PåløpskjøringService(
 
   @Transactional
   fun genererPåløpsfil(påløp: Påløp) {
+    LOGGER.info("Starter generering av påløpsfil...")
     val konteringer = persistenceService.hentAlleIkkeOverførteKonteringer()
     påløpsfilGenerator.skrivPåløpsfilOgLastOppPåFilsluse(konteringer, påløp)
     settKonteringTilOverførtOgOpprettOverføringKontering(konteringer, påløp)

@@ -11,10 +11,10 @@ import org.springframework.context.annotation.Scope
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.web.client.RestTemplate
 
-
 @Configuration
 @EnableSecurityConfiguration
 class RestTemplateConfiguration {
+
   @Bean
   @Scope("prototype")
   fun baseRestTemplate(
