@@ -2,7 +2,6 @@ package no.nav.bidrag.regnskap.service
 
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
@@ -64,23 +63,6 @@ class OppdragsperiodeServiceTest {
       nyeOppdragsperioder[1].beløp shouldBe hendelse.periodeListe[1].beløp
       nyeOppdragsperioder[1].periodeFra shouldBe hendelse.periodeListe[1].periodeFomDato
       nyeOppdragsperioder[1].periodeTil shouldBe hendelse.periodeListe[1].periodeTilDato
-    }
-
-    @Test
-    fun `Skal opprette randomUUID om delytelseId ikke er angitt`() {
-      val hendelse = TestData.opprettHendelse(
-        periodeListe = listOf(
-          TestData.opprettPeriodeDomene(
-            referanse = null
-          )
-        )
-      )
-      val oppdrag = TestData.opprettOppdrag()
-
-
-      val nyeOppdragsperioder = oppdragsperiodeService.opprettNyeOppdragsperioder(hendelse, oppdrag)
-
-      nyeOppdragsperioder[0].delytelseId shouldNotBe null
     }
   }
 }

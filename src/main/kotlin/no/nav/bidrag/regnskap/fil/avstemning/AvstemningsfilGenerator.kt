@@ -65,7 +65,7 @@ class AvstemningsfilGenerator(
             + LocalDate.of(periode.year, periode.month, periode.lengthOfMonth()).format(DateTimeFormatter.ofPattern("yyMMdd")).toString() + ";"
             + now + ";"
             + "F" + ";" //TODO
-            + kontering.oppdragsperiode.delytelseId + ";"
+            + kontering.oppdragsperiode.delytelseId.toString() + ";"
             + kontering.oppdragsperiode.mottakerIdent + ";"
             + kontering.oppdragsperiode.oppdrag!!.kravhaverIdent + ";"
             + "\n")

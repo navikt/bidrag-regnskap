@@ -188,11 +188,11 @@ class PåløpsfilGenerator(
     konteringBr10Element.appendChild(refFagsystemId)
 
     val delytelseId = dokument.createElement("delytelseId")
-    delytelseId.textContent = kontering.oppdragsperiode?.delytelseId
+    delytelseId.textContent = kontering.oppdragsperiode?.delytelseId.toString()
     konteringBr10Element.appendChild(delytelseId)
 
     val refDelytelseId = dokument.createElement("refDelytelseId")
-    refDelytelseId.textContent = kontering.oppdragsperiode?.delytelseId //TODO() Hvorfor er denne to ganger
+    refDelytelseId.textContent = kontering.oppdragsperiode?.delytelseId.toString() //TODO() Hvorfor er denne to ganger
     konteringBr10Element.appendChild(refDelytelseId)
   }
 

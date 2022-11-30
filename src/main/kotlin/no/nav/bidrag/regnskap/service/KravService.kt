@@ -151,7 +151,7 @@ class KravService(
           attestantId = kontering.oppdragsperiode.opprettetAv,
           tekst = kontering.oppdragsperiode.oppdrag.eksternReferanse,
           fagsystemId = kontering.oppdragsperiode.sakId,
-          delytelsesId = kontering.oppdragsperiode.delytelseId
+          delytelsesId = kontering.oppdragsperiode.delytelseId.toString()
         )
       )
     }

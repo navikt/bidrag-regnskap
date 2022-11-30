@@ -87,7 +87,7 @@ class VedtakHendelseService(
           periodeTilDato = vedtakHendelse.vedtakDato.withDayOfMonth(1).plusMonths(1),
           beløp = engangsbelop.belop,
           valutakode = engangsbelop.valutakode,
-          referanse = engangsbelop.referanse
+          referanse = engangsbelop.referanse?.let { Integer.valueOf(it) }
         )
       )
     )
@@ -96,14 +96,14 @@ class VedtakHendelseService(
 
   private fun mapPeriodelisteTilDomene(periodeListe: List<no.nav.bidrag.behandling.felles.dto.vedtak.Periode>): List<Periode> {
     val perioder = mutableListOf<Periode>()
-    periodeListe.forEach {
+    periodeListe.forEach { periode ->
       perioder.add(
         Periode(
-          beløp = it.belop,
-          valutakode = it.valutakode,
-          periodeFomDato = it.periodeFomDato,
-          periodeTilDato = it.periodeTilDato,
-          referanse = it.referanse
+          beløp = periode.belop,
+          valutakode = periode.valutakode,
+          periodeFomDato = periode.periodeFomDato,
+          periodeTilDato = periode.periodeTilDato,
+          referanse = periode.referanse?.let { Integer.valueOf(it) }
         )
       )
     }

@@ -1,5 +1,6 @@
 package no.nav.bidrag.regnskap.persistence.entity
 
+import org.hibernate.Hibernate
 import java.time.LocalDateTime
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -30,4 +31,25 @@ data class Driftsavvik(
 
   @Column(name = "arsak")
   val årsak: String? = null
-)
+) {
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
+    other as Driftsavvik
+
+    return driftsavvikId != null && driftsavvikId == other.driftsavvikId
+  }
+
+  override fun hashCode(): Int = javaClass.hashCode()
+
+  @Override
+  override fun toString(): String {
+    return this::class.simpleName +
+        "(driftsavvikId = $driftsavvikId , " +
+        "påløpId = $påløpId , " +
+        "tidspunktFra = $tidspunktFra , " +
+        "tidspunktTil = $tidspunktTil , " +
+        "opprettetAv = $opprettetAv , " +
+        "årsak = $årsak )"
+  }
+}

@@ -21,6 +21,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
 import java.util.*
+import kotlin.random.Random
 
 object TestData {
 
@@ -179,7 +180,7 @@ object TestData {
     valutakode: String? = "NOK",
     periodeFomDato: LocalDate = LocalDate.now().minusMonths(2).withDayOfMonth(1),
     periodeTilDato: LocalDate? = LocalDate.now(),
-    referanse: String? = UUID.randomUUID().toString()
+    referanse: Int? = Random.nextInt()
   ): Periode {
     return Periode(
       beløp = beløp,
@@ -203,7 +204,7 @@ object TestData {
     periodeTil: LocalDate = LocalDate.now().plusMonths(1),
     vedtaksdato: LocalDate = LocalDate.now(),
     opprettetAv: String = "Saksbehandler",
-    delytelseId: String = "DelytelseId",
+    delytelseId: Int = Random.nextInt(),
     aktivTil: LocalDate? = null,
     konteringer: List<Kontering> = listOf(opprettKontering())
 

@@ -1,5 +1,6 @@
 package no.nav.bidrag.regnskap.persistence.entity
 
+import org.hibernate.Hibernate
 import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.persistence.CascadeType
@@ -50,17 +51,28 @@ data class Oppdrag(
   @OneToMany(mappedBy = "oppdrag", cascade = [CascadeType.ALL])
   var oppdragsperioder: List<Oppdragsperiode>? = null
 ) {
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
+    other as Oppdrag
+
+    return oppdragId != null && oppdragId == other.oppdragId
+  }
+
+  override fun hashCode(): Int = javaClass.hashCode()
+
+  @Override
   override fun toString(): String {
-    return "Oppdrag(" +
-        "oppdragId=$oppdragId, " +
-        "stønadType='$stønadType, " +
-        "kravhaverIdent=$kravhaverIdent, " +
-        "skyldnerIdent=$skyldnerIdent, " +
-        "eksternReferanse=$eksternReferanse, " +
-        "utsattTilDato=$utsattTilDato, " +
-        "sistOversendtePeriode=$sistOversendtePeriode, " +
-        "endretTidspunkt=$endretTidspunkt, " +
-        "engangsbeløpId=$engangsbeløpId, " +
-        "oppdragsperioder=$oppdragsperioder)"
+    return this::class.simpleName +
+        "(oppdragId = $oppdragId , " +
+        "stønadType = $stønadType , " +
+        "vedtakType = $vedtakType , " +
+        "kravhaverIdent = $kravhaverIdent , " +
+        "skyldnerIdent = $skyldnerIdent , " +
+        "eksternReferanse = $eksternReferanse , " +
+        "utsattTilDato = $utsattTilDato , " +
+        "sistOversendtePeriode = $sistOversendtePeriode , " +
+        "endretTidspunkt = $endretTidspunkt , " +
+        "engangsbeløpId = $engangsbeløpId )"
   }
 }

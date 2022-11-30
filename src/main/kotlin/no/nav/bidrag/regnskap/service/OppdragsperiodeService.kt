@@ -5,7 +5,6 @@ import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
 import org.springframework.stereotype.Service
-import java.util.*
 
 @Service
 class OppdragsperiodeService(
@@ -30,7 +29,7 @@ class OppdragsperiodeService(
           periodeTil = oppdragsperiode.periodeTil.toString(),
           vedtaksdato = oppdragsperiode.vedtaksdato.toString(),
           opprettetAv = oppdragsperiode.opprettetAv,
-          delytelseId = oppdragsperiode.delytelseId,
+          delytelseId = oppdragsperiode.delytelseId.toString(),
           aktivTil = oppdragsperiode.aktivTil.toString(),
           konteringer = konteringService.hentKonteringer(oppdrag)
         )
@@ -57,7 +56,7 @@ class OppdragsperiodeService(
           periodeTil = periode.periodeTilDato,
           vedtaksdato = hendelse.vedtakDato,
           opprettetAv = hendelse.opprettetAv,
-          delytelseId = periode.referanse ?: genererRandomUUID(),
+          delytelseId = periode.referanse,
           oppdrag = oppdrag
         )
       )
@@ -77,9 +76,5 @@ class OppdragsperiodeService(
         it.aktivTil = periodeFra
       }
     }
-  }
-
-  private fun genererRandomUUID(): String {
-    return UUID.randomUUID().toString()
   }
 }
