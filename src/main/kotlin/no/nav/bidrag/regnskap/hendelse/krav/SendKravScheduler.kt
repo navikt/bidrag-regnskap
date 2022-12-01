@@ -27,10 +27,10 @@ class SendKravScheduler(
     LockAssert.assertLocked()
     LOGGER.info("Starter schedulert overføring av alle konteringer som ikke har blitt overført.")
     if (harAktiveDriftAvvik()) {
-      LOGGER.error("Det finnes aktive driftsavvik. Starter derfor ikke overføring av konteringer.")
+      LOGGER.info("Det finnes aktive driftsavvik. Starter derfor ikke overføring av konteringer.")
       return
     } else if (kravService.erVedlikeholdsmodusPåslått()) {
-      LOGGER.error("Vedlikeholdsmodus er påslått! Starter derfor ikke overføring av kontering.")
+      LOGGER.info("Vedlikeholdsmodus er påslått! Starter derfor ikke overføring av kontering.")
       return
     }
 

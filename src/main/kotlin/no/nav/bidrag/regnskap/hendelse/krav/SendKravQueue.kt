@@ -26,10 +26,10 @@ class SendKravQueue(
   @Transactional
   fun send() {
     if(harAktiveDriftAvvik()) {
-      LOGGER.error("Det finnes aktive driftsavvik! Starter derfor ikke overføring av kontering.")
+      LOGGER.info("Det finnes aktive driftsavvik! Starter derfor ikke overføring av kontering.")
       return
     } else if (kravService.erVedlikeholdsmodusPåslått()) {
-      LOGGER.error("Vedlikeholdsmodus er påslått! Starter derfor ikke overføring av kontering.")
+      LOGGER.info("Vedlikeholdsmodus er påslått! Starter derfor ikke overføring av kontering.")
       return
     }
     while (linkedBlockingQueue.isNotEmpty()) {

@@ -9,6 +9,7 @@ KAFKA_BOOTSTRAP_SERVERS: localhost:9092
 KAFKA_BROKERS: localhost:9092
 scheduler.sendkrav.cron: "*/30 * * * * *" #Hvert 30. sekund
 scheduler.avstemning.cron: "0 0 1 * * *" #Hver dag kl 01:00
+scheduler.påløpkjøring.cron: "* 5 * * * *" #Hver time 5 minutter over hel
 
 maskinporten:
   tokenUrl: https://ver2.maskinporten.no/token
