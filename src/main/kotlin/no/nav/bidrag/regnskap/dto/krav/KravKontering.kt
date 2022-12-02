@@ -137,11 +137,10 @@ data class KravKontering(
 
   @field:Schema(
     description = "Felt hvor utlandsavdelingen legger inn referansenummer (ffu-ref). " +
-        "Dette er et fritekstfelt som kan inneholde spesialtegn." +
-        "\n\nTODO: Bedre navn på feltet? Hva blir riktig regnskapsmessig?",
+        "Dette er et fritekstfelt som kan inneholde spesialtegn.",
     example = "VII W → 450 → 40 /11",
     required = false
-  ) val tekst: String?,
+  ) val eksternReferanse: String?,
 
   @field:Schema(
     description = "Bidragssakens saksnummer angitt som String.",

@@ -146,7 +146,7 @@ class PåløpsfilGenerator(
 
     val fradragTillegg = dokument.createElement("fradragTillegg")
     fradragTillegg.textContent =
-      if (Transaksjonskode.valueOf(kontering.transaksjonskode).korreksjonskode != null) "F" else "T" //TODO() Direkte oppgjør?
+      if (Transaksjonskode.valueOf(kontering.transaksjonskode).korreksjonskode != null) "F" else "T"
     konteringBr10Element.appendChild(fradragTillegg)
 
     val valutaKode = dokument.createElement("valutaKode")
@@ -184,7 +184,7 @@ class PåløpsfilGenerator(
     konteringBr10Element.appendChild(tekst)
 
     val refFagsystemId = dokument.createElement("refFagsystemId")
-    refFagsystemId.textContent = kontering.oppdragsperiode?.sakId //TODO() Hvorfor er denne to ganger
+    refFagsystemId.textContent = kontering.oppdragsperiode?.sakId
     konteringBr10Element.appendChild(refFagsystemId)
 
     val delytelseId = dokument.createElement("delytelseId")
@@ -192,7 +192,7 @@ class PåløpsfilGenerator(
     konteringBr10Element.appendChild(delytelseId)
 
     val refDelytelseId = dokument.createElement("refDelytelseId")
-    refDelytelseId.textContent = kontering.oppdragsperiode?.delytelseId.toString() //TODO() Hvorfor er denne to ganger
+    refDelytelseId.textContent = kontering.oppdragsperiode?.delytelseId.toString()
     konteringBr10Element.appendChild(refDelytelseId)
   }
 

@@ -80,7 +80,6 @@ class PåløpskjøringService(
     val driftsavvikListe = persistenceService.hentAlleAktiveDriftsavvik()
     if (driftsavvikListe.any { it.påløpId != påløp.påløpId }) {
       LOGGER.error("Det finnes aktive driftsavvik som ikke er knyttet til påløpet! Kan derfor ikke starte påløpskjøring!")
-      //Todo() Bedre feilhåndtering
       throw IllegalStateException("Det finnes aktive driftsavvik som ikke er knyttet til påløpet! Kan derfor ikke starte påløpskjøring!")
     }
     if (driftsavvikListe.isEmpty()) persistenceService.lagreDriftsavvik(

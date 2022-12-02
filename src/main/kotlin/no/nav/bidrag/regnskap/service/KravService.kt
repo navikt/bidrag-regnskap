@@ -149,7 +149,7 @@ class KravService(
           kjoredato = LocalDate.now(),
           saksbehandlerId = kontering.oppdragsperiode.opprettetAv,
           attestantId = kontering.oppdragsperiode.opprettetAv,
-          tekst = kontering.oppdragsperiode.oppdrag.eksternReferanse,
+          eksternReferanse = kontering.oppdragsperiode.oppdrag.eksternReferanse,
           fagsystemId = kontering.oppdragsperiode.sakId,
           delytelsesId = kontering.oppdragsperiode.delytelseId.toString()
         )
