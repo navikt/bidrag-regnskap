@@ -1,6 +1,8 @@
 package no.nav.bidrag.regnskap.controller
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.Parameters
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
@@ -10,10 +12,14 @@ import no.nav.bidrag.regnskap.dto.påløp.PåløpRequest
 import no.nav.bidrag.regnskap.dto.påløp.PåløpResponse
 import no.nav.bidrag.regnskap.service.PåløpsService
 import no.nav.security.token.support.core.api.Protected
+import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import java.time.LocalDateTime
+import java.time.YearMonth
 
 @RestController
 @Protected
@@ -66,7 +72,14 @@ class PåløpsController(
       content = [Content()]
     )]
   )
-  fun lagrePåløp(påløpRequest: PåløpRequest): ResponseEntity<Int> {
-    return ResponseEntity.ok(påløpsService.lagrePåløp(påløpRequest))
+  @Parameters(value = [
+    Parameter(name = "kjøredato", example = "2022-01-01T10:00:00"),
+    Parameter(name = "forPeriode", example = "2022-02")
+  ])
+  fun lagrePåløp(
+    @RequestParam(required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) kjøredato: LocalDateTime,
+    @RequestParam(required = true) forPeriode: String
+  ): ResponseEntity<Int> {
+    return ResponseEntity.ok(påløpsService.lagrePåløp(PåløpRequest(kjøredato, YearMonth.parse(forPeriode))))
   }
 }

@@ -15,6 +15,7 @@ import no.nav.bidrag.regnskap.persistence.repository.OverføringKonteringReposit
 import no.nav.bidrag.regnskap.persistence.repository.PåløpRepository
 import org.slf4j.LoggerFactory
 import org.springframework.dao.EmptyResultDataAccessException
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -125,6 +126,10 @@ class PersistenceService(
 
   fun hentAlleAktiveDriftsavvik(): List<Driftsavvik> {
     return driftsavvikRepository.findAllByTidspunktTilAfterOrTidspunktTilIsNull(LocalDateTime.now())
+  }
+
+  fun hentDriftsavvik(pageable: Pageable): List<Driftsavvik> {
+    return driftsavvikRepository.findAll(pageable).toList()
   }
 
   fun hentDriftsavvikForPåløp(påløpId: Int): Driftsavvik? {

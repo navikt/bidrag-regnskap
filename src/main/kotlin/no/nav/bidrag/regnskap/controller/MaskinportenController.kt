@@ -1,6 +1,5 @@
 package no.nav.bidrag.regnskap.controller
 
-import com.nimbusds.jwt.SignedJWT
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -36,24 +35,4 @@ class MaskinportenController(
   fun hentToken(scopes: String): ResponseEntity<String> {
     return ResponseEntity.ok(maskinportenClient.hentMaskinportenToken(scopes).parsedString)
   }
-
-  @Operation(
-    summary = "Hent fult Maskinporten-token med gitte scopes",
-    description = "Gyldig Maskinporten-token returneres dersom alle oppgitte scopes finnes i konfigurasjonen til klienten. " +
-        "Det fulle maskinporten-tokenet er ment til brukt ved feilsøking."
-  )
-  @ApiResponses(
-    ApiResponse(
-      responseCode = "200", description = "Gyldig token returnert"
-    ), ApiResponse(
-      responseCode = "400",
-      description = "Noen eller alle oppgitte scopes finnes ikke i konfigurasjonen",
-      content = [Content()]
-    )
-  )
-  @GetMapping(value = ["/fultToken"])
-  fun hentFultToken(scopes: String): ResponseEntity<SignedJWT> {
-    return ResponseEntity.ok(maskinportenClient.hentMaskinportenToken(scopes))
-  }
-
 }
