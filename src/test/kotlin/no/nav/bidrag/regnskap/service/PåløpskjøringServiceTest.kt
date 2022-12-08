@@ -47,7 +47,7 @@ class PåløpskjøringServiceTest {
 
   @Test
   fun `skal ikke opprette konteringer for utgåtte oppdragsperioder`() {
-    val påløp = TestData.opprettPåløp(forPeriode = "2022-03")
+    val påløp = TestData.opprettPåløp(påløpId = 1, forPeriode = "2022-03")
     val utgåttOppdragsperiode = TestData.opprettOppdragsperiode(
       periodeFra = LocalDate.of(2022, 1, 1),
       periodeTil = LocalDate.of(2022, 3, 1)
@@ -64,7 +64,7 @@ class PåløpskjøringServiceTest {
 
   @Test
   fun `skal opprette konteringer for løpende oppdragsperioder`() {
-    val påløp = TestData.opprettPåløp(forPeriode = "2022-03")
+    val påløp = TestData.opprettPåløp(påløpId = 2, forPeriode = "2022-03")
     val løpendeOppdragsperiode = TestData.opprettOppdragsperiode(
       periodeFra = LocalDate.of(2022, 1, 1),
       periodeTil = LocalDate.of(2022, 4, 1)

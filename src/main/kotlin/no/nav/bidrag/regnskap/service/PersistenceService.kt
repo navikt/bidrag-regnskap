@@ -40,7 +40,7 @@ class PersistenceService(
   }
 
   fun hentOppdragPaUnikeIdentifikatorer(
-    stønadType: String, kravhaverIdent: String, skyldnerIdent: String, referanse: String?
+    stønadType: String, kravhaverIdent: String?, skyldnerIdent: String, referanse: String?
   ): Optional<Oppdrag> {
     SECURE_LOGGER.info(
       "Henter oppdrag med stønadType: $stønadType, kravhaverIdent: $kravhaverIdent, skyldnerIdent: $skyldnerIdent, referanse: $referanse"
@@ -65,6 +65,13 @@ class PersistenceService(
     val lagretOverføringKontering = overføringKonteringRepository.save(overføringKontering)
     LOGGER.debug("Lagret overforingKontering med ID: ${lagretOverføringKontering.overføringId}")
     return lagretOverføringKontering.overføringId
+  }
+
+  fun hentOverføringKontering(pageable: Pageable): List<OverføringKontering> {
+    return overføringKonteringRepository.findAll(pageable).toList()
+  }
+  fun hentOverføringKonteringMedFeil(pageable: Pageable): List<OverføringKontering> {
+    return overføringKonteringRepository.findByFeilmeldingIsNotNull(pageable).toList()
   }
 
   fun hentPåløp(): List<Påløp> {

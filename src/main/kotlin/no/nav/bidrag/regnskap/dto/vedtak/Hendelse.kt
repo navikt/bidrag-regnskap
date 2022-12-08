@@ -8,7 +8,7 @@ data class Hendelse(
   val endretEngangsbelopId: Int? = null,
   val type: String,
   val vedtakType: VedtakType,
-  val kravhaverIdent: String,
+  val kravhaverIdent: String?,
   val skyldnerIdent: String,
   val mottakerIdent: String,
   val sakId: String,

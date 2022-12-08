@@ -11,6 +11,7 @@ import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
 import no.nav.bidrag.regnskap.dto.enumer.Type
 import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
 import no.nav.bidrag.regnskap.dto.vedtak.Periode
+import no.nav.bidrag.regnskap.persistence.entity.Driftsavvik
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
@@ -34,7 +35,8 @@ object TestData {
     kravhaverIdent: String = TestDataGenerator.genererPersonnummer(),
     utsattTilDato: LocalDate? = null,
     sistOversendtePeriode: String? = null,
-    endretTidspunkt: LocalDateTime? = null
+    endretTidspunkt: LocalDateTime? = null,
+    engangsbeløpId: Int? = null
   ): Oppdrag {
     return Oppdrag(
       oppdragId = oppdragId,
@@ -45,7 +47,8 @@ object TestData {
       kravhaverIdent = kravhaverIdent,
       utsattTilDato = utsattTilDato,
       sistOversendtePeriode = sistOversendtePeriode,
-      endretTidspunkt = endretTidspunkt
+      endretTidspunkt = endretTidspunkt,
+      engangsbeløpId = engangsbeløpId
     )
   }
 
@@ -204,9 +207,9 @@ object TestData {
     periodeTil: LocalDate = LocalDate.now().plusMonths(1),
     vedtaksdato: LocalDate = LocalDate.now(),
     opprettetAv: String = "Saksbehandler",
-    delytelseId: Int = Random.nextInt(),
+    delytelseId: Int? = Random.nextInt(),
     aktivTil: LocalDate? = null,
-    konteringer: List<Kontering> = listOf(opprettKontering())
+    konteringer: List<Kontering>? = listOf(opprettKontering())
 
   ): Oppdragsperiode {
     return Oppdragsperiode(
@@ -237,8 +240,7 @@ object TestData {
     type: String = Type.NY.toString(),
     søknadType: String = SøknadType.EN.name,
     sendtIPalopsfil: Boolean = false,
-    overføringKontering: List<OverføringKontering> = listOf(opprettOverføringKontering())
-
+    overføringKontering: List<OverføringKontering>? = listOf(opprettOverføringKontering())
   ): Kontering {
     return Kontering(
       konteringId = konteringId,
@@ -272,7 +274,7 @@ object TestData {
   }
 
   fun opprettPåløp(
-    påløpId: Int? = 123,
+    påløpId: Int? = null,
     kjøredato: LocalDateTime = LocalDateTime.now(),
     fullførtTidspunkt: LocalDateTime? = null,
     forPeriode: String = "2022-01"
@@ -282,6 +284,24 @@ object TestData {
       kjøredato = kjøredato,
       fullførtTidspunkt = fullførtTidspunkt,
       forPeriode = forPeriode
+    )
+  }
+
+  fun opprettDriftsavvik(
+    driftsavvikId: Int? = null,
+    påløpId: Int? = null,
+    tidspunktFra: LocalDateTime = LocalDateTime.now(),
+    tidspunktTil: LocalDateTime? = LocalDateTime.now().plusHours(1),
+    opprettetAv: String? = "Manuelt REST",
+    årsak: String? = "Feil ved overføringer"
+  ): Driftsavvik {
+    return Driftsavvik(
+      driftsavvikId = driftsavvikId,
+      påløpId = påløpId,
+      tidspunktFra = tidspunktFra,
+      tidspunktTil = tidspunktTil,
+      opprettetAv = opprettetAv,
+      årsak = årsak
     )
   }
 }

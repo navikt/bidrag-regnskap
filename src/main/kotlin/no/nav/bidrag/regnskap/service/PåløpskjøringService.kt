@@ -10,9 +10,9 @@ import no.nav.bidrag.regnskap.persistence.entity.Påløp
 import no.nav.bidrag.regnskap.fil.PåløpsfilGenerator
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalDateTime
-import javax.transaction.Transactional
 
 private val LOGGER = LoggerFactory.getLogger(PåløpskjøringService::class.java)
 
@@ -56,7 +56,9 @@ class PåløpskjøringService(
 
       persistenceService.lagreOverføringKontering(
         OverføringKontering(
-          kontering = it, tidspunkt = timestamp, kanal = "Påløpsfil"
+          kontering = it,
+          tidspunkt = timestamp,
+          kanal = "Påløpsfil"
         )
       )
     }

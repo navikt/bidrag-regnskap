@@ -7,7 +7,7 @@ import java.util.*
 interface OppdragRepository : JpaRepository<Oppdrag, Int> {
   fun findByStønadTypeAndKravhaverIdentAndSkyldnerIdentAndEksternReferanse(
     stønadType: String,
-    kravhaverIdent: String,
+    kravhaverIdent: String?,
     skyldnerIdent: String,
     eksternReferanse: String?
   ): Optional<Oppdrag>

@@ -102,7 +102,10 @@ class KravService(
 
       persistenceService.lagreOverføringKontering(
         opprettOverføringKontering(
-          kontering = kontering, referanseKode = kravResponse.batchUid, tidspunkt = now, kanal = "REST"
+          kontering = kontering,
+          referanseKode = kravResponse.batchUid,
+          tidspunkt = now,
+          kanal = "REST"
         )
       )
     }
@@ -116,7 +119,10 @@ class KravService(
     alleIkkeOverforteKonteringer.forEach { kontering ->
       persistenceService.lagreOverføringKontering(
         opprettOverføringKontering(
-          kontering = kontering, tidspunkt = LocalDateTime.now(), feilmelding = skattFeiletKravResponse, kanal = "REST"
+          kontering = kontering,
+          tidspunkt = LocalDateTime.now(),
+          feilmelding = skattFeiletKravResponse,
+          kanal = "REST"
         )
       )
     }
@@ -126,7 +132,11 @@ class KravService(
     kontering: Kontering, referanseKode: String? = null, tidspunkt: LocalDateTime, feilmelding: String? = null, kanal: String
   ): OverføringKontering {
     return OverføringKontering(
-      kontering = kontering, referansekode = referanseKode, feilmelding = feilmelding, tidspunkt = tidspunkt, kanal = kanal
+      kontering = kontering,
+      referansekode = referanseKode,
+      feilmelding = feilmelding,
+      tidspunkt = tidspunkt,
+      kanal = kanal
     )
   }
 
