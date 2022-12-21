@@ -1,9 +1,5 @@
 package no.nav.bidrag.regnskap.utils
 
-import no.nav.bidrag.behandling.felles.dto.vedtak.Engangsbelop
-import no.nav.bidrag.behandling.felles.dto.vedtak.Stonadsendring
-import no.nav.bidrag.behandling.felles.dto.vedtak.VedtakHendelse
-import no.nav.bidrag.behandling.felles.enums.EngangsbelopType
 import no.nav.bidrag.behandling.felles.enums.StonadType
 import no.nav.bidrag.behandling.felles.enums.VedtakType
 import no.nav.bidrag.regnskap.dto.enumer.SøknadType
@@ -21,7 +17,6 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
-import java.util.*
 import kotlin.random.Random
 
 object TestData {
@@ -49,100 +44,6 @@ object TestData {
       sistOversendtePeriode = sistOversendtePeriode,
       endretTidspunkt = endretTidspunkt,
       engangsbeløpId = engangsbeløpId
-    )
-  }
-
-  fun opprettVedtakhendelse(
-    vedtakType: VedtakType = VedtakType.MANUELT,
-    vedtakId: Int = 12345,
-    vedtakDato: LocalDate = LocalDate.now(),
-    enhetId: String = "Oslo 2",
-    eksternReferanse: String = "Utenlandsavdeling notat",
-    utsattTilDato: LocalDate = LocalDate.now().plusDays(3),
-    opprettetAv: String = "Saksbehandler",
-    opprettetTidspunkt: LocalDateTime = LocalDateTime.now(),
-    stonadsendringListe: List<Stonadsendring> = listOf(opprettStonadsending()),
-    engangsbelopListe: List<Engangsbelop> = listOf(opprettEngangsbelop())
-  ): VedtakHendelse {
-    return VedtakHendelse(
-      vedtakType = vedtakType,
-      vedtakId = vedtakId,
-      vedtakDato = vedtakDato,
-      enhetId = enhetId,
-      eksternReferanse = eksternReferanse,
-      utsattTilDato = utsattTilDato,
-      opprettetAv = opprettetAv,
-      opprettetTidspunkt = opprettetTidspunkt,
-      stonadsendringListe = stonadsendringListe,
-      engangsbelopListe = engangsbelopListe
-    )
-  }
-
-  fun opprettEngangsbelop(
-    engangsbeløpId: Int = 123,
-    endrerEngangsbeløpId: Int? = null,
-    type: EngangsbelopType = EngangsbelopType.GEBYR_SKYLDNER,
-    sakId: String = "Sak123",
-    skyldnerId: String = TestDataGenerator.genererPersonnummer(),
-    kravhaverId: String = TestDataGenerator.genererPersonnummer(),
-    mottakerId: String = TestDataGenerator.genererPersonnummer(),
-    belop: BigDecimal = BigDecimal.valueOf(1200),
-    valutakode: String = "NOK",
-    resultatkode: String = "KOS",
-    referanse: String = UUID.randomUUID().toString()
-  ): Engangsbelop {
-    return Engangsbelop(
-      engangsbelopId = engangsbeløpId,
-      endrerEngangsbelopId = endrerEngangsbeløpId,
-      type = type,
-      sakId = sakId,
-      skyldnerId = skyldnerId,
-      kravhaverId = kravhaverId,
-      mottakerId = mottakerId,
-      belop = belop,
-      valutakode = valutakode,
-      resultatkode = resultatkode,
-      referanse = referanse
-    )
-  }
-
-  fun opprettStonadsending(
-    stonadType: StonadType = StonadType.BIDRAG,
-    sakId: String = "SAK1",
-    skyldnerId: String = TestDataGenerator.genererPersonnummer(),
-    kravhaverId: String = TestDataGenerator.genererPersonnummer(),
-    mottakerId: String = TestDataGenerator.genererPersonnummer(),
-    periodeListe: List<no.nav.bidrag.behandling.felles.dto.vedtak.Periode> = listOf(opprettPeriode()),
-    indeksreguleringAar: String? = null,
-    opphortFra: LocalDate? = null
-  ): Stonadsendring {
-    return Stonadsendring(
-      stonadType = stonadType,
-      sakId = sakId,
-      skyldnerId = skyldnerId,
-      kravhaverId = kravhaverId,
-      mottakerId = mottakerId,
-      periodeListe = periodeListe,
-      indeksreguleringAar = indeksreguleringAar,
-      opphortFra = opphortFra
-    )
-  }
-
-  fun opprettPeriode(
-    periodeFomDato: LocalDate = LocalDate.now().minusMonths(2).withDayOfMonth(1),
-    periodeTilDato: LocalDate? = LocalDate.now(),
-    belop: BigDecimal = BigDecimal.valueOf(7500),
-    valutakode: String = "NOK",
-    resultatkode: String = "ABC",
-    referanse: String? = UUID.randomUUID().toString()
-  ): no.nav.bidrag.behandling.felles.dto.vedtak.Periode {
-    return no.nav.bidrag.behandling.felles.dto.vedtak.Periode(
-      periodeFomDato = periodeFomDato,
-      periodeTilDato = periodeTilDato,
-      belop = belop,
-      valutakode = valutakode,
-      resultatkode = resultatkode,
-      referanse = referanse
     )
   }
 

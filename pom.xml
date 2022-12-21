@@ -18,8 +18,8 @@
     <kotlin.version>1.7.22</kotlin.version>
     <kotlin-coroutines.version>1.6.4</kotlin-coroutines.version>
     <bidrag-commons.version>0.7.4</bidrag-commons.version>
-    <bidrag-behandling-felles-dto.version>0.0.53</bidrag-behandling-felles-dto.version>
-    <bidrag-behandling-felles.version>0.0.58</bidrag-behandling-felles.version>
+    <bidrag-behandling-felles-dto.version>0.0.58</bidrag-behandling-felles-dto.version>
+    <bidrag-behandling-felles.version>0.0.63</bidrag-behandling-felles.version>
     <logback-encoder.version>7.2</logback-encoder.version>
     <token-support.version>2.1.3</token-support.version>
     <springdoc.version>1.6.10</springdoc.version>
@@ -33,6 +33,8 @@
     <google-cloud-storage.version>2.14.0</google-cloud-storage.version>
     <jsch.version>0.2.4</jsch.version>
     <testcontainers.version>1.17.6</testcontainers.version>
+    <spring-kafka.version>2.9.3</spring-kafka.version>
+    <scala.version>2.13.10</scala.version>
   </properties>
   <dependencies>
 
@@ -40,6 +42,12 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.yaml</groupId>
+          <artifactId>snakeyaml</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -90,6 +98,33 @@
     <dependency>
       <groupId>org.springframework.kafka</groupId>
       <artifactId>spring-kafka</artifactId>
+      <version>${spring-kafka.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.kafka</groupId>
+      <artifactId>spring-kafka-test</artifactId>
+      <version>${spring-kafka.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.scala-lang</groupId>
+          <artifactId>scala-library</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>io.netty</groupId>
+          <artifactId>netty-codec</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>io.netty</groupId>
+          <artifactId>netty-handler</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <!--Manuelt oppdatert versjon på avhengighet pga vulnerabilities-->
+    <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-library</artifactId>
+      <version>${scala.version}</version>
     </dependency>
 
     <!--SpringDoc-->
@@ -283,6 +318,12 @@
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-failsafe-plugin</artifactId>
       <version>${maven-failsafe-plugin.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>kafka</artifactId>
+      <version>${testcontainers.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

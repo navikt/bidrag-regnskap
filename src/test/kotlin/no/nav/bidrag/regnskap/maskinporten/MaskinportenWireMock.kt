@@ -59,6 +59,23 @@ class MaskinportenWireMock {
     )
   }
 
+  internal fun kravMedGyldigResponse() {
+    mock.stubFor(
+      WireMock.post(WireMock.urlEqualTo(TOKEN_PATH)).withHeader("Content-Type", WireMock.equalTo(CONTENT_TYPE))
+        .withRequestBody(WireMock.matching("grant_type=$GRANT_TYPE&assertion=.*")).willReturn(
+        WireMock.ok(
+      """{
+                  "access_token" : "${opprettMaskinportenToken(120)}",
+                  "token_type" : "Bearer",
+                  "expires_in" : 599,
+                  "scope" : "difitest:test1"
+                }
+            """
+        )
+      )
+    )
+  }
+
   internal fun medUgyldigResponse() {
     mock.stubFor(
       WireMock.post(WireMock.urlPathEqualTo(TOKEN_PATH)).withHeader("Content-Type", WireMock.equalTo(CONTENT_TYPE))

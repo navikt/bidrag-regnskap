@@ -33,13 +33,12 @@ class SendKravQueue(
       return
     }
     while (linkedBlockingQueue.isNotEmpty()) {
-      val oppdragId = linkedBlockingQueue.peek()
+      val oppdragId = linkedBlockingQueue.poll()
       LOGGER.debug("Fant id $oppdragId i queuen. Starter oversending av krav..")
 
       val sisteOverfortePeriodeForPalop = persistenceService.finnSisteOverførtePeriode()
 
       kravService.sendKrav(oppdragId, sisteOverfortePeriodeForPalop)
-      linkedBlockingQueue.remove()
     }
   }
 

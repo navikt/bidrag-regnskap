@@ -1,0 +1,25 @@
+{
+  "vedtakType": "MANUELT",
+  "opprettetAv": "D101753",
+  "vedtakDato": "2021-02-15",
+  "enhetId": "4849",
+  "eksternReferanse": null,
+  "utsattTilDato": null,
+  "opprettetTidspunkt": "2022-02-15T12:00:00.254988482",
+  "stonadsendringListe": [],
+  "engangsbelopListe": [
+    {
+      "engangsbelopId": "30",
+      "endrerEngangsbelopId": null,
+      "type": "TILBAKEKREVING",
+      "sakId": "1313296",
+      "skyldnerId": "",
+      "kravhaverId": "",
+      "mottakerId": "NAV",
+      "belop": 3315.00,
+      "valutakode": "NOK",
+      "resultatkode": "TB",
+      "referanse": "26398673"
+    }
+  ]
+}

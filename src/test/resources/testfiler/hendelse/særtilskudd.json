@@ -1,0 +1,22 @@
+{
+  "vedtakType": "MANUELT",
+  "vedtakId": "800",
+  "vedtakDato": "2022-01-02",
+  "enhetId": "4812",
+  "opprettetAv": "B101173",
+  "opprettetTidspunkt": "2022-01-02T16:00:23.254988482",
+  "stonadsendringListe": [],
+  "engangsbelopListe": [
+    {
+      "engangsbelopId": "20",
+      "type": "SAERTILSKUDD",
+      "sakId": "2200400",
+      "skyldnerId": "",
+      "kravhaverId": "",
+      "mottakerId": "",
+      "belop": "15000.40",
+      "valutakode": "NOK",
+      "resultatkode": "GIGI"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "vedtakType": "MANUELT",
+  "opprettetAv": "B129973",
+  "vedtakDato": "2022-06-01",
+  "enhetId": "4865",
+  "eksternReferanse": null,
+  "utsattTilDato": null,
+  "opprettetTidspunkt": "2022-06-01T16:00:23.254988482",
+  "stonadsendringListe": [
+    {
+      "stonadType": "EKTEFELLEBIDRAG",
+      "sakId": "2004447",
+      "skyldnerId": "BP",
+      "kravhaverId": "",
+      "mottakerId": "",
+      "indeksreguleringAar": "NN  ",
+      "periodeListe": [
+        {
+          "periodeFomDato": "2022-02-01",
+          "periodeTilDato": null,
+          "belop": 2250.00,
+          "valutakode": "PLN",
+          "resultatkode": "IV"
+        }
+      ]
+    }
+  ],
+  "engangsbelopListe": []
+}

@@ -1,0 +1,29 @@
+{
+  "vedtakType": "MANUELT",
+  "opprettetAv": "L105567",
+  "vedtakDato": "2022-06-27",
+  "enhetId": "4820",
+  "eksternReferanse": null,
+  "utsattTilDato": null,
+  "opprettetTidspunkt": "2022-06-27T16:00:23.254988482",
+  "stonadsendringListe": [
+    {
+      "stonadType": "BIDRAG18AAR",
+      "sakId": "0403128",
+      "skyldnerId": "BP",
+      "kravhaverId": "",
+      "mottakerId": "",
+      "indeksreguleringAar": "2023",
+      "periodeListe": [
+        {
+          "periodeFomDato": "2022-04-01",
+          "periodeTilDato": "2023-06-01",
+          "belop": 6540.00,
+          "valutakode": "NOK",
+          "resultatkode": "KBB"
+        }
+      ]
+    }
+  ],
+  "engangsbelopListe": []
+}

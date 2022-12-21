@@ -1,5 +1,6 @@
 package no.nav.bidrag.regnskap.maskinporten
 
+@SuppressWarnings("kotlin:S117")
 data class MaskinportenTokenResponse(
   val access_token: String,
   val token_type: String?,

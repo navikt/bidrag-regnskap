@@ -64,7 +64,7 @@ class AvstemningsfilGenerator(
             + LocalDate.of(periode.year, periode.month, 1).format(DateTimeFormatter.ofPattern("yyMMdd")).toString() + ";"
             + LocalDate.of(periode.year, periode.month, periode.lengthOfMonth()).format(DateTimeFormatter.ofPattern("yyMMdd")).toString() + ";"
             + now + ";"
-            + if (Transaksjonskode.valueOf(kontering.transaksjonskode).korreksjonskode == null) "F" else "T"
+            + if (Transaksjonskode.valueOf(kontering.transaksjonskode).negativtBeløp) "F" else "T"
             + kontering.oppdragsperiode.delytelseId.toString() + ";"
             + kontering.oppdragsperiode.mottakerIdent + ";"
             + kontering.oppdragsperiode.oppdrag!!.kravhaverIdent + ";"

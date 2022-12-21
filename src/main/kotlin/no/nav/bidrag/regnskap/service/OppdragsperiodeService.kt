@@ -48,7 +48,7 @@ class OppdragsperiodeService(
         Oppdragsperiode(
           vedtakId = hendelse.vedtakId,
           sakId = hendelse.sakId,
-          gjelderIdent = "22222222226", //TODO() Avklare med skatt. Dummynr per nå
+          gjelderIdent = "22222222226", //TODO() Må hente ut BM fra bidrag-sak, eller få over topicen. Hvis finnes -> BM else -> Dummy
           mottakerIdent = hendelse.mottakerIdent,
           beløp = periode.beløp!!,
           valuta = periode.valutakode!!,

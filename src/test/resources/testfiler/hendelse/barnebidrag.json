@@ -1,0 +1,90 @@
+{
+  "vedtakType": "MANUELT",
+  "vedtakId": "64846",
+  "opprettetAv": "B138788",
+  "vedtakDato": "2022-01-02",
+  "enhetId": "4849",
+  "eksternReferanse": null,
+  "utsattTilDato": null,
+  "opprettetTidspunkt": "2022-01-02T16:00:23.254988482",
+  "stonadsendringListe": [
+    {
+      "stonadType": "BIDRAG",
+      "sakId": "2203234",
+      "skyldnerId": "BP",
+      "kravhaverId": "BARN1",
+      "mottakerId": "BM",
+      "indeksreguleringAar": "2023",
+      "periodeListe": [
+        {
+          "periodeFomDato": "2022-01-01",
+          "periodeTilDato": "2022-03-01",
+          "belop": 4820.00,
+          "valutakode": "NOK",
+          "resultatkode": "KBB",
+          "referanse": "26683715"
+        },
+        {
+          "periodeFomDato": "2022-03-01",
+          "periodeTilDato": null,
+          "belop": 5510.00,
+          "valutakode": "NOK",
+          "resultatkode": "KBB",
+          "referanse": "26683717"
+        }
+      ]
+    },
+    {
+      "stonadType": "BIDRAG",
+      "sakId": "2203234",
+      "skyldnerId": "BP",
+      "kravhaverId": "BARN2",
+      "mottakerId": "BM",
+      "indeksreguleringAar": "2023",
+      "periodeListe": [
+        {
+          "periodeFomDato": "2022-01-01",
+          "periodeTilDato": "2022-03-01",
+          "belop": 4820.00,
+          "valutakode": "NOK",
+          "resultatkode": "KBB",
+          "referanse": "26683716"
+        },
+        {
+          "periodeFomDato": "2022-03-01",
+          "periodeTilDato": null,
+          "belop": 4940.00,
+          "valutakode": "NOK",
+          "resultatkode": "KBB",
+          "referanse": "26683718"
+        }
+      ]
+    }
+  ],
+  "engangsbelopListe": [
+    {
+      "engangsbelopId": "100",
+      "type": "GEBYR_SKYLDNER",
+      "sakId": "2203234",
+      "skyldnerId": "BP",
+      "kravhaverId": "NAV",
+      "mottakerId": "NAV",
+      "belop": 1223.00,
+      "valutakode": "NOK",
+      "resultatkode": "GIGI",
+      "referanse": "26683719"
+    },
+    {
+      "engangsbelopId": "101",
+      "type": "GEBYR_MOTTAKER",
+      "sakId": "2203234",
+      "skyldnerId": "BM",
+      "kravhaverId": "NAV",
+      "mottakerId": "NAV",
+      "belop": 1223.00,
+      "valutakode": "NOK",
+      "resultatkode": "GIGI",
+      "referanse": "26683720"
+    }
+  ]
+}

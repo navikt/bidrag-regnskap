@@ -3,31 +3,32 @@ package no.nav.bidrag.regnskap.dto.enumer
 import no.nav.bidrag.behandling.felles.enums.EngangsbelopType
 import no.nav.bidrag.behandling.felles.enums.StonadType
 
-enum class Transaksjonskode(val beskrivelse: String, val korreksjonskode: String?) {
-  A1("Bidragsforskudd", "A3"),
-  A3("Bidragsforskudd", null),
-  B1("Underholdsbidrag (m/u tilleggsbidrag)", "B3"),
-  B3("Underholdsbidrag (m/u tilleggsbidrag)", null),
-  D1("18årsbidrag", "D3"),
-  D3("18årsbidrag", null),
-  E1("Bidrag til særlige utgifter (særtilskudd)", "E3"),
-  E3("Bidrag til særlige utgifter (særtilskudd)", null),
-  F1("Ektefellebidrag", "F3"),
-  F3("Ektefellebidrag", null),
-  G1("Gebyr", "G3"),
-  G3("Gebyr", null),
-  H1("Tilbakekreving", "H3"),
-  H3("Tilbakekreving", null),
-  I1("Motregning", null),
-  K1("Ettergivelse", null),
-  K2("Direkte oppgjør (innbetalt beløp)", null),
-  K3("Tilbakekreving ettergivelse", null);
+enum class Transaksjonskode(val korreksjonskode: String?, val negativtBeløp: Boolean) {
+  A1("A3", false),  //Bidragsforskudd
+  A3(null, true),
+  B1("B3", false),  //Underholdsbidrag (m/u tilleggsbidrag)
+  B3(null, true),
+  D1("D3", false),  //18årsbidrag
+  D3(null, true),
+  E1("E3", false),  //Bidrag til særlige utgifter (særtilskudd)
+  E3(null, true),
+  F1("F3", false),  //Ektefellebidrag
+  F3(null, true),
+  G1("G3", false),  //Gebyr
+  G3(null, true),
+  H1("H3", false),  //Tilbakekreving
+  H3(null, true),
+  I1(null, true),   //Motregning
+  K1(null, true),   //Ettergivelse
+  K2(null, false),  //Direkte oppgjør (innbetalt beløp)
+  K3(null, false);  //Tilbakekreving ettergivelse
 
   companion object {
     fun hentTransaksjonskodeForType(type: String): Transaksjonskode {
       return when (type) {
         StonadType.FORSKUDD.name -> A1
         StonadType.BIDRAG.name -> B1
+        StonadType.OPPFOSTRINGSBIDRAG.name -> B1
         StonadType.BIDRAG18AAR.name -> D1
         StonadType.EKTEFELLEBIDRAG.name -> F1
         StonadType.MOTREGNING.name -> I1

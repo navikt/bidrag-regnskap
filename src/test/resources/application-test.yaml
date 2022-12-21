@@ -1,10 +1,13 @@
-SKATT_URL: http://localhost:${wiremock.server.port:0}/skatt
+SKATT_URL: http://localhost:${wiremock.server.port:8097}
 AZURE_OPENID_CONFIG_ISSUER: http://localhost:${mock-oauth2-server.port}/aad
 
-spring:
-  flyway.enabled: false
-  datasource:
-    type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:h2:mem:default
-  h2.console.enabled: true
-  jpa.hibernate.hbmddl-auto: create-drop
+scheduler:
+  sendkrav:
+    cron: "-" #Disabled
+  avstemning:
+    cron: "-" #Disabled
+  påløpkjøring:
+    cron: "-" #Disabled
+
+atlas.kafka.zookeeper.session.timeout.ms: 60000
+atlas.kafka.zookeeper.connection.timeout.ms: 30000

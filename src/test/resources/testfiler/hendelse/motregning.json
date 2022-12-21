@@ -1,0 +1,30 @@
+{
+  "vedtakType": "MANUELT",
+  "opprettetAv": "E158931",
+  "vedtakDato": "2021-06-30",
+  "enhetId": "9401",
+  "eksternReferanse": null,
+  "utsattTilDato": null,
+  "opprettetTidspunkt": "2021-06-30T16:00:23.254988482",
+  "stonadsendringListe": [
+    {
+      "stonadType": "MOTREGNING",
+      "sakId": "1706132",
+      "skyldnerId": "",
+      "kravhaverId": "",
+      "mottakerId": "",
+      "indeksreguleringAar": "2023",
+      "periodeListe": [
+        {
+          "periodeFomDato": "2021-08-01",
+          "periodeTilDato": "2022-08-01",
+          "belop": 815.00,
+          "valutakode": "NOK",
+          "resultatkode": "IV",
+          "referanse": "26681362"
+        }
+      ]
+    }
+  ],
+  "engangsbelopListe": []
+}

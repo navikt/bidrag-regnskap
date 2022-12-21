@@ -51,12 +51,12 @@ class OppdragService(
 
     return if (oppdragOptional.isPresent) {
       LOGGER.debug(
-        "Kombinasjonen av stonadType, kravhaverIdent, skyldnerIdent og referanse viser til et allerede opprettet oppdrag med id: ${oppdragOptional.get().oppdragId}" + "\nOppdaterer oppdrag.."
+        "Fant eksisterende oppdrag med id: ${oppdragOptional.get().oppdragId}" + "\nOppdaterer oppdrag.."
       )
       oppdaterOppdrag(hendelse, oppdragOptional.get())
     } else {
       LOGGER.debug(
-        "Kombinasjonen av stonadType, kravhaverIdent, skyldnerIdent og referanse viser ikke til et eksisterende oppdrag. " + "\nOpprettet nytt oppdrag.."
+        "Fant ikke eksisterende oppdrag." + "\nOpprettet nytt oppdrag.."
       )
       opprettNyttOppdrag(hendelse)
     }

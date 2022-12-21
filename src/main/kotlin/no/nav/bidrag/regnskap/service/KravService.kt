@@ -52,7 +52,7 @@ class KravService(
     when (skattResponse.statusCode) {
 
       HttpStatus.ACCEPTED -> {
-        SECURE_LOGGER.info("Mottok svar fra skatt: \n${skattResponse}")
+        SECURE_LOGGER.debug("Mottok svar fra skatt: \n${skattResponse}")
 
         val kravResponse = objectMapper.readValue(skattResponse.body, KravResponse::class.java)
         lagreVellykketOverføringAvKrav(alleIkkeOverførteKonteringer, kravResponse, oppdrag, periode)
@@ -140,7 +140,7 @@ class KravService(
     )
   }
 
-  private fun opprettSkattKravRequest(konteringerListe: List<Kontering>): Krav {
+  fun opprettSkattKravRequest(konteringerListe: List<Kontering>): Krav {
     val kravKonteringerListe = mutableListOf<KravKontering>()
     konteringerListe.forEach { kontering ->
       kravKonteringerListe.add(
@@ -152,7 +152,7 @@ class KravService(
           kravhaverIdent = kontering.oppdragsperiode.oppdrag!!.kravhaverIdent,
           mottakerIdent = kontering.oppdragsperiode.mottakerIdent,
           skyldnerIdent = kontering.oppdragsperiode.oppdrag.skyldnerIdent,
-          belop = kontering.oppdragsperiode.beløp,
+          belop = if (Transaksjonskode.valueOf(kontering.transaksjonskode).negativtBeløp) kontering.oppdragsperiode.beløp.negate() else kontering.oppdragsperiode.beløp,
           valuta = kontering.oppdragsperiode.valuta,
           periode = YearMonth.parse(kontering.overføringsperiode),
           vedtaksdato = kontering.oppdragsperiode.vedtaksdato,

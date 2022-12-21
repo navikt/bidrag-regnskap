@@ -20,6 +20,10 @@ class VedtakHendelseService(
   private val oppdragService: OppdragService
 ) {
 
+  companion object {
+    const val NAV_TSS_IDENT = "80000345435"
+  }
+
   fun behandleHendelse(hendelse: String) {
     val vedtakHendelse = mapVedtakHendelse(hendelse)
 
@@ -51,9 +55,9 @@ class VedtakHendelseService(
     val hendelse = Hendelse(
       type = stonadsendring.stonadType.name,
       vedtakType = vedtakHendelse.vedtakType,
-      kravhaverIdent = stonadsendring.kravhaverId,
-      skyldnerIdent = stonadsendring.skyldnerId,
-      mottakerIdent = stonadsendring.mottakerId,
+      kravhaverIdent = leggTilIdent(stonadsendring.kravhaverId),
+      skyldnerIdent = leggTilIdent(stonadsendring.skyldnerId),
+      mottakerIdent = leggTilIdent(stonadsendring.mottakerId),
       sakId = stonadsendring.sakId,
       vedtakId = vedtakHendelse.vedtakId,
       vedtakDato = vedtakHendelse.vedtakDato,
@@ -72,9 +76,9 @@ class VedtakHendelseService(
       endretEngangsbelopId = engangsbelop.endrerEngangsbelopId,
       type = engangsbelop.type.name,
       vedtakType = vedtakHendelse.vedtakType,
-      kravhaverIdent = engangsbelop.kravhaverId,
-      skyldnerIdent = engangsbelop.skyldnerId,
-      mottakerIdent = engangsbelop.mottakerId,
+      kravhaverIdent = leggTilIdent(engangsbelop.kravhaverId),
+      skyldnerIdent = leggTilIdent(engangsbelop.skyldnerId),
+      mottakerIdent = leggTilIdent(engangsbelop.mottakerId),
       sakId = engangsbelop.sakId,
       vedtakId = vedtakHendelse.vedtakId,
       vedtakDato = vedtakHendelse.vedtakDato,
@@ -92,6 +96,10 @@ class VedtakHendelseService(
       )
     )
     oppdragService.lagreHendelse(hendelse)
+  }
+
+  private fun leggTilIdent(ident: String): String {
+    return if (ident == "NAV") NAV_TSS_IDENT else ident
   }
 
   private fun mapPeriodelisteTilDomene(periodeListe: List<no.nav.bidrag.behandling.felles.dto.vedtak.Periode>): List<Periode> {

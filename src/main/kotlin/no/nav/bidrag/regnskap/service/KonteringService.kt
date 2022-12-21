@@ -112,7 +112,9 @@ class KonteringService(
 
       overførteKonteringerListe.forEach { kontering ->
         val korreksjonskode = Transaksjonskode.valueOf(kontering.transaksjonskode).korreksjonskode
-        if (perioderForNyOppdrasperiode.contains(YearMonth.parse(kontering.overføringsperiode)) && korreksjonskode != null && !erOverførtKonteringAlleredeKorrigert(
+        if ((perioderForNyOppdrasperiode.contains(YearMonth.parse(kontering.overføringsperiode)) || YearMonth.parse(kontering.overføringsperiode).isAfter(perioderForNyOppdrasperiode.max()))
+          && korreksjonskode != null
+          && !erOverførtKonteringAlleredeKorrigert(
             kontering, overførteKonteringerListe
           )
         ) {

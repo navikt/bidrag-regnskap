@@ -1,0 +1,24 @@
+{
+  "vedtakType": "MANUELT",
+  "vedtakId": "779",
+  "vedtakDato": "2022-01-03",
+  "enhetId": "4812",
+  "opprettetAv": "B101173",
+  "opprettetTidspunkt": "2022-01-03T08:05:14.164984472",
+  "stonadsendringListe": [
+  ],
+  "engangsbelopListe": [
+    {
+      "engangsbelopId": "12",
+      "endrerEngangsbelopId": "11",
+      "type": "GEBYR_SKYLDNER",
+      "sakId": "2200381",
+      "skyldnerId": "",
+      "kravhaverId": "NAV",
+      "mottakerId": "NAV",
+      "belop": "1701.10",
+      "valutakode": "NOK",
+      "resultatkode": "GIGI"
+    }
+  ]
+}
