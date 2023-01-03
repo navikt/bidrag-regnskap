@@ -1,5 +1,6 @@
 package no.nav.bidrag.regnskap.service
 
+import no.nav.bidrag.regnskap.consumer.SakConsumer
 import no.nav.bidrag.regnskap.dto.oppdrag.OppdragsperiodeResponse
 import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
@@ -8,7 +9,8 @@ import org.springframework.stereotype.Service
 
 @Service
 class OppdragsperiodeService(
-  val konteringService: KonteringService
+  val konteringService: KonteringService,
+  val sakConsumer: SakConsumer
 ) {
 
   fun hentOppdragsperioderMedKonteringer(oppdrag: Oppdrag): List<OppdragsperiodeResponse> {
@@ -48,7 +50,7 @@ class OppdragsperiodeService(
         Oppdragsperiode(
           vedtakId = hendelse.vedtakId,
           sakId = hendelse.sakId,
-          gjelderIdent = "22222222226", //TODO() Må hente ut BM fra bidrag-sak, eller få over topicen. Hvis finnes -> BM else -> Dummy
+          gjelderIdent = sakConsumer.hentBmFraSak(hendelse.sakId),
           mottakerIdent = hendelse.mottakerIdent,
           beløp = periode.beløp!!,
           valuta = periode.valutakode!!,

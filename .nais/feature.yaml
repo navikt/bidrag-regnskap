@@ -4,6 +4,8 @@ ingresses:
 azure:
   skatt_url: bidrag-stubs.dev.intern.nav.no
   skatt_scope: dev-gcp.bidrag.bidrag-stubs
+  sak_url: bidrag-sak-feature.dev-fss-pub.nais.io
+  sak_scope: dev-fss.bidrag.bidrag-sak-feature
 kafka:
   pool: nav-dev
 kafka-topic-vedtak: bidrag.vedtak-feature

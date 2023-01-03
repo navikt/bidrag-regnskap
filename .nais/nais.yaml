@@ -56,6 +56,10 @@ spec:
       value: {{ bucket.navn }}
     - name: SFTP_HOST
       value: {{ sftp.host }}
+    - name: SAK_URL
+      value: https://{{ azure.skatt_url }}
+    - name: SAK_SCOPE
+      value: https://{{ azure.sak_scope }}
 
   gcp:
     sqlInstances:

@@ -1,5 +1,7 @@
 SKATT_URL: https://bidrag-stubs.dev.intern.nav.no
 SKATT_SCOPE: dev-gcp.bidrag.bidrag-stubs
+SAK_URL: https://bidrag-sak-feature.dev-fss-pub.nais.io
+SAK_SCOPE: dev-fss.bidrag.bidrag-sak-feature
 AZURE_APP_CLIENT_ID: <CLIENT_ID>
 AZURE_APP_CLIENT_SECRET: <CLIENT_SECRET>
 AZURE_APP_TENANT_ID: 966ac572-f5b7-4bbe-aa88-c76419c0f851

@@ -95,7 +95,7 @@ class KonteringService(
   }
 
   private fun vurderType(oppdragsperiode: Oppdragsperiode): String {
-    if(oppdragsperiode.oppdrag?.oppdragsperioder?.filter { it.konteringer?.isNotEmpty() == true }?.isEmpty() == true) {
+    if (oppdragsperiode.oppdrag?.oppdragsperioder?.filter { it.konteringer?.isNotEmpty() == true }?.isEmpty() == true) {
       return Type.NY.name
     }
     return Type.ENDRING.name
@@ -103,7 +103,8 @@ class KonteringService(
 
 
   fun opprettKorreksjonskonteringerForAlleredeOversendteKonteringer(
-    oppdrag: Oppdrag, nyeOppdragsperioder: List<Oppdragsperiode>
+    oppdrag: Oppdrag,
+    nyeOppdragsperioder: List<Oppdragsperiode>
   ) {
     val overførteKonteringerListe = finnAlleOverførteKontering(oppdrag)
 
@@ -112,11 +113,12 @@ class KonteringService(
 
       overførteKonteringerListe.forEach { kontering ->
         val korreksjonskode = Transaksjonskode.valueOf(kontering.transaksjonskode).korreksjonskode
-        if ((perioderForNyOppdrasperiode.contains(YearMonth.parse(kontering.overføringsperiode)) || YearMonth.parse(kontering.overføringsperiode).isAfter(perioderForNyOppdrasperiode.max()))
-          && korreksjonskode != null
-          && !erOverførtKonteringAlleredeKorrigert(
-            kontering, overførteKonteringerListe
-          )
+
+        if (korreksjonskode != null
+          && !erOverførtKonteringAlleredeKorrigert(kontering, overførteKonteringerListe)
+          && (erPeriodeOverlappende(perioderForNyOppdrasperiode, kontering)
+              || slutterNyeOppdragsperiodeFørOverførteKonteringsPeriode(kontering, perioderForNyOppdrasperiode)
+              || erKonteringGebyr(kontering))
         ) {
           persistenceService.lagreKontering(
             Kontering(
@@ -131,6 +133,19 @@ class KonteringService(
       }
     }
   }
+
+  private fun erKonteringGebyr(kontering: Kontering) =
+    (kontering.søknadType == SøknadType.FABM.name || kontering.søknadType == SøknadType.FABP.name)
+
+  private fun slutterNyeOppdragsperiodeFørOverførteKonteringsPeriode(
+    kontering: Kontering,
+    perioderForNyOppdrasperiode: List<YearMonth>
+  ) = YearMonth.parse(kontering.overføringsperiode).isAfter(perioderForNyOppdrasperiode.max())
+
+  private fun erPeriodeOverlappende(
+    perioderForNyOppdrasperiode: List<YearMonth>,
+    kontering: Kontering
+  ) = perioderForNyOppdrasperiode.contains(YearMonth.parse(kontering.overføringsperiode))
 
   private fun vurderOmNyEllerEndring(indexOppdragsperiode: Int, indexPeriode: Int, oppdatering: Boolean): String {
     return if (indexOppdragsperiode == 0 && indexPeriode == 0 && !oppdatering) Type.NY.toString() else Type.ENDRING.toString()
