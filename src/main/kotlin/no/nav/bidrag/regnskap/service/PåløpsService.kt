@@ -4,6 +4,7 @@ import no.nav.bidrag.regnskap.dto.påløp.PåløpRequest
 import no.nav.bidrag.regnskap.dto.påløp.PåløpResponse
 import no.nav.bidrag.regnskap.persistence.entity.Påløp
 import org.springframework.stereotype.Service
+import java.time.YearMonth
 
 @Service
 class PåløpsService(
@@ -26,7 +27,7 @@ class PåløpsService(
       )
     }
 
-    return påløpResponseListe
+    return påløpResponseListe.sortedBy { YearMonth.parse(it.forPeriode) }
   }
 
   fun lagrePåløp(påløpRequest: PåløpRequest): Int {
