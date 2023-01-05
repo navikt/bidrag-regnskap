@@ -127,7 +127,7 @@ class PersistenceService(
     return driftsavvikRepository.save(driftsavvik)
   }
 
-  fun finnesAktivtDriftsavvik(): Boolean {
+  fun harAktivtDriftsavvik(): Boolean {
     return driftsavvikRepository.findAllByTidspunktTilAfterOrTidspunktTilIsNull(LocalDateTime.now()).isNotEmpty()
   }
 

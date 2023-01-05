@@ -43,6 +43,6 @@ class SendKravQueue(
   }
 
   private fun harAktiveDriftAvvik(): Boolean {
-    return persistenceService.finnesAktivtDriftsavvik()
+    return persistenceService.harAktivtDriftsavvik()
   }
 }

@@ -1,7 +1,6 @@
 package no.nav.bidrag.regnskap.service
 
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
@@ -10,10 +9,13 @@ import io.mockk.verify
 import no.nav.bidrag.regnskap.consumer.SkattConsumer
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.utils.TestData
+import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.*
 import org.springframework.http.ResponseEntity
+import org.springframework.web.client.HttpClientErrorException
+import org.springframework.web.client.HttpServerErrorException
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
@@ -43,11 +45,9 @@ class KravServiceTest {
     )
     every { skattConsumer.sendKrav(any()) } returns ResponseEntity.accepted().body(batchUid)
 
-    val restResponse = kravService.sendKrav(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
+    kravService.sendKrav(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
 
     verify(exactly = 1) { skattConsumer.sendKrav(any()) }
-
-    restResponse.statusCode shouldBe HttpStatus.OK
   }
 
   @Test
@@ -57,9 +57,60 @@ class KravServiceTest {
     )
     every { skattConsumer.sendKrav(any()) } returns ResponseEntity.accepted().body(batchUid)
 
-    val restResponse = kravService.sendKrav(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
+    kravService.sendKrav(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
 
-    restResponse.statusCode shouldBe HttpStatus.OK
+    verify(exactly = 1) { skattConsumer.sendKrav(any()) }
+  }
+
+  @Test
+  fun `skal kaste feil om kontering ikke går igjennom validering`() {
+    every { persistenceService.hentOppdrag(oppdragsId) } returns opprettOppdragOptionalForPeriode(
+      now, now.plusMonths(1)
+    )
+    every { skattConsumer.sendKrav(any()) } returns ResponseEntity.badRequest().body(
+        """
+          {
+            "kravKonteringsfeil": [
+            {
+              "feilkode": "TOLKNING",
+              "feilmelding": "Tolkning feilet i Elin.",
+              "kravKonteringId": {
+                "transaksjonskode": "B1",
+                "periode": "2022-04",
+                "delytelsesId": "123456789"
+               }
+            }
+          ]
+        }
+        """
+    )
+    shouldThrow<HttpClientErrorException> {
+      kravService.sendKrav(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
+    }
+  }
+
+  @Test
+  fun `skal kaste feil om tjenesten er slått av`() {
+    every { persistenceService.hentOppdrag(oppdragsId) } returns opprettOppdragOptionalForPeriode(
+      now, now.plusMonths(1)
+    )
+    every { skattConsumer.sendKrav(any()) } returns ResponseEntity.status(SERVICE_UNAVAILABLE).body(batchUid)
+
+    shouldThrow<HttpServerErrorException> {
+      kravService.sendKrav(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
+    }
+  }
+
+  @Test
+  fun `skal kaste feil om autentisering feiler`() {
+    every { persistenceService.hentOppdrag(oppdragsId) } returns opprettOppdragOptionalForPeriode(
+      now, now.plusMonths(1)
+    )
+    every { skattConsumer.sendKrav(any()) } returns ResponseEntity.status(UNAUTHORIZED).body(batchUid)
+
+    shouldThrow<JwtTokenUnauthorizedException> {
+      kravService.sendKrav(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
+    }
   }
 
   @Test
@@ -78,9 +129,9 @@ class KravServiceTest {
       )
     )
 
-    val restResponse = kravService.sendKrav(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
+    kravService.sendKrav(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
 
-    restResponse.statusCode shouldBe HttpStatus.NO_CONTENT
+    verify(exactly = 0) { skattConsumer.sendKrav(any()) }
   }
 
   @Test

@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 
 private val LOGGER = LoggerFactory.getLogger(SendKravScheduler::class.java)
 
@@ -29,15 +30,15 @@ class SendKravScheduler(
     if (harAktiveDriftAvvik()) {
       LOGGER.info("Det finnes aktive driftsavvik. Starter derfor ikke overføring av konteringer.")
       return
-    } else if (kravService.erVedlikeholdsmodusPåslått()) {
+    } else if (erVedlikeholdsmodusPåslått()) {
       LOGGER.info("Vedlikeholdsmodus er påslått! Starter derfor ikke overføring av kontering.")
       return
     }
 
-    val oppdragMedIkkeOverforteKonteringer = hentOppdragMedIkkeOverforteKonteringer()
+    val oppdragMedIkkeOverforteKonteringer = hentOppdragMedIkkeOverforteKonteringerHvorKonteringIkkeErUtsatt()
 
     if (oppdragMedIkkeOverforteKonteringer.isEmpty()) {
-      LOGGER.info("Det finnes ingen oppdrag med unsendte konteringer.")
+      LOGGER.info("Det finnes ingen oppdrag med unsendte konteringer som ikke skal utsettes.")
       return
     }
 
@@ -47,11 +48,20 @@ class SendKravScheduler(
     LOGGER.info("Alle oppdrag(antall: ${oppdragMedIkkeOverforteKonteringer.size}) med unsendte konteringer er nå overført til skatt.")
   }
 
-  private fun harAktiveDriftAvvik(): Boolean {
-    return persistenceService.finnesAktivtDriftsavvik()
+  private fun erVedlikeholdsmodusPåslått(): Boolean {
+    return kravService.erVedlikeholdsmodusPåslått()
   }
 
-  private fun hentOppdragMedIkkeOverforteKonteringer() = persistenceService.hentAlleIkkeOverførteKonteringer().flatMap {
-    listOf(it.oppdragsperiode?.oppdrag?.oppdragId)
-  }.distinct().filterNotNull()
+  private fun harAktiveDriftAvvik(): Boolean {
+    return persistenceService.harAktivtDriftsavvik()
+  }
+
+  private fun hentOppdragMedIkkeOverforteKonteringerHvorKonteringIkkeErUtsatt(): List<Int> {
+    return persistenceService.hentAlleIkkeOverførteKonteringer()
+      .flatMap { listOf(it.oppdragsperiode?.oppdrag) }
+      .filterNot { it?.utsattTilDato?.isAfter(LocalDate.now()) == true }
+      .map { it?.oppdragId }
+      .distinct()
+      .filterNotNull()
+  }
 }

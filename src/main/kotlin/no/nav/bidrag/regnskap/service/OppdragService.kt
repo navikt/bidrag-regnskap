@@ -4,6 +4,7 @@ import no.nav.bidrag.regnskap.dto.oppdrag.OppdragResponse
 import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
 import no.nav.bidrag.regnskap.hendelse.krav.SendKravQueue
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
+import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -90,8 +91,7 @@ class OppdragService(
   fun oppdaterOppdrag(
     hendelse: Hendelse, oppdrag: Oppdrag
   ): Int {
-
-    //TODO: Håndtere oppdatering av skyldnerIdent/kravhaver, egentlig alt som ligger på oppdrag nivå.
+    //TODO: Håndtere oppdatering av skyldnerIdent/kravhaver
     if (hendelse.endretEngangsbelopId != null) {
       oppdrag.engangsbeløpId = hendelse.engangsbelopId
     }
@@ -103,12 +103,18 @@ class OppdragService(
       nyeOppdragsperioder, hendelse, true
     )
 
-    oppdrag.oppdragsperioder = nyeOppdragsperioder
-    oppdrag.endretTidspunkt = LocalDateTime.now()
+    oppdatererVerdierPåOppdrag(hendelse, oppdrag, nyeOppdragsperioder)
 
     val oppdragId = persistenceService.lagreOppdrag(oppdrag)!!
     sendKravQueue.leggTil(oppdragId)
 
     return oppdragId
+  }
+
+  private fun oppdatererVerdierPåOppdrag(hendelse: Hendelse, oppdrag: Oppdrag, nyeOppdragsperioder: List<Oppdragsperiode>) {
+    oppdrag.oppdragsperioder = nyeOppdragsperioder
+    oppdrag.endretTidspunkt = LocalDateTime.now()
+    oppdrag.vedtakType = hendelse.vedtakType.name
+    oppdrag.utsattTilDato = hendelse.utsattTilDato
   }
 }

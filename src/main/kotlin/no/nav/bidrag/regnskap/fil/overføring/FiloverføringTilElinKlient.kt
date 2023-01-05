@@ -36,7 +36,8 @@ class FiloverføringTilElinKlient(
 
       channel = session.openChannel(FiloverføringTilElinConfig.JSCH_CHANNEL_TYPE_SFTP) as ChannelSftp
       channel.connect()
-      LOGGER.info("Oppkobling mot filsluse var vellykket! \nStarter opplasting av fil: $filnavn fra GCP-bucket...")
+      LOGGER.info("Oppkobling mot filsluse var vellykket!")
+      LOGGER.info("Starter opplasting av fil: $filnavn fra GCP-bucket...")
       channel.cd(config.directory)
       channel.put(gcpFilBucket.hentFil(filmappe + filnavn), filnavn)
       LOGGER.info("Fil: $filnavn har blitt lastet opp på filsluse!")

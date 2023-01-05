@@ -31,7 +31,7 @@ class GcpFilBucket(
   fun finnesFil(filnavn: String): Boolean {
     if(storage.get(lagBlobinfo(filnavn).blobId) != null) {
       LOGGER.info("Fil: $filnavn finnes allerede i GCP-bucket: $bucketNavn! Filen blir derfor ikke lastet opp. " +
-          "\nOm det er ønskelig å erstatte eksisterende fil må den manuelt slettes fra $bucketNavn.")
+          "Om det er ønskelig å erstatte eksisterende fil må den manuelt slettes fra GCP-bucket: $bucketNavn.")
       return true
     }
     return false

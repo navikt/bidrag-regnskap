@@ -17,8 +17,8 @@ import no.nav.bidrag.regnskap.persistence.entity.OverføringKontering
 import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
+import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.HttpServerErrorException
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -32,16 +32,20 @@ class KravService(
   val skattConsumer: SkattConsumer, val persistenceService: PersistenceService
 ) {
 
-  fun sendKrav(oppdragId: Int, periode: YearMonth): ResponseEntity<*> {
+  fun sendKrav(oppdragId: Int, periode: YearMonth) {
     LOGGER.info("Starter overføring av krav til skatt for oppdragId: $oppdragId")
 
     val oppdrag = persistenceService.hentOppdrag(oppdragId).get()
+
+    if(oppdrag.utsattTilDato?.isAfter(LocalDate.now()) == true) {
+      LOGGER.info("Oppdrag $oppdragId skal ikke oversendes før ${oppdrag.utsattTilDato}. Avventer oversending av krav.")
+      return
+    }
     val oppdragsperioderMedIkkeOverførteKonteringer = hentOppdragsperioderMedIkkeOverførteKonteringer(oppdrag)
 
     if (oppdragsperioderMedIkkeOverførteKonteringer.isEmpty()) {
       LOGGER.info("Alle konteringer er allerede overført for oppdrag $oppdragId i periode $periode")
-      return ResponseEntity.status(HttpStatus.NO_CONTENT)
-        .body("Alle konteringer er allerede overført for oppdrag $oppdragId i periode $periode")
+      return
     }
 
     val alleIkkeOverførteKonteringer = finnAlleIkkeOverførteKonteringer(oppdragsperioderMedIkkeOverførteKonteringer)
@@ -56,7 +60,6 @@ class KravService(
 
         val kravResponse = objectMapper.readValue(skattResponse.body, KravResponse::class.java)
         lagreVellykketOverføringAvKrav(alleIkkeOverførteKonteringer, kravResponse, oppdrag, periode)
-        return ResponseEntity.ok(kravResponse)
       }
 
       HttpStatus.BAD_REQUEST -> {
@@ -65,7 +68,7 @@ class KravService(
 
         val kravfeil = objectMapper.readValue(skattResponse.body, Kravfeil::class.java)
         lagreFeiletOverføringAvKrav(alleIkkeOverførteKonteringer, kravfeil.toString())
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(kravfeil)
+        throw HttpClientErrorException(skattResponse.statusCode)
       }
 
       HttpStatus.SERVICE_UNAVAILABLE -> {

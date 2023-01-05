@@ -24,7 +24,7 @@ data class Oppdrag(
   val stønadType: String,
 
   @Column(name = "vedtak_type")
-  val vedtakType: String,
+  var vedtakType: String,
 
   @Column(name = "kravhaver_ident")
   val kravhaverIdent: String? = null,
@@ -36,7 +36,7 @@ data class Oppdrag(
   val eksternReferanse: String? = null,
 
   @Column(name = "utsatt_til_dato")
-  val utsattTilDato: LocalDate? = null,
+  var utsattTilDato: LocalDate? = null,
 
   @Column(name = "sist_oversendte_periode")
   var sistOversendtePeriode: String? = null,

@@ -323,7 +323,7 @@ internal class PersistenceServiceIT {
     @Test
     @Order(2)
     fun finnesAktivtDriftsavvik() {
-      val aktivtDriftsavvik = persistenceService.finnesAktivtDriftsavvik()
+      val aktivtDriftsavvik = persistenceService.harAktivtDriftsavvik()
 
       aktivtDriftsavvik shouldBe true
     }
