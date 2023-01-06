@@ -10,12 +10,12 @@ import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
 import java.time.LocalDate
 
-private val LOGGER = LoggerFactory.getLogger((OpprettAvstemningsfilerScheduler::class.java))
+private val LOGGER = LoggerFactory.getLogger((AvstemningsfilerScheduler::class.java))
 
 @Configuration
 @EnableScheduling
 @EnableSchedulerLock(defaultLockAtMostFor = "10m")
-class OpprettAvstemningsfilerScheduler(
+class AvstemningsfilerScheduler(
   private val avstemningService: AvstemningService
 ) {
 

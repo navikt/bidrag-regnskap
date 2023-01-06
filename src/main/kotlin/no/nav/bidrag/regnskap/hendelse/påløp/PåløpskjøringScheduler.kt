@@ -30,10 +30,15 @@ class PåløpskjøringScheduler(
     LOGGER.info("Starter skedulert påløpskjøring..")
     persistenceService.hentIkkeKjørtePåløp().minByOrNull { it.forPeriode }.let {
       if (it != null) {
-        if (it.kjøredato.isBefore(LocalDateTime.now())) påløpskjøringService.startPåløpskjøring(it, true)
-        else LOGGER.info("Fant ingen påløp som skulle kjøres på dette tidspunkt. " +
-            "Neste påløpskjøring er for periode: ${it.forPeriode} som kjøres: ${it.kjøredato}")
-      } else LOGGER.error("Det finnes ingen fremtidige planlagte påløp! Påløpsfil kommer ikke til å generes før dette legges inn!")
+        if (it.kjøredato.isBefore(LocalDateTime.now())) {
+          påløpskjøringService.startPåløpskjøring(it, true)
+        }
+        else {
+          LOGGER.info("Fant ingen påløp som skulle kjøres på dette tidspunkt. Neste påløpskjøring er for periode: ${it.forPeriode} som kjøres: ${it.kjøredato}")
+        }
+      } else {
+        LOGGER.error("Det finnes ingen fremtidige planlagte påløp! Påløpsfil kommer ikke til å generes før dette legges inn!")
+      }
     }
   }
 }
