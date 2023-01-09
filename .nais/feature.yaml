@@ -15,3 +15,5 @@ bucket:
   navn: bidrag-regnskap-feature
 sftp:
   host: sftp-q.nav.no
+maskinporten:
+  url: https://test.maskinporten.no

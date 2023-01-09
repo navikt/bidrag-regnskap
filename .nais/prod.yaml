@@ -15,3 +15,5 @@ bucket:
   navn: bidrag-regnskap-prod
 sftp:
   host: sftp.nav.no
+maskinporten:
+  url: https://maskinporten.no
