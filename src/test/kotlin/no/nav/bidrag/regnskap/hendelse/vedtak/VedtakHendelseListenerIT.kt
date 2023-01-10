@@ -47,6 +47,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.Pageable
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.test.context.EmbeddedKafka
+import org.springframework.test.annotation.Rollback
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
@@ -73,6 +74,7 @@ private const val TOPIC = "bidrag.vedtak-feature"
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 @SpringBootTest(classes = [BidragRegnskapLocal::class])
 @EmbeddedKafka(partitions = 1, topics = [TOPIC], brokerProperties = ["listeners=PLAINTEXT://localhost:9092", "port=9092"])
+@Rollback(false)
 internal class VedtakHendelseListenerIT {
 
   companion object {
