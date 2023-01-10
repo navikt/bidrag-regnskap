@@ -17,6 +17,7 @@ import no.nav.bidrag.behandling.felles.enums.StonadType
 import no.nav.bidrag.behandling.felles.enums.StonadType.*
 import no.nav.bidrag.regnskap.BidragRegnskapLocal
 import no.nav.bidrag.regnskap.consumer.KravApiWireMock
+import no.nav.bidrag.regnskap.consumer.SakApiWireMock
 import no.nav.bidrag.regnskap.dto.enumer.SøknadType
 import no.nav.bidrag.regnskap.dto.enumer.SøknadType.FABM
 import no.nav.bidrag.regnskap.dto.enumer.SøknadType.FABP
@@ -80,6 +81,7 @@ internal class VedtakHendelseListenerIT {
     private val PÅLØPSDATO = LocalDate.of(2022, 6, 1)
 
     private var kravApiWireMock: KravApiWireMock = KravApiWireMock()
+    private var sakApiWireMock: SakApiWireMock = SakApiWireMock()
     private var maskinportenWireMock: MaskinportenWireMock = MaskinportenWireMock()
 
     @Container
@@ -134,8 +136,10 @@ internal class VedtakHendelseListenerIT {
   @BeforeEach
   fun beforeEach() {
     kravApiWireMock.reset()
+    sakApiWireMock.reset()
     maskinportenWireMock.reset()
     kravApiWireMock.kravMedGyldigResponse()
+    sakApiWireMock.sakMedGyldigResponse()
     kravApiWireMock.livenessMedGyldigResponse()
     maskinportenWireMock.kravMedGyldigResponse()
   }
@@ -143,6 +147,7 @@ internal class VedtakHendelseListenerIT {
   @AfterAll
   internal fun teardown() {
     kravApiWireMock.stop()
+    sakApiWireMock.stop()
     maskinportenWireMock.stop()
     file.close()
   }
