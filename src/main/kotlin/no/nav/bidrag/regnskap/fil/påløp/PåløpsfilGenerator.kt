@@ -1,5 +1,6 @@
 package no.nav.bidrag.regnskap.fil
 
+import kotlinx.coroutines.yield
 import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
 import no.nav.bidrag.regnskap.fil.overføring.FiloverføringTilElinKlient
 import no.nav.bidrag.regnskap.persistence.bucket.GcpFilBucket
@@ -33,7 +34,7 @@ class PåløpsfilGenerator(
 
   private val documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
 
-  fun skrivPåløpsfilOgLastOppPåFilsluse(konteringer: List<Kontering>, påløp: Påløp) {
+  suspend fun skrivPåløpsfilOgLastOppPåFilsluse(konteringer: List<Kontering>, påløp: Påløp) {
     val now = LocalDate.now()
     val påløpsMappe = "påløp/"
     val påløpsfilnavn = "paaloop_D" + now.format(DateTimeFormatter.ofPattern("yyMMdd")).toString() + ".xml"
@@ -51,6 +52,7 @@ class PåløpsfilGenerator(
       var index = 0
       var sum = BigDecimal.ZERO
       finnAlleOppdragFraKonteringer(konteringer).forEach { (_, konteringerForOppdrag) ->
+        yield()
 
         if (++index % 100 == 0) {
           LOGGER.info("Har skrevet $index av ${konteringer.size} konteringer til påløpsfil...")
@@ -60,6 +62,7 @@ class PåløpsfilGenerator(
         rootElement.appendChild(oppdragElement)
 
         konteringerForOppdrag.forEach { kontering ->
+          yield()
           opprettKonteringBr10(dokument, oppdragElement, kontering, now)
 
           sum += kontering.oppdragsperiode!!.beløp

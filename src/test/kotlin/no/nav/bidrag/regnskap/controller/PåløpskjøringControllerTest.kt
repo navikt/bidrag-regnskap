@@ -5,6 +5,8 @@ import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import no.nav.bidrag.regnskap.service.PåløpskjøringService
 import no.nav.bidrag.regnskap.utils.TestData
 import org.junit.jupiter.api.Test
@@ -22,7 +24,8 @@ class PåløpskjøringControllerTest{
   private lateinit var påløpskjøringController: PåløpskjøringController
 
   @Test
-  fun `skal ved påløpskjøring returnere 201`() {
+  @OptIn(ExperimentalCoroutinesApi::class)
+  fun `skal ved påløpskjøring returnere 201`() = runTest {
     val påløp = TestData.opprettPåløp(påløpId = 1, fullførtTidspunkt = null, forPeriode = "2022-01")
 
     every { påløpskjøringService.hentPåløp() } returns påløp
@@ -33,7 +36,8 @@ class PåløpskjøringControllerTest{
   }
 
   @Test
-  fun `skal om det ikke finnes ikke kjørte påløpsperioder returnere 204`() {
+  @OptIn(ExperimentalCoroutinesApi::class)
+  fun `skal om det ikke finnes ikke kjørte påløpsperioder returnere 204`() = runTest {
     every { påløpskjøringService.hentPåløp() } returns null
 
     val response = påløpskjøringController.startPåløpskjøring()

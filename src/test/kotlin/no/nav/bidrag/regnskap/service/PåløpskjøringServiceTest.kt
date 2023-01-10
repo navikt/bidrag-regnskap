@@ -6,6 +6,8 @@ import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import no.nav.bidrag.regnskap.consumer.SkattConsumer
 import no.nav.bidrag.regnskap.fil.PåløpsfilGenerator
 import no.nav.bidrag.regnskap.utils.TestData
@@ -46,7 +48,8 @@ class PåløpskjøringServiceTest {
   }
 
   @Test
-  fun `skal ikke opprette konteringer for utgåtte oppdragsperioder`() {
+  @OptIn(ExperimentalCoroutinesApi::class)
+  fun `skal ikke opprette konteringer for utgåtte oppdragsperioder`() = runTest {
     val påløp = TestData.opprettPåløp(påløpId = 1, forPeriode = "2022-03")
     val utgåttOppdragsperiode = TestData.opprettOppdragsperiode(
       periodeFra = LocalDate.of(2022, 1, 1),
@@ -63,7 +66,8 @@ class PåløpskjøringServiceTest {
   }
 
   @Test
-  fun `skal opprette konteringer for løpende oppdragsperioder`() {
+  @OptIn(ExperimentalCoroutinesApi::class)
+  fun `skal opprette konteringer for løpende oppdragsperioder`() = runTest {
     val påløp = TestData.opprettPåløp(påløpId = 2, forPeriode = "2022-03")
     val løpendeOppdragsperiode = TestData.opprettOppdragsperiode(
       periodeFra = LocalDate.of(2022, 1, 1),

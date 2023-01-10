@@ -2,9 +2,12 @@ package no.nav.bidrag.regnskap.hendelse.krav
 
 import no.nav.bidrag.regnskap.service.KravService
 import no.nav.bidrag.regnskap.service.PersistenceService
+import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.client.HttpClientErrorException
+import org.springframework.web.client.HttpServerErrorException
 import java.util.concurrent.LinkedBlockingQueue
 
 private val LOGGER = LoggerFactory.getLogger(SendKravQueue::class.java)
@@ -23,7 +26,7 @@ class SendKravQueue(
     kravPublisher.publishKravEvent(oppdragId.toString())
   }
 
-  @Transactional
+  @Transactional(noRollbackFor = [HttpClientErrorException::class, HttpServerErrorException::class, JwtTokenUnauthorizedException::class])
   fun send() {
     if(harAktiveDriftAvvik()) {
       LOGGER.info("Det finnes aktive driftsavvik! Starter derfor ikke overføring av kontering.")

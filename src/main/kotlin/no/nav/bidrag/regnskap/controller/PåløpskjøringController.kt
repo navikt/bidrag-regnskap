@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
+import kotlinx.coroutines.runBlocking
 import no.nav.bidrag.regnskap.service.PåløpskjøringService
 import no.nav.security.token.support.core.api.Protected
 import org.springframework.http.HttpStatus
@@ -47,8 +48,32 @@ class PåløpskjøringController(
   )
   fun startPåløpskjøring(): ResponseEntity<Int> {
     val påløp = påløpskjøringService.hentPåløp() ?: return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
+    runBlocking { påløpskjøringService.startPåløpskjøring(påløp, false) }
+    return ResponseEntity.status(HttpStatus.CREATED).body(påløp.påløpId)
+  }
 
-    påløpskjøringService.startPåløpskjøring(påløp, false)
-
-    return ResponseEntity.status(HttpStatus.CREATED).body(påløp.påløpId)  }
+  @GetMapping("/stop_palopskjoring")
+  @Operation(
+    summary = "Stopper pågående generering av påløpsfil",
+    description = "Operasjon for å stoppe påløpskjøring.",
+    security = [SecurityRequirement(name = "bearer-key")]
+  )
+  @ApiResponses(
+    value = [ApiResponse(
+      responseCode = "200",
+      description = "Påløpskjøringen er stoppet."
+    ), ApiResponse(
+      responseCode = "401",
+      description = "Klienten ikke er autentisert.",
+      content = [Content()]
+    ), ApiResponse(
+      responseCode = "403",
+      description = "Klienten ikke har tilgang.",
+      content = [Content()]
+    )]
+  )
+  fun stopPågåendePåløpskjøring(): ResponseEntity<Any> {
+    påløpskjøringService.stoppPågåendePåløpskjøring()
+    return ResponseEntity.ok().build()
+  }
 }
