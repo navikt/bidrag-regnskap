@@ -11,3 +11,9 @@ CREATE TABLE IF NOT EXISTS oppdrag
     endret_tidspunkt        timestamp,
     engangsbelop_id         integer
 );
+
+CREATE INDEX oppdrag_stonad_type_index ON oppdrag (stonad_type);
+CREATE INDEX oppdrag_kravhaver_ident_index ON oppdrag (kravhaver_ident);
+CREATE INDEX oppdrag_skyldner_ident_index ON oppdrag (skyldner_ident);
+CREATE INDEX oppdrag_ekstern_referanse_index ON oppdrag (ekstern_referanse);
+CREATE INDEX oppdrag_engangsbelop_id_index ON oppdrag (engangsbelop_id);

@@ -7,3 +7,6 @@ CREATE TABLE IF NOT EXISTS driftsavvik
     opprettet_av   text,
     arsak          text
 );
+
+CREATE INDEX driftsavvik_palop_id_index ON driftsavvik (palop_id);
+CREATE INDEX driftsavvik_tidspunkt_til_index ON driftsavvik (tidspunkt_til);

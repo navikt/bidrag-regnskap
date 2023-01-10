@@ -19,3 +19,5 @@ CREATE TABLE IF NOT EXISTS oppdragsperioder
 
     CONSTRAINT delytelses_id_unique UNIQUE (delytelses_id)
 );
+
+CREATE INDEX aktiv_til_index ON oppdragsperioder (aktiv_til);

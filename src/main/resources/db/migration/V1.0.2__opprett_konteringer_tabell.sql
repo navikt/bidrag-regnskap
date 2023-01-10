@@ -10,3 +10,5 @@ CREATE TABLE IF NOT EXISTS konteringer
     gebyr_rolle          text,
     sendt_i_palopsfil    boolean NOT NULL
 );
+
+CREATE INDEX konteringer_overforingstidspunkt_index ON konteringer (overforingstidspunkt);

@@ -6,3 +6,6 @@ CREATE TABLE IF NOT EXISTS palop
     for_periode        text      NOT NULL,
     CONSTRAINT for_periode_unique UNIQUE (for_periode)
 );
+
+CREATE INDEX for_periode_index ON palop (for_periode);
+CREATE INDEX fullfort_tidspunkt_index ON palop (fullfort_tidspunkt);
