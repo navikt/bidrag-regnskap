@@ -159,6 +159,10 @@ internal class VedtakHendelseListenerIT {
   fun `skal opprette gybyr for skyldner`() {
     val vedtakHendelse = hentFilOgSendPåKafka("gebyrSkyldner.json", 1)
 
+    await().atMost(TEN_SECONDS).until {
+      return@until persistenceService.hentOppdrag(1).isPresent
+    }
+
     val kontering = assertVedOpprettelseAvEngangsbeløp(
       1,
       vedtakHendelse,
@@ -190,6 +194,10 @@ internal class VedtakHendelseListenerIT {
   @Order(3)
   fun `skal opprette gebyr for mottaker`() {
     val vedtakHendelse = hentFilOgSendPåKafka("gebyrMottaker.json", 4)
+
+    await().atMost(TEN_SECONDS).until {
+      return@until persistenceService.hentOppdrag(2).isPresent
+    }
 
     val kontering = assertVedOpprettelseAvEngangsbeløp(
       2,
@@ -223,6 +231,10 @@ internal class VedtakHendelseListenerIT {
   fun `skal opprette særtilskudd`() {
     val vedtakHendelse = hentFilOgSendPåKafka("særtilskudd.json", 7)
 
+    await().atMost(TEN_SECONDS).until {
+      return@until persistenceService.hentOppdrag(3).isPresent
+    }
+
     val kontering = assertVedOpprettelseAvEngangsbeløp(
       3, vedtakHendelse, SAERTILSKUDD, E1, 100000002, SøknadType.EN
     )
@@ -249,6 +261,10 @@ internal class VedtakHendelseListenerIT {
   @Order(7)
   fun `skal opprette tilbakekreving`() {
     val vedtakHendelse = hentFilOgSendPåKafka("tilbakekreving.json", 10)
+
+    await().atMost(TEN_SECONDS).until {
+      return@until persistenceService.hentOppdrag(4).isPresent
+    }
 
     val kontering = assertVedOpprettelseAvEngangsbeløp(
       4,
@@ -283,6 +299,10 @@ internal class VedtakHendelseListenerIT {
   fun `skal opprette ettergivelse`() {
     val vedtakHendelse = hentFilOgSendPåKafka("ettergivelse.json", 14)
 
+    await().atMost(TEN_SECONDS).until {
+      return@until persistenceService.hentOppdrag(5).isPresent
+    }
+
     val kontering = assertVedOpprettelseAvEngangsbeløp(
       5,
       vedtakHendelse,
@@ -300,6 +320,10 @@ internal class VedtakHendelseListenerIT {
   fun `skal opprette direkte oppgjør`() {
     val vedtakHendelse = hentFilOgSendPåKafka("direkteOppgjor.json", 15)
 
+    await().atMost(TEN_SECONDS).until {
+      return@until persistenceService.hentOppdrag(7).isPresent
+    }
+
     val kontering = assertVedOpprettelseAvEngangsbeløp(
       7,
       vedtakHendelse,
@@ -316,6 +340,10 @@ internal class VedtakHendelseListenerIT {
   @Order(11)
   fun `skal opprette ettergivelse tilbakekreving`() {
     val vedtakHendelse = hentFilOgSendPåKafka("ettergivelseTilbakekreving.json", 16)
+
+    await().atMost(TEN_SECONDS).until {
+      return@until persistenceService.hentOppdrag(8).isPresent
+    }
 
     val kontering = assertVedOpprettelseAvEngangsbeløp(
       8,
@@ -336,6 +364,11 @@ internal class VedtakHendelseListenerIT {
   @Order(12)
   fun `skal opprette bidragsforskudd`() {
     val vedtakHendelse = hentFilOgSendPåKafka("bidragsforskudd.json", 31, skyldnerIdent, kravhaverIdent)
+
+    await().atMost(TEN_SECONDS).until {
+      return@until persistenceService.hentOppdrag(9).isPresent
+    }
+
     val oppdrag = assertStønader(
       9,
       vedtakHendelse,
@@ -392,6 +425,10 @@ internal class VedtakHendelseListenerIT {
       barn1 = barn1Bidrag,
       barn2 = barn2Bidrag
     )
+
+    await().atMost(TEN_SECONDS).until {
+      return@until persistenceService.hentOppdrag(10).isPresent
+    }
 
     val oppdrag1 = assertStønader(
       10,
@@ -468,6 +505,11 @@ internal class VedtakHendelseListenerIT {
       "Oppdaterer barnebidrag for barn 1 med 10kr."
     )
 
+
+    await().atMost(TEN_SECONDS).until {
+      return@until persistenceService.hentOppdrag(11).isPresent
+    }
+
     val oppdrag2 = assertStønader(
       11,
       vedtakHendelse,
@@ -500,6 +542,11 @@ internal class VedtakHendelseListenerIT {
       barn1 = barn1Oppfostring,
       barn2 = barn2Oppfostring
     )
+
+    await().atMost(TEN_SECONDS).until {
+      return@until persistenceService.hentOppdrag(14).isPresent
+    }
+
     val oppdrag1 = assertStønader(
       14,
       vedtakHendelse,
@@ -509,6 +556,11 @@ internal class VedtakHendelseListenerIT {
       B1,
       SøknadType.EN
     )
+
+    await().atMost(TEN_SECONDS).until {
+      return@until persistenceService.hentOppdrag(15).isPresent
+    }
+
     val oppdrag2 = assertStønader(
       15,
       vedtakHendelse,
@@ -580,6 +632,10 @@ internal class VedtakHendelseListenerIT {
       kravhaverIdent = kravhaverIdEktefellebidrag,
     )
 
+    await().atMost(TEN_SECONDS).until {
+      return@until persistenceService.hentOppdrag(16).isPresent
+    }
+
     val oppdrag = assertStønader(
       16,
       vedtakHendelse,
@@ -634,6 +690,11 @@ internal class VedtakHendelseListenerIT {
       kravhaverIdent = kravhaverIdEktefellebidrag,
     )
 
+    await().atMost(TEN_SECONDS).until {
+      return@until persistenceService.hentOppdrag(17).isPresent
+    }
+
+
     val oppdrag = assertStønader(
       17,
       vedtakHendelse,
@@ -682,6 +743,10 @@ internal class VedtakHendelseListenerIT {
       "motregning.json",
       172
     )
+
+    await().atMost(TEN_SECONDS).until {
+      return@until persistenceService.hentOppdrag(18).isPresent
+    }
 
     val oppdrag = assertStønader(
       18,
