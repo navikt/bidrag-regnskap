@@ -98,7 +98,7 @@ class AvstemningsfilGenerator(
               + "\n")
             .toByteArray()
         )
-        totalSum += avstemningSummering.sum
+        totalSum += if(avstemningSummering.transaksjonskode.negativtBeløp) avstemningSummering.sum.negate() else avstemningSummering.sum
         totalAntall++
       }
     }
@@ -106,7 +106,7 @@ class AvstemningsfilGenerator(
     avstemningSummeringFil.write(
       ("Total:;"
           + totalSum + ";"
-          + "T;" //TODO() Avklare hva dette er for noe??
+          + if(totalSum >= BigDecimal.ZERO) "T;" else "F;"
           + totalAntall + ";")
         .toByteArray()
     )
