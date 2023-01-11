@@ -15,7 +15,7 @@ import no.nav.bidrag.behandling.felles.enums.EngangsbelopType
 import no.nav.bidrag.behandling.felles.enums.EngangsbelopType.*
 import no.nav.bidrag.behandling.felles.enums.StonadType
 import no.nav.bidrag.behandling.felles.enums.StonadType.*
-import no.nav.bidrag.regnskap.BidragRegnskapLocal
+import no.nav.bidrag.regnskap.SpringTestRunner
 import no.nav.bidrag.regnskap.consumer.KravApiWireMock
 import no.nav.bidrag.regnskap.consumer.SakApiWireMock
 import no.nav.bidrag.regnskap.dto.enumer.SøknadType
@@ -32,7 +32,6 @@ import no.nav.bidrag.regnskap.service.KravService
 import no.nav.bidrag.regnskap.service.PersistenceService
 import no.nav.bidrag.regnskap.utils.TestData
 import no.nav.bidrag.regnskap.utils.TestDataGenerator
-import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
@@ -43,18 +42,10 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestMethodOrder
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.Pageable
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.test.context.EmbeddedKafka
-import org.springframework.test.annotation.Rollback
-import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.DynamicPropertyRegistry
-import org.springframework.test.context.DynamicPropertySource
 import org.springframework.transaction.annotation.Transactional
-import org.testcontainers.containers.PostgreSQLContainer
-import org.testcontainers.junit.jupiter.Container
-import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.shaded.org.awaitility.Awaitility.await
 import org.testcontainers.shaded.org.awaitility.Durations.*
 import java.io.FileOutputStream
@@ -63,19 +54,13 @@ import java.time.LocalDateTime
 import java.time.YearMonth
 import java.util.*
 
-
-private const val TOPIC = "bidrag.vedtak-feature"
+private const val TOPIC = "bidrag.vedtak-feature-test"
 
 @Transactional
-@Testcontainers
-@ActiveProfiles("test")
-@EnableMockOAuth2Server
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
-@SpringBootTest(classes = [BidragRegnskapLocal::class])
 @EmbeddedKafka(partitions = 1, topics = [TOPIC], brokerProperties = ["listeners=PLAINTEXT://localhost:9092", "port=9092"])
-@Rollback(false)
-internal class VedtakHendelseListenerIT {
+internal class VedtakHendelseListenerIT: SpringTestRunner() {
 
   companion object {
     private const val HENDELSE_FILMAPPE = "testfiler/hendelse/"
@@ -85,29 +70,6 @@ internal class VedtakHendelseListenerIT {
     private var kravApiWireMock: KravApiWireMock = KravApiWireMock()
     private var sakApiWireMock: SakApiWireMock = SakApiWireMock()
     private var maskinportenWireMock: MaskinportenWireMock = MaskinportenWireMock()
-
-    @Container
-    val postgreSQLContainer = PostgreSQLContainer("postgres:latest").apply {
-      withDatabaseName("bidrag-regnskap")
-      withUsername("cloudsqliamuser")
-      withPassword("admin")
-      start()
-    }
-
-    private val maskinportenConfig = MaskinportenWireMock.createMaskinportenConfig()
-
-    @JvmStatic
-    @DynamicPropertySource
-    fun properties(registry: DynamicPropertyRegistry) {
-      registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl)
-      registry.add("spring.datasource.username", postgreSQLContainer::getUsername)
-      registry.add("spring.datasource.password", postgreSQLContainer::getPassword)
-      registry.add("maskinporten.privateKey", maskinportenConfig.privateKey::toString)
-      registry.add("maskinporten.tokenUrl", maskinportenConfig.tokenUrl::toString)
-      registry.add("maskinporten.audience", maskinportenConfig.audience::toString)
-      registry.add("maskinporten.clientId", maskinportenConfig.clientId::toString)
-      registry.add("maskinporten.scope", maskinportenConfig.scope::toString)
-    }
   }
 
   @Autowired
@@ -137,9 +99,6 @@ internal class VedtakHendelseListenerIT {
 
   @BeforeEach
   fun beforeEach() {
-    kravApiWireMock.reset()
-    sakApiWireMock.reset()
-    maskinportenWireMock.reset()
     kravApiWireMock.kravMedGyldigResponse()
     sakApiWireMock.sakMedGyldigResponse()
     kravApiWireMock.livenessMedGyldigResponse()
@@ -148,9 +107,6 @@ internal class VedtakHendelseListenerIT {
 
   @AfterAll
   internal fun teardown() {
-    kravApiWireMock.stop()
-    sakApiWireMock.stop()
-    maskinportenWireMock.stop()
     file.close()
   }
 
@@ -158,10 +114,6 @@ internal class VedtakHendelseListenerIT {
   @Order(1)
   fun `skal opprette gybyr for skyldner`() {
     val vedtakHendelse = hentFilOgSendPåKafka("gebyrSkyldner.json", 1)
-
-    await().atMost(TEN_SECONDS).until {
-      return@until persistenceService.hentOppdrag(1).isPresent
-    }
 
     val kontering = assertVedOpprettelseAvEngangsbeløp(
       1,
@@ -178,6 +130,10 @@ internal class VedtakHendelseListenerIT {
   @Test
   @Order(2)
   fun `skal oppdatere gebyr for skyldner`() {
+    await().atMost(TEN_SECONDS).until {
+      return@until persistenceService.hentOppdrag(1) != null
+    }
+
     hentFilOgSendPåKafka("gebyrSkyldnerOppdatering.json", 3)
 
     val konteringer = assertVedOppdateringAvEngangsbeløpOgReturnerKonteringer(
@@ -195,10 +151,6 @@ internal class VedtakHendelseListenerIT {
   fun `skal opprette gebyr for mottaker`() {
     val vedtakHendelse = hentFilOgSendPåKafka("gebyrMottaker.json", 4)
 
-    await().atMost(TEN_SECONDS).until {
-      return@until persistenceService.hentOppdrag(2).isPresent
-    }
-
     val kontering = assertVedOpprettelseAvEngangsbeløp(
       2,
       vedtakHendelse,
@@ -214,6 +166,10 @@ internal class VedtakHendelseListenerIT {
   @Test
   @Order(4)
   fun `skal oppdatere gebyr for mottaker`() {
+    await().atMost(TEN_SECONDS).until {
+      return@until persistenceService.hentOppdrag(2) != null
+    }
+
     hentFilOgSendPåKafka("gebyrMottakerOppdatering.json", 6)
 
     val konteringer = assertVedOppdateringAvEngangsbeløpOgReturnerKonteringer(
@@ -231,10 +187,6 @@ internal class VedtakHendelseListenerIT {
   fun `skal opprette særtilskudd`() {
     val vedtakHendelse = hentFilOgSendPåKafka("særtilskudd.json", 7)
 
-    await().atMost(TEN_SECONDS).until {
-      return@until persistenceService.hentOppdrag(3).isPresent
-    }
-
     val kontering = assertVedOpprettelseAvEngangsbeløp(
       3, vedtakHendelse, SAERTILSKUDD, E1, 100000002, SøknadType.EN
     )
@@ -245,6 +197,10 @@ internal class VedtakHendelseListenerIT {
   @Test
   @Order(6)
   fun `skal oppdatere særtilskudd`() {
+    await().atMost(TEN_SECONDS).until {
+      return@until persistenceService.hentOppdrag(3) != null
+    }
+
     hentFilOgSendPåKafka("særtilskuddOppdatering.json", 9)
 
     val konteringer = assertVedOppdateringAvEngangsbeløpOgReturnerKonteringer(
@@ -262,10 +218,6 @@ internal class VedtakHendelseListenerIT {
   fun `skal opprette tilbakekreving`() {
     val vedtakHendelse = hentFilOgSendPåKafka("tilbakekreving.json", 10)
 
-    await().atMost(TEN_SECONDS).until {
-      return@until persistenceService.hentOppdrag(4).isPresent
-    }
-
     val kontering = assertVedOpprettelseAvEngangsbeløp(
       4,
       vedtakHendelse,
@@ -282,6 +234,10 @@ internal class VedtakHendelseListenerIT {
   @Test
   @Order(8)
   fun `skal oppdatere tilbakekreving`() {
+    await().atMost(TEN_SECONDS).until {
+      return@until persistenceService.hentOppdrag(4) != null
+    }
+
     hentFilOgSendPåKafka("tilbakekrevingOppdatering.json", 12)
 
     val konteringer = assertVedOppdateringAvEngangsbeløpOgReturnerKonteringer(
@@ -298,10 +254,6 @@ internal class VedtakHendelseListenerIT {
   @Order(9)
   fun `skal opprette ettergivelse`() {
     val vedtakHendelse = hentFilOgSendPåKafka("ettergivelse.json", 14)
-
-    await().atMost(TEN_SECONDS).until {
-      return@until persistenceService.hentOppdrag(5).isPresent
-    }
 
     val kontering = assertVedOpprettelseAvEngangsbeløp(
       5,
@@ -320,10 +272,6 @@ internal class VedtakHendelseListenerIT {
   fun `skal opprette direkte oppgjør`() {
     val vedtakHendelse = hentFilOgSendPåKafka("direkteOppgjor.json", 15)
 
-    await().atMost(TEN_SECONDS).until {
-      return@until persistenceService.hentOppdrag(7).isPresent
-    }
-
     val kontering = assertVedOpprettelseAvEngangsbeløp(
       7,
       vedtakHendelse,
@@ -340,10 +288,6 @@ internal class VedtakHendelseListenerIT {
   @Order(11)
   fun `skal opprette ettergivelse tilbakekreving`() {
     val vedtakHendelse = hentFilOgSendPåKafka("ettergivelseTilbakekreving.json", 16)
-
-    await().atMost(TEN_SECONDS).until {
-      return@until persistenceService.hentOppdrag(8).isPresent
-    }
 
     val kontering = assertVedOpprettelseAvEngangsbeløp(
       8,
@@ -365,10 +309,6 @@ internal class VedtakHendelseListenerIT {
   fun `skal opprette bidragsforskudd`() {
     val vedtakHendelse = hentFilOgSendPåKafka("bidragsforskudd.json", 31, skyldnerIdent, kravhaverIdent)
 
-    await().atMost(TEN_SECONDS).until {
-      return@until persistenceService.hentOppdrag(9).isPresent
-    }
-
     val oppdrag = assertStønader(
       9,
       vedtakHendelse,
@@ -387,6 +327,10 @@ internal class VedtakHendelseListenerIT {
   @Test
   @Order(13)
   fun `skal oppdatere bidragsforskudd`() {
+    await().atMost(TEN_SECONDS).until {
+      return@until persistenceService.hentOppdrag(9) != null
+    }
+
     val vedtakHendelse = hentFilOgSendPåKafka(
       "bidragsforskuddOppdatering.json",
       41,
@@ -425,10 +369,6 @@ internal class VedtakHendelseListenerIT {
       barn1 = barn1Bidrag,
       barn2 = barn2Bidrag
     )
-
-    await().atMost(TEN_SECONDS).until {
-      return@until persistenceService.hentOppdrag(10).isPresent
-    }
 
     val oppdrag1 = assertStønader(
       10,
@@ -479,6 +419,10 @@ internal class VedtakHendelseListenerIT {
   @Test
   @Order(15)
   fun `skal oppdatere bidrag`() {
+    await().atMost(TEN_SECONDS).until {
+      return@until persistenceService.hentOppdrag(10) != null
+    }
+
     val vedtakHendelse = hentFilOgSendPåKafka(
       filnavn = "barnebidragOppdatering.json",
       antallOverføringerSåLangt = 59,
@@ -507,7 +451,7 @@ internal class VedtakHendelseListenerIT {
 
 
     await().atMost(TEN_SECONDS).until {
-      return@until persistenceService.hentOppdrag(11).isPresent
+      return@until persistenceService.hentOppdrag(11) != null
     }
 
     val oppdrag2 = assertStønader(
@@ -544,7 +488,7 @@ internal class VedtakHendelseListenerIT {
     )
 
     await().atMost(TEN_SECONDS).until {
-      return@until persistenceService.hentOppdrag(14).isPresent
+      return@until persistenceService.hentOppdrag(14) != null
     }
 
     val oppdrag1 = assertStønader(
@@ -558,7 +502,7 @@ internal class VedtakHendelseListenerIT {
     )
 
     await().atMost(TEN_SECONDS).until {
-      return@until persistenceService.hentOppdrag(15).isPresent
+      return@until persistenceService.hentOppdrag(15) != null
     }
 
     val oppdrag2 = assertStønader(
@@ -633,7 +577,7 @@ internal class VedtakHendelseListenerIT {
     )
 
     await().atMost(TEN_SECONDS).until {
-      return@until persistenceService.hentOppdrag(16).isPresent
+      return@until persistenceService.hentOppdrag(16) != null
     }
 
     val oppdrag = assertStønader(
@@ -691,7 +635,7 @@ internal class VedtakHendelseListenerIT {
     )
 
     await().atMost(TEN_SECONDS).until {
-      return@until persistenceService.hentOppdrag(17).isPresent
+      return@until persistenceService.hentOppdrag(17) != null
     }
 
 
@@ -745,7 +689,7 @@ internal class VedtakHendelseListenerIT {
     )
 
     await().atMost(TEN_SECONDS).until {
-      return@until persistenceService.hentOppdrag(18).isPresent
+      return@until persistenceService.hentOppdrag(18) != null
     }
 
     val oppdrag = assertStønader(
@@ -772,7 +716,7 @@ internal class VedtakHendelseListenerIT {
     forventetKorreksjonskode: Transaksjonskode? = null,
     stonadsendringIndex: Int = 0
   ): Oppdrag {
-    val oppdrag = persistenceService.hentOppdrag(oppdragId).get()
+    val oppdrag = persistenceService.hentOppdrag(oppdragId) ?: error("Det finnes ingen oppdrag med angitt oppdragsId: $oppdragId")
 
     oppdrag.stønadType shouldBe stønadstype.name
     oppdrag.eksternReferanse shouldBe vedtakHendelse.eksternReferanse
@@ -827,7 +771,7 @@ internal class VedtakHendelseListenerIT {
     forventetKorreksjonskode: Transaksjonskode,
     forventetDelytelsesId: Int
   ): List<Kontering> {
-    val oppdrag = persistenceService.hentOppdrag(oppdragId).get()
+    val oppdrag = persistenceService.hentOppdrag(oppdragId) ?: error("Det finnes ingen oppdrag med angitt oppdragsId: $oppdragId")
 
     oppdrag.oppdragsperioder!! shouldHaveSize 2
     oppdrag.oppdragsperioder!![0].beløp shouldNotBe oppdrag.oppdragsperioder!![1].beløp
@@ -877,7 +821,7 @@ internal class VedtakHendelseListenerIT {
     søknadType: SøknadType,
     engangsbeløpIndex: Int = 0
   ): Kontering {
-    val oppdrag = persistenceService.hentOppdrag(oppdragId).get()
+    val oppdrag = persistenceService.hentOppdrag(oppdragId) ?: error("Det finnes ingen oppdrag med angitt oppdragsId: $oppdragId")
     assertSoftly {
       oppdrag.engangsbeløpId shouldBe vedtakHendelse.engangsbelopListe!![engangsbeløpIndex].engangsbelopId
       oppdrag.stønadType shouldBe forventetEngangsbeløpType.name

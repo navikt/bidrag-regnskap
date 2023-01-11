@@ -40,7 +40,7 @@ class KravServiceTest {
 
   @Test
   fun `skal sende kontering til skatt når oppdragsperioden er innenfor innsendt periode`() {
-    every { persistenceService.hentOppdrag(oppdragsId) } returns opprettOppdragOptionalForPeriode(
+    every { persistenceService.hentOppdrag(oppdragsId) } returns opprettOppdragForPeriode(
       now.minusMonths(3), now.plusMonths(1)
     )
     every { skattConsumer.sendKrav(any()) } returns ResponseEntity.accepted().body(batchUid)
@@ -52,7 +52,7 @@ class KravServiceTest {
 
   @Test
   fun `skal sende kontering om perioden kun er for en måned`() {
-    every { persistenceService.hentOppdrag(oppdragsId) } returns opprettOppdragOptionalForPeriode(
+    every { persistenceService.hentOppdrag(oppdragsId) } returns opprettOppdragForPeriode(
       now, now.plusMonths(1)
     )
     every { skattConsumer.sendKrav(any()) } returns ResponseEntity.accepted().body(batchUid)
@@ -64,11 +64,11 @@ class KravServiceTest {
 
   @Test
   fun `skal kaste feil om kontering ikke går igjennom validering`() {
-    every { persistenceService.hentOppdrag(oppdragsId) } returns opprettOppdragOptionalForPeriode(
+    every { persistenceService.hentOppdrag(oppdragsId) } returns opprettOppdragForPeriode(
       now, now.plusMonths(1)
     )
     every { skattConsumer.sendKrav(any()) } returns ResponseEntity.badRequest().body(
-        """
+      """
           {
             "kravKonteringsfeil": [
             {
@@ -91,7 +91,7 @@ class KravServiceTest {
 
   @Test
   fun `skal kaste feil om tjenesten er slått av`() {
-    every { persistenceService.hentOppdrag(oppdragsId) } returns opprettOppdragOptionalForPeriode(
+    every { persistenceService.hentOppdrag(oppdragsId) } returns opprettOppdragForPeriode(
       now, now.plusMonths(1)
     )
     every { skattConsumer.sendKrav(any()) } returns ResponseEntity.status(SERVICE_UNAVAILABLE).body(batchUid)
@@ -103,7 +103,7 @@ class KravServiceTest {
 
   @Test
   fun `skal kaste feil om autentisering feiler`() {
-    every { persistenceService.hentOppdrag(oppdragsId) } returns opprettOppdragOptionalForPeriode(
+    every { persistenceService.hentOppdrag(oppdragsId) } returns opprettOppdragForPeriode(
       now, now.plusMonths(1)
     )
     every { skattConsumer.sendKrav(any()) } returns ResponseEntity.status(UNAUTHORIZED).body(batchUid)
@@ -115,16 +115,10 @@ class KravServiceTest {
 
   @Test
   fun `skal ikke sende kontering til skatt når kontering allerede er overført`() {
-    every { persistenceService.hentOppdrag(oppdragsId) } returns Optional.of(
-      TestData.opprettOppdrag(
-        oppdragsperioder = listOf(
-          TestData.opprettOppdragsperiode(
-            konteringer = listOf(
-              TestData.opprettKontering(
-                overforingstidspunkt = LocalDateTime.now()
-              )
-            )
-          )
+    every { persistenceService.hentOppdrag(oppdragsId) } returns TestData.opprettOppdrag(
+      oppdragsperioder = listOf(
+        TestData.opprettOppdragsperiode(
+          konteringer = listOf(TestData.opprettKontering(overforingstidspunkt = LocalDateTime.now()))
         )
       )
     )
@@ -136,23 +130,21 @@ class KravServiceTest {
 
   @Test
   fun `skal ikke sende kontering om oppdrag ikke finnes`() {
-    every { persistenceService.hentOppdrag(oppdragsId) } returns Optional.empty()
+    every { persistenceService.hentOppdrag(oppdragsId) } returns null
 
-    shouldThrow<NoSuchElementException> {
+    shouldThrow<IllegalStateException> {
       kravService.sendKrav(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
     }
   }
 
-  private fun opprettOppdragOptionalForPeriode(periodeFra: LocalDate, periodeTil: LocalDate): Optional<Oppdrag> {
-    return Optional.of(
-      TestData.opprettOppdrag(
-        oppdragsperioder = listOf(
-          TestData.opprettOppdragsperiode(
-            periodeTil = periodeTil, periodeFra = periodeFra, konteringer = listOf(
-              TestData.opprettKontering(
-                oppdragsperiode = TestData.opprettOppdragsperiode(
-                  oppdrag = TestData.opprettOppdrag()
-                )
+  private fun opprettOppdragForPeriode(periodeFra: LocalDate, periodeTil: LocalDate): Oppdrag {
+    return TestData.opprettOppdrag(
+      oppdragsperioder = listOf(
+        TestData.opprettOppdragsperiode(
+          periodeTil = periodeTil, periodeFra = periodeFra, konteringer = listOf(
+            TestData.opprettKontering(
+              oppdragsperiode = TestData.opprettOppdragsperiode(
+                oppdrag = TestData.opprettOppdrag()
               )
             )
           )

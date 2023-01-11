@@ -35,7 +35,15 @@ class KravService(
   fun sendKrav(oppdragId: Int, periode: YearMonth) {
     LOGGER.info("Starter overføring av krav til skatt for oppdragId: $oppdragId")
 
-    val oppdrag = persistenceService.hentOppdrag(oppdragId).get()
+    if(oppdragId > 1) {
+      var index = 1
+      while (index < oppdragId) {
+        LOGGER.info("OPPDRAG SOM EKSISTERER: ${persistenceService.hentOppdrag(index).toString()}")
+        index++
+      }
+    }
+
+    val oppdrag = persistenceService.hentOppdrag(oppdragId) ?: error("Det finnes ingen oppdrag med angitt oppdragsId: $oppdragId")
 
     if(oppdrag.utsattTilDato?.isAfter(LocalDate.now()) == true) {
       LOGGER.info("Oppdrag $oppdragId skal ikke oversendes før ${oppdrag.utsattTilDato}. Avventer oversending av krav.")

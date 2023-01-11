@@ -16,6 +16,7 @@ class KravListener(
   @EventListener
   fun sendKravEvent(oppdragId: String) {
     LOGGER.debug("Starter oversending av krav med konteringer for oppdrag med ID: $oppdragId")
+    Thread.sleep(500)
     sendKravQueue.send()
   }
 }

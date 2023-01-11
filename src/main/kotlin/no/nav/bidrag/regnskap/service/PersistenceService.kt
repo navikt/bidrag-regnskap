@@ -16,11 +16,11 @@ import no.nav.bidrag.regnskap.persistence.repository.PåløpRepository
 import org.slf4j.LoggerFactory
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.domain.Pageable
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
-import java.util.*
 
 private val LOGGER = LoggerFactory.getLogger(PersistenceService::class.java)
 
@@ -34,14 +34,14 @@ class PersistenceService(
   val driftsavvikRepository: DriftsavvikRepository
 ) {
 
-  fun hentOppdrag(oppdragId: Int): Optional<Oppdrag> {
+  fun hentOppdrag(oppdragId: Int): Oppdrag? {
     LOGGER.debug("Henter oppdrag med ID: $oppdragId")
-    return oppdragRepository.findById(oppdragId)
+    return oppdragRepository.findByIdOrNull(oppdragId)
   }
 
   fun hentOppdragPaUnikeIdentifikatorer(
     stønadType: String, kravhaverIdent: String?, skyldnerIdent: String, referanse: String?
-  ): Optional<Oppdrag> {
+  ): Oppdrag? {
     SECURE_LOGGER.info(
       "Henter oppdrag med stønadType: $stønadType, kravhaverIdent: $kravhaverIdent, skyldnerIdent: $skyldnerIdent, referanse: $referanse"
     )
@@ -50,7 +50,7 @@ class PersistenceService(
     )
   }
 
-  fun hentOppdragPåEngangsbeløpId(engangsbeløpId: Int): Optional<Oppdrag> {
+  fun hentOppdragPåEngangsbeløpId(engangsbeløpId: Int): Oppdrag? {
     LOGGER.debug("Henter oppdrag på engangsbeløpId: $engangsbeløpId")
     return oppdragRepository.findByEngangsbeløpId(engangsbeløpId)
   }
@@ -123,8 +123,8 @@ class PersistenceService(
     return oppdragsperiodeRepository.save(oppdragsperiode).oppdragsperiodeId
   }
 
-  fun lagreDriftsavvik(driftsavvik: Driftsavvik): Driftsavvik {
-    return driftsavvikRepository.save(driftsavvik)
+  fun lagreDriftsavvik(driftsavvik: Driftsavvik): Int? {
+    return driftsavvikRepository.save(driftsavvik).driftsavvikId
   }
 
   fun harAktivtDriftsavvik(): Boolean {

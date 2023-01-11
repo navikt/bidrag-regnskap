@@ -17,14 +17,6 @@ class SakApiWireMock {
     mock.start()
   }
 
-  internal fun reset() {
-    mock.resetAll()
-  }
-
-  internal fun stop() {
-    mock.stop()
-  }
-
   internal fun sakMedGyldigResponse() {
     mock.stubFor(
       WireMock.get(WireMock.urlEqualTo(SakConsumer.SAK_PATH)).willReturn(

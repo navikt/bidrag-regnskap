@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
-import java.util.*
 
 private val LOGGER = LoggerFactory.getLogger(OppdragService::class.java)
 
@@ -22,7 +21,7 @@ class OppdragService(
 ) {
 
   fun hentOppdrag(oppdragId: Int): OppdragResponse {
-    val oppdrag = persistenceService.hentOppdrag(oppdragId).get()
+    val oppdrag = persistenceService.hentOppdrag(oppdragId) ?: error("Det finnes ingen oppdrag med angitt oppdragsId: $oppdragId")
 
     return OppdragResponse(
       oppdragId = oppdrag.oppdragId,
@@ -39,22 +38,21 @@ class OppdragService(
 
   @Transactional
   fun lagreHendelse(hendelse: Hendelse): Int {
-    val oppdragOptional: Optional<Oppdrag>
-    if (hendelse.endretEngangsbelopId != null) {
-      oppdragOptional = persistenceService.hentOppdragPåEngangsbeløpId(hendelse.endretEngangsbelopId)
+    val oppdrag: Oppdrag? = if (hendelse.endretEngangsbelopId != null) {
+      persistenceService.hentOppdragPåEngangsbeløpId(hendelse.endretEngangsbelopId)
     } else if (hendelse.engangsbelopId != null) {
       return opprettNyttOppdrag(hendelse)
     } else {
-      oppdragOptional = persistenceService.hentOppdragPaUnikeIdentifikatorer(
+      persistenceService.hentOppdragPaUnikeIdentifikatorer(
         hendelse.type, hendelse.kravhaverIdent, hendelse.skyldnerIdent, hendelse.eksternReferanse
       )
     }
 
-    return if (oppdragOptional.isPresent) {
+    return if (oppdrag != null) {
       LOGGER.debug(
-        "Fant eksisterende oppdrag med id: ${oppdragOptional.get().oppdragId}" + "\nOppdaterer oppdrag.."
+        "Fant eksisterende oppdrag med id: ${oppdrag.oppdragId}" + "\nOppdaterer oppdrag.."
       )
-      oppdaterOppdrag(hendelse, oppdragOptional.get())
+      oppdaterOppdrag(hendelse, oppdrag)
     } else {
       LOGGER.debug(
         "Fant ikke eksisterende oppdrag." + "\nOpprettet nytt oppdrag.."

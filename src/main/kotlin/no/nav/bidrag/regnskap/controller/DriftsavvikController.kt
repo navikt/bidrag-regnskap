@@ -9,9 +9,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.bidrag.regnskap.persistence.entity.Driftsavvik
-import no.nav.bidrag.regnskap.service.PersistenceService
+import no.nav.bidrag.regnskap.service.DriftsavvikService
 import no.nav.security.token.support.core.api.Protected
-import org.springframework.data.domain.PageRequest
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -24,7 +23,7 @@ import java.time.LocalDateTime
 @Protected
 @Tag(name = "Driftsavvik")
 class DriftsavvikController(
-  private val persistenceService: PersistenceService
+  private val driftsavvikService: DriftsavvikService
 ) {
 
   @GetMapping("/aktiveDriftsavvik")
@@ -48,7 +47,7 @@ class DriftsavvikController(
     )]
   )
   fun hentAlleAktiveDriftsavvik(): ResponseEntity<List<Driftsavvik>> {
-    return ResponseEntity.ok(persistenceService.hentAlleAktiveDriftsavvik())
+    return ResponseEntity.ok(driftsavvikService.hentAlleAktiveDriftsavvik())
   }
 
   @GetMapping("/driftsavvik")
@@ -72,7 +71,7 @@ class DriftsavvikController(
     )]
   )
   fun hentDriftsavvik(antallDriftsavvik: Int): ResponseEntity<List<Driftsavvik>> {
-    return ResponseEntity.ok(persistenceService.hentDriftsavvik(PageRequest.of(0, antallDriftsavvik)))
+    return ResponseEntity.ok(driftsavvikService.hentDriftsavvik(antallDriftsavvik))
   }
 
 
@@ -105,17 +104,7 @@ class DriftsavvikController(
     @RequestParam(required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) tidspunktTil: LocalDateTime,
     @RequestParam(required = false) opprettetAv: String?,
     @RequestParam(required = false) årsak: String?
-  ): ResponseEntity<Driftsavvik> {
-
-    return ResponseEntity.ok(
-      persistenceService.lagreDriftsavvik(
-        Driftsavvik(
-          tidspunktFra = tidspunktFra,
-          tidspunktTil = tidspunktTil,
-          opprettetAv = opprettetAv,
-          årsak = årsak
-        )
-      )
-    )
+  ): ResponseEntity<Int> {
+    return ResponseEntity.ok(driftsavvikService.lagreDriftsavvik(tidspunktFra, tidspunktTil, opprettetAv, årsak))
   }
 }

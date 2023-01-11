@@ -1,6 +1,7 @@
 SKATT_URL: http://localhost:${wiremock.server.port:8097}
 SAK_URL: http://localhost:${wiremock.server.port:8098}
 AZURE_OPENID_CONFIG_ISSUER: http://localhost:${mock-oauth2-server.port}/aad
+TOPIC_VEDTAK: bidrag.vedtak-feature-test
 
 scheduler:
   sendkrav:

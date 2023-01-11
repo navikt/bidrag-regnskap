@@ -43,10 +43,9 @@ class OppdragServiceTest {
       val stonadType = StonadType.BIDRAG
       val skyldnerIdent = genererPersonnummer()
 
-      every { persistenceService.hentOppdrag(any()) } returns Optional.of(
-        TestData.opprettOppdrag(
-          stonadType = stonadType, skyldnerIdent = skyldnerIdent
-        )
+      every { persistenceService.hentOppdrag(any()) } returns TestData.opprettOppdrag(
+        stonadType = stonadType,
+        skyldnerIdent = skyldnerIdent
       )
 
       val oppdragResponse = oppdragService.hentOppdrag(1)
@@ -57,8 +56,8 @@ class OppdragServiceTest {
 
     @Test
     fun `skal kaste feil om oppdrag ikke eksisterer`() {
-      every { persistenceService.hentOppdrag(any()) } returns Optional.empty()
-      shouldThrow<NoSuchElementException> { oppdragService.hentOppdrag(1) }
+      every { persistenceService.hentOppdrag(any()) } returns null
+      shouldThrow<IllegalStateException> { oppdragService.hentOppdrag(1) }
     }
   }
 
