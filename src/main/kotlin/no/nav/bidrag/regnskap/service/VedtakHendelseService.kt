@@ -17,7 +17,8 @@ private val objectMapper = ObjectMapper().registerModule(KotlinModule.Builder().
 
 @Service
 class VedtakHendelseService(
-  private val oppdragService: OppdragService
+  private val oppdragService: OppdragService,
+  private val kravService: KravService
 ) {
 
   companion object {
@@ -66,7 +67,9 @@ class VedtakHendelseService(
       utsattTilDato = vedtakHendelse.utsattTilDato,
       periodeListe = mapPeriodelisteTilDomene(stonadsendring.periodeListe)
     )
-    oppdragService.lagreHendelse(hendelse)
+    val oppdragId = oppdragService.lagreHendelse(hendelse)
+
+    kravService.sendKrav(oppdragId)
   }
 
   private fun opprettOppdragForEngangsbelop(vedtakHendelse: VedtakHendelse, engangsbelop: Engangsbelop) {
@@ -95,7 +98,9 @@ class VedtakHendelseService(
         )
       )
     )
-    oppdragService.lagreHendelse(hendelse)
+    val oppdragId = oppdragService.lagreHendelse(hendelse)
+
+    kravService.sendKrav(oppdragId)
   }
 
   private fun leggTilIdent(ident: String): String {

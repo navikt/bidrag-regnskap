@@ -9,7 +9,6 @@ import io.mockk.junit5.MockKExtension
 import io.mockk.verify
 import no.nav.bidrag.behandling.felles.enums.EngangsbelopType
 import no.nav.bidrag.behandling.felles.enums.StonadType
-import no.nav.bidrag.regnskap.hendelse.krav.SendKravQueue
 import no.nav.bidrag.regnskap.utils.TestData
 import no.nav.bidrag.regnskap.utils.TestDataGenerator.genererPersonnummer
 import org.junit.jupiter.api.Nested
@@ -28,9 +27,6 @@ class OppdragServiceTest {
 
   @MockK(relaxed = true)
   private lateinit var konteringService: KonteringService
-
-  @MockK(relaxed = true)
-  private lateinit var sendKravQueue: SendKravQueue
 
   @InjectMockKs
   private lateinit var oppdragService: OppdragService

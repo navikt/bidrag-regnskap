@@ -9,6 +9,7 @@ import io.mockk.just
 import io.mockk.mockkStatic
 import io.mockk.verify
 import net.javacrumbs.shedlock.core.LockAssert
+import no.nav.bidrag.regnskap.hendelse.schedule.krav.SendKravScheduler
 import no.nav.bidrag.regnskap.service.KravService
 import no.nav.bidrag.regnskap.service.PersistenceService
 import no.nav.bidrag.regnskap.utils.TestData
@@ -42,7 +43,7 @@ internal class SendKravSchedulerTest {
 
     sendKravScheduler.skedulertOverforingAvKrav()
 
-    verify(exactly = 0) { kravService.sendKrav(any(), any()) }
+    verify(exactly = 0) { kravService.sendKrav(any()) }
   }
 
   @Test
@@ -52,7 +53,7 @@ internal class SendKravSchedulerTest {
 
     sendKravScheduler.skedulertOverforingAvKrav()
 
-    verify(exactly = 0) { kravService.sendKrav(any(), any()) }
+    verify(exactly = 0) { kravService.sendKrav(any()) }
   }
 
   @Test
@@ -64,7 +65,7 @@ internal class SendKravSchedulerTest {
 
     sendKravScheduler.skedulertOverforingAvKrav()
 
-    verify(exactly = 0) { kravService.sendKrav(any(), any()) }
+    verify(exactly = 0) { kravService.sendKrav(any()) }
   }
 
   @Test
@@ -77,11 +78,11 @@ internal class SendKravSchedulerTest {
     every { kravService.erVedlikeholdsmodusPåslått() } returns false
     every { persistenceService.hentAlleIkkeOverførteKonteringer() } returns listOf(kontering)
     every { persistenceService.finnSisteOverførtePeriode() } returns YearMonth.now()
-    every { kravService.sendKrav(any(), any()) } just Runs
+    every { kravService.sendKrav(any()) } just Runs
 
     sendKravScheduler.skedulertOverforingAvKrav()
 
-    verify(exactly = 1) { kravService.sendKrav(any(), any()) }
+    verify(exactly = 1) { kravService.sendKrav(any()) }
   }
 
   @Test
@@ -97,7 +98,7 @@ internal class SendKravSchedulerTest {
 
     sendKravScheduler.skedulertOverforingAvKrav()
 
-    verify(exactly = 0) { kravService.sendKrav(any(), any()) }
+    verify(exactly = 0) { kravService.sendKrav(any()) }
   }
 
   @Test
@@ -110,10 +111,10 @@ internal class SendKravSchedulerTest {
     every { kravService.erVedlikeholdsmodusPåslått() } returns false
     every { persistenceService.hentAlleIkkeOverførteKonteringer() } returns listOf(kontering)
     every { persistenceService.finnSisteOverførtePeriode() } returns YearMonth.now()
-    every { kravService.sendKrav(any(), any()) } just Runs
+    every { kravService.sendKrav(any()) } just Runs
 
     sendKravScheduler.skedulertOverforingAvKrav()
 
-    verify(exactly = 1) { kravService.sendKrav(any(), any()) }
+    verify(exactly = 1) { kravService.sendKrav(any()) }
   }
 }

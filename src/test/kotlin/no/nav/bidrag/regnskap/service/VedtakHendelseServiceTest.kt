@@ -23,6 +23,9 @@ class VedtakHendelseServiceTest {
   @MockK(relaxed = true)
   private lateinit var oppdragService: OppdragService
 
+  @MockK(relaxed = true)
+  private lateinit var kravService: KravService
+
   @InjectMockKs
   private lateinit var vedtakHendelseService: VedtakHendelseService
 

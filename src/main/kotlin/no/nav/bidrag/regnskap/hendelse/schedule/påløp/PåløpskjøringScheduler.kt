@@ -1,4 +1,4 @@
-package no.nav.bidrag.regnskap.hendelse.påløp
+package no.nav.bidrag.regnskap.hendelse.schedule.påløp
 
 import kotlinx.coroutines.runBlocking
 import net.javacrumbs.shedlock.core.LockAssert

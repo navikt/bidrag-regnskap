@@ -39,7 +39,7 @@ data class Oppdrag(
   var utsattTilDato: LocalDate? = null,
 
   @Column(name = "sist_oversendte_periode")
-  var sistOversendtePeriode: String? = null,
+  var sistOversendtePeriode: String? = null, //TODO() fjerne
 
   @Column(name = "endret_tidspunkt")
   @Version

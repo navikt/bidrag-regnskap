@@ -1,6 +1,6 @@
 package no.nav.bidrag.regnskap.config
 
-import no.nav.bidrag.regnskap.hendelse.vedtak.VedtakHendelseListener
+import no.nav.bidrag.regnskap.hendelse.kafka.vedtak.VedtakHendelseListener
 import no.nav.bidrag.regnskap.service.VedtakHendelseService
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean

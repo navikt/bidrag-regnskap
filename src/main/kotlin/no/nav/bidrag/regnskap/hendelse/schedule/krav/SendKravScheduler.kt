@@ -1,18 +1,15 @@
-package no.nav.bidrag.regnskap.hendelse.krav
+package no.nav.bidrag.regnskap.hendelse.schedule.krav
 
 import net.javacrumbs.shedlock.core.LockAssert
 import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
 import no.nav.bidrag.regnskap.service.KravService
 import no.nav.bidrag.regnskap.service.PersistenceService
-import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.web.client.HttpClientErrorException
-import org.springframework.web.client.HttpServerErrorException
 import java.time.LocalDate
 
 private val LOGGER = LoggerFactory.getLogger(SendKravScheduler::class.java)
@@ -26,7 +23,7 @@ class SendKravScheduler(
 
   @Scheduled(cron = "\${scheduler.sendkrav.cron}")
   @SchedulerLock(name = "skedulertOverforingAvKrav")
-  @Transactional(noRollbackFor = [HttpClientErrorException::class, HttpServerErrorException::class, JwtTokenUnauthorizedException::class])
+  @Transactional
   fun skedulertOverforingAvKrav() {
     LockAssert.assertLocked()
     LOGGER.info("Starter schedulert overføring av alle konteringer som ikke har blitt overført.")
@@ -46,7 +43,7 @@ class SendKravScheduler(
     }
 
     oppdragMedIkkeOverforteKonteringer.forEach {
-      kravService.sendKrav(it, persistenceService.finnSisteOverførtePeriode())
+      kravService.sendKrav(it)
     }
     LOGGER.info("Alle oppdrag(antall: ${oppdragMedIkkeOverforteKonteringer.size}) med unsendte konteringer er nå overført til skatt.")
   }

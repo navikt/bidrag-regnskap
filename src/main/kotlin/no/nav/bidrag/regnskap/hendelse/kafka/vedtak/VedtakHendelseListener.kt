@@ -1,4 +1,4 @@
-package no.nav.bidrag.regnskap.hendelse.vedtak
+package no.nav.bidrag.regnskap.hendelse.kafka.vedtak
 
 import com.fasterxml.jackson.core.JacksonException
 import no.nav.bidrag.regnskap.SECURE_LOGGER

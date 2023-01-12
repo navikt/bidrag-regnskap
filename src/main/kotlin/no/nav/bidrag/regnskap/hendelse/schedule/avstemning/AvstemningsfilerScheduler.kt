@@ -1,4 +1,4 @@
-package no.nav.bidrag.regnskap.hendelse.avstemning
+package no.nav.bidrag.regnskap.hendelse.schedule.avstemning
 
 import net.javacrumbs.shedlock.core.LockAssert
 import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock

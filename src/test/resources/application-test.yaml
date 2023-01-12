@@ -13,3 +13,8 @@ scheduler:
 
 atlas.kafka.zookeeper.session.timeout.ms: 60000
 atlas.kafka.zookeeper.connection.timeout.ms: 30000
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate

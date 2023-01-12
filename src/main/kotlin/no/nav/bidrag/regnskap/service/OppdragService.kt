@@ -2,7 +2,6 @@ package no.nav.bidrag.regnskap.service
 
 import no.nav.bidrag.regnskap.dto.oppdrag.OppdragResponse
 import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
-import no.nav.bidrag.regnskap.hendelse.krav.SendKravQueue
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
 import org.slf4j.LoggerFactory
@@ -16,8 +15,7 @@ private val LOGGER = LoggerFactory.getLogger(OppdragService::class.java)
 class OppdragService(
   val persistenceService: PersistenceService,
   val oppdragsperiodeService: OppdragsperiodeService,
-  val konteringService: KonteringService,
-  val sendKravQueue: SendKravQueue
+  val konteringService: KonteringService
 ) {
 
   fun hentOppdrag(oppdragId: Int): OppdragResponse {
@@ -38,27 +36,29 @@ class OppdragService(
 
   @Transactional
   fun lagreHendelse(hendelse: Hendelse): Int {
-    val oppdrag: Oppdrag? = if (hendelse.endretEngangsbelopId != null) {
-      persistenceService.hentOppdragPåEngangsbeløpId(hendelse.endretEngangsbelopId)
-    } else if (hendelse.engangsbelopId != null) {
-      return opprettNyttOppdrag(hendelse)
-    } else {
-      persistenceService.hentOppdragPaUnikeIdentifikatorer(
-        hendelse.type, hendelse.kravhaverIdent, hendelse.skyldnerIdent, hendelse.eksternReferanse
-      )
-    }
+    val oppdrag: Oppdrag? = hentOppdragOmDetFinnes(hendelse)
 
     return if (oppdrag != null) {
-      LOGGER.debug(
-        "Fant eksisterende oppdrag med id: ${oppdrag.oppdragId}" + "\nOppdaterer oppdrag.."
-      )
+      LOGGER.debug("Fant eksisterende oppdrag med id: ${oppdrag.oppdragId}" + "\nOppdaterer oppdrag..")
       oppdaterOppdrag(hendelse, oppdrag)
     } else {
-      LOGGER.debug(
-        "Fant ikke eksisterende oppdrag." + "\nOpprettet nytt oppdrag.."
-      )
+      LOGGER.debug("Fant ikke eksisterende oppdrag." + "\nOpprettet nytt oppdrag..")
       opprettNyttOppdrag(hendelse)
     }
+  }
+
+  private fun hentOppdragOmDetFinnes(hendelse: Hendelse): Oppdrag? {
+    if (hendelse.endretEngangsbelopId != null) {
+      return persistenceService.hentOppdragPåEngangsbeløpId(hendelse.endretEngangsbelopId)
+    } else if (hendelse.engangsbelopId == null) {
+      return persistenceService.hentOppdragPaUnikeIdentifikatorer(
+        hendelse.type,
+        hendelse.kravhaverIdent,
+        hendelse.skyldnerIdent,
+        hendelse.eksternReferanse //TODO() fjerne og bytte med sakID
+      )
+    }
+    return null
   }
 
   fun opprettNyttOppdrag(
@@ -81,8 +81,6 @@ class OppdragService(
 
     val oppdragId = persistenceService.lagreOppdrag(oppdrag)!!
 
-    sendKravQueue.leggTil(oppdragId)
-
     return oppdragId
   }
 
@@ -104,7 +102,6 @@ class OppdragService(
     oppdatererVerdierPåOppdrag(hendelse, oppdrag, nyeOppdragsperioder)
 
     val oppdragId = persistenceService.lagreOppdrag(oppdrag)!!
-    sendKravQueue.leggTil(oppdragId)
 
     return oppdragId
   }

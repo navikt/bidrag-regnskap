@@ -29,7 +29,7 @@ data class Oppdragsperiode(
   val oppdrag: Oppdrag? = null,
 
   @Column(name = "sak_id")
-  val sakId: String,
+  val sakId: String, //TODO() Flytt til Oppdrag
 
   @Column(name = "vedtak_id")
   val vedtakId: Int,

@@ -17,7 +17,10 @@ import no.nav.bidrag.regnskap.persistence.entity.OverføringKontering
 import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Propagation
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.HttpServerErrorException
 import java.time.LocalDate
@@ -32,42 +35,44 @@ class KravService(
   val skattConsumer: SkattConsumer, val persistenceService: PersistenceService
 ) {
 
-  fun sendKrav(oppdragId: Int, periode: YearMonth) {
+  @Transactional(
+    noRollbackFor = [HttpClientErrorException::class, HttpServerErrorException::class, JwtTokenUnauthorizedException::class],
+    propagation = Propagation.REQUIRES_NEW
+  )
+  fun sendKrav(oppdragId: Int) {
     LOGGER.info("Starter overføring av krav til skatt for oppdragId: $oppdragId")
-
-    if(oppdragId > 1) {
-      var index = 1
-      while (index < oppdragId) {
-        LOGGER.info("OPPDRAG SOM EKSISTERER: ${persistenceService.hentOppdrag(index).toString()}")
-        index++
-      }
-    }
 
     val oppdrag = persistenceService.hentOppdrag(oppdragId) ?: error("Det finnes ingen oppdrag med angitt oppdragsId: $oppdragId")
 
-    if(oppdrag.utsattTilDato?.isAfter(LocalDate.now()) == true) {
+    if (oppdrag.utsattTilDato?.isAfter(LocalDate.now()) == true) {
       LOGGER.info("Oppdrag $oppdragId skal ikke oversendes før ${oppdrag.utsattTilDato}. Avventer oversending av krav.")
       return
     }
     val oppdragsperioderMedIkkeOverførteKonteringer = hentOppdragsperioderMedIkkeOverførteKonteringer(oppdrag)
 
     if (oppdragsperioderMedIkkeOverførteKonteringer.isEmpty()) {
-      LOGGER.info("Alle konteringer er allerede overført for oppdrag $oppdragId i periode $periode")
+      LOGGER.info("Alle konteringer er allerede overført for oppdrag $oppdragId.")
       return
     }
 
     val alleIkkeOverførteKonteringer = finnAlleIkkeOverførteKonteringer(oppdragsperioderMedIkkeOverførteKonteringer)
-    val skattKravRequest = opprettSkattKravRequest(alleIkkeOverførteKonteringer)
 
-    val skattResponse = skattConsumer.sendKrav(skattKravRequest)
+    val skattResponse = skattConsumer.sendKrav(opprettSkattKravRequest(alleIkkeOverførteKonteringer))
 
+    lagreOverføringAvKrav(skattResponse, alleIkkeOverførteKonteringer, oppdrag)
+  }
+
+  private fun lagreOverføringAvKrav(
+    skattResponse: ResponseEntity<String>,
+    alleIkkeOverførteKonteringer: List<Kontering>,
+    oppdrag: Oppdrag
+  ) {
     when (skattResponse.statusCode) {
-
       HttpStatus.ACCEPTED -> {
         SECURE_LOGGER.debug("Mottok svar fra skatt: \n${skattResponse}")
 
         val kravResponse = objectMapper.readValue(skattResponse.body, KravResponse::class.java)
-        lagreVellykketOverføringAvKrav(alleIkkeOverførteKonteringer, kravResponse, oppdrag, periode)
+        lagreVellykketOverføringAvKrav(alleIkkeOverførteKonteringer, kravResponse, oppdrag)
       }
 
       HttpStatus.BAD_REQUEST -> {
@@ -104,8 +109,7 @@ class KravService(
   private fun lagreVellykketOverføringAvKrav(
     alleIkkeOverforteKonteringer: List<Kontering>,
     kravResponse: KravResponse,
-    oppdrag: Oppdrag,
-    periode: YearMonth
+    oppdrag: Oppdrag
   ) {
     alleIkkeOverforteKonteringer.forEach { kontering ->
       val now = LocalDateTime.now()
@@ -120,7 +124,6 @@ class KravService(
         )
       )
     }
-    oppdrag.sistOversendtePeriode = periode.toString()
     persistenceService.lagreOppdrag(oppdrag)
   }
 

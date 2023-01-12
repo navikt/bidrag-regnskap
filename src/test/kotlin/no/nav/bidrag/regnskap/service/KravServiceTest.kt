@@ -18,7 +18,6 @@ import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.HttpServerErrorException
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.YearMonth
 import java.util.*
 
 @ExtendWith(MockKExtension::class)
@@ -45,7 +44,7 @@ class KravServiceTest {
     )
     every { skattConsumer.sendKrav(any()) } returns ResponseEntity.accepted().body(batchUid)
 
-    kravService.sendKrav(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
+    kravService.sendKrav(oppdragId = oppdragsId)
 
     verify(exactly = 1) { skattConsumer.sendKrav(any()) }
   }
@@ -57,7 +56,7 @@ class KravServiceTest {
     )
     every { skattConsumer.sendKrav(any()) } returns ResponseEntity.accepted().body(batchUid)
 
-    kravService.sendKrav(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
+    kravService.sendKrav(oppdragId = oppdragsId)
 
     verify(exactly = 1) { skattConsumer.sendKrav(any()) }
   }
@@ -85,7 +84,7 @@ class KravServiceTest {
         """
     )
     shouldThrow<HttpClientErrorException> {
-      kravService.sendKrav(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
+      kravService.sendKrav(oppdragId = oppdragsId)
     }
   }
 
@@ -97,7 +96,7 @@ class KravServiceTest {
     every { skattConsumer.sendKrav(any()) } returns ResponseEntity.status(SERVICE_UNAVAILABLE).body(batchUid)
 
     shouldThrow<HttpServerErrorException> {
-      kravService.sendKrav(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
+      kravService.sendKrav(oppdragId = oppdragsId)
     }
   }
 
@@ -109,7 +108,7 @@ class KravServiceTest {
     every { skattConsumer.sendKrav(any()) } returns ResponseEntity.status(UNAUTHORIZED).body(batchUid)
 
     shouldThrow<JwtTokenUnauthorizedException> {
-      kravService.sendKrav(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
+      kravService.sendKrav(oppdragId = oppdragsId)
     }
   }
 
@@ -123,7 +122,7 @@ class KravServiceTest {
       )
     )
 
-    kravService.sendKrav(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
+    kravService.sendKrav(oppdragId = oppdragsId)
 
     verify(exactly = 0) { skattConsumer.sendKrav(any()) }
   }
@@ -133,7 +132,7 @@ class KravServiceTest {
     every { persistenceService.hentOppdrag(oppdragsId) } returns null
 
     shouldThrow<IllegalStateException> {
-      kravService.sendKrav(oppdragId = oppdragsId, YearMonth.of(now.year, now.month))
+      kravService.sendKrav(oppdragId = oppdragsId)
     }
   }
 
