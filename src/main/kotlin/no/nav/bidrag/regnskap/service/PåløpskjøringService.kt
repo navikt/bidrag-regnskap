@@ -60,16 +60,15 @@ class PåløpskjøringService(
     LOGGER.info("Starter generering av påløpsfil...")
     val konteringer = persistenceService.hentAlleIkkeOverførteKonteringer()
     påløpsfilGenerator.skrivPåløpsfilOgLastOppPåFilsluse(konteringer, påløp)
-    settKonteringTilOverførtOgOpprettOverføringKontering(konteringer, påløp)
+    settKonteringTilOverførtOgOpprettOverføringKontering(konteringer)
     LOGGER.info("Påløpsfil er ferdig skrevet med ${konteringer.size} konteringer og lastet opp til filsluse.")
   }
 
-  private suspend fun settKonteringTilOverførtOgOpprettOverføringKontering(konteringer: List<Kontering>, påløp: Påløp) {
+  private suspend fun settKonteringTilOverførtOgOpprettOverføringKontering(konteringer: List<Kontering>) {
     val timestamp = LocalDateTime.now()
     konteringer.forEach {
       yield()
       it.overføringstidspunkt = timestamp
-      it.oppdragsperiode?.oppdrag?.sistOversendtePeriode = påløp.forPeriode
 
       persistenceService.lagreKontering(it)
 

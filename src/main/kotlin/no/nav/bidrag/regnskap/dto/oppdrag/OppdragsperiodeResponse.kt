@@ -24,12 +24,6 @@ data class OppdragsperiodeResponse(
   val oppdragId: Int?,
 
   @field:Schema(
-    description = "SakId for bidragssaken.",
-    example = "123456"
-  )
-  val sakId: String,
-
-  @field:Schema(
     description = "VedtaksId for vedtaket oppdraget gjelder for.",
     example = "123456"
   )

@@ -40,13 +40,13 @@ class PersistenceService(
   }
 
   fun hentOppdragPaUnikeIdentifikatorer(
-    stønadType: String, kravhaverIdent: String?, skyldnerIdent: String, referanse: String?
+    stønadType: String, kravhaverIdent: String?, skyldnerIdent: String, sakId: String
   ): Oppdrag? {
     SECURE_LOGGER.info(
-      "Henter oppdrag med stønadType: $stønadType, kravhaverIdent: $kravhaverIdent, skyldnerIdent: $skyldnerIdent, referanse: $referanse"
+      "Henter oppdrag med stønadType: $stønadType, kravhaverIdent: $kravhaverIdent, skyldnerIdent: $skyldnerIdent, sakId: $sakId"
     )
-    return oppdragRepository.findByStønadTypeAndKravhaverIdentAndSkyldnerIdentAndEksternReferanse(
-      stønadType, kravhaverIdent, skyldnerIdent, referanse
+    return oppdragRepository.findByStønadTypeAndKravhaverIdentAndSkyldnerIdentAndSakId(
+      stønadType, kravhaverIdent, skyldnerIdent, sakId
     )
   }
 

@@ -24,10 +24,10 @@ class OppdragService(
     return OppdragResponse(
       oppdragId = oppdrag.oppdragId,
       type = oppdrag.stønadType,
+      sakId = oppdrag.sakId,
       kravhaverIdent = oppdrag.kravhaverIdent,
       skyldnerIdent = oppdrag.skyldnerIdent,
       referanse = oppdrag.eksternReferanse,
-      sistOversendtePeriode = oppdrag.sistOversendtePeriode,
       endretTidspunkt = oppdrag.endretTidspunkt.toString(),
       engangsbelopId = oppdrag.engangsbeløpId,
       oppdragsperioder = oppdragsperiodeService.hentOppdragsperioderMedKonteringer(oppdrag)
@@ -55,7 +55,7 @@ class OppdragService(
         hendelse.type,
         hendelse.kravhaverIdent,
         hendelse.skyldnerIdent,
-        hendelse.eksternReferanse //TODO() fjerne og bytte med sakID
+        hendelse.sakId
       )
     }
     return null
@@ -67,6 +67,7 @@ class OppdragService(
     val oppdrag = Oppdrag(
       stønadType = hendelse.type,
       vedtakType = hendelse.vedtakType.toString(),
+      sakId = hendelse.sakId,
       kravhaverIdent = hendelse.kravhaverIdent,
       skyldnerIdent = hendelse.skyldnerIdent,
       eksternReferanse = hendelse.eksternReferanse,

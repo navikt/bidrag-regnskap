@@ -21,7 +21,6 @@ class OppdragsperiodeService(
         OppdragsperiodeResponse(
           oppdragsperiodeId = oppdragsperiode.oppdragsperiodeId,
           oppdragId = oppdragsperiode.oppdrag?.oppdragId,
-          sakId = oppdragsperiode.sakId,
           vedtakId = oppdragsperiode.vedtakId,
           gjelderIdent = oppdragsperiode.gjelderIdent,
           mottakerIdent = oppdragsperiode.mottakerIdent,
@@ -49,7 +48,6 @@ class OppdragsperiodeService(
       oppdragsperiodeListe.add(
         Oppdragsperiode(
           vedtakId = hendelse.vedtakId,
-          sakId = hendelse.sakId,
           gjelderIdent = sakConsumer.hentBmFraSak(hendelse.sakId),
           mottakerIdent = hendelse.mottakerIdent,
           beløp = periode.beløp!!,

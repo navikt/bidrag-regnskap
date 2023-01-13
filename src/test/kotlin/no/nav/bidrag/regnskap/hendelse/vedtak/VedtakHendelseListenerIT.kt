@@ -721,10 +721,10 @@ internal class VedtakHendelseListenerIT: SpringTestRunner() {
     oppdrag.stønadType shouldBe stønadstype.name
     oppdrag.eksternReferanse shouldBe vedtakHendelse.eksternReferanse
     oppdrag.oppdragsperioder?.size shouldBe antallOppdragsperioder
+    oppdrag.sakId shouldBe vedtakHendelse.stonadsendringListe!![stonadsendringIndex].sakId
     oppdrag.oppdragsperioder
       ?.subList(antallOppdragsperioder - antallOpprettetIGjeldendeFil, antallOppdragsperioder)
       ?.forEachIndexed { i: Int, oppdragsperiode: Oppdragsperiode ->
-        oppdragsperiode.sakId shouldBe vedtakHendelse.stonadsendringListe!![stonadsendringIndex].sakId
         oppdragsperiode.vedtaksdato shouldBe vedtakHendelse.vedtakDato
         oppdragsperiode.vedtakId shouldBe vedtakHendelse.vedtakId
         oppdragsperiode.opprettetAv shouldBe vedtakHendelse.opprettetAv
@@ -825,12 +825,12 @@ internal class VedtakHendelseListenerIT: SpringTestRunner() {
     assertSoftly {
       oppdrag.engangsbeløpId shouldBe vedtakHendelse.engangsbelopListe!![engangsbeløpIndex].engangsbelopId
       oppdrag.stønadType shouldBe forventetEngangsbeløpType.name
+      oppdrag.sakId shouldBe vedtakHendelse.engangsbelopListe!![engangsbeløpIndex].sakId
     }
 
     val oppdragsperiode = oppdrag.oppdragsperioder!!.first()
     assertSoftly {
       oppdragsperiode.oppdrag shouldBeSameInstanceAs oppdrag
-      oppdragsperiode.sakId shouldBe vedtakHendelse.engangsbelopListe!![engangsbeløpIndex].sakId
       oppdragsperiode.vedtakId shouldBe vedtakHendelse.vedtakId
       oppdragsperiode.beløp shouldBe vedtakHendelse.engangsbelopListe!![engangsbeløpIndex].belop
       oppdragsperiode.valuta shouldBe vedtakHendelse.engangsbelopListe!![engangsbeløpIndex].valutakode

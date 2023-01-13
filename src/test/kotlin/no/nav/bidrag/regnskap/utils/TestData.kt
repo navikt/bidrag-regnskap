@@ -25,11 +25,11 @@ object TestData {
     oppdragId: Int? = null,
     stonadType: StonadType = StonadType.BIDRAG,
     vedtakType: VedtakType = VedtakType.MANUELT,
+    sakId: String = "123456",
     skyldnerIdent: String = TestDataGenerator.genererPersonnummer(),
     oppdragsperioder: List<Oppdragsperiode>? = listOf(opprettOppdragsperiode()),
     kravhaverIdent: String = TestDataGenerator.genererPersonnummer(),
     utsattTilDato: LocalDate? = null,
-    sistOversendtePeriode: String? = null,
     endretTidspunkt: LocalDateTime? = null,
     engangsbeløpId: Int? = null
   ): Oppdrag {
@@ -37,11 +37,11 @@ object TestData {
       oppdragId = oppdragId,
       stønadType = stonadType.toString(),
       vedtakType = vedtakType.toString(),
+      sakId = sakId,
       skyldnerIdent = skyldnerIdent,
       oppdragsperioder = oppdragsperioder,
       kravhaverIdent = kravhaverIdent,
       utsattTilDato = utsattTilDato,
-      sistOversendtePeriode = sistOversendtePeriode,
       endretTidspunkt = endretTidspunkt,
       engangsbeløpId = engangsbeløpId
     )
@@ -98,7 +98,6 @@ object TestData {
   fun opprettOppdragsperiode(
     oppdragsperiodeId: Int? = null,
     oppdrag: Oppdrag? = null,
-    sakId: String = "123456",
     vedtakId: Int = 654321,
     gjelderIdent: String = TestDataGenerator.genererPersonnummer(),
     mottakerIdent: String = TestDataGenerator.genererPersonnummer(),
@@ -116,7 +115,6 @@ object TestData {
     return Oppdragsperiode(
       oppdragsperiodeId = oppdragsperiodeId,
       oppdrag = oppdrag,
-      sakId = sakId,
       vedtakId = vedtakId,
       gjelderIdent = gjelderIdent,
       mottakerIdent = mottakerIdent,

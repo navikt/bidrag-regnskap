@@ -124,7 +124,7 @@ class PåløpsfilGenerator(
     konteringBr10Element.appendChild(behandlEnhet)
 
     val fagsystemId = dokument.createElement("fagsystemId")
-    fagsystemId.textContent = kontering.oppdragsperiode?.sakId
+    fagsystemId.textContent = kontering.oppdragsperiode?.oppdrag?.sakId
     konteringBr10Element.appendChild(fagsystemId)
 
     val oppdragGjelderId = dokument.createElement("oppdragGjelderId")
@@ -187,7 +187,7 @@ class PåløpsfilGenerator(
     konteringBr10Element.appendChild(tekst)
 
     val refFagsystemId = dokument.createElement("refFagsystemId")
-    refFagsystemId.textContent = kontering.oppdragsperiode?.sakId
+    refFagsystemId.textContent = kontering.oppdragsperiode?.oppdrag?.sakId
     konteringBr10Element.appendChild(refFagsystemId)
 
     val delytelseId = dokument.createElement("delytelseId")

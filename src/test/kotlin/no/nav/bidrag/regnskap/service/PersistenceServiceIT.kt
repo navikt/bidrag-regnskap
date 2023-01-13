@@ -48,14 +48,14 @@ internal class PersistenceServiceIT : SpringTestRunner() {
       oppdragTestData.stønadType,
       oppdragTestData.kravhaverIdent,
       oppdragTestData.skyldnerIdent,
-      oppdragTestData.eksternReferanse
+      oppdragTestData.sakId
     )
 
     val oppdragHentetPåUnikeIdentifikatorerUtenTreff = persistenceService.hentOppdragPaUnikeIdentifikatorer(
       oppdragTestData.stønadType,
       "ingentreff",
       oppdragTestData.skyldnerIdent,
-      oppdragTestData.eksternReferanse
+      oppdragTestData.sakId
     )
 
     oppdrag shouldNotBe null

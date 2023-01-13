@@ -4,11 +4,11 @@ import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface OppdragRepository : JpaRepository<Oppdrag, Int> {
-  fun findByStønadTypeAndKravhaverIdentAndSkyldnerIdentAndEksternReferanse(
+  fun findByStønadTypeAndKravhaverIdentAndSkyldnerIdentAndSakId(
     stønadType: String,
     kravhaverIdent: String?,
     skyldnerIdent: String,
-    eksternReferanse: String?
+    sakId: String
   ): Oppdrag?
 
   fun findByEngangsbeløpId(engangsbeløpId: Int): Oppdrag?

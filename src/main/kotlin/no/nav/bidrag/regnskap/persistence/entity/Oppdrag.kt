@@ -26,6 +26,9 @@ data class Oppdrag(
   @Column(name = "vedtak_type")
   var vedtakType: String,
 
+  @Column(name = "sak_id")
+  val sakId: String, //TODO() Flytt til Oppdrag
+
   @Column(name = "kravhaver_ident")
   val kravhaverIdent: String? = null,
 
@@ -37,9 +40,6 @@ data class Oppdrag(
 
   @Column(name = "utsatt_til_dato")
   var utsattTilDato: LocalDate? = null,
-
-  @Column(name = "sist_oversendte_periode")
-  var sistOversendtePeriode: String? = null, //TODO() fjerne
 
   @Column(name = "endret_tidspunkt")
   @Version
@@ -67,11 +67,11 @@ data class Oppdrag(
         "(oppdragId = $oppdragId , " +
         "stønadType = $stønadType , " +
         "vedtakType = $vedtakType , " +
+        "sakId = $sakId , " +
         "kravhaverIdent = $kravhaverIdent , " +
         "skyldnerIdent = $skyldnerIdent , " +
         "eksternReferanse = $eksternReferanse , " +
         "utsattTilDato = $utsattTilDato , " +
-        "sistOversendtePeriode = $sistOversendtePeriode , " +
         "endretTidspunkt = $endretTidspunkt , " +
         "engangsbeløpId = $engangsbeløpId )"
   }

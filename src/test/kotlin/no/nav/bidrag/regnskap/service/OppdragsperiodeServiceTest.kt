@@ -35,7 +35,6 @@ class OppdragsperiodeServiceTest {
       val opprettetOppdragsperiodeListe = oppdragsperiodeService.hentOppdragsperioderMedKonteringer(oppdrag)
 
       opprettetOppdragsperiodeListe shouldHaveSize oppdrag.oppdragsperioder!!.size
-      opprettetOppdragsperiodeListe[0].sakId shouldBe oppdrag.oppdragsperioder!![0].sakId
     }
   }
 

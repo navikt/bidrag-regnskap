@@ -59,7 +59,7 @@ class AvstemningsfilGenerator(
 
       avstemningsfilBuffer.write(
         (kontering.transaksjonskode + ";"
-            + kontering.oppdragsperiode!!.sakId + ";"
+            + kontering.oppdragsperiode!!.oppdrag!!.sakId + ";"
             + kontering.oppdragsperiode.beløp.toString() + ";"
             + LocalDate.of(periode.year, periode.month, 1).format(DateTimeFormatter.ofPattern("yyMMdd")).toString() + ";"
             + LocalDate.of(periode.year, periode.month, periode.lengthOfMonth()).format(DateTimeFormatter.ofPattern("yyMMdd")).toString() + ";"

@@ -21,6 +21,12 @@ data class OppdragResponse(
   val type: String,
 
   @field:Schema(
+    description = "SakId for bidragssaken.",
+    example = "123456"
+  )
+  val sakId: String,
+
+  @field:Schema(
     description = "Personident (FNR/DNR) eller aktoernummer (TSS-ident/samhandler) til kravhaver." +
         "\n\nKravhaver angis ikke for gebyr.",
     example = "12345678910"
@@ -40,12 +46,6 @@ data class OppdragResponse(
     example = "ABC123"
   )
   val referanse: String?,
-
-  @field:Schema(
-    description = "Sist overførte periode for kontering knyttet til oppdraget.",
-    example = "2022-01"
-  )
-  val sistOversendtePeriode: String?,
 
   @field:Schema(
     description = "Sist endret tidspunkt for oppdraget.",

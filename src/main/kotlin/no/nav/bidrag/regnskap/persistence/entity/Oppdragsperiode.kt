@@ -28,9 +28,6 @@ data class Oppdragsperiode(
   @JoinColumn(name = "oppdrag_id")
   val oppdrag: Oppdrag? = null,
 
-  @Column(name = "sak_id")
-  val sakId: String, //TODO() Flytt til Oppdrag
-
   @Column(name = "vedtak_id")
   val vedtakId: Int,
 
@@ -83,7 +80,6 @@ data class Oppdragsperiode(
     return this::class.simpleName +
         "(oppdragsperiodeId = $oppdragsperiodeId , " +
         "oppdragId = ${oppdrag?.oppdragId} , " +
-        "sakId = $sakId , " +
         "vedtakId = $vedtakId , " +
         "gjelderIdent = $gjelderIdent , " +
         "mottakerIdent = $mottakerIdent , " +
