@@ -3,7 +3,7 @@ package no.nav.bidrag.regnskap.dto.krav
 import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(name = "Konteringsfeil", description = "Beskriver feil i en enkelt kontering.")
-data class KravKonteringsfeil(
+data class Kravkonteringsfeil(
 
   @field:Schema(
     description = "En kode som angir type feil som har oppstått. " +
@@ -20,5 +20,5 @@ data class KravKonteringsfeil(
   val feilmelding: String,
 
   @field:Schema(description = "Identifiserer hvilken kontering som førte til feilen.")
-  val kravKonteringId: KravKonteringId
+  val kravKonteringId: KravkonteringId
 )

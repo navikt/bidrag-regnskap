@@ -10,7 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat
 import java.time.YearMonth
 
 @Schema(name = "KonteringId", description = "Identifiserer en kontering unikt.")
-data class KravKonteringId(
+data class KravkonteringId(
 
   @field:Schema(description = "Type transaksjon.", example = "B1", required = true)
   val transaksjonskode: Transaksjonskode,

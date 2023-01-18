@@ -23,7 +23,7 @@ import java.time.YearMonth
       "\n" +
       "I testmiljøene må Tenor-identer støttes i stedet for FNR/DNR. Disse identene har 8 eller 9 i tredje siffer."
 )
-data class KravKontering(
+data class Kravkontering(
 
   @field:Schema(
     description = "Type transaksjon.\n\n"
