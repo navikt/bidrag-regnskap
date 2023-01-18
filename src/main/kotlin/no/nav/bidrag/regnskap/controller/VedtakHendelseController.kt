@@ -36,14 +36,6 @@ class VedtakHendelseController(
       responseCode = "400",
       description = "Noe er galt med meldingen.",
       content = [Content()]
-    ), ApiResponse(
-      responseCode = "401",
-      description = "Klienten ikke er autentisert.",
-      content = [Content()]
-    ), ApiResponse(
-      responseCode = "403",
-      description = "Klienten ikke har tilgang.",
-      content = [Content()]
     )]
   )
   fun opprettHendelse(vedtakHendelse: String): ResponseEntity<Any> {

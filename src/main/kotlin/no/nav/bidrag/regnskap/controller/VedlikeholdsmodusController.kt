@@ -38,14 +38,6 @@ class VedlikeholdsmodusController(
       responseCode = "200",
       description = "Vedlikeholdsmodus ble endret.",
       content = [Content()]
-    ), ApiResponse(
-      responseCode = "401",
-      description = "Klienten ikke er autentisert.",
-      content = [Content()]
-    ), ApiResponse(
-      responseCode = "403",
-      description = "Klienten ikke har tilgang.",
-      content = [Content()]
     )]
   )
   @Parameter(name = "kommentar", example = "Påløp for 2022-12 genereres hos NAV.")
@@ -66,14 +58,6 @@ class VedlikeholdsmodusController(
     value = [ApiResponse(
       responseCode = "200",
       description = "Vedlikeholdsmodus er avslått.",
-      content = [Content()]
-    ), ApiResponse(
-      responseCode = "401",
-      description = "Klienten ikke er autentisert.",
-      content = [Content()]
-    ), ApiResponse(
-      responseCode = "403",
-      description = "Klienten ikke har tilgang.",
       content = [Content()]
     ), ApiResponse(
       responseCode = "503",

@@ -38,14 +38,6 @@ class AvstemningController(
       responseCode = "400",
       description = "Dato er satt frem i tid. Generering blir derfor ikke startet.",
       content = [Content()]
-    ), ApiResponse(
-      responseCode = "401",
-      description = "Klienten ikke er autentisert.",
-      content = [Content()]
-    ), ApiResponse(
-      responseCode = "403",
-      description = "Klienten ikke har tilgang.",
-      content = [Content()]
     )]
   )
   fun startAvstemningsgenerering(

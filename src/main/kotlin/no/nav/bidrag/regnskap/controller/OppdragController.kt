@@ -36,14 +36,6 @@ class OppdragController(
       responseCode = "204",
       description = "Oppdraget finnes ikke.",
       content = [Content()]
-    ), ApiResponse(
-      responseCode = "401",
-      description = "Klienten ikke er autentisert.",
-      content = [Content()]
-    ), ApiResponse(
-      responseCode = "403",
-      description = "Klienten ikke har tilgang.",
-      content = [Content()]
     )]
   )
   fun hentOppdrag(oppdragId: Int): ResponseEntity<OppdragResponse> {

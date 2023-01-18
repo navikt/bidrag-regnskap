@@ -36,14 +36,6 @@ class PåløpskjøringController(
       responseCode = "204",
       description = "Det finnes ingen ikke gjennomførte påløp.",
       content = [Content()]
-    ), ApiResponse(
-      responseCode = "401",
-      description = "Klienten ikke er autentisert.",
-      content = [Content()]
-    ), ApiResponse(
-      responseCode = "403",
-      description = "Klienten ikke har tilgang.",
-      content = [Content()]
     )]
   )
   fun startPåløpskjøring(): ResponseEntity<Int> {
@@ -62,14 +54,6 @@ class PåløpskjøringController(
     value = [ApiResponse(
       responseCode = "200",
       description = "Påløpskjøringen er stoppet."
-    ), ApiResponse(
-      responseCode = "401",
-      description = "Klienten ikke er autentisert.",
-      content = [Content()]
-    ), ApiResponse(
-      responseCode = "403",
-      description = "Klienten ikke har tilgang.",
-      content = [Content()]
     )]
   )
   fun stopPågåendePåløpskjøring(): ResponseEntity<Any> {

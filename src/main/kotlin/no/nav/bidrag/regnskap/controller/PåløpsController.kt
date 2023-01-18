@@ -3,7 +3,6 @@ package no.nav.bidrag.regnskap.controller
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.Parameters
-import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
@@ -38,14 +37,6 @@ class PåløpsController(
     value = [ApiResponse(
       responseCode = "200",
       description = "Returnerer påløp."
-    ), ApiResponse(
-      responseCode = "401",
-      description = "Dersom klienten ikke er autentisert.",
-      content = [Content()]
-    ), ApiResponse(
-      responseCode = "403",
-      description = "Dersom klienten ikke har tilgang.",
-      content = [Content()]
     )]
   )
   fun hentPåløp(): ResponseEntity<List<PåløpResponse>> {
@@ -62,14 +53,6 @@ class PåløpsController(
     value = [ApiResponse(
       responseCode = "200",
       description = "Lagret påløp."
-    ), ApiResponse(
-      responseCode = "401",
-      description = "Klienten ikke er autentisert.",
-      content = [Content()]
-    ), ApiResponse(
-      responseCode = "403",
-      description = "Klienten ikke har tilgang.",
-      content = [Content()]
     )]
   )
   @Parameters(value = [

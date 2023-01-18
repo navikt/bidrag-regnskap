@@ -36,14 +36,6 @@ class DriftsavvikController(
       responseCode = "200",
       description = "Vedlikeholdsmodus ble endret.",
       content = [Content()]
-    ), ApiResponse(
-      responseCode = "401",
-      description = "Klienten ikke er autentisert.",
-      content = [Content()]
-    ), ApiResponse(
-      responseCode = "403",
-      description = "Klienten ikke har tilgang.",
-      content = [Content()]
     )]
   )
   fun hentAlleAktiveDriftsavvik(): ResponseEntity<List<Driftsavvik>> {
@@ -59,14 +51,6 @@ class DriftsavvikController(
     value = [ApiResponse(
       responseCode = "200",
       description = "Vedlikeholdsmodus ble endret.",
-      content = [Content()]
-    ), ApiResponse(
-      responseCode = "401",
-      description = "Klienten ikke er autentisert.",
-      content = [Content()]
-    ), ApiResponse(
-      responseCode = "403",
-      description = "Klienten ikke har tilgang.",
       content = [Content()]
     )]
   )
@@ -84,14 +68,6 @@ class DriftsavvikController(
     value = [ApiResponse(
       responseCode = "200",
       description = "Vedlikeholdsmodus ble endret.",
-      content = [Content()]
-    ), ApiResponse(
-      responseCode = "401",
-      description = "Klienten ikke er autentisert.",
-      content = [Content()]
-    ), ApiResponse(
-      responseCode = "403",
-      description = "Klienten ikke har tilgang.",
       content = [Content()]
     )]
   )
