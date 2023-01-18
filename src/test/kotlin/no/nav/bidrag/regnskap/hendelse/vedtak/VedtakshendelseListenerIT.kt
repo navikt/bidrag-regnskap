@@ -60,7 +60,7 @@ private const val TOPIC = "bidrag.vedtak-feature-test"
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 @EmbeddedKafka(partitions = 1, topics = [TOPIC], brokerProperties = ["listeners=PLAINTEXT://localhost:9092", "port=9092"])
-internal class VedtakHendelseListenerIT: SpringTestRunner() {
+internal class VedtakshendelseListenerIT: SpringTestRunner() {
 
   companion object {
     private const val HENDELSE_FILMAPPE = "testfiler/hendelse/"

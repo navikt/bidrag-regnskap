@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
-import no.nav.bidrag.regnskap.service.VedtakHendelseService
+import no.nav.bidrag.regnskap.service.VedtakshendelseService
 import no.nav.security.token.support.core.api.Protected
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RestController
 @Tag(
   name = "Vedtak hendelse"
 )
-class VedtakHendelseController(
-  private val vedtakHendelseService: VedtakHendelseService
+class VedtakshendelseController(
+  private val vedtakshendelseService: VedtakshendelseService
 ) {
 
   @PostMapping("/vedtakHendelse")
@@ -39,7 +39,7 @@ class VedtakHendelseController(
     )]
   )
   fun opprettHendelse(vedtakHendelse: String): ResponseEntity<Any> {
-    vedtakHendelseService.behandleHendelse(vedtakHendelse)
+    vedtakshendelseService.behandleHendelse(vedtakHendelse)
     return ResponseEntity.ok().build()
   }
 }

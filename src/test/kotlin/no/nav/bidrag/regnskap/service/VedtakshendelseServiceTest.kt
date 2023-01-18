@@ -18,7 +18,7 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(MockKExtension::class)
-class VedtakHendelseServiceTest {
+class VedtakshendelseServiceTest {
 
   @MockK(relaxed = true)
   private lateinit var oppdragService: OppdragService
@@ -27,13 +27,13 @@ class VedtakHendelseServiceTest {
   private lateinit var kravService: KravService
 
   @InjectMockKs
-  private lateinit var vedtakHendelseService: VedtakHendelseService
+  private lateinit var vedtakshendelseService: VedtakshendelseService
 
   @Test
   fun `skal mappe vedtakshendelse uten feil`() {
     val hendelse = opprettVedtakshendelse()
 
-    val vedtakHendelse = vedtakHendelseService.mapVedtakHendelse(hendelse)
+    val vedtakHendelse = vedtakshendelseService.mapVedtakHendelse(hendelse)
 
     vedtakHendelse shouldNotBe null
     vedtakHendelse.vedtakId shouldBe 123
@@ -48,7 +48,7 @@ class VedtakHendelseServiceTest {
 
     every { oppdragService.lagreHendelse(capture(hendelseCaptor)) } returns 1
 
-    vedtakHendelseService.behandleHendelse(hendelse)
+    vedtakshendelseService.behandleHendelse(hendelse)
 
     verify(exactly = 2) { oppdragService.lagreHendelse(any()) }
     hendelseCaptor[0].type shouldBe StonadType.BIDRAG.name
@@ -58,7 +58,7 @@ class VedtakHendelseServiceTest {
   @Test
   fun `Skal lese vedtakshendelse uten feil`() {
     assertDoesNotThrow {
-      vedtakHendelseService.mapVedtakHendelse(
+      vedtakshendelseService.mapVedtakHendelse(
         """
         {
           "vedtakType":"AUTOMATISK_INDEKSREGULERING",
@@ -80,7 +80,7 @@ class VedtakHendelseServiceTest {
   @Test
   fun `Skal lese vedtakshendelse med feil`() {
     assertThrows<InvalidFormatException> {
-      vedtakHendelseService.mapVedtakHendelse(
+      vedtakshendelseService.mapVedtakHendelse(
         """
         {
           "vedtakType":"ÅRSAVGIFT",

@@ -1,7 +1,7 @@
 package no.nav.bidrag.regnskap.config
 
-import no.nav.bidrag.regnskap.hendelse.kafka.vedtak.VedtakHendelseListener
-import no.nav.bidrag.regnskap.service.VedtakHendelseService
+import no.nav.bidrag.regnskap.hendelse.kafka.vedtak.VedtakshendelseListener
+import no.nav.bidrag.regnskap.service.VedtakshendelseService
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -16,8 +16,8 @@ private val LOGGER = LoggerFactory.getLogger(KafkaConfiguration::class.java)
 class KafkaConfiguration {
 
   @Bean
-  fun vedtakHendesleListener(vedtakHendelseService: VedtakHendelseService) =
-    VedtakHendelseListener(vedtakHendelseService)
+  fun vedtakHendesleListener(vedtakshendelseService: VedtakshendelseService) =
+    VedtakshendelseListener(vedtakshendelseService)
 
   @Bean
   fun vedtakshendelseErrorHandler(): KafkaListenerErrorHandler {

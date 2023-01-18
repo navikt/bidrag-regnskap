@@ -12,11 +12,11 @@ import no.nav.bidrag.regnskap.dto.vedtak.Periode
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
-private val LOGGER = LoggerFactory.getLogger(VedtakHendelseService::class.java)
+private val LOGGER = LoggerFactory.getLogger(VedtakshendelseService::class.java)
 private val objectMapper = ObjectMapper().registerModule(KotlinModule.Builder().build()).registerModule(JavaTimeModule())
 
 @Service
-class VedtakHendelseService(
+class VedtakshendelseService(
   private val oppdragService: OppdragService,
   private val kravService: KravService
 ) {
