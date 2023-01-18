@@ -2,7 +2,7 @@ package no.nav.bidrag.regnskap.service
 
 import no.nav.bidrag.behandling.felles.enums.EngangsbelopType
 import no.nav.bidrag.behandling.felles.enums.VedtakType
-import no.nav.bidrag.regnskap.dto.enumer.SøknadType
+import no.nav.bidrag.regnskap.dto.enumer.Søknadstype
 import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
 import no.nav.bidrag.regnskap.dto.enumer.Type
 import no.nav.bidrag.regnskap.dto.oppdrag.KonteringResponse
@@ -39,7 +39,7 @@ class KonteringService(
             overforingsperiode = kontering.overføringsperiode,
             overforingstidspunkt = kontering.overføringstidspunkt.toString(),
             type = Type.valueOf(kontering.type),
-            soknadType = SøknadType.valueOf(kontering.søknadType),
+            soknadType = Søknadstype.valueOf(kontering.søknadType),
             sendtIPalopsfil = kontering.sendtIPåløpsfil
           )
         )
@@ -85,7 +85,7 @@ class KonteringService(
             transaksjonskode = Transaksjonskode.hentTransaksjonskodeForType(oppdragsperiode.oppdrag!!.stønadType).name,
             overføringsperiode = forPeriode,
             type = vurderType(oppdragsperiode),
-            søknadType = SøknadType.EN.name,
+            søknadType = Søknadstype.EN.name,
             oppdragsperiode = oppdragsperiode,
             sendtIPåløpsfil = true
           )
@@ -135,7 +135,7 @@ class KonteringService(
   }
 
   private fun erKonteringGebyr(kontering: Kontering) =
-    (kontering.søknadType == SøknadType.FABM.name || kontering.søknadType == SøknadType.FABP.name)
+    (kontering.søknadType == Søknadstype.FABM.name || kontering.søknadType == Søknadstype.FABP.name)
 
   private fun slutterNyeOppdragsperiodeFørOverførteKonteringsPeriode(
     kontering: Kontering,
@@ -153,13 +153,13 @@ class KonteringService(
 
   private fun finnSøknadsType(hendelse: Hendelse): String {
     return if (hendelse.vedtakType == VedtakType.AUTOMATISK_INDEKSREGULERING) {
-      SøknadType.IN.name
+      Søknadstype.IN.name
     } else if (hendelse.type == EngangsbelopType.GEBYR_MOTTAKER.name) {
-      SøknadType.FABM.name
+      Søknadstype.FABM.name
     } else if (hendelse.type == EngangsbelopType.GEBYR_SKYLDNER.name) {
-      SøknadType.FABP.name
+      Søknadstype.FABP.name
     } else {
-      SøknadType.EN.name
+      Søknadstype.EN.name
     }
   }
 

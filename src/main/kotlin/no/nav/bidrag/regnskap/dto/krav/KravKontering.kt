@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.datatype.jsr310.deser.YearMonthDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.YearMonthSerializer
 import io.swagger.v3.oas.annotations.media.Schema
-import no.nav.bidrag.regnskap.dto.enumer.SøknadType
+import no.nav.bidrag.regnskap.dto.enumer.Søknadstype
 import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
 import no.nav.bidrag.regnskap.dto.enumer.Type
 import org.springframework.format.annotation.DateTimeFormat
@@ -61,7 +61,7 @@ data class KravKontering(
         + "| EN   | Alle andre typer endringer. Også førstegangsvedtak.                        |\n",
     example = "EN",
     required = true
-  ) val soknadType: SøknadType,
+  ) val soknadType: Søknadstype,
 
   @field:Schema(
     description = "Personident (FNR/DNR) til bidragsmottaker i bidragssaken. I saker der bidragsmottaker ikke er satt benyttes et dummynr 22222222226",

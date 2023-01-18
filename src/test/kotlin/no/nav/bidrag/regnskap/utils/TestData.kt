@@ -2,7 +2,7 @@ package no.nav.bidrag.regnskap.utils
 
 import no.nav.bidrag.behandling.felles.enums.StonadType
 import no.nav.bidrag.behandling.felles.enums.VedtakType
-import no.nav.bidrag.regnskap.dto.enumer.SøknadType
+import no.nav.bidrag.regnskap.dto.enumer.Søknadstype
 import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
 import no.nav.bidrag.regnskap.dto.enumer.Type
 import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
@@ -137,7 +137,7 @@ object TestData {
     overforingsperiode: String = YearMonth.now().toString(),
     overforingstidspunkt: LocalDateTime? = null,
     type: String = Type.NY.toString(),
-    søknadType: String = SøknadType.EN.name,
+    søknadstype: String = Søknadstype.EN.name,
     sendtIPalopsfil: Boolean = false,
     overføringKontering: List<OverføringKontering>? = listOf(opprettOverføringKontering())
   ): Kontering {
@@ -148,7 +148,7 @@ object TestData {
       overføringsperiode = overforingsperiode,
       overføringstidspunkt = overforingstidspunkt,
       type = type,
-      søknadType = søknadType,
+      søknadType = søknadstype,
       sendtIPåløpsfil = sendtIPalopsfil,
       overføringKontering = overføringKontering
     )

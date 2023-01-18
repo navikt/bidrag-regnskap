@@ -18,9 +18,9 @@ import no.nav.bidrag.behandling.felles.enums.StonadType.*
 import no.nav.bidrag.regnskap.SpringTestRunner
 import no.nav.bidrag.regnskap.consumer.KravApiWireMock
 import no.nav.bidrag.regnskap.consumer.SakApiWireMock
-import no.nav.bidrag.regnskap.dto.enumer.SøknadType
-import no.nav.bidrag.regnskap.dto.enumer.SøknadType.FABM
-import no.nav.bidrag.regnskap.dto.enumer.SøknadType.FABP
+import no.nav.bidrag.regnskap.dto.enumer.Søknadstype
+import no.nav.bidrag.regnskap.dto.enumer.Søknadstype.FABM
+import no.nav.bidrag.regnskap.dto.enumer.Søknadstype.FABP
 import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
 import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode.*
 import no.nav.bidrag.regnskap.dto.enumer.Type.*
@@ -188,7 +188,7 @@ internal class VedtakHendelseListenerIT: SpringTestRunner() {
     val vedtakHendelse = hentFilOgSendPåKafka("særtilskudd.json", 7)
 
     val kontering = assertVedOpprettelseAvEngangsbeløp(
-      3, vedtakHendelse, SAERTILSKUDD, E1, 100000002, SøknadType.EN
+      3, vedtakHendelse, SAERTILSKUDD, E1, 100000002, Søknadstype.EN
     )
 
     skrivTilTestdatafil(listOf(kontering), "Særtilskudd")
@@ -224,7 +224,7 @@ internal class VedtakHendelseListenerIT: SpringTestRunner() {
       TILBAKEKREVING,
       H1,
       Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].referanse),
-      SøknadType.EN
+      Søknadstype.EN
     )
 
     skrivTilTestdatafil(listOf(kontering), "Tilbakekreving")
@@ -261,7 +261,7 @@ internal class VedtakHendelseListenerIT: SpringTestRunner() {
       ETTERGIVELSE,
       K1,
       Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].referanse),
-      SøknadType.EN
+      Søknadstype.EN
     )
 
     skrivTilTestdatafil(listOf(kontering), "Ettergivelse")
@@ -278,7 +278,7 @@ internal class VedtakHendelseListenerIT: SpringTestRunner() {
       DIREKTE_OPPGJOR,
       K2,
       Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].referanse),
-      SøknadType.EN
+      Søknadstype.EN
     )
 
     skrivTilTestdatafil(listOf(kontering), "Direkte oppgjør")
@@ -295,7 +295,7 @@ internal class VedtakHendelseListenerIT: SpringTestRunner() {
       ETTERGIVELSE_TILBAKEKREVING,
       K3,
       Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].referanse),
-      SøknadType.EN
+      Søknadstype.EN
     )
 
     skrivTilTestdatafil(listOf(kontering), "Ettergivelse tilbakekreving")
@@ -316,7 +316,7 @@ internal class VedtakHendelseListenerIT: SpringTestRunner() {
       3,
       3,
       A1,
-      SøknadType.EN
+      Søknadstype.EN
     )
 
     val konteringer = hentAlleKonteringerForOppdrag(oppdrag)
@@ -345,7 +345,7 @@ internal class VedtakHendelseListenerIT: SpringTestRunner() {
       4,
       1,
       A1,
-      SøknadType.EN,
+      Søknadstype.EN,
       A3
     )
 
@@ -377,7 +377,7 @@ internal class VedtakHendelseListenerIT: SpringTestRunner() {
       2,
       2,
       B1,
-      SøknadType.EN
+      Søknadstype.EN
     )
 
     val oppdrag2 = assertStønader(
@@ -387,7 +387,7 @@ internal class VedtakHendelseListenerIT: SpringTestRunner() {
       2,
       2,
       B1,
-      SøknadType.EN,
+      Søknadstype.EN,
       stonadsendringIndex = 1
     )
 
@@ -439,7 +439,7 @@ internal class VedtakHendelseListenerIT: SpringTestRunner() {
       3,
       1,
       B1,
-      SøknadType.EN,
+      Søknadstype.EN,
       B3,
       0
     )
@@ -461,7 +461,7 @@ internal class VedtakHendelseListenerIT: SpringTestRunner() {
       3,
       1,
       B1,
-      SøknadType.EN,
+      Søknadstype.EN,
       B3,
       1
     )
@@ -498,7 +498,7 @@ internal class VedtakHendelseListenerIT: SpringTestRunner() {
       1,
       1,
       B1,
-      SøknadType.EN
+      Søknadstype.EN
     )
 
     await().atMost(TEN_SECONDS).until {
@@ -512,7 +512,7 @@ internal class VedtakHendelseListenerIT: SpringTestRunner() {
       1,
       1,
       B1,
-      SøknadType.EN
+      Søknadstype.EN
     )
 
     skrivTilTestdatafil(hentAlleKonteringerForOppdrag(oppdrag1), "Oppfostringsbidrag for barn 1")
@@ -538,7 +538,7 @@ internal class VedtakHendelseListenerIT: SpringTestRunner() {
       2,
       1,
       B1,
-      SøknadType.EN,
+      Søknadstype.EN,
       B3,
       0
     )
@@ -555,7 +555,7 @@ internal class VedtakHendelseListenerIT: SpringTestRunner() {
       2,
       1,
       B1,
-      SøknadType.EN,
+      Søknadstype.EN,
       B3,
       1
     )
@@ -587,7 +587,7 @@ internal class VedtakHendelseListenerIT: SpringTestRunner() {
       3,
       3,
       D1,
-      SøknadType.EN
+      Søknadstype.EN
     )
 
     skrivTilTestdatafil(hentAlleKonteringerForOppdrag(oppdrag), "18 års bidrag")
@@ -611,7 +611,7 @@ internal class VedtakHendelseListenerIT: SpringTestRunner() {
       4,
       1,
       D1,
-      SøknadType.EN,
+      Søknadstype.EN,
       D3
     )
 
@@ -646,7 +646,7 @@ internal class VedtakHendelseListenerIT: SpringTestRunner() {
       2,
       2,
       F1,
-      SøknadType.EN
+      Søknadstype.EN
     )
 
     skrivTilTestdatafil(hentAlleKonteringerForOppdrag(oppdrag), "Ektefellebidrag")
@@ -670,7 +670,7 @@ internal class VedtakHendelseListenerIT: SpringTestRunner() {
       3,
       1,
       F1,
-      SøknadType.EN,
+      Søknadstype.EN,
       F3
     )
 
@@ -699,7 +699,7 @@ internal class VedtakHendelseListenerIT: SpringTestRunner() {
       1,
       1,
       I1,
-      SøknadType.EN
+      Søknadstype.EN
     )
 
     skrivTilTestdatafil(hentAlleKonteringerForOppdrag(oppdrag), "Motregning")
@@ -712,7 +712,7 @@ internal class VedtakHendelseListenerIT: SpringTestRunner() {
     antallOppdragsperioder: Int,
     antallOpprettetIGjeldendeFil: Int,
     forventetTransaksjonskode: Transaksjonskode,
-    forventetSøknadstype: SøknadType,
+    forventetSøknadstype: Søknadstype,
     forventetKorreksjonskode: Transaksjonskode? = null,
     stonadsendringIndex: Int = 0
   ): Oppdrag {
@@ -818,7 +818,7 @@ internal class VedtakHendelseListenerIT: SpringTestRunner() {
     forventetEngangsbeløpType: EngangsbelopType,
     forventetTransaksjonskode: Transaksjonskode,
     forventetDelytelsesId: Int,
-    søknadType: SøknadType,
+    søknadstype: Søknadstype,
     engangsbeløpIndex: Int = 0
   ): Kontering {
     val oppdrag = persistenceService.hentOppdrag(oppdragId) ?: error("Det finnes ingen oppdrag med angitt oppdragsId: $oppdragId")
@@ -846,7 +846,7 @@ internal class VedtakHendelseListenerIT: SpringTestRunner() {
       kontering.transaksjonskode shouldBe forventetTransaksjonskode.name
       kontering.overføringsperiode shouldBe YearMonth.from(vedtakHendelse.vedtakDato).toString()
       kontering.type shouldBe NY.name
-      kontering.søknadType shouldBe søknadType.name
+      kontering.søknadType shouldBe søknadstype.name
       kontering.sendtIPåløpsfil shouldBe false
     }
     return kontering

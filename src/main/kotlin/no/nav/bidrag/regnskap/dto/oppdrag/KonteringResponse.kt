@@ -1,7 +1,7 @@
 package no.nav.bidrag.regnskap.dto.oppdrag
 
 import io.swagger.v3.oas.annotations.media.Schema
-import no.nav.bidrag.regnskap.dto.enumer.SøknadType
+import no.nav.bidrag.regnskap.dto.enumer.Søknadstype
 import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
 import no.nav.bidrag.regnskap.dto.enumer.Type
 
@@ -74,7 +74,7 @@ data class KonteringResponse(
         + "| EN   | Alle andre typer endringer. Også førstegangsvedtak.                        |\n",
     example = "EN",
     required = true
-  ) val soknadType: SøknadType,
+  ) val soknadType: Søknadstype,
 
   @field:Schema(
     description = "Angir om konteringen har blitt overført i generert påløpsfil eller om den er sendt over via REST-endepunktet.",

@@ -3,7 +3,7 @@ package no.nav.bidrag.regnskap.service
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.bidrag.regnskap.SECURE_LOGGER
 import no.nav.bidrag.regnskap.consumer.SkattConsumer
-import no.nav.bidrag.regnskap.dto.enumer.SøknadType
+import no.nav.bidrag.regnskap.dto.enumer.Søknadstype
 import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
 import no.nav.bidrag.regnskap.dto.enumer.Type
 import no.nav.bidrag.regnskap.dto.krav.Krav
@@ -161,7 +161,7 @@ class KravService(
         KravKontering(
           transaksjonskode = Transaksjonskode.valueOf(kontering.transaksjonskode),
           type = Type.valueOf(kontering.type),
-          soknadType = SøknadType.valueOf(kontering.søknadType),
+          soknadType = Søknadstype.valueOf(kontering.søknadType),
           gjelderIdent = kontering.oppdragsperiode!!.gjelderIdent,
           kravhaverIdent = kontering.oppdragsperiode.oppdrag!!.kravhaverIdent,
           mottakerIdent = kontering.oppdragsperiode.mottakerIdent,
