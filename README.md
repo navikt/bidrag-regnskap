@@ -130,11 +130,11 @@ Det sjekkes 5 minutter over hver time om det finnes en påløpskjøring som skal
 Genereringen av påløpsfil starter kun for påløpets måned om kjøredato for påløpet er passert. 
 Se [PåløpskjøringScheduler.kt](src/main/kotlin/no/nav/bidrag/regnskap/hendelse/schedule/påløp/PåløpskjøringScheduler.kt).
 
-### Avstemning
-Hver dag kl 01:00 starter generering av to avstemningsfiler. Begge xml filene er navngitt med en fast prefix avstdet_D og avstsum_D, som etterfølges av dagens dato på yyMMdd format. 
+### Avstemming
+Hver dag kl 01:00 starter generering av to avstemmingsfiler. Begge xml filene er navngitt med en fast prefix avstdet_D og avstsum_D, som etterfølges av dagens dato på yyMMdd format. 
 Den første filen, avstdet_D inneholder alle oversendte konteringer for gjeldende dag. En linje i filen representerer en kontering med tilhørende verdier.
 Den andre filen, avstsum er en summering over hvor mange av hver transaksjonskode som ble oversendt, samt totale beløpet alle de var på.
-Se [AvstemningsfilerScheduler.kt](src/main/kotlin/no/nav/bidrag/regnskap/hendelse/schedule/avstemning/AvstemningsfilerScheduler.kt).
+Se [AvstemmingsfilerScheduler.kt](src/main/kotlin/no/nav/bidrag/regnskap/hendelse/schedule/avstemning/AvstemmingsfilerScheduler.kt).
 
 ### Vedlikeholdsmodus
 Vedlikeholdsmodus er en funksjon som sørger for at KravAPIet blir stengt for videre oversending av konteringer. Denne kan slå av og på ved å kalle et endepunkt i ELIN. 

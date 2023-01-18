@@ -15,7 +15,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @ExtendWith(MockKExtension::class)
-class AvstemningsfilGeneratorTest {
+class AvstemmingsfilGeneratorTest {
 
   @MockK(relaxed = true)
   private lateinit var gcpFilBucket: GcpFilBucket
@@ -23,7 +23,7 @@ class AvstemningsfilGeneratorTest {
   private lateinit var filoverføringTilElinKlient: FiloverføringTilElinKlient
 
   @InjectMockKs
-  private lateinit var avstemningsfilGenerator: AvstemningsfilGenerator
+  private lateinit var avstemmingsfilGenerator: AvstemmingsfilGenerator
 
   @Test
   fun `skal skrive avstemningsfil`() {
@@ -54,7 +54,7 @@ class AvstemningsfilGeneratorTest {
     oppdrag2.oppdragsperioder = listOf(oppdragsperiode2)
     oppdragsperiode2.konteringer = konteringer2
 
-    avstemningsfilGenerator.skrivAvstemningfil(konteringer + konteringer2, now)
+    avstemmingsfilGenerator.skrivAvstemmingsfil(konteringer + konteringer2, now)
 
     verify(exactly = 1) { gcpFilBucket.finnesFil("avstemning/avstdet_D$nowFormattert.xml") }
     verify(exactly = 1) { gcpFilBucket.lagreFil("avstemning/avstdet_D$nowFormattert.xml", any()) }
@@ -68,7 +68,7 @@ class AvstemningsfilGeneratorTest {
     val now = LocalDate.now()
     val nowFormattert = now.format(DateTimeFormatter.ofPattern("yyMMdd")).toString()
 
-    avstemningsfilGenerator.skrivAvstemningfil(emptyList(), now)
+    avstemmingsfilGenerator.skrivAvstemmingsfil(emptyList(), now)
 
     verify(exactly = 1) { gcpFilBucket.finnesFil("avstemning/avstdet_D$nowFormattert.xml") }
     verify(exactly = 1) { gcpFilBucket.lagreFil("avstemning/avstdet_D$nowFormattert.xml", any()) }

@@ -12,43 +12,41 @@ import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 
+private val LOGGER = LoggerFactory.getLogger(AvstemmingsfilGenerator::class.java)
+
 @Component
-class AvstemningsfilGenerator(
+class AvstemmingsfilGenerator(
   private val gcpFilBucket: GcpFilBucket,
   private val filoverføringTilElinKlient: FiloverføringTilElinKlient
 ) {
 
-  companion object {
-    private val LOGGER = LoggerFactory.getLogger(AvstemningsfilGenerator::class.java)
-  }
-
-  fun skrivAvstemningfil(konteringer: List<Kontering>, now: LocalDate) {
+  fun skrivAvstemmingsfil(konteringer: List<Kontering>, now: LocalDate) {
     LOGGER.info("Starter bygging av avstemningKontering- og avstemningSummeringsfil for $now.")
 
     val nowFormattert = now.format(DateTimeFormatter.ofPattern("yyMMdd")).toString()
-    val avstemningMappe = "avstemning/"
-    val avstemningKonteringFilnavn = "avstdet_D$nowFormattert.xml"
-    val avstemningSummeringFilnavn = "avstsum_D$nowFormattert.xml"
+    val avstemmingMappe = "avstemning/"
+    val avstemmingKonteringFilnavn = "avstdet_D$nowFormattert.xml"
+    val avstemmingSummeringFilnavn = "avstsum_D$nowFormattert.xml"
 
-    if (!gcpFilBucket.finnesFil(avstemningMappe + avstemningKonteringFilnavn)) {
-      val summeringer = opprettAvstemningsfilSummeringer()
+    if (!gcpFilBucket.finnesFil(avstemmingMappe + avstemmingKonteringFilnavn)) {
+      val summeringer = opprettAvstemmingsfilSummeringer()
 
-      val avstemningsfilBuffer = opprettAvstemningFil(konteringer, summeringer, nowFormattert)
-      gcpFilBucket.lagreFil(avstemningMappe + avstemningKonteringFilnavn, avstemningsfilBuffer)
+      val avstemningsfilBuffer = opprettAvstemmingFil(konteringer, summeringer, nowFormattert)
+      gcpFilBucket.lagreFil(avstemmingMappe + avstemmingKonteringFilnavn, avstemningsfilBuffer)
 
-      val avstemningSummeringFil = opprettAvstemningSummeringFil(summeringer)
-      gcpFilBucket.lagreFil(avstemningMappe + avstemningSummeringFilnavn, avstemningSummeringFil)
+      val avstemningSummeringFil = opprettAvstemmingSummeringFil(summeringer)
+      gcpFilBucket.lagreFil(avstemmingMappe + avstemmingSummeringFilnavn, avstemningSummeringFil)
     }
 
-    filoverføringTilElinKlient.lastOppFilTilFilsluse(avstemningMappe, avstemningKonteringFilnavn)
-    filoverføringTilElinKlient.lastOppFilTilFilsluse(avstemningMappe, avstemningSummeringFilnavn)
+    filoverføringTilElinKlient.lastOppFilTilFilsluse(avstemmingMappe, avstemmingKonteringFilnavn)
+    filoverføringTilElinKlient.lastOppFilTilFilsluse(avstemmingMappe, avstemmingSummeringFilnavn)
 
-    LOGGER.info("AvstemningKontering- og avstemningSummeringsfil er ferdig skrevet med ${konteringer.size} konteringer og lastet opp til filsluse.")
+    LOGGER.info("AvstemmingKontering- og avstemmingSummeringsfil er ferdig skrevet med ${konteringer.size} konteringer og lastet opp til filsluse.")
   }
 
-  private fun opprettAvstemningFil(
+  private fun opprettAvstemmingFil(
     konteringer: List<Kontering>,
-    summering: Map<String, AvstemningsfilSummeringer>,
+    summering: Map<String, AvstemmingsfilSummeringer>,
     now: String
   ): ByteArrayOutputStreamTilByteBuffer {
     val avstemningsfilBuffer = ByteArrayOutputStreamTilByteBuffer()
@@ -82,7 +80,7 @@ class AvstemningsfilGenerator(
     return avstemningsfilBuffer
   }
 
-  private fun opprettAvstemningSummeringFil(summering: Map<String, AvstemningsfilSummeringer>): ByteArrayOutputStreamTilByteBuffer {
+  private fun opprettAvstemmingSummeringFil(summering: Map<String, AvstemmingsfilSummeringer>): ByteArrayOutputStreamTilByteBuffer {
     val avstemningSummeringFil = ByteArrayOutputStreamTilByteBuffer()
 
     var totalSum = BigDecimal.ZERO
@@ -113,10 +111,10 @@ class AvstemningsfilGenerator(
     return avstemningSummeringFil
   }
 
-  private fun opprettAvstemningsfilSummeringer(): Map<String, AvstemningsfilSummeringer> {
-    val summering = mutableMapOf<String, AvstemningsfilSummeringer>()
+  private fun opprettAvstemmingsfilSummeringer(): Map<String, AvstemmingsfilSummeringer> {
+    val summering = mutableMapOf<String, AvstemmingsfilSummeringer>()
     Transaksjonskode.values().forEach {
-      summering[it.name] = AvstemningsfilSummeringer(it, BigDecimal(0), 0)
+      summering[it.name] = AvstemmingsfilSummeringer(it, BigDecimal(0), 0)
     }
     return summering
   }
