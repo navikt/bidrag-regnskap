@@ -1,37 +1,81 @@
 package no.nav.bidrag.regnskap.consumer
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import no.nav.bidrag.commons.security.service.SecurityTokenService
-import no.nav.bidrag.regnskap.SECURE_LOGGER
-import no.nav.bidrag.regnskap.model.KravRequest
-import no.nav.bidrag.regnskap.model.KravResponse
-import org.slf4j.LoggerFactory
+import no.nav.bidrag.regnskap.dto.krav.Krav
+import no.nav.bidrag.regnskap.dto.påløp.Vedlikeholdsmodus
+import no.nav.bidrag.regnskap.maskinporten.MaskinportenClient
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
-import org.springframework.web.client.HttpClientErrorException.BadRequest
+import org.springframework.web.client.HttpStatusCodeException
 import org.springframework.web.client.RestTemplate
-
-private val LOGGER = LoggerFactory.getLogger(SkattConsumer::class.java)
+import java.net.URI
 
 @Service
 class SkattConsumer(
-  @Value("\${SKATT_URL}") skattUrl: String,
-  restTemplate: RestTemplate,
-  securityTokenService: SecurityTokenService
-) : DefaultConsumer("skatt", skattUrl, restTemplate, securityTokenService) {
+  @Value("\${SKATT_URL}") private val skattUrl: String,
+  @Value("\${maskinporten.scope}") private val scope: String,
+  private val restTemplate: RestTemplate,
+  private val maskinportenClient: MaskinportenClient
+) {
 
-  fun lagreKrav(kravRequest: KravRequest): ResponseEntity<KravResponse> {
-    LOGGER.info("Lagrer krav")
-    val kravResponse: ResponseEntity<KravResponse>
-    try {
-      kravResponse = restTemplate.postForEntity("/ekstern/skatt/api/krav", kravRequest, KravResponse::class.java)
-    } catch (e: BadRequest) {
-      SECURE_LOGGER.info("En eller flere av konteringene har ikke gått gjennom validering, ${e.message}")
-      val objectMapper = jacksonObjectMapper()
-      return ResponseEntity(objectMapper.readValue(e.responseBodyAsString, KravResponse::class.java), e.statusCode)
+  companion object {
+    const val KRAV_PATH = "/ekstern/skatt/api/krav"
+    const val LIVENESS_PATH = "/ekstern/skatt/api/liveness"
+    const val VEDLIKEHOLDSMODUS_PATH = "/ekstern/skatt/api/vedlikeholdsmodus"
+  }
+
+  fun sendKrav(krav: Krav): ResponseEntity<String> {
+    return try {
+      restTemplate.exchange(
+        opprettSkattUrl(KRAV_PATH),
+        HttpMethod.POST,
+        HttpEntity<Krav>(krav, opprettHttpHeaders()),
+        String::class.java
+      )
+    } catch (e: HttpStatusCodeException) {
+      ResponseEntity.status(e.statusCode).body(e.responseBodyAsString)
     }
-    SECURE_LOGGER.info("Mottok svar: \n${kravResponse}")
-    return kravResponse
+  }
+
+  fun oppdaterVedlikeholdsmodus(vedlikeholdsmodus: Vedlikeholdsmodus): ResponseEntity<Any> {
+    return restTemplate.exchange(
+        opprettSkattUrl(VEDLIKEHOLDSMODUS_PATH),
+        HttpMethod.POST,
+        HttpEntity<Vedlikeholdsmodus>(vedlikeholdsmodus, opprettHttpHeaders()),
+        Any::class.java
+      )
+  }
+
+  fun hentStatusPåVedlikeholdsmodus(): ResponseEntity<Any> {
+    return try {
+      restTemplate.exchange(
+        opprettSkattUrl(LIVENESS_PATH),
+        HttpMethod.GET,
+        HttpEntity<String>(opprettHttpHeaders()),
+        Any::class.java
+      )
+    } catch (e: HttpStatusCodeException) {
+      ResponseEntity.status(e.statusCode).body(e.responseBodyAsString)
+    }
+  }
+
+  private fun opprettSkattUrl(path: String): URI {
+    return URI.create(skattUrl + path)
+  }
+
+  private fun opprettHttpHeaders(): HttpHeaders {
+    val httpHeaders = HttpHeaders()
+    httpHeaders.set("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+    httpHeaders.set("Accept", MediaType.APPLICATION_JSON_VALUE)
+    httpHeaders.set("Authorization", "Bearer " + hentJwtToken())
+    return httpHeaders
+  }
+
+  private fun hentJwtToken(): String {
+    return maskinportenClient.hentMaskinportenToken(scope).parsedString
   }
 }

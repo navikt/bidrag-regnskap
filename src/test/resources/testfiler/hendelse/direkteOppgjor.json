@@ -1,0 +1,24 @@
+{
+  "vedtakType": "MANUELT",
+  "opprettetAv": "O163248",
+  "vedtakDato": "2022-02-28",
+  "enhetId": "4817",
+  "eksternReferanse": null,
+  "utsattTilDato": null,
+  "opprettetTidspunkt": "2022-02-28T16:00:23.254988482",
+  "stonadsendringListe": [],
+  "engangsbelopListe": [
+    {
+      "engangsbelopId": "42",
+      "type": "DIREKTE_OPPGJOR",
+      "sakId": "0809546",
+      "skyldnerId": "",
+      "kravhaverId": "",
+      "mottakerId": "",
+      "belop": 7999.00,
+      "valutakode": "NOK",
+      "resultatkode": "HE",
+      "referanse": "26681272"
+    }
+  ]
+}

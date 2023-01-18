@@ -1,7 +1,7 @@
 package no.nav.bidrag.regnskap.config
 
-import no.nav.bidrag.regnskap.hendelse.VedtakHendelseListener
-import no.nav.bidrag.regnskap.service.BehandleHendelseService
+import no.nav.bidrag.regnskap.hendelse.kafka.vedtak.VedtakshendelseListener
+import no.nav.bidrag.regnskap.service.VedtakshendelseService
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -16,7 +16,8 @@ private val LOGGER = LoggerFactory.getLogger(KafkaConfiguration::class.java)
 class KafkaConfiguration {
 
   @Bean
-  fun vedtakHendesleListener(behandleHendelseService: BehandleHendelseService) = VedtakHendelseListener(behandleHendelseService)
+  fun vedtakHendesleListener(vedtakshendelseService: VedtakshendelseService) =
+    VedtakshendelseListener(vedtakshendelseService)
 
   @Bean
   fun vedtakshendelseErrorHandler(): KafkaListenerErrorHandler {
@@ -27,7 +28,9 @@ class KafkaConfiguration {
         "Unable to read message payload"
       }
 
-      LOGGER.error("Message {} cause error: {} - {} - headers: {}", messagePayload, e.javaClass.simpleName, e.message, message.headers)
+      LOGGER.error(
+        "Message {} cause error: {} - {} - headers: {}", messagePayload, e.javaClass.simpleName, e.message, message.headers
+      )
       Optional.empty<Any>()
     }
   }

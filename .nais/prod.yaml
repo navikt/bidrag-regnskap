@@ -4,6 +4,16 @@ ingresses:
 azure:
   skatt_url: bidrag-stubs.dev.intern.nav.no #TODO: LEGGE INN URL
   skatt_scope: dev-gcp.bidrag.bidrag-stubs
+  sak_url: bidrag-sak.prod-fss-pub.nais.io
+  sak_scope: prod-fss.bidrag.bidrag-sak
 kafka:
   pool: nav-prod
 kafka-topic-vedtak: bidrag.vedtak
+database:
+  navn: bidrag-regnskap-prod
+bucket:
+  navn: bidrag-regnskap-prod
+sftp:
+  host: sftp.nav.no
+maskinporten:
+  url: https://maskinporten.no
