@@ -11,7 +11,7 @@ import no.nav.bidrag.regnskap.service.PåløpskjøringService
 import no.nav.security.token.support.core.api.Protected
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -21,7 +21,7 @@ class PåløpskjøringController(
   private val påløpskjøringService: PåløpskjøringService
 ) {
 
-  @GetMapping("/palopskjoring")
+  @PostMapping("/palopskjoring")
   @Operation(
     summary = "Start manuel generering av påløpsfil",
     description = "Operasjon for å starte påløpskjøring. Vil starte eldste ikke gjennomførte påløp i 'palop' tabellen. " +
@@ -44,7 +44,7 @@ class PåløpskjøringController(
     return ResponseEntity.status(HttpStatus.CREATED).body(påløp.påløpId)
   }
 
-  @GetMapping("/stop_palopskjoring")
+  @PostMapping("/stop_palopskjoring")
   @Operation(
     summary = "Stopper pågående generering av påløpsfil",
     description = "Operasjon for å stoppe påløpskjøring.",
