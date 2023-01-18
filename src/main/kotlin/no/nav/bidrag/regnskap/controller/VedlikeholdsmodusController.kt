@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.bidrag.regnskap.consumer.SkattConsumer
-import no.nav.bidrag.regnskap.dto.enumer.ÅrsakKode
+import no.nav.bidrag.regnskap.dto.enumer.Årsakskode
 import no.nav.bidrag.regnskap.dto.påløp.Vedlikeholdsmodus
 import no.nav.bidrag.regnskap.dto.vedlikeholdsmodus.Feilsituasjon
 import no.nav.security.token.support.core.api.Protected
@@ -43,10 +43,10 @@ class VedlikeholdsmodusController(
   @Parameter(name = "kommentar", example = "Påløp for 2022-12 genereres hos NAV.")
   fun endreVedlikeholdsmodus(
     aktiv: Boolean,
-    årsakKode: ÅrsakKode,
+    årsakskode: Årsakskode,
     kommentar: String
   ): ResponseEntity<Any> {
-    return skattConsumer.oppdaterVedlikeholdsmodus(Vedlikeholdsmodus(aktiv, årsakKode, kommentar))
+    return skattConsumer.oppdaterVedlikeholdsmodus(Vedlikeholdsmodus(aktiv, årsakskode, kommentar))
   }
 
   @GetMapping("/vedlikeholdsmodus")

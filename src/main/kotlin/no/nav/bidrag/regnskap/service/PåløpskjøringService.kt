@@ -7,7 +7,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
 import no.nav.bidrag.regnskap.consumer.SkattConsumer
-import no.nav.bidrag.regnskap.dto.enumer.ÅrsakKode
+import no.nav.bidrag.regnskap.dto.enumer.Årsakskode
 import no.nav.bidrag.regnskap.dto.påløp.Vedlikeholdsmodus
 import no.nav.bidrag.regnskap.fil.PåløpsfilGenerator
 import no.nav.bidrag.regnskap.persistence.entity.Driftsavvik
@@ -36,11 +36,11 @@ class PåløpskjøringService(
     påløpskjøringJob = launch {
       withContext(Dispatchers.IO) {
         validerDriftsavvik(påløp, schedulertKjøring)
-        endreElinVedlikeholdsmodus(ÅrsakKode.PAALOEP_GENERERES, "Påløp for ${påløp.forPeriode} genereres hos NAV.")
+        endreElinVedlikeholdsmodus(Årsakskode.PAALOEP_GENERERES, "Påløp for ${påløp.forPeriode} genereres hos NAV.")
         opprettKonteringerForAlleAktiveOppdrag(påløp)
         genererPåløpsfil(påløp)
         fullførPåløp(påløp)
-        endreElinVedlikeholdsmodus(ÅrsakKode.PAALOEP_LEVERT, "Påløp for ${påløp.forPeriode} er ferdig generert fra NAV.")
+        endreElinVedlikeholdsmodus(Årsakskode.PAALOEP_LEVERT, "Påløp for ${påløp.forPeriode} er ferdig generert fra NAV.")
         avsluttDriftsavvik(påløp)
       }
     }
@@ -140,7 +140,7 @@ class PåløpskjøringService(
     )
   }
 
-  private fun endreElinVedlikeholdsmodus(årsakKode: ÅrsakKode, kommentar: String) {
-    skattConsumer.oppdaterVedlikeholdsmodus(Vedlikeholdsmodus(true, årsakKode, kommentar))
+  private fun endreElinVedlikeholdsmodus(årsakskode: Årsakskode, kommentar: String) {
+    skattConsumer.oppdaterVedlikeholdsmodus(Vedlikeholdsmodus(true, årsakskode, kommentar))
   }
 }

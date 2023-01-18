@@ -1,7 +1,7 @@
 package no.nav.bidrag.regnskap.dto.påløp
 
 import io.swagger.v3.oas.annotations.media.Schema
-import no.nav.bidrag.regnskap.dto.enumer.ÅrsakKode
+import no.nav.bidrag.regnskap.dto.enumer.Årsakskode
 
 @Schema(name = "Vedlikeholdsmodus", description = "Kontroll av vedlikeholdsmodus.")
 data class Vedlikeholdsmodus(
@@ -19,7 +19,7 @@ data class Vedlikeholdsmodus(
     example = "PAALOEP_GENERERES",
     required = true
   )
-  val aarsakKode: ÅrsakKode,
+  val aarsakKode: Årsakskode,
 
   @field:Schema(
     description = "Kommentar som sier noe om hvorfor påløpsmodus er aktiv.",
