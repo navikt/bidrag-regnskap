@@ -1,7 +1,6 @@
 package no.nav.bidrag.regnskap.dto.påløp
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.springframework.format.annotation.DateTimeFormat
 import java.time.LocalDateTime
 import java.time.YearMonth
 
@@ -15,7 +14,6 @@ data class PåløpRequest(
     type = "String",
     required = true
   )
-  @field:DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   val kjoredato: LocalDateTime,
 
   @field:Schema(

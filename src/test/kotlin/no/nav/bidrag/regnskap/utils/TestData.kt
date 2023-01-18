@@ -63,7 +63,7 @@ object TestData {
     periodeListe: List<Periode> = listOf(opprettPeriodeDomene())
   ): Hendelse {
     return Hendelse(
-      engangsbelopId = engangsbelopId,
+      engangsbeløpId = engangsbelopId,
       type = type,
       vedtakType = vedtakType,
       kravhaverIdent = kravhaverIdent,

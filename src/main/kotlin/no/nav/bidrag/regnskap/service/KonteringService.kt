@@ -37,7 +37,7 @@ class KonteringService(
             oppdragsperiodeId = kontering.oppdragsperiode?.oppdragsperiodeId,
             transaksjonskode = Transaksjonskode.valueOf(kontering.transaksjonskode),
             overforingsperiode = kontering.overføringsperiode,
-            overforingstidspunkt = kontering.overføringstidspunkt.toString(),
+            overforingstidspunkt = kontering.overføringstidspunkt,
             type = Type.valueOf(kontering.type),
             soknadType = Søknadstype.valueOf(kontering.søknadType),
             sendtIPalopsfil = kontering.sendtIPåløpsfil

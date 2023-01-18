@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import no.nav.bidrag.regnskap.dto.enumer.Søknadstype
 import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
 import no.nav.bidrag.regnskap.dto.enumer.Type
+import java.time.LocalDateTime
 
 @Schema(
   name = "KonteringResponse",
@@ -56,7 +57,7 @@ data class KonteringResponse(
     format = "date-time",
     example = "2022-02-01:00:00:00",
   )
-  val overforingstidspunkt: String?,
+  val overforingstidspunkt: LocalDateTime?,
 
   @field:Schema(
     description = "Angir om det er en ny transaksjon eller en endring.",

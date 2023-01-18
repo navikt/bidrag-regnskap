@@ -75,8 +75,8 @@ class VedtakshendelseService(
   private fun opprettOppdragForEngangsbelop(vedtakHendelse: VedtakHendelse, engangsbelop: Engangsbelop) {
     LOGGER.debug("Oppretter oppdrag for engangsbeløp.")
     val hendelse = Hendelse(
-      engangsbelopId = engangsbelop.engangsbelopId,
-      endretEngangsbelopId = engangsbelop.endrerEngangsbelopId,
+      engangsbeløpId = engangsbelop.engangsbelopId,
+      endretEngangsbeløpId = engangsbelop.endrerEngangsbelopId,
       type = engangsbelop.type.name,
       vedtakType = vedtakHendelse.vedtakType,
       kravhaverIdent = leggTilIdent(engangsbelop.kravhaverId),

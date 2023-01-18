@@ -48,9 +48,9 @@ class OppdragService(
   }
 
   private fun hentOppdragOmDetFinnes(hendelse: Hendelse): Oppdrag? {
-    if (hendelse.endretEngangsbelopId != null) {
-      return persistenceService.hentOppdragPåEngangsbeløpId(hendelse.endretEngangsbelopId)
-    } else if (hendelse.engangsbelopId == null) {
+    if (hendelse.endretEngangsbeløpId != null) {
+      return persistenceService.hentOppdragPåEngangsbeløpId(hendelse.endretEngangsbeløpId)
+    } else if (hendelse.engangsbeløpId == null) {
       return persistenceService.hentOppdragPaUnikeIdentifikatorer(
         hendelse.type,
         hendelse.kravhaverIdent,
@@ -72,7 +72,7 @@ class OppdragService(
       skyldnerIdent = hendelse.skyldnerIdent,
       eksternReferanse = hendelse.eksternReferanse,
       utsattTilDato = hendelse.utsattTilDato,
-      engangsbeløpId = hendelse.engangsbelopId
+      engangsbeløpId = hendelse.engangsbeløpId
     )
 
     val oppdragsperioder = oppdragsperiodeService.opprettNyeOppdragsperioder(hendelse, oppdrag)
@@ -89,8 +89,8 @@ class OppdragService(
     hendelse: Hendelse, oppdrag: Oppdrag
   ): Int {
     //TODO: Håndtere oppdatering av skyldnerIdent/kravhaver
-    if (hendelse.endretEngangsbelopId != null) {
-      oppdrag.engangsbeløpId = hendelse.engangsbelopId
+    if (hendelse.endretEngangsbeløpId != null) {
+      oppdrag.engangsbeløpId = hendelse.engangsbeløpId
     }
 
     val nyeOppdragsperioder = oppdragsperiodeService.opprettNyeOppdragsperioder(hendelse, oppdrag)

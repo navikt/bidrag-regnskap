@@ -4,8 +4,8 @@ import no.nav.bidrag.behandling.felles.enums.VedtakType
 import java.time.LocalDate
 
 data class Hendelse(
-  val engangsbelopId: Int? = null,
-  val endretEngangsbelopId: Int? = null,
+  val engangsbeløpId: Int? = null,
+  val endretEngangsbeløpId: Int? = null,
   val type: String,
   val vedtakType: VedtakType,
   val kravhaverIdent: String?,

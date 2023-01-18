@@ -1,6 +1,5 @@
 package no.nav.bidrag.regnskap.persistence.entity
 
-import org.hibernate.Hibernate
 import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.persistence.CascadeType
