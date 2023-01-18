@@ -42,7 +42,7 @@ internal class PersistenceServiceIT : SpringTestRunner() {
 
     oppdragId shouldNotBe null
 
-    val oppdrag = persistenceService.hentOppdrag(oppdragId!!)
+    val oppdrag = persistenceService.hentOppdrag(oppdragId)
 
     val oppdragHentetPåUnikeIdentifikatorer = persistenceService.hentOppdragPaUnikeIdentifikatorer(
       oppdragTestData.stønadType,
@@ -187,7 +187,7 @@ internal class PersistenceServiceIT : SpringTestRunner() {
           forPeriode = "1900-01",
           fullførtTidspunkt = LocalDateTime.now().minusYears(100)
         )
-      )!!
+      )
       val driftsavvikMedPåløp = TestData.opprettDriftsavvik(
         påløpId = påløpId,
         tidspunktFra = LocalDateTime.now().minusMinutes(10),

@@ -18,7 +18,7 @@ data class Oppdrag(
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "oppdrag_id")
-  val oppdragId: Int? = null,
+  val oppdragId: Int = 0,
 
   @Column(name = "stonad_type")
   val stønadType: String,
@@ -27,7 +27,7 @@ data class Oppdrag(
   var vedtakType: String,
 
   @Column(name = "sak_id")
-  val sakId: String, //TODO() Flytt til Oppdrag
+  val sakId: String,
 
   @Column(name = "kravhaver_ident")
   val kravhaverIdent: String? = null,
@@ -51,17 +51,7 @@ data class Oppdrag(
   @OneToMany(mappedBy = "oppdrag", cascade = [CascadeType.ALL])
   var oppdragsperioder: List<Oppdragsperiode>? = null
 ) {
-  override fun equals(other: Any?): Boolean {
-    if (this === other) return true
-    if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
-    other as Oppdrag
 
-    return oppdragId != null && oppdragId == other.oppdragId
-  }
-
-  override fun hashCode(): Int = javaClass.hashCode()
-
-  @Override
   override fun toString(): String {
     return this::class.simpleName +
         "(oppdragId = $oppdragId , " +

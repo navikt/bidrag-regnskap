@@ -1,6 +1,5 @@
 package no.nav.bidrag.regnskap.persistence.entity
 
-import org.hibernate.Hibernate
 import java.time.LocalDateTime
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -14,7 +13,7 @@ data class Påløp(
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "palop_id")
-  val påløpId: Int? = null,
+  val påløpId: Int = 0,
 
   @Column(name = "kjoredato")
   val kjøredato: LocalDateTime,
@@ -25,17 +24,7 @@ data class Påløp(
   @Column(name = "for_periode")
   val forPeriode: String
 ) {
-  override fun equals(other: Any?): Boolean {
-    if (this === other) return true
-    if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
-    other as Påløp
 
-    return påløpId != null && påløpId == other.påløpId
-  }
-
-  override fun hashCode(): Int = javaClass.hashCode()
-
-  @Override
   override fun toString(): String {
     return this::class.simpleName + "(påløpId = $påløpId , kjøredato = $kjøredato , fullførtTidspunkt = $fullførtTidspunkt , forPeriode = $forPeriode )"
   }

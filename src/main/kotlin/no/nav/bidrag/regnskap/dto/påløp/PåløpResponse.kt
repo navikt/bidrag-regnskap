@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class PåløpResponse(
 
   @field:Schema(description = "Id for påløpet.")
-  val påløpId: Int? = null,
+  val påløpId: Int,
 
   @field:Schema(
     description = "Dato paløpet skal kjøre.",

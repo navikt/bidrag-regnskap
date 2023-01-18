@@ -35,6 +35,6 @@ class PåløpsService(
       kjøredato = påløpRequest.kjoredato, forPeriode = påløpRequest.forPeriode.toString()
     )
 
-    return persistenceService.lagrePåløp(påløp)!!
+    return persistenceService.lagrePåløp(påløp)
   }
 }

@@ -15,7 +15,7 @@ data class KonteringResponse(
     description = "Id til konteringen.",
     example = "30"
   )
-  val konteringId: Int?,
+  val konteringId: Int,
 
   @field:Schema(
     description = "Id til oppdragsperioden konteringen tilhører.",

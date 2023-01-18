@@ -80,7 +80,7 @@ class OppdragService(
 
     oppdrag.oppdragsperioder = oppdragsperioder
 
-    val oppdragId = persistenceService.lagreOppdrag(oppdrag)!!
+    val oppdragId = persistenceService.lagreOppdrag(oppdrag)
 
     return oppdragId
   }
@@ -102,7 +102,7 @@ class OppdragService(
 
     oppdatererVerdierPåOppdrag(hendelse, oppdrag, nyeOppdragsperioder)
 
-    val oppdragId = persistenceService.lagreOppdrag(oppdrag)!!
+    val oppdragId = persistenceService.lagreOppdrag(oppdrag)
 
     return oppdragId
   }

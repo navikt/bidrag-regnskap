@@ -22,7 +22,7 @@ import kotlin.random.Random
 object TestData {
 
   fun opprettOppdrag(
-    oppdragId: Int? = null,
+    oppdragId: Int = 0,
     stonadType: StonadType = StonadType.BIDRAG,
     vedtakType: VedtakType = VedtakType.MANUELT,
     sakId: String = "123456",
@@ -96,7 +96,7 @@ object TestData {
   }
 
   fun opprettOppdragsperiode(
-    oppdragsperiodeId: Int? = null,
+    oppdragsperiodeId: Int = 0,
     oppdrag: Oppdrag? = null,
     vedtakId: Int = 654321,
     gjelderIdent: String = TestDataGenerator.genererPersonnummer(),
@@ -131,7 +131,7 @@ object TestData {
   }
 
   fun opprettKontering(
-    konteringId: Int? = null,
+    konteringId: Int = 0,
     oppdragsperiode: Oppdragsperiode? = null,
     transaksjonskode: String = Transaksjonskode.A1.toString(),
     overforingsperiode: String = YearMonth.now().toString(),
@@ -155,7 +155,7 @@ object TestData {
   }
 
   fun opprettOverføringKontering(
-    overføringId: Int? = null,
+    overføringId: Int = 0,
     kontering: Kontering? = null,
     referansekode: String? = null,
     feilmelding: String? = null,
@@ -173,7 +173,7 @@ object TestData {
   }
 
   fun opprettPåløp(
-    påløpId: Int? = null,
+    påløpId: Int = 0,
     kjøredato: LocalDateTime = LocalDateTime.now(),
     fullførtTidspunkt: LocalDateTime? = null,
     forPeriode: String = "2022-01"
@@ -187,7 +187,7 @@ object TestData {
   }
 
   fun opprettDriftsavvik(
-    driftsavvikId: Int? = null,
+    driftsavvikId: Int = 0,
     påløpId: Int? = null,
     tidspunktFra: LocalDateTime = LocalDateTime.now(),
     tidspunktTil: LocalDateTime? = LocalDateTime.now().plusHours(1),

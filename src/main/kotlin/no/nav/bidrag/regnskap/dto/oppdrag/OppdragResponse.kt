@@ -12,7 +12,7 @@ data class OppdragResponse(
     description = "Id til oppdraget.",
     example = "10"
   )
-  val oppdragId: Int?,
+  val oppdragId: Int,
 
   @field:Schema(
     description = "Type stønad.",

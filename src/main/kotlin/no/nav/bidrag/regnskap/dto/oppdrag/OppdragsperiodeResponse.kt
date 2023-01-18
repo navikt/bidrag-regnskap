@@ -15,7 +15,7 @@ data class OppdragsperiodeResponse(
     description = "Id til oppdragsperioden.",
     example = "20"
   )
-  val oppdragsperiodeId: Int?,
+  val oppdragsperiodeId: Int,
 
   @field:Schema(
     description = "Id til oppdraget oppdragsperioden tilhører.",

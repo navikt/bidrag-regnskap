@@ -18,7 +18,7 @@ class DriftsavvikService(
     return persistenceService.hentAlleAktiveDriftsavvik()
   }
 
-  fun lagreDriftsavvik(tidspunktFra: LocalDateTime, tidspunktTil: LocalDateTime, opprettetAv: String?, årsak: String?): Int? {
+  fun lagreDriftsavvik(tidspunktFra: LocalDateTime, tidspunktTil: LocalDateTime, opprettetAv: String?, årsak: String?): Int {
     return persistenceService.lagreDriftsavvik(
       Driftsavvik(tidspunktFra = tidspunktFra, tidspunktTil = tidspunktTil, opprettetAv = opprettetAv, årsak = årsak)
     )

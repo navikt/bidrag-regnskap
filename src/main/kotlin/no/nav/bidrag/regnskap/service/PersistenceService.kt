@@ -55,13 +55,13 @@ class PersistenceService(
     return oppdragRepository.findByEngangsbeløpId(engangsbeløpId)
   }
 
-  fun lagreOppdrag(oppdrag: Oppdrag): Int? {
+  fun lagreOppdrag(oppdrag: Oppdrag): Int {
     val lagretOppdrag = oppdragRepository.save(oppdrag)
     LOGGER.debug("Lagret oppdrag med ID: ${lagretOppdrag.oppdragId}")
     return lagretOppdrag.oppdragId
   }
 
-  fun lagreOverføringKontering(overføringKontering: OverføringKontering): Int? {
+  fun lagreOverføringKontering(overføringKontering: OverføringKontering): Int {
     val lagretOverføringKontering = overføringKonteringRepository.save(overføringKontering)
     LOGGER.debug("Lagret overforingKontering med ID: ${lagretOverføringKontering.overføringId}")
     return lagretOverføringKontering.overføringId
@@ -78,7 +78,7 @@ class PersistenceService(
     return påløpRepository.findAll()
   }
 
-  fun lagrePåløp(påløp: Påløp): Int? {
+  fun lagrePåløp(påløp: Påløp): Int {
     val lagretPåløp = påløpRepository.save(påløp)
     LOGGER.debug("Lagret påløp med ID: ${lagretPåløp.påløpId}")
     return lagretPåløp.påløpId
@@ -109,7 +109,7 @@ class PersistenceService(
     return konteringRepository.hentAlleKonteringerForDato(dato)
   }
 
-  fun lagreKontering(kontering: Kontering): Int? {
+  fun lagreKontering(kontering: Kontering): Int {
     val lagretKontering = konteringRepository.save(kontering)
     LOGGER.debug("Lagret kontering med ID: ${lagretKontering.konteringId}")
     return lagretKontering.konteringId
@@ -119,11 +119,11 @@ class PersistenceService(
     return oppdragsperiodeRepository.hentAlleOppdragsperioderSomErAktiveForPeriode(periode)
   }
 
-  fun lagreOppdragsperiode(oppdragsperiode: Oppdragsperiode): Int? {
+  fun lagreOppdragsperiode(oppdragsperiode: Oppdragsperiode): Int {
     return oppdragsperiodeRepository.save(oppdragsperiode).oppdragsperiodeId
   }
 
-  fun lagreDriftsavvik(driftsavvik: Driftsavvik): Int? {
+  fun lagreDriftsavvik(driftsavvik: Driftsavvik): Int {
     return driftsavvikRepository.save(driftsavvik).driftsavvikId
   }
 

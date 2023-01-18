@@ -90,7 +90,7 @@ class PåløpskjøringService(
 
   @Transactional
   fun avsluttDriftsavvik(påløp: Påløp) {
-    val driftsavvik = persistenceService.hentDriftsavvikForPåløp(påløp.påløpId!!)!!
+    val driftsavvik = persistenceService.hentDriftsavvikForPåløp(påløp.påløpId) ?: error("Fant ikke driftsavvik på ID: ${påløp.påløpId}")
     driftsavvik.tidspunktTil = LocalDateTime.now()
     persistenceService.lagreDriftsavvik(driftsavvik)
   }
