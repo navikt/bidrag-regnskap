@@ -1,32 +1,20 @@
-SKATT_URL: http://localhost:${wiremock.server.port:0}/skatt
+SKATT_URL: http://localhost:${wiremock.server.port:8097}
+SAK_URL: http://localhost:${wiremock.server.port:8098}
 AZURE_OPENID_CONFIG_ISSUER: http://localhost:${mock-oauth2-server.port}/aad
-AZURE_APP_TENANT_ID: 12321321-123213-3213123
-AZURE_APP_CLIENT_ID: asdasd-sadas-ddas-qwe
-AZURE_APP_CLIENT_SECRET: asdasdsad214123sadas
-TOPIC_VEDTAK: bidrag.vedtak-feature
-NAIS_APP_NAME: bidrag-regnskap
-no.nav.security.jwt:
-  client:
-    registration:
-      skatt:
-        token-endpoint-url: http://localhost:${mock-oauth2-server.port:1234}/aad/token
-        grant-type: urn:ietf:params:oauth:grant-type:jwt-bearer
-        scope: api://123/.default
-        authentication:
-          client-id: 123
-          client-secret: 123
-          client-auth-method: client_secret_basic
-  issuer.aad:
-    discovery_url: http://localhost:${mock-oauth2-server.port:0}/aad/.well-known/openid-configuration
-    accepted_audience: ${AZURE_APP_CLIENT_ID}, api://${AZURE_APP_CLIENT_ID}
+TOPIC_VEDTAK: bidrag.vedtak-feature-test
 
-spring.kafka:
-  properties:
-    schema:
-      registry.url: http://unused-dummy-url
-      security.protocol: PLAINTEXT
-  consumer:
-    group-id: test
-    auto-offset-reset: earliest
-    key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-    value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+scheduler:
+  sendkrav:
+    cron: "-" #Disabled
+  avstemning:
+    cron: "-" #Disabled
+  påløpkjøring:
+    cron: "-" #Disabled
+
+atlas.kafka.zookeeper.session.timeout.ms: 60000
+atlas.kafka.zookeeper.connection.timeout.ms: 30000
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate

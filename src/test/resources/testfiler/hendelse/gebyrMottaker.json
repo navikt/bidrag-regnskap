@@ -1,0 +1,24 @@
+{
+  "vedtakType": "MANUELT",
+  "vedtakId": "780",
+  "vedtakDato": "2022-01-02",
+  "enhetId": "4812",
+  "opprettetAv": "B101173",
+  "opprettetTidspunkt": "2022-01-02T16:00:23.254988482",
+  "stonadsendringListe": [
+  ],
+  "engangsbelopListe": [
+    {
+      "engangsbelopId": "13",
+      "type": "GEBYR_MOTTAKER",
+      "sakId": "2200382",
+      "skyldnerId": "",
+      "kravhaverId": "NAV",
+      "mottakerId": "NAV",
+      "belop": "1700",
+      "valutakode": "NOK",
+      "resultatkode": "GIGI",
+      "referanse": "123456"
+    }
+  ]
+}

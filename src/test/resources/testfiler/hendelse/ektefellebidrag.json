@@ -1,0 +1,36 @@
+{
+  "vedtakType": "MANUELT",
+  "opprettetAv": "B129973",
+  "vedtakDato": "2020-12-21",
+  "enhetId": "4865",
+  "eksternReferanse": null,
+  "utsattTilDato": null,
+  "opprettetTidspunkt": "2020-12-21T16:00:23.254988482",
+  "stonadsendringListe": [
+    {
+      "stonadType": "EKTEFELLEBIDRAG",
+      "sakId": "2004447",
+      "skyldnerId": "BP",
+      "kravhaverId": "",
+      "mottakerId": "",
+      "indeksreguleringAar": "NN  ",
+      "periodeListe": [
+        {
+          "periodeFomDato": "2020-10-01",
+          "periodeTilDato": "2020-11-01",
+          "belop": 19350.00,
+          "valutakode": "PLN",
+          "resultatkode": "IV"
+        },
+        {
+          "periodeFomDato": "2020-11-01",
+          "periodeTilDato": null,
+          "belop": 1250.00,
+          "valutakode": "PLN",
+          "resultatkode": "IV"
+        }
+      ]
+    }
+  ],
+  "engangsbelopListe": []
+}

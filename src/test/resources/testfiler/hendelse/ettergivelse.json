@@ -1,0 +1,36 @@
+{
+  "vedtakType": "MANUELT",
+  "opprettetAv": "O163248",
+  "vedtakDato": "2022-02-28",
+  "enhetId": "4817",
+  "eksternReferanse": null,
+  "utsattTilDato": null,
+  "opprettetTidspunkt": "2022-02-28T16:00:23.254988482",
+  "stonadsendringListe": [],
+  "engangsbelopListe": [
+    {
+      "engangsbelopId": "55",
+      "type": "ETTERGIVELSE",
+      "sakId": "0809545",
+      "skyldnerId": "",
+      "kravhaverId": "",
+      "mottakerId": "",
+      "belop": 11599.00,
+      "valutakode": "NOK",
+      "resultatkode": "HE",
+      "referanse": "26681284"
+    },
+    {
+      "engangsbelopId": "56",
+      "type": "ETTERGIVELSE",
+      "sakId": "0809545",
+      "skyldnerId": "",
+      "kravhaverId": "",
+      "mottakerId": "",
+      "belop": 11001.00,
+      "valutakode": "NOK",
+      "resultatkode": "HE",
+      "referanse": "26681285"
+    }
+  ]
+}
