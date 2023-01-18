@@ -102,7 +102,7 @@ class PersistenceService(
   }
 
   fun hentAlleIkkeOverførteKonteringer(): List<Kontering> {
-    return konteringRepository.hentAlleIkkeOverførteKonteringer()
+    return konteringRepository.findAllByOverføringstidspunktIsNull()
   }
 
   fun hentAlleKonteringerForDato(dato: LocalDate): List<Kontering> {
@@ -116,7 +116,7 @@ class PersistenceService(
   }
 
   fun hentAlleOppdragsperioderSomErAktiveForPeriode(periode: LocalDate): List<Oppdragsperiode> {
-    return oppdragsperiodeRepository.hentAlleOppdragsperioderSomErAktiveForPeriode(periode)
+    return oppdragsperiodeRepository.findAllByAktivTilIsNullOrAktivTilAfter(periode)
   }
 
   fun lagreOppdragsperiode(oppdragsperiode: Oppdragsperiode): Int {

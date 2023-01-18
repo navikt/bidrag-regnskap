@@ -7,11 +7,7 @@ import java.time.LocalDate
 
 interface KonteringRepository : JpaRepository<Kontering, Int> {
 
-  @Query(
-    value = "SELECT * FROM konteringer WHERE overforingstidspunkt IS NULL",
-    nativeQuery = true
-  )
-  fun hentAlleIkkeOverførteKonteringer(): List<Kontering>
+  fun findAllByOverføringstidspunktIsNull(): List<Kontering>
 
   @Query(
     value = "SELECT * FROM konteringer WHERE date(overforingstidspunkt) = ?1",

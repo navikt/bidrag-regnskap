@@ -14,55 +14,44 @@ class OppdragsperiodeService(
 ) {
 
   fun hentOppdragsperioderMedKonteringer(oppdrag: Oppdrag): List<OppdragsperiodeResponse> {
-    val oppdragsperiodeResponser = mutableListOf<OppdragsperiodeResponse>()
-
-    (oppdrag.oppdragsperioder)?.forEach { oppdragsperiode ->
-      oppdragsperiodeResponser.add(
+    return (oppdrag.oppdragsperioder)?.map {
         OppdragsperiodeResponse(
-          oppdragsperiodeId = oppdragsperiode.oppdragsperiodeId,
-          oppdragId = oppdragsperiode.oppdrag?.oppdragId,
-          vedtakId = oppdragsperiode.vedtakId,
-          gjelderIdent = oppdragsperiode.gjelderIdent,
-          mottakerIdent = oppdragsperiode.mottakerIdent,
-          belop = oppdragsperiode.beløp,
-          valuta = oppdragsperiode.valuta,
-          periodeFra = oppdragsperiode.periodeFra.toString(),
-          periodeTil = oppdragsperiode.periodeTil.toString(),
-          vedtaksdato = oppdragsperiode.vedtaksdato.toString(),
-          opprettetAv = oppdragsperiode.opprettetAv,
-          delytelseId = oppdragsperiode.delytelseId.toString(),
-          aktivTil = oppdragsperiode.aktivTil.toString(),
+          oppdragsperiodeId = it.oppdragsperiodeId,
+          oppdragId = it.oppdrag?.oppdragId,
+          vedtakId = it.vedtakId,
+          gjelderIdent = it.gjelderIdent,
+          mottakerIdent = it.mottakerIdent,
+          belop = it.beløp,
+          valuta = it.valuta,
+          periodeFra = it.periodeFra.toString(),
+          periodeTil = it.periodeTil.toString(),
+          vedtaksdato = it.vedtaksdato.toString(),
+          opprettetAv = it.opprettetAv,
+          delytelseId = it.delytelseId.toString(),
+          aktivTil = it.aktivTil.toString(),
           konteringer = konteringService.hentKonteringer(oppdrag)
         )
-      )
-    }
-    return oppdragsperiodeResponser
+    } ?: emptyList()
   }
 
   fun opprettNyeOppdragsperioder(
     hendelse: Hendelse, oppdrag: Oppdrag
   ): List<Oppdragsperiode> {
-    val oppdragsperiodeListe = mutableListOf<Oppdragsperiode>()
-
-    hendelse.periodeListe.forEach { periode ->
-      oppdragsperiodeListe.add(
+    return hendelse.periodeListe.map {
         Oppdragsperiode(
           vedtakId = hendelse.vedtakId,
           gjelderIdent = sakConsumer.hentBmFraSak(hendelse.sakId),
           mottakerIdent = hendelse.mottakerIdent,
-          beløp = periode.beløp!!,
-          valuta = periode.valutakode!!,
-          periodeFra = periode.periodeFomDato,
-          periodeTil = periode.periodeTilDato,
+          beløp = it.beløp!!,
+          valuta = it.valutakode!!,
+          periodeFra = it.periodeFomDato,
+          periodeTil = it.periodeTilDato,
           vedtaksdato = hendelse.vedtakDato,
           opprettetAv = hendelse.opprettetAv,
-          delytelseId = periode.referanse,
+          delytelseId = it.referanse,
           oppdrag = oppdrag
         )
-      )
     }
-
-    return oppdragsperiodeListe
   }
 
   fun settAktivTilDatoPåEksisterendeOppdragsperioder(oppdrag: Oppdrag, nyeOppdragsperioder: List<Oppdragsperiode>) {

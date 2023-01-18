@@ -148,8 +148,7 @@ class PåløpsfilGenerator(
     konteringBr10Element.appendChild(belop)
 
     val fradragTillegg = dokument.createElement("fradragTillegg")
-    fradragTillegg.textContent =
-      if (Transaksjonskode.valueOf(kontering.transaksjonskode).korreksjonskode != null) "F" else "T"
+    fradragTillegg.textContent = if (Transaksjonskode.valueOf(kontering.transaksjonskode).korreksjonskode != null) "F" else "T"
     konteringBr10Element.appendChild(fradragTillegg)
 
     val valutaKode = dokument.createElement("valutaKode")
