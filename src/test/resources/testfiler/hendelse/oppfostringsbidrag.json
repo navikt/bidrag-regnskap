@@ -1,23 +1,26 @@
 {
-  "vedtakType": "MANUELT",
+  "kilde": "MANUELT",
+  "type": "FASTSETTELSE",
   "opprettetAv": "J141208",
-  "vedtakDato": "2022-05-01",
+  "vedtakTidspunkt": "2022-05-01T00:00:00.000000000",
   "enhetId": "4833",
   "eksternReferanse": null,
   "utsattTilDato": null,
   "opprettetTidspunkt": "2022-05-01T16:00:23.254988482",
   "stonadsendringListe": [
     {
-      "stonadType": "OPPFOSTRINGSBIDRAG",
+      "type": "OPPFOSTRINGSBIDRAG",
       "sakId": "1210712",
       "skyldnerId": "BP",
       "kravhaverId": "BARN1",
       "mottakerId": "80000364510",
       "indeksreguleringAar": "2023",
+      "innkreving": "JA",
+      "endring": true,
       "periodeListe": [
         {
-          "periodeFomDato": "2021-11-01",
-          "periodeTilDato": null,
+          "fomDato": "2021-11-01",
+          "tilDato": null,
           "belop": 5000.00,
           "valutakode": "NOK",
           "resultatkode": "IV",
@@ -26,16 +29,18 @@
       ]
     },
     {
-      "stonadType": "OPPFOSTRINGSBIDRAG",
+      "type": "OPPFOSTRINGSBIDRAG",
       "sakId": "1210712",
       "skyldnerId": "BP",
       "kravhaverId": "BARN2",
       "mottakerId": "80000364510",
       "indeksreguleringAar": "2023",
+      "innkreving": "JA",
+      "endring": true,
       "periodeListe": [
         {
-          "periodeFomDato": "2021-11-01",
-          "periodeTilDato": null,
+          "fomDato": "2021-11-01",
+          "tilDato": null,
           "belop": 5000.00,
           "valutakode": "NOK",
           "resultatkode": "IV",
@@ -44,5 +49,8 @@
       ]
     }
   ],
-  "engangsbelopListe": []
+  "engangsbelopListe": [],
+  "sporingsdata": {
+    "correlationId": "12345"
+  }
 }

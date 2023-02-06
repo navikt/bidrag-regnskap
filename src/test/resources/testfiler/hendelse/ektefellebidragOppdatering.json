@@ -1,23 +1,26 @@
 {
-  "vedtakType": "MANUELT",
+  "kilde": "MANUELT",
+  "type": "FASTSETTELSE",
   "opprettetAv": "B129973",
-  "vedtakDato": "2022-06-01",
+  "vedtakTidspunkt": "2022-06-01T00:00:00.000000000",
   "enhetId": "4865",
   "eksternReferanse": null,
   "utsattTilDato": null,
   "opprettetTidspunkt": "2022-06-01T16:00:23.254988482",
   "stonadsendringListe": [
     {
-      "stonadType": "EKTEFELLEBIDRAG",
+      "type": "EKTEFELLEBIDRAG",
       "sakId": "2004447",
       "skyldnerId": "BP",
       "kravhaverId": "",
       "mottakerId": "",
       "indeksreguleringAar": "NN  ",
+      "innkreving": "JA",
+      "endring": true,
       "periodeListe": [
         {
-          "periodeFomDato": "2022-02-01",
-          "periodeTilDato": null,
+          "fomDato": "2022-02-01",
+          "tilDato": null,
           "belop": 2250.00,
           "valutakode": "PLN",
           "resultatkode": "IV"
@@ -25,5 +28,8 @@
       ]
     }
   ],
-  "engangsbelopListe": []
+  "engangsbelopListe": [],
+  "sporingsdata": {
+    "correlationId": "12345"
+  }
 }

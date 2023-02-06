@@ -602,19 +602,19 @@ internal class VedtakshendelseListenerIT {
     oppdrag.sakId shouldBe vedtakHendelse.stonadsendringListe!![stonadsendringIndex].sakId
     oppdrag.oppdragsperioder?.subList(antallOppdragsperioder - antallOpprettetIGjeldendeFil, antallOppdragsperioder)
       ?.forEachIndexed { i: Int, oppdragsperiode: Oppdragsperiode ->
-        oppdragsperiode.vedtaksdato shouldBe vedtakHendelse.vedtakDato
-        oppdragsperiode.vedtakId shouldBe vedtakHendelse.vedtakId
+        oppdragsperiode.vedtaksdato shouldBe vedtakHendelse.vedtakTidspunkt.toLocalDate()
+        oppdragsperiode.vedtakId shouldBe vedtakHendelse.id
         oppdragsperiode.opprettetAv shouldBe vedtakHendelse.opprettetAv
         oppdragsperiode.mottakerIdent shouldBe vedtakHendelse.stonadsendringListe!![stonadsendringIndex].mottakerId
         oppdragsperiode.delytelseId shouldNotBe null
-        oppdragsperiode.periodeFra shouldBe vedtakHendelse.stonadsendringListe!![stonadsendringIndex].periodeListe[i].periodeFomDato
-        oppdragsperiode.periodeTil shouldBe vedtakHendelse.stonadsendringListe!![stonadsendringIndex].periodeListe[i].periodeTilDato
+        oppdragsperiode.periodeFra shouldBe vedtakHendelse.stonadsendringListe!![stonadsendringIndex].periodeListe[i].fomDato
+        oppdragsperiode.periodeTil shouldBe vedtakHendelse.stonadsendringListe!![stonadsendringIndex].periodeListe[i].tilDato
         oppdragsperiode.beløp shouldBe vedtakHendelse.stonadsendringListe!![stonadsendringIndex].periodeListe[i].belop
         oppdragsperiode.valuta shouldBe vedtakHendelse.stonadsendringListe!![stonadsendringIndex].periodeListe[i].valutakode
 
         val månederForKontering = finnAlleMånederForKonteringer(
-          vedtakHendelse.stonadsendringListe!![stonadsendringIndex].periodeListe[i].periodeFomDato,
-          vedtakHendelse.stonadsendringListe!![stonadsendringIndex].periodeListe[i].periodeTilDato
+          vedtakHendelse.stonadsendringListe!![stonadsendringIndex].periodeListe[i].fomDato,
+          vedtakHendelse.stonadsendringListe!![stonadsendringIndex].periodeListe[i].tilDato
         )
 
         oppdragsperiode.konteringer?.size shouldBe månederForKontering.size
@@ -700,7 +700,7 @@ internal class VedtakshendelseListenerIT {
   ): Kontering {
     val oppdrag = persistenceService.hentOppdrag(oppdragId) ?: error("Det finnes ingen oppdrag med angitt oppdragsId: $oppdragId")
     assertSoftly {
-      oppdrag.engangsbeløpId shouldBe vedtakHendelse.engangsbelopListe!![engangsbeløpIndex].engangsbelopId
+      oppdrag.engangsbeløpId shouldBe vedtakHendelse.engangsbelopListe!![engangsbeløpIndex].id
       oppdrag.stønadType shouldBe forventetEngangsbeløpType.name
       oppdrag.sakId shouldBe vedtakHendelse.engangsbelopListe!![engangsbeløpIndex].sakId
     }
@@ -708,12 +708,12 @@ internal class VedtakshendelseListenerIT {
     val oppdragsperiode = oppdrag.oppdragsperioder!!.first()
     assertSoftly {
       oppdragsperiode.oppdrag shouldBeSameInstanceAs oppdrag
-      oppdragsperiode.vedtakId shouldBe vedtakHendelse.vedtakId
+      oppdragsperiode.vedtakId shouldBe vedtakHendelse.id
       oppdragsperiode.beløp shouldBe vedtakHendelse.engangsbelopListe!![engangsbeløpIndex].belop
       oppdragsperiode.valuta shouldBe vedtakHendelse.engangsbelopListe!![engangsbeløpIndex].valutakode
-      oppdragsperiode.vedtaksdato shouldBe vedtakHendelse.vedtakDato
-      oppdragsperiode.periodeFra shouldBe vedtakHendelse.vedtakDato.withDayOfMonth(1)
-      oppdragsperiode.periodeTil shouldBe vedtakHendelse.vedtakDato.plusMonths(1).withDayOfMonth(1)
+      oppdragsperiode.vedtaksdato shouldBe vedtakHendelse.vedtakTidspunkt.toLocalDate()
+      oppdragsperiode.periodeFra shouldBe vedtakHendelse.vedtakTidspunkt.toLocalDate().withDayOfMonth(1)
+      oppdragsperiode.periodeTil shouldBe vedtakHendelse.vedtakTidspunkt.toLocalDate().plusMonths(1).withDayOfMonth(1)
       oppdragsperiode.opprettetAv shouldBe vedtakHendelse.opprettetAv
       oppdragsperiode.delytelseId shouldBe forventetDelytelsesId
     }
@@ -721,7 +721,7 @@ internal class VedtakshendelseListenerIT {
     val kontering = hentAlleKonteringerForOppdrag(oppdrag).first()
     assertSoftly {
       kontering.transaksjonskode shouldBe forventetTransaksjonskode.name
-      kontering.overføringsperiode shouldBe YearMonth.from(vedtakHendelse.vedtakDato).toString()
+      kontering.overføringsperiode shouldBe YearMonth.from(vedtakHendelse.vedtakTidspunkt.toLocalDate()).toString()
       kontering.type shouldBe NY.name
       kontering.søknadType shouldBe søknadstype.name
       kontering.sendtIPåløpsfil shouldBe false

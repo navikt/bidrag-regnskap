@@ -1,7 +1,8 @@
 {
-  "vedtakType": "MANUELT",
+  "kilde": "MANUELT",
+  "type": "FASTSETTELSE",
   "opprettetAv": "O163248",
-  "vedtakDato": "2022-02-28",
+  "vedtakTidspunkt": "2022-02-28T00:00:00.000000000",
   "enhetId": "4817",
   "eksternReferanse": null,
   "utsattTilDato": null,
@@ -9,7 +10,7 @@
   "stonadsendringListe": [],
   "engangsbelopListe": [
     {
-      "engangsbelopId": "42",
+      "id": "42",
       "type": "DIREKTE_OPPGJOR",
       "sakId": "0809546",
       "skyldnerId": "",
@@ -18,7 +19,12 @@
       "belop": 7999.00,
       "valutakode": "NOK",
       "resultatkode": "HE",
-      "referanse": "26681272"
+      "referanse": "26681272",
+      "innkreving": "JA",
+      "endring": true
     }
-  ]
+  ],
+  "sporingsdata": {
+    "correlationId": "12345"
+  }
 }

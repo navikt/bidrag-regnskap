@@ -152,7 +152,7 @@ class KonteringService(
   }
 
   private fun finnSøknadsType(hendelse: Hendelse): String {
-    return if (hendelse.vedtakType == VedtakType.AUTOMATISK_INDEKSREGULERING) {
+    return if (hendelse.vedtakType == VedtakType.INDEKSREGULERING) {
       Søknadstype.IN.name
     } else if (hendelse.type == EngangsbelopType.GEBYR_MOTTAKER.name) {
       Søknadstype.FABM.name

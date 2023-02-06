@@ -1,7 +1,8 @@
 {
-  "vedtakType": "MANUELT",
+  "kilde": "MANUELT",
+  "type": "FASTSETTELSE",
   "opprettetAv": "D101753",
-  "vedtakDato": "2021-02-16",
+  "vedtakTidspunkt": "2021-02-16T00:00:00.000000000",
   "enhetId": "4849",
   "eksternReferanse": null,
   "utsattTilDato": null,
@@ -9,8 +10,8 @@
   "stonadsendringListe": [],
   "engangsbelopListe": [
     {
-      "engangsbelopId": "31",
-      "endrerEngangsbelopId": "30",
+      "id": "31",
+      "endrerId": "30",
       "type": "TILBAKEKREVING",
       "sakId": "1313296",
       "skyldnerId": "",
@@ -18,7 +19,12 @@
       "mottakerId": "NAV",
       "belop": 3316.00,
       "valutakode": "NOK",
-      "resultatkode": "TB"
+      "resultatkode": "TB",
+      "innkreving": "JA",
+      "endring": true
     }
-  ]
+  ],
+  "sporingsdata": {
+    "correlationId": "12345"
+  }
 }
