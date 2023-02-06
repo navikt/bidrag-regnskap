@@ -36,7 +36,7 @@ class VedtakshendelseServiceTest {
     val vedtakHendelse = vedtakshendelseService.mapVedtakHendelse(hendelse)
 
     vedtakHendelse shouldNotBe null
-    vedtakHendelse.vedtakId shouldBe 123
+    vedtakHendelse.id shouldBe 123
     vedtakHendelse.engangsbelopListe?.shouldHaveSize(1)
     vedtakHendelse.stonadsendringListe?.shouldHaveSize(1)
   }
@@ -61,16 +61,20 @@ class VedtakshendelseServiceTest {
       vedtakshendelseService.mapVedtakHendelse(
         """
         {
-          "vedtakType":"AUTOMATISK_INDEKSREGULERING",
-          "vedtakId":"779",
-          "vedtakDato":"2022-06-03",
+          "kilde":"MANUELT",
+          "type":"INDEKSREGULERING",
+          "id":"779",
+          "vedtakTidspunkt":"2022-06-03T00:00:00.000000000",
           "enhetId":"4812",
           "opprettetAv":"B101173",
           "opprettetTidspunkt":"2022-10-19T16:00:23.254988482",
           "stonadsendringListe":[
           ],
           "engangsbelopListe":[
-          ]
+          ],
+          "sporingsdata": {
+            "correlationId": "12345"
+          }
         }
       """.trimIndent()
       )
@@ -83,9 +87,9 @@ class VedtakshendelseServiceTest {
       vedtakshendelseService.mapVedtakHendelse(
         """
         {
-          "vedtakType":"ÅRSAVGIFT",
-          "vedtakDato":"2022-01-01",
-          "vedtakId":"123",
+          "type":"ÅRSAVGIFT",
+          "vedtakTidspunkt":"2022-01-01T00:00:00.000000000",
+          "id":"123",
           "enhetId":"enhetid",
           "stonadType":"BIDRAG",
           "sakId":"",
@@ -94,7 +98,10 @@ class VedtakshendelseServiceTest {
           "mottakerId":"",
           "opprettetAv":"",
           "opprettetTidspunkt":"2022-01-11T10:00:00.000001",
-          "periodeListe":[]
+          "periodeListe":[],
+          "sporingsdata: {
+            "correlationId": "12345"
+          }
         }
       """.trimIndent()
       )
@@ -102,51 +109,61 @@ class VedtakshendelseServiceTest {
   }
 
   private fun opprettVedtakshendelse(): String {
-    return "{" +
-        "\"vedtakType\":\"MANUELT\",\n" +
-        "  \"vedtakId\":\"123\",\n" +
-        "  \"vedtakDato\":\"2022-06-01\",\n" +
-        "  \"enhetId\":\"4812\",\n" +
-        "  \"opprettetAv\":\"B111111\",\n" +
-        "  \"opprettetTidspunkt\":\"2022-01-01T16:00:00.000000000\",\n" +
-        "  \"stonadsendringListe\":[\n" +
-        "    {\n" +
-        "      \"stonadType\":\"BIDRAG\",\n" +
-        "      \"sakId\":\"456\",\n" +
-        "      \"skyldnerId\":\"11111111111\",\n" +
-        "      \"kravhaverId\":\"22222222222\",\n" +
-        "      \"mottakerId\":\"333333333333\",\n" +
-        "      \"periodeListe\":[\n" +
-        "        {\n" +
-        "          \"periodeFomDato\":\"2022-01-01\",\n" +
-        "          \"periodeTilDato\":\"2022-03-01\",\n" +
-        "          \"belop\":\"2910\",\n" +
-        "          \"valutakode\":\"NOK\",\n" +
-        "          \"resultatkode\":\"KBB\"\n" +
-        "        },\n" +
-        "        {\"periodeFomDato\":\"2022-03-01\",\n" +
-        "          \"periodeTilDato\":null,\n" +
-        "          \"belop\":\"2930\",\n" +
-        "          \"valutakode\":\"NOK\",\n" +
-        "          \"resultatkode\":\"KBB\"\n" +
-        "        }\n" +
-        "      ]\n" +
-        "    }\n" +
-        "  ]\n" +
-        "  ,\n" +
-        "  \"engangsbelopListe\":[\n" +
-        "    {\n" +
-        "      \"engangsbelopId\":\"1\",\n" +
-        "      \"type\":\"GEBYR_SKYLDNER\",\n" +
-        "      \"sakId\":\"789\",\n" +
-        "      \"skyldnerId\":\"11111111111\",\n" +
-        "      \"kravhaverId\":\"22222222222\",\n" +
-        "      \"mottakerId\":\"333333333333\",\n" +
-        "      \"belop\":\"1790\",\n" +
-        "      \"valutakode\":\"NOK\",\n" +
-        "      \"resultatkode\":\"GIGI\"\n" +
-        "    }\n" +
-        "  ]\n" +
-        "}"
+    return """
+      {
+        "kilde":"MANUELT",
+        "type":"INNKREVING",
+        "id":"123",
+        "vedtakTidspunkt":"2022-06-01T00:00:00.000000000",
+        "enhetId":"4812",
+        "opprettetAv":"B111111",
+        "opprettetTidspunkt":"2022-01-01T16:00:00.000000000",
+        "stonadsendringListe":[
+          {
+            "type":"BIDRAG",
+            "sakId":"456",
+            "skyldnerId":"11111111111",
+            "kravhaverId":"22222222222",
+            "mottakerId":"333333333333",
+            "innkreving":"JA",
+            "endring":true,
+            "periodeListe":[
+              {
+                "fomDato":"2022-01-01",
+                "tilDato":"2022-03-01",
+                "belop":"2910",
+                "valutakode":"NOK",
+                "resultatkode":"KBB"
+              },
+              {
+                "fomDato":"2022-03-01",
+                "tilDato":null,
+                "belop":"2930",
+                "valutakode":"NOK",
+                "resultatkode":"KBB"
+              }
+            ]
+          }
+        ]
+        ,
+        "engangsbelopListe":[
+          {
+            "id":"1",
+            "type":"GEBYR_SKYLDNER",
+            "sakId":"789",
+            "skyldnerId":"11111111111",
+            "kravhaverId":"22222222222",
+            "mottakerId":"333333333333",
+            "belop":"1790",
+            "valutakode":"NOK",
+            "resultatkode":"GIGI",
+            "innkreving":"JA",
+            "endring":true
+          }
+        ],
+         "sporingsdata": {
+            "correlationId": "12345"
+          }
+      }"""
   }
 }

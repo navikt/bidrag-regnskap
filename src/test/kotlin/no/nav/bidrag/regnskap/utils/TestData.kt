@@ -24,7 +24,7 @@ object TestData {
   fun opprettOppdrag(
     oppdragId: Int = 0,
     stonadType: StonadType = StonadType.BIDRAG,
-    vedtakType: VedtakType = VedtakType.MANUELT,
+    vedtakType: VedtakType = VedtakType.FASTSETTELSE,
     sakId: String = "123456",
     skyldnerIdent: String = TestDataGenerator.genererPersonnummer(),
     oppdragsperioder: List<Oppdragsperiode>? = listOf(opprettOppdragsperiode()),
@@ -50,7 +50,7 @@ object TestData {
   fun opprettHendelse(
     engangsbelopId: Int? = null,
     type: String = StonadType.BIDRAG.name,
-    vedtakType: VedtakType = VedtakType.MANUELT,
+    vedtakType: VedtakType = VedtakType.FASTSETTELSE,
     kravhaverIdent: String = TestDataGenerator.genererPersonnummer(),
     skyldnerIdent: String = TestDataGenerator.genererPersonnummer(),
     mottakerIdent: String = TestDataGenerator.genererPersonnummer(),

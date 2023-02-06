@@ -1,23 +1,26 @@
 {
-  "vedtakType": "MANUELT",
+  "kilde": "MANUELT",
+  "type": "FASTSETTELSE",
   "opprettetAv": "L105567",
-  "vedtakDato": "2022-06-27",
+  "vedtakTidspunkt": "2022-06-27T00:00:00.000000000",
   "enhetId": "4820",
   "eksternReferanse": null,
   "utsattTilDato": null,
   "opprettetTidspunkt": "2022-06-27T16:00:23.254988482",
   "stonadsendringListe": [
     {
-      "stonadType": "BIDRAG18AAR",
+      "type": "BIDRAG18AAR",
       "sakId": "0403128",
       "skyldnerId": "BP",
       "kravhaverId": "",
       "mottakerId": "",
       "indeksreguleringAar": "2023",
+      "innkreving": "JA",
+      "endring": true,
       "periodeListe": [
         {
-          "periodeFomDato": "2022-04-01",
-          "periodeTilDato": "2023-06-01",
+          "fomDato": "2022-04-01",
+          "tilDato": "2023-06-01",
           "belop": 6540.00,
           "valutakode": "NOK",
           "resultatkode": "KBB"
@@ -25,5 +28,8 @@
       ]
     }
   ],
-  "engangsbelopListe": []
+  "engangsbelopListe": [],
+  "sporingsdata": {
+    "correlationId": "12345"
+  }
 }

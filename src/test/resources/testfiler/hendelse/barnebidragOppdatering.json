@@ -1,24 +1,27 @@
 {
-  "vedtakType": "MANUELT",
-  "vedtakId": "64846",
+  "kilde": "MANUELT",
+  "type": "FASTSETTELSE",
+  "id": "64846",
   "opprettetAv": "B138788",
-  "vedtakDato": "2022-01-02",
+  "vedtakTidspunkt": "2022-01-02T00:00:00.000000000",
   "enhetId": "4849",
   "eksternReferanse": null,
   "utsattTilDato": null,
   "opprettetTidspunkt": "2022-01-02T16:00:23.254988482",
   "stonadsendringListe": [
     {
-      "stonadType": "BIDRAG",
+      "type": "BIDRAG",
       "sakId": "2203234",
       "skyldnerId": "BP",
       "kravhaverId": "BARN1",
       "mottakerId": "BM",
       "indeksreguleringAar": "2023",
+      "innkreving": "JA",
+      "endring": true,
       "periodeListe": [
         {
-          "periodeFomDato": "2022-03-01",
-          "periodeTilDato": null,
+          "fomDato": "2022-03-01",
+          "tilDato": null,
           "belop": 5520.00,
           "valutakode": "NOK",
           "resultatkode": "KBB"
@@ -26,16 +29,18 @@
       ]
     },
     {
-      "stonadType": "BIDRAG",
+      "type": "BIDRAG",
       "sakId": "2203234",
       "skyldnerId": "BP",
       "kravhaverId": "BARN2",
       "mottakerId": "BM",
       "indeksreguleringAar": "2023",
+      "innkreving": "JA",
+      "endring": true,
       "periodeListe": [
         {
-          "periodeFomDato": "2022-03-01",
-          "periodeTilDato": null,
+          "fomDato": "2022-03-01",
+          "tilDato": null,
           "belop": 4950.00,
           "valutakode": "NOK",
           "resultatkode": "KBB"
@@ -43,5 +48,8 @@
       ]
     }
   ],
-  "engangsbelopListe": []
+  "engangsbelopListe": [],
+  "sporingsdata": {
+    "correlationId": "12345"
+  }
 }

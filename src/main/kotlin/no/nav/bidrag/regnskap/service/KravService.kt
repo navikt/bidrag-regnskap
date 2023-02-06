@@ -32,7 +32,8 @@ private val objectMapper = jacksonObjectMapper()
 
 @Service
 class KravService(
-  val skattConsumer: SkattConsumer, val persistenceService: PersistenceService
+  private val skattConsumer: SkattConsumer,
+  private val persistenceService: PersistenceService
 ) {
 
   @Transactional(

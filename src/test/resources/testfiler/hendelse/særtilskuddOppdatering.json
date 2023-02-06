@@ -1,7 +1,8 @@
 {
-  "vedtakType": "MANUELT",
-  "vedtakId": "801",
-  "vedtakDato": "2022-01-02",
+  "kilde": "MANUELT",
+  "type": "FASTSETTELSE",
+  "id": "801",
+  "vedtakTidspunkt": "2022-01-02T00:00:00.000000000",
   "enhetId": "4812",
   "opprettetAv": "B101173",
   "opprettetTidspunkt": "2022-01-02T16:00:23.254988482",
@@ -9,8 +10,8 @@
   ],
   "engangsbelopListe": [
     {
-      "engangsbelopId": "21",
-      "endrerEngangsbelopId": "20",
+      "id": "21",
+      "endrerId": "20",
       "type": "SAERTILSKUDD",
       "sakId": "2200400",
       "skyldnerId": "",
@@ -18,7 +19,12 @@
       "mottakerId": "",
       "belop": "15010.40",
       "valutakode": "NOK",
-      "resultatkode": "GIGI"
+      "resultatkode": "GIGI",
+      "innkreving": "JA",
+      "endring": true
     }
-  ]
+  ],
+  "sporingsdata": {
+    "correlationId": "12345"
+  }
 }

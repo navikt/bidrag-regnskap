@@ -28,7 +28,7 @@ class VedtakshendelseService(
   fun behandleHendelse(hendelse: String) {
     val vedtakHendelse = mapVedtakHendelse(hendelse)
 
-    LOGGER.debug("Behandler vedakHendelse for vedtakid: ${vedtakHendelse.vedtakId}")
+    LOGGER.debug("Behandler vedakHendelse for vedtakid: ${vedtakHendelse.id}")
     SECURE_LOGGER.debug("Behandler vedtakHendelse: $vedtakHendelse")
 
     vedtakHendelse.stonadsendringListe?.forEach {
@@ -39,7 +39,7 @@ class VedtakshendelseService(
       opprettOppdragForEngangsbelop(vedtakHendelse, it)
     }
 
-    LOGGER.debug("Ferdig med behandling av vedtakshendelse: ${vedtakHendelse.vedtakId}")
+    LOGGER.debug("Ferdig med behandling av vedtakshendelse: ${vedtakHendelse.id}")
   }
 
   fun mapVedtakHendelse(hendelse: String): VedtakHendelse {
@@ -54,14 +54,14 @@ class VedtakshendelseService(
     LOGGER.debug("Oppretter oppdrag for stonadendring.")
 
     val hendelse = Hendelse(
-      type = stonadsendring.stonadType.name,
-      vedtakType = vedtakHendelse.vedtakType,
+      type = stonadsendring.type.name,
+      vedtakType = vedtakHendelse.type,
       kravhaverIdent = leggTilIdent(stonadsendring.kravhaverId),
       skyldnerIdent = leggTilIdent(stonadsendring.skyldnerId),
       mottakerIdent = leggTilIdent(stonadsendring.mottakerId),
       sakId = stonadsendring.sakId,
-      vedtakId = vedtakHendelse.vedtakId,
-      vedtakDato = vedtakHendelse.vedtakDato,
+      vedtakId = vedtakHendelse.id,
+      vedtakDato = vedtakHendelse.vedtakTidspunkt.toLocalDate(),
       opprettetAv = vedtakHendelse.opprettetAv,
       eksternReferanse = vedtakHendelse.eksternReferanse,
       utsattTilDato = vedtakHendelse.utsattTilDato,
@@ -75,23 +75,23 @@ class VedtakshendelseService(
   private fun opprettOppdragForEngangsbelop(vedtakHendelse: VedtakHendelse, engangsbelop: Engangsbelop) {
     LOGGER.debug("Oppretter oppdrag for engangsbeløp.")
     val hendelse = Hendelse(
-      engangsbeløpId = engangsbelop.engangsbelopId,
-      endretEngangsbeløpId = engangsbelop.endrerEngangsbelopId,
+      engangsbeløpId = engangsbelop.id,
+      endretEngangsbeløpId = engangsbelop.endrerId,
       type = engangsbelop.type.name,
-      vedtakType = vedtakHendelse.vedtakType,
+      vedtakType = vedtakHendelse.type,
       kravhaverIdent = leggTilIdent(engangsbelop.kravhaverId),
       skyldnerIdent = leggTilIdent(engangsbelop.skyldnerId),
       mottakerIdent = leggTilIdent(engangsbelop.mottakerId),
       sakId = engangsbelop.sakId,
-      vedtakId = vedtakHendelse.vedtakId,
-      vedtakDato = vedtakHendelse.vedtakDato,
+      vedtakId = vedtakHendelse.id,
+      vedtakDato = vedtakHendelse.vedtakTidspunkt.toLocalDate(),
       opprettetAv = vedtakHendelse.opprettetAv,
       eksternReferanse = vedtakHendelse.eksternReferanse,
       utsattTilDato = vedtakHendelse.utsattTilDato,
       periodeListe = listOf(
         Periode(
-          periodeFomDato = vedtakHendelse.vedtakDato.withDayOfMonth(1),
-          periodeTilDato = vedtakHendelse.vedtakDato.withDayOfMonth(1).plusMonths(1),
+          periodeFomDato = vedtakHendelse.vedtakTidspunkt.toLocalDate().withDayOfMonth(1),
+          periodeTilDato = vedtakHendelse.vedtakTidspunkt.toLocalDate().withDayOfMonth(1).plusMonths(1),
           beløp = engangsbelop.belop,
           valutakode = engangsbelop.valutakode,
           referanse = engangsbelop.referanse?.let { Integer.valueOf(it) }
@@ -114,8 +114,8 @@ class VedtakshendelseService(
         Periode(
           beløp = periode.belop,
           valutakode = periode.valutakode,
-          periodeFomDato = periode.periodeFomDato,
-          periodeTilDato = periode.periodeTilDato,
+          periodeFomDato = periode.fomDato,
+          periodeTilDato = periode.tilDato,
           referanse = periode.referanse?.let { Integer.valueOf(it) }
         )
       )

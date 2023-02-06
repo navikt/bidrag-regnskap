@@ -1,7 +1,8 @@
 {
-  "vedtakType": "MANUELT",
+  "kilde": "MANUELT",
+  "type": "FASTSETTELSE",
   "opprettetAv": "B121269",
-  "vedtakDato": "2018-04-18",
+  "vedtakTidspunkt": "2018-04-18T00:00:00.000000000",
   "enhetId": "4849",
   "eksternReferanse": null,
   "utsattTilDato": null,
@@ -9,7 +10,7 @@
   "stonadsendringListe": [],
   "engangsbelopListe": [
     {
-      "engangsbelopId": "43",
+      "id": "43",
       "type": "ETTERGIVELSE_TILBAKEKREVING",
       "sakId": "0411765",
       "skyldnerId": "",
@@ -18,7 +19,12 @@
       "belop": 36279.00,
       "valutakode": "NOK",
       "resultatkode": "HE",
-      "referanse": "25314875"
+      "referanse": "25314875",
+      "innkreving": "JA",
+      "endring": true
     }
-  ]
+  ],
+  "sporingsdata": {
+    "correlationId": "12345"
+  }
 }
