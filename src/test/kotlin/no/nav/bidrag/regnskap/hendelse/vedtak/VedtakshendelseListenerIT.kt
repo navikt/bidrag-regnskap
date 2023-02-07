@@ -57,6 +57,8 @@ import org.springframework.test.context.DynamicPropertySource
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.junit.jupiter.Container
+import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.shaded.org.awaitility.Awaitility.await
 import org.testcontainers.shaded.org.awaitility.Durations.*
 import java.io.FileOutputStream
@@ -67,6 +69,7 @@ import java.util.*
 
 
 @Transactional
+@Testcontainers
 @ActiveProfiles("test")
 @EnableMockOAuth2Server
 @TestInstance(PER_CLASS)
@@ -85,6 +88,7 @@ internal class VedtakshendelseListenerIT {
 
     private val maskinportenConfig = MaskinportenWireMock.createMaskinportenConfig()
 
+    @Container
     private var postgreSqlDb = PostgreSQLContainer("postgres:latest").apply {
       withDatabaseName("bidrag-regnskap")
       withUsername("cloudsqliamuser")
