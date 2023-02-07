@@ -80,7 +80,7 @@ class PersistenceService(
 
   fun lagrePåløp(påløp: Påløp): Int {
     val lagretPåløp = påløpRepository.save(påløp)
-    LOGGER.debug("Lagret påløp med ID: ${lagretPåløp.påløpId}")
+    LOGGER.info("Lagret påløp med ID: ${lagretPåløp.påløpId}")
     return lagretPåløp.påløpId
   }
 
