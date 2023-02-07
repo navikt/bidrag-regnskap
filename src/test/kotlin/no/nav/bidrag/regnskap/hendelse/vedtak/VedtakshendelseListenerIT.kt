@@ -28,6 +28,7 @@ import no.nav.bidrag.regnskap.maskinporten.MaskinportenWireMock
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
+import no.nav.bidrag.regnskap.persistence.entity.Påløp
 import no.nav.bidrag.regnskap.service.KravService
 import no.nav.bidrag.regnskap.service.PersistenceService
 import no.nav.bidrag.regnskap.utils.TestData
@@ -49,9 +50,11 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.Pageable
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.test.context.EmbeddedKafka
+import org.springframework.stereotype.Component
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
+import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.shaded.org.awaitility.Awaitility.await
@@ -61,6 +64,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
 import java.util.*
+
 
 @Transactional
 @ActiveProfiles("test")
@@ -111,22 +115,25 @@ internal class VedtakshendelseListenerIT {
   @Autowired
   private lateinit var kravService: KravService
 
+  @Autowired
+  private lateinit var lagrePåløpTestDataBean: LagrePåløpTestDataBean
+
   @Value("\${TOPIC_VEDTAK}")
   private lateinit var topic: String
 
   private lateinit var file: FileOutputStream
+
+  private val påløp =
+    TestData.opprettPåløp(forPeriode = YearMonth.from(PÅLØPSDATO).toString(), fullførtTidspunkt = LocalDateTime.now())
 
   private val objectmapper = jacksonObjectMapper().registerModule(KotlinModule.Builder().build()).registerModule(JavaTimeModule())
     .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
 
   @BeforeAll
   fun beforeAll() {
-    persistenceService.lagrePåløp(
-      TestData.opprettPåløp(
-        forPeriode = YearMonth.from(PÅLØPSDATO).toString(), fullførtTidspunkt = LocalDateTime.now()
-      )
-    )
     file = FileOutputStream(TESTDATA_OUTPUT_NAVN)
+    persistenceService.lagrePåløp(påløp)
+    println("Henter alle påløp fra db:" + persistenceService.hentPåløp())
   }
 
   @BeforeEach
@@ -777,5 +784,14 @@ internal class VedtakshendelseListenerIT {
 
   private fun hentTestfil(filnavn: String): String {
     return String(javaClass.classLoader.getResourceAsStream("${HENDELSE_FILMAPPE}$filnavn")!!.readAllBytes())
+  }
+}
+
+@Component
+internal class LagrePåløpTestDataBean {
+
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  fun lagrePåløp(persistenceService: PersistenceService, påløp: Påløp) {
+    persistenceService.lagrePåløp(påløp)
   }
 }
