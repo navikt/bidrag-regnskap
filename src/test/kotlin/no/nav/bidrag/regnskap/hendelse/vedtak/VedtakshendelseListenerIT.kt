@@ -28,7 +28,6 @@ import no.nav.bidrag.regnskap.maskinporten.MaskinportenWireMock
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
-import no.nav.bidrag.regnskap.persistence.entity.Påløp
 import no.nav.bidrag.regnskap.service.KravService
 import no.nav.bidrag.regnskap.service.PersistenceService
 import no.nav.bidrag.regnskap.utils.TestData
@@ -50,16 +49,12 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.Pageable
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.test.context.EmbeddedKafka
-import org.springframework.stereotype.Component
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
-import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import org.testcontainers.containers.PostgreSQLContainer
-import org.testcontainers.junit.jupiter.Container
-import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.shaded.org.awaitility.Awaitility.await
 import org.testcontainers.shaded.org.awaitility.Durations.*
 import java.io.FileOutputStream
@@ -71,7 +66,6 @@ import java.util.*
 
 @Transactional
 @DirtiesContext
-@Testcontainers
 @ActiveProfiles("test")
 @EnableMockOAuth2Server
 @TestInstance(PER_CLASS)
@@ -90,7 +84,6 @@ internal class VedtakshendelseListenerIT {
 
     private val maskinportenConfig = MaskinportenWireMock.createMaskinportenConfig()
 
-    @Container
     private var postgreSqlDb = PostgreSQLContainer("postgres:latest").apply {
       withDatabaseName("bidrag-regnskap")
       withUsername("cloudsqliamuser")
@@ -120,9 +113,6 @@ internal class VedtakshendelseListenerIT {
 
   @Autowired
   private lateinit var kravService: KravService
-
-  @Autowired
-  private lateinit var lagrePåløpTestDataBean: LagrePåløpTestDataBean
 
   @Value("\${TOPIC_VEDTAK}")
   private lateinit var topic: String
@@ -790,14 +780,5 @@ internal class VedtakshendelseListenerIT {
 
   private fun hentTestfil(filnavn: String): String {
     return String(javaClass.classLoader.getResourceAsStream("${HENDELSE_FILMAPPE}$filnavn")!!.readAllBytes())
-  }
-}
-
-@Component
-internal class LagrePåløpTestDataBean {
-
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
-  fun lagrePåløp(persistenceService: PersistenceService, påløp: Påløp) {
-    persistenceService.lagrePåløp(påløp)
   }
 }
