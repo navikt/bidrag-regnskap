@@ -15,7 +15,7 @@ import no.nav.bidrag.behandling.felles.enums.EngangsbelopType
 import no.nav.bidrag.behandling.felles.enums.EngangsbelopType.*
 import no.nav.bidrag.behandling.felles.enums.StonadType
 import no.nav.bidrag.behandling.felles.enums.StonadType.*
-import no.nav.bidrag.regnskap.SpringTestRunner
+import no.nav.bidrag.regnskap.BidragRegnskapLocal
 import no.nav.bidrag.regnskap.consumer.KravApiWireMock
 import no.nav.bidrag.regnskap.consumer.SakApiWireMock
 import no.nav.bidrag.regnskap.dto.enumer.Søknadstype
@@ -32,6 +32,7 @@ import no.nav.bidrag.regnskap.service.KravService
 import no.nav.bidrag.regnskap.service.PersistenceService
 import no.nav.bidrag.regnskap.utils.TestData
 import no.nav.bidrag.regnskap.utils.TestDataGenerator
+import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
@@ -43,11 +44,15 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestMethodOrder
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.Pageable
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.test.context.EmbeddedKafka
-import org.springframework.test.annotation.DirtiesContext
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.DynamicPropertyRegistry
+import org.springframework.test.context.DynamicPropertySource
 import org.springframework.transaction.annotation.Transactional
+import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.shaded.org.awaitility.Awaitility.await
 import org.testcontainers.shaded.org.awaitility.Durations.*
 import java.io.FileOutputStream
@@ -57,12 +62,13 @@ import java.time.YearMonth
 import java.util.*
 
 @Transactional
-@DirtiesContext
+@ActiveProfiles("test")
+@EnableMockOAuth2Server
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
+@SpringBootTest(classes = [BidragRegnskapLocal::class])
 @EmbeddedKafka(partitions = 1, brokerProperties = ["listeners=PLAINTEXT://localhost:9092", "port=9092"])
-internal class VedtakshendelseListenerIT: SpringTestRunner() {
-
+internal class VedtakshendelseListenerIT {
   companion object {
     private const val HENDELSE_FILMAPPE = "testfiler/hendelse/"
     private const val TESTDATA_OUTPUT_NAVN = "kravTestData.json"
@@ -71,6 +77,28 @@ internal class VedtakshendelseListenerIT: SpringTestRunner() {
     private var kravApiWireMock: KravApiWireMock = KravApiWireMock()
     private var sakApiWireMock: SakApiWireMock = SakApiWireMock()
     private var maskinportenWireMock: MaskinportenWireMock = MaskinportenWireMock()
+
+    private val maskinportenConfig = MaskinportenWireMock.createMaskinportenConfig()
+
+    private var postgreSqlDb = PostgreSQLContainer("postgres:latest").apply {
+      withDatabaseName("bidrag-regnskap")
+      withUsername("cloudsqliamuser")
+      withPassword("admin")
+      start()
+    }
+
+    @JvmStatic
+    @DynamicPropertySource
+    fun properties(registry: DynamicPropertyRegistry) {
+      registry.add("spring.datasource.url", postgreSqlDb::getJdbcUrl)
+      registry.add("spring.datasource.username", postgreSqlDb::getUsername)
+      registry.add("spring.datasource.password", postgreSqlDb::getPassword)
+      registry.add("maskinporten.privateKey", maskinportenConfig::privateKey)
+      registry.add("maskinporten.tokenUrl", maskinportenConfig::tokenUrl)
+      registry.add("maskinporten.audience", maskinportenConfig::audience)
+      registry.add("maskinporten.clientId", maskinportenConfig::clientId)
+      registry.add("maskinporten.scope", maskinportenConfig::scope)
+    }
   }
 
   @Autowired
@@ -94,8 +122,7 @@ internal class VedtakshendelseListenerIT: SpringTestRunner() {
   fun beforeAll() {
     persistenceService.lagrePåløp(
       TestData.opprettPåløp(
-        forPeriode = YearMonth.from(PÅLØPSDATO).toString(),
-        fullførtTidspunkt = LocalDateTime.now()
+        forPeriode = YearMonth.from(PÅLØPSDATO).toString(), fullførtTidspunkt = LocalDateTime.now()
       )
     )
     file = FileOutputStream(TESTDATA_OUTPUT_NAVN)
@@ -120,12 +147,7 @@ internal class VedtakshendelseListenerIT: SpringTestRunner() {
     val vedtakHendelse = hentFilOgSendPåKafka("gebyrSkyldner.json", 1)
 
     val kontering = assertVedOpprettelseAvEngangsbeløp(
-      1,
-      vedtakHendelse,
-      GEBYR_SKYLDNER,
-      G1,
-      Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].referanse),
-      FABP
+      1, vedtakHendelse, GEBYR_SKYLDNER, G1, Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].referanse), FABP
     )
 
     skrivTilTestdatafil(listOf(kontering), "Gebyr for skyldner")
@@ -141,10 +163,7 @@ internal class VedtakshendelseListenerIT: SpringTestRunner() {
     hentFilOgSendPåKafka("gebyrSkyldnerOppdatering.json", 3)
 
     val konteringer = assertVedOppdateringAvEngangsbeløpOgReturnerKonteringer(
-      1,
-      G1,
-      G3,
-      100000000
+      1, G1, G3, 100000000
     )
 
     skrivTilTestdatafil(konteringer.subList(1, 3), "Oppdatering på gebyr for skyldner")
@@ -156,12 +175,7 @@ internal class VedtakshendelseListenerIT: SpringTestRunner() {
     val vedtakHendelse = hentFilOgSendPåKafka("gebyrMottaker.json", 4)
 
     val kontering = assertVedOpprettelseAvEngangsbeløp(
-      2,
-      vedtakHendelse,
-      GEBYR_MOTTAKER,
-      G1,
-      Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].referanse),
-      FABM
+      2, vedtakHendelse, GEBYR_MOTTAKER, G1, Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].referanse), FABM
     )
 
     skrivTilTestdatafil(listOf(kontering), "Gebyr for mottaker")
@@ -177,10 +191,7 @@ internal class VedtakshendelseListenerIT: SpringTestRunner() {
     hentFilOgSendPåKafka("gebyrMottakerOppdatering.json", 6)
 
     val konteringer = assertVedOppdateringAvEngangsbeløpOgReturnerKonteringer(
-      2,
-      G1,
-      G3,
-      100000001
+      2, G1, G3, 100000001
     )
 
     skrivTilTestdatafil(konteringer.subList(1, 3), "Oppdatering på gebyr for skyldner")
@@ -208,10 +219,7 @@ internal class VedtakshendelseListenerIT: SpringTestRunner() {
     hentFilOgSendPåKafka("særtilskuddOppdatering.json", 9)
 
     val konteringer = assertVedOppdateringAvEngangsbeløpOgReturnerKonteringer(
-      3,
-      E1,
-      E3,
-      100000003
+      3, E1, E3, 100000003
     )
 
     skrivTilTestdatafil(konteringer.subList(1, 3), "Oppdatering på særtilskudd")
@@ -223,12 +231,7 @@ internal class VedtakshendelseListenerIT: SpringTestRunner() {
     val vedtakHendelse = hentFilOgSendPåKafka("tilbakekreving.json", 10)
 
     val kontering = assertVedOpprettelseAvEngangsbeløp(
-      4,
-      vedtakHendelse,
-      TILBAKEKREVING,
-      H1,
-      Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].referanse),
-      Søknadstype.EN
+      4, vedtakHendelse, TILBAKEKREVING, H1, Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].referanse), Søknadstype.EN
     )
 
     skrivTilTestdatafil(listOf(kontering), "Tilbakekreving")
@@ -245,10 +248,7 @@ internal class VedtakshendelseListenerIT: SpringTestRunner() {
     hentFilOgSendPåKafka("tilbakekrevingOppdatering.json", 12)
 
     val konteringer = assertVedOppdateringAvEngangsbeløpOgReturnerKonteringer(
-      4,
-      H1,
-      H3,
-      100000004
+      4, H1, H3, 100000004
     )
 
     skrivTilTestdatafil(konteringer.subList(1, 3), "Oppdatering på tilbakekreving")
@@ -260,12 +260,7 @@ internal class VedtakshendelseListenerIT: SpringTestRunner() {
     val vedtakHendelse = hentFilOgSendPåKafka("ettergivelse.json", 14)
 
     val kontering = assertVedOpprettelseAvEngangsbeløp(
-      5,
-      vedtakHendelse,
-      ETTERGIVELSE,
-      K1,
-      Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].referanse),
-      Søknadstype.EN
+      5, vedtakHendelse, ETTERGIVELSE, K1, Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].referanse), Søknadstype.EN
     )
 
     skrivTilTestdatafil(listOf(kontering), "Ettergivelse")
@@ -277,12 +272,7 @@ internal class VedtakshendelseListenerIT: SpringTestRunner() {
     val vedtakHendelse = hentFilOgSendPåKafka("direkteOppgjor.json", 15)
 
     val kontering = assertVedOpprettelseAvEngangsbeløp(
-      7,
-      vedtakHendelse,
-      DIREKTE_OPPGJOR,
-      K2,
-      Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].referanse),
-      Søknadstype.EN
+      7, vedtakHendelse, DIREKTE_OPPGJOR, K2, Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].referanse), Søknadstype.EN
     )
 
     skrivTilTestdatafil(listOf(kontering), "Direkte oppgjør")
@@ -314,13 +304,7 @@ internal class VedtakshendelseListenerIT: SpringTestRunner() {
     val vedtakHendelse = hentFilOgSendPåKafka("bidragsforskudd.json", 31, skyldnerIdent, kravhaverIdent)
 
     val oppdrag = assertStønader(
-      9,
-      vedtakHendelse,
-      FORSKUDD,
-      3,
-      3,
-      A1,
-      Søknadstype.EN
+      9, vedtakHendelse, FORSKUDD, 3, 3, A1, Søknadstype.EN
     )
 
     val konteringer = hentAlleKonteringerForOppdrag(oppdrag)
@@ -336,21 +320,11 @@ internal class VedtakshendelseListenerIT: SpringTestRunner() {
     }
 
     val vedtakHendelse = hentFilOgSendPåKafka(
-      "bidragsforskuddOppdatering.json",
-      41,
-      skyldnerIdent,
-      kravhaverIdent
+      "bidragsforskuddOppdatering.json", 41, skyldnerIdent, kravhaverIdent
     )
 
     val oppdrag = assertStønader(
-      9,
-      vedtakHendelse,
-      FORSKUDD,
-      4,
-      1,
-      A1,
-      Søknadstype.EN,
-      A3
+      9, vedtakHendelse, FORSKUDD, 4, 1, A1, Søknadstype.EN, A3
     )
 
     val konteringer = hentAlleOppdaterteOgNyeKonteringerForOppdragVedOppdatering(oppdrag)
@@ -375,33 +349,15 @@ internal class VedtakshendelseListenerIT: SpringTestRunner() {
     )
 
     val oppdrag1 = assertStønader(
-      10,
-      vedtakHendelse,
-      BIDRAG,
-      2,
-      2,
-      B1,
-      Søknadstype.EN
+      10, vedtakHendelse, BIDRAG, 2, 2, B1, Søknadstype.EN
     )
 
     val oppdrag2 = assertStønader(
-      11,
-      vedtakHendelse,
-      BIDRAG,
-      2,
-      2,
-      B1,
-      Søknadstype.EN,
-      stonadsendringIndex = 1
+      11, vedtakHendelse, BIDRAG, 2, 2, B1, Søknadstype.EN, stonadsendringIndex = 1
     )
 
     val gebyrBp = assertVedOpprettelseAvEngangsbeløp(
-      12,
-      vedtakHendelse,
-      GEBYR_SKYLDNER,
-      G1,
-      Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].referanse),
-      FABP
+      12, vedtakHendelse, GEBYR_SKYLDNER, G1, Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].referanse), FABP
     )
 
     val gebyrBm = assertVedOpprettelseAvEngangsbeløp(
@@ -437,20 +393,11 @@ internal class VedtakshendelseListenerIT: SpringTestRunner() {
     )
 
     val oppdrag1 = assertStønader(
-      10,
-      vedtakHendelse,
-      BIDRAG,
-      3,
-      1,
-      B1,
-      Søknadstype.EN,
-      B3,
-      0
+      10, vedtakHendelse, BIDRAG, 3, 1, B1, Søknadstype.EN, B3, 0
     )
 
     skrivTilTestdatafil(
-      hentAlleOppdaterteOgNyeKonteringerForOppdragVedOppdatering(oppdrag1),
-      "Oppdaterer barnebidrag for barn 1 med 10kr."
+      hentAlleOppdaterteOgNyeKonteringerForOppdragVedOppdatering(oppdrag1), "Oppdaterer barnebidrag for barn 1 med 10kr."
     )
 
 
@@ -459,20 +406,11 @@ internal class VedtakshendelseListenerIT: SpringTestRunner() {
     }
 
     val oppdrag2 = assertStønader(
-      11,
-      vedtakHendelse,
-      BIDRAG,
-      3,
-      1,
-      B1,
-      Søknadstype.EN,
-      B3,
-      1
+      11, vedtakHendelse, BIDRAG, 3, 1, B1, Søknadstype.EN, B3, 1
     )
 
     skrivTilTestdatafil(
-      hentAlleOppdaterteOgNyeKonteringerForOppdragVedOppdatering(oppdrag2),
-      "Oppdaterer barnebidrag for barn 2 med 10kr."
+      hentAlleOppdaterteOgNyeKonteringerForOppdragVedOppdatering(oppdrag2), "Oppdaterer barnebidrag for barn 2 med 10kr."
     )
   }
 
@@ -484,11 +422,7 @@ internal class VedtakshendelseListenerIT: SpringTestRunner() {
   @Order(16)
   fun `skal opprette oppfostringsbidrag`() {
     val vedtakHendelse = hentFilOgSendPåKafka(
-      "oppfostringsbidrag.json",
-      87,
-      bp = bpOppfostring,
-      barn1 = barn1Oppfostring,
-      barn2 = barn2Oppfostring
+      "oppfostringsbidrag.json", 87, bp = bpOppfostring, barn1 = barn1Oppfostring, barn2 = barn2Oppfostring
     )
 
     await().atMost(TEN_SECONDS).until {
@@ -496,13 +430,7 @@ internal class VedtakshendelseListenerIT: SpringTestRunner() {
     }
 
     val oppdrag1 = assertStønader(
-      14,
-      vedtakHendelse,
-      OPPFOSTRINGSBIDRAG,
-      1,
-      1,
-      B1,
-      Søknadstype.EN
+      14, vedtakHendelse, OPPFOSTRINGSBIDRAG, 1, 1, B1, Søknadstype.EN
     )
 
     await().atMost(TEN_SECONDS).until {
@@ -510,13 +438,7 @@ internal class VedtakshendelseListenerIT: SpringTestRunner() {
     }
 
     val oppdrag2 = assertStønader(
-      15,
-      vedtakHendelse,
-      OPPFOSTRINGSBIDRAG,
-      1,
-      1,
-      B1,
-      Søknadstype.EN
+      15, vedtakHendelse, OPPFOSTRINGSBIDRAG, 1, 1, B1, Søknadstype.EN
     )
 
     skrivTilTestdatafil(hentAlleKonteringerForOppdrag(oppdrag1), "Oppfostringsbidrag for barn 1")
@@ -536,37 +458,19 @@ internal class VedtakshendelseListenerIT: SpringTestRunner() {
     )
 
     val oppdrag1 = assertStønader(
-      14,
-      vedtakHendelse,
-      OPPFOSTRINGSBIDRAG,
-      2,
-      1,
-      B1,
-      Søknadstype.EN,
-      B3,
-      0
+      14, vedtakHendelse, OPPFOSTRINGSBIDRAG, 2, 1, B1, Søknadstype.EN, B3, 0
     )
 
     skrivTilTestdatafil(
-      hentAlleOppdaterteOgNyeKonteringerForOppdragVedOppdatering(oppdrag1),
-      "Oppdaterer oppfostringsbidrag for barn 1 med 100kr."
+      hentAlleOppdaterteOgNyeKonteringerForOppdragVedOppdatering(oppdrag1), "Oppdaterer oppfostringsbidrag for barn 1 med 100kr."
     )
 
     val oppdrag2 = assertStønader(
-      15,
-      vedtakHendelse,
-      OPPFOSTRINGSBIDRAG,
-      2,
-      1,
-      B1,
-      Søknadstype.EN,
-      B3,
-      1
+      15, vedtakHendelse, OPPFOSTRINGSBIDRAG, 2, 1, B1, Søknadstype.EN, B3, 1
     )
 
     skrivTilTestdatafil(
-      hentAlleOppdaterteOgNyeKonteringerForOppdragVedOppdatering(oppdrag2),
-      "Oppdaterer oppfostringsbidrag for barn 2 med 100kr."
+      hentAlleOppdaterteOgNyeKonteringerForOppdragVedOppdatering(oppdrag2), "Oppdaterer oppfostringsbidrag for barn 2 med 100kr."
     )
   }
 
@@ -585,13 +489,7 @@ internal class VedtakshendelseListenerIT: SpringTestRunner() {
     }
 
     val oppdrag = assertStønader(
-      16,
-      vedtakHendelse,
-      BIDRAG18AAR,
-      3,
-      3,
-      D1,
-      Søknadstype.EN
+      16, vedtakHendelse, BIDRAG18AAR, 3, 3, D1, Søknadstype.EN
     )
 
     skrivTilTestdatafil(hentAlleKonteringerForOppdrag(oppdrag), "18 års bidrag")
@@ -609,14 +507,7 @@ internal class VedtakshendelseListenerIT: SpringTestRunner() {
     )
 
     val oppdrag = assertStønader(
-      16,
-      vedtakHendelse,
-      BIDRAG18AAR,
-      4,
-      1,
-      D1,
-      Søknadstype.EN,
-      D3
+      16, vedtakHendelse, BIDRAG18AAR, 4, 1, D1, Søknadstype.EN, D3
     )
 
     skrivTilTestdatafil(
@@ -644,13 +535,7 @@ internal class VedtakshendelseListenerIT: SpringTestRunner() {
 
 
     val oppdrag = assertStønader(
-      17,
-      vedtakHendelse,
-      EKTEFELLEBIDRAG,
-      2,
-      2,
-      F1,
-      Søknadstype.EN
+      17, vedtakHendelse, EKTEFELLEBIDRAG, 2, 2, F1, Søknadstype.EN
     )
 
     skrivTilTestdatafil(hentAlleKonteringerForOppdrag(oppdrag), "Ektefellebidrag")
@@ -668,19 +553,11 @@ internal class VedtakshendelseListenerIT: SpringTestRunner() {
     )
 
     val oppdrag = assertStønader(
-      17,
-      vedtakHendelse,
-      EKTEFELLEBIDRAG,
-      3,
-      1,
-      F1,
-      Søknadstype.EN,
-      F3
+      17, vedtakHendelse, EKTEFELLEBIDRAG, 3, 1, F1, Søknadstype.EN, F3
     )
 
     skrivTilTestdatafil(
-      hentAlleOppdaterteOgNyeKonteringerForOppdragVedOppdatering(oppdrag),
-      "Oppdaterer ektefellebidrag med 1000kr fra 2022-02-01."
+      hentAlleOppdaterteOgNyeKonteringerForOppdragVedOppdatering(oppdrag), "Oppdaterer ektefellebidrag med 1000kr fra 2022-02-01."
     )
   }
 
@@ -688,8 +565,7 @@ internal class VedtakshendelseListenerIT: SpringTestRunner() {
   @Order(22)
   fun `skal opprette motregning`() {
     val vedtakHendelse = hentFilOgSendPåKafka(
-      "motregning.json",
-      172
+      "motregning.json", 172
     )
 
     await().atMost(TEN_SECONDS).until {
@@ -697,13 +573,7 @@ internal class VedtakshendelseListenerIT: SpringTestRunner() {
     }
 
     val oppdrag = assertStønader(
-      18,
-      vedtakHendelse,
-      MOTREGNING,
-      1,
-      1,
-      I1,
-      Søknadstype.EN
+      18, vedtakHendelse, MOTREGNING, 1, 1, I1, Søknadstype.EN
     )
 
     skrivTilTestdatafil(hentAlleKonteringerForOppdrag(oppdrag), "Motregning")
@@ -726,8 +596,7 @@ internal class VedtakshendelseListenerIT: SpringTestRunner() {
     oppdrag.eksternReferanse shouldBe vedtakHendelse.eksternReferanse
     oppdrag.oppdragsperioder?.size shouldBe antallOppdragsperioder
     oppdrag.sakId shouldBe vedtakHendelse.stonadsendringListe!![stonadsendringIndex].sakId
-    oppdrag.oppdragsperioder
-      ?.subList(antallOppdragsperioder - antallOpprettetIGjeldendeFil, antallOppdragsperioder)
+    oppdrag.oppdragsperioder?.subList(antallOppdragsperioder - antallOpprettetIGjeldendeFil, antallOppdragsperioder)
       ?.forEachIndexed { i: Int, oppdragsperiode: Oppdragsperiode ->
         oppdragsperiode.vedtaksdato shouldBe vedtakHendelse.vedtakDato
         oppdragsperiode.vedtakId shouldBe vedtakHendelse.vedtakId
@@ -871,12 +740,10 @@ internal class VedtakshendelseListenerIT: SpringTestRunner() {
     barn1: String,
     barn2: String,
   ): String {
-    return vedtakFil
-      .replace("\"skyldnerId\": \"\"", "\"skyldnerId\" : \"${TestDataGenerator.genererPersonnummer()}\"")
+    return vedtakFil.replace("\"skyldnerId\": \"\"", "\"skyldnerId\" : \"${TestDataGenerator.genererPersonnummer()}\"")
       .replace("\"kravhaverId\": \"\"", "\"kravhaverId\" : \"$kravhaverIdent\"")
       .replace("\"mottakerId\": \"\"", "\"mottakerId\" : \"$mottaker\"")
-      .replace("\"skyldnerId\": \"BP\"", "\"skyldnerId\" : \"$bp\"")
-      .replace("\"skyldnerId\": \"BM\"", "\"skyldnerId\" : \"$bm\"")
+      .replace("\"skyldnerId\": \"BP\"", "\"skyldnerId\" : \"$bp\"").replace("\"skyldnerId\": \"BM\"", "\"skyldnerId\" : \"$bm\"")
       .replace("\"kravhaverId\": \"BARN1\"", "\"kravhaverId\" : \"$barn1\"")
       .replace("\"kravhaverId\": \"BARN2\"", "\"kravhaverId\" : \"$barn2\"")
       .replace("\"mottakerId\": \"BM\"", "\"mottakerId\" : \"$bm\"")
