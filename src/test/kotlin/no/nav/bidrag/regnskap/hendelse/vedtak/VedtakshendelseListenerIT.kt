@@ -51,6 +51,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.test.context.EmbeddedKafka
 import org.springframework.stereotype.Component
+import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
@@ -69,6 +70,7 @@ import java.util.*
 
 
 @Transactional
+@DirtiesContext
 @Testcontainers
 @ActiveProfiles("test")
 @EnableMockOAuth2Server
