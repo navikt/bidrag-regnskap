@@ -129,7 +129,6 @@ internal class VedtakshendelseListenerIT {
   fun beforeAll() {
     file = FileOutputStream(TESTDATA_OUTPUT_NAVN)
     persistenceService.lagrePåløp(påløp)
-    println("Henter alle påløp fra db:" + persistenceService.hentPåløp())
   }
 
   @BeforeEach
@@ -747,7 +746,8 @@ internal class VedtakshendelseListenerIT {
     return vedtakFil.replace("\"skyldnerId\": \"\"", "\"skyldnerId\" : \"${TestDataGenerator.genererPersonnummer()}\"")
       .replace("\"kravhaverId\": \"\"", "\"kravhaverId\" : \"$kravhaverIdent\"")
       .replace("\"mottakerId\": \"\"", "\"mottakerId\" : \"$mottaker\"")
-      .replace("\"skyldnerId\": \"BP\"", "\"skyldnerId\" : \"$bp\"").replace("\"skyldnerId\": \"BM\"", "\"skyldnerId\" : \"$bm\"")
+      .replace("\"skyldnerId\": \"BP\"", "\"skyldnerId\" : \"$bp\"")
+      .replace("\"skyldnerId\": \"BM\"", "\"skyldnerId\" : \"$bm\"")
       .replace("\"kravhaverId\": \"BARN1\"", "\"kravhaverId\" : \"$barn1\"")
       .replace("\"kravhaverId\": \"BARN2\"", "\"kravhaverId\" : \"$barn2\"")
       .replace("\"mottakerId\": \"BM\"", "\"mottakerId\" : \"$bm\"")
