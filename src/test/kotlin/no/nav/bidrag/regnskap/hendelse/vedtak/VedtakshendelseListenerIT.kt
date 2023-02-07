@@ -42,9 +42,11 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestMethodOrder
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.Pageable
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.test.context.EmbeddedKafka
+import org.springframework.test.annotation.DirtiesContext
 import org.springframework.transaction.annotation.Transactional
 import org.testcontainers.shaded.org.awaitility.Awaitility.await
 import org.testcontainers.shaded.org.awaitility.Durations.*
@@ -54,12 +56,11 @@ import java.time.LocalDateTime
 import java.time.YearMonth
 import java.util.*
 
-private const val TOPIC = "bidrag.vedtak-feature-test"
-
 @Transactional
+@DirtiesContext
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
-@EmbeddedKafka(partitions = 1, topics = [TOPIC], brokerProperties = ["listeners=PLAINTEXT://localhost:9092", "port=9092"])
+@EmbeddedKafka(partitions = 1, brokerProperties = ["listeners=PLAINTEXT://localhost:9092", "port=9092"])
 internal class VedtakshendelseListenerIT: SpringTestRunner() {
 
   companion object {
@@ -80,6 +81,9 @@ internal class VedtakshendelseListenerIT: SpringTestRunner() {
 
   @Autowired
   private lateinit var kravService: KravService
+
+  @Value("\${TOPIC_VEDTAK}")
+  private lateinit var topic: String
 
   private lateinit var file: FileOutputStream
 
@@ -802,7 +806,7 @@ internal class VedtakshendelseListenerIT: SpringTestRunner() {
   ): VedtakHendelse {
     val vedtakFilString = leggInnGenererteIdenter(hentTestfil(filnavn), kravhaverIdent, mottaker, bm, bp, barn1, barn2)
 
-    kafkaTemplate.usingCompletableFuture().send(TOPIC, vedtakFilString)
+    kafkaTemplate.usingCompletableFuture().send(topic, vedtakFilString)
 
     val vedtakHendelse = objectmapper.readValue(vedtakFilString, VedtakHendelse::class.java)
 

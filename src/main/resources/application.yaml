@@ -31,7 +31,7 @@ sftp:
   port: 22
   privateKey: ${SFTP_PRIVATE_KEY}
 
-spring.config.activate.on-profile: nais,local
+spring.config.activate.on-profile: nais
 
 no.nav.security.jwt:
   client:
