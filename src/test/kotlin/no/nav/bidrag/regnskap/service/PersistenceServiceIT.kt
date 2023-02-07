@@ -6,21 +6,47 @@ import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.ints.shouldBeGreaterThanOrEqual
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import no.nav.bidrag.regnskap.SpringTestRunner
+import no.nav.bidrag.regnskap.BidragRegnskapLocal
 import no.nav.bidrag.regnskap.utils.TestData
+import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.Pageable
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.DynamicPropertyRegistry
+import org.springframework.test.context.DynamicPropertySource
 import org.springframework.transaction.annotation.Transactional
+import org.testcontainers.containers.PostgreSQLContainer
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Transactional
+@ActiveProfiles("test")
+@EnableMockOAuth2Server
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class PersistenceServiceIT : SpringTestRunner() {
+@SpringBootTest(classes = [BidragRegnskapLocal::class])
+internal class PersistenceServiceIT {
+
+  companion object {
+    private var postgreSqlDb = PostgreSQLContainer("postgres:latest").apply {
+      withDatabaseName("bidrag-regnskap")
+      withUsername("cloudsqliamuser")
+      withPassword("admin")
+      start()
+    }
+
+    @JvmStatic
+    @DynamicPropertySource
+    fun properties(registry: DynamicPropertyRegistry) {
+      registry.add("spring.datasource.url", postgreSqlDb::getJdbcUrl)
+      registry.add("spring.datasource.username", postgreSqlDb::getUsername)
+      registry.add("spring.datasource.password", postgreSqlDb::getPassword)
+    }
+  }
 
   @Autowired
   private lateinit var persistenceService: PersistenceService
