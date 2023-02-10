@@ -56,6 +56,38 @@ data class Kontering(
         "søknadType = $søknadType , " +
         "sendtIPåløpsfil = $sendtIPåløpsfil )"
   }
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as Kontering
+
+    if (konteringId != other.konteringId) return false
+    if (oppdragsperiode != other.oppdragsperiode) return false
+    if (transaksjonskode != other.transaksjonskode) return false
+    if (overføringsperiode != other.overføringsperiode) return false
+    if (overføringstidspunkt != other.overføringstidspunkt) return false
+    if (type != other.type) return false
+    if (søknadType != other.søknadType) return false
+    if (sendtIPåløpsfil != other.sendtIPåløpsfil) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    var result = konteringId
+    result = 31 * result + (oppdragsperiode?.hashCode() ?: 0)
+    result = 31 * result + transaksjonskode.hashCode()
+    result = 31 * result + overføringsperiode.hashCode()
+    result = 31 * result + (overføringstidspunkt?.hashCode() ?: 0)
+    result = 31 * result + type.hashCode()
+    result = 31 * result + søknadType.hashCode()
+    result = 31 * result + sendtIPåløpsfil.hashCode()
+    return result
+  }
+
+
 }
 
 

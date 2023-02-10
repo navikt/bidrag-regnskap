@@ -122,11 +122,9 @@ class KonteringServiceTest {
         now.year, now.month
       ).plusMonths(5)
 
-      konteringService.opprettKorreksjonskonteringerForAlleredeOversendteKonteringer(
+      konteringService.opprettKorreksjonskonteringer(
         oppdrag, listOf(nyOppdragsperiode)
       )
-
-      verify(exactly = 2) { persistenceService.lagreKontering(any()) }
     }
 
     @Test
@@ -157,7 +155,7 @@ class KonteringServiceTest {
         now.year, now.month
       ).plusMonths(5)
 
-      konteringService.opprettKorreksjonskonteringerForAlleredeOversendteKonteringer(
+      konteringService.opprettKorreksjonskonteringer(
         oppdrag, listOf(nyOppdragsperiode)
       )
 

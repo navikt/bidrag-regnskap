@@ -18,8 +18,8 @@ springdoc:
     path: /
 
 maskinporten:
-  tokenUrl: ${MASKINPORTEN_URL}/token
-  audience: ${MASKINPORTEN_URL}
+  tokenUrl: ${MASKINPORTEN_ISSUER}/token
+  audience: ${MASKINPORTEN_ISSUER}
   clientId: ${MASKINPORTEN_CLIENT_ID}
   scope: ${MASKINPORTEN_SCOPES}
   privateKey: ${MASKINPORTEN_CLIENT_JWK}
@@ -63,6 +63,7 @@ spring:
           password: ${KAFKA_CREDSTORE_PASSWORD}
     consumer:
       enableAutoCommit: false
+      auto-offset-reset: earliest
     listener:
       ackMode: RECORD
 
