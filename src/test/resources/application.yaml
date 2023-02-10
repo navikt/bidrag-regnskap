@@ -18,8 +18,8 @@ springdoc:
     path: /
 
 maskinporten:
-  tokenUrl: https://test.maskinporten.no/token
-  audience: https://test.maskinporten.no/
+  tokenUrl: https://ver2.maskinporten.no/token
+  audience: https://ver2.maskinporten.no/
   clientId: <MASKINPORTEN_CLIENT_ID>
   scope: <MASKINPORTEN_SCOPES>
   privateKey: <MASKINPORTEN_CLIENT_JWK>
@@ -39,6 +39,7 @@ spring:
       security.protocol: PLAINTEXT
     consumer:
       enableAutoCommit: false
+      auto-offset-reset: earliest
     listener:
       ackMode: RECORD
 

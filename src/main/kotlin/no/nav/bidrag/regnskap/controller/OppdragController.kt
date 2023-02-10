@@ -1,7 +1,9 @@
 package no.nav.bidrag.regnskap.controller
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
@@ -9,6 +11,8 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.bidrag.regnskap.dto.oppdrag.OppdragResponse
 import no.nav.bidrag.regnskap.service.OppdragService
 import no.nav.security.token.support.core.api.Protected
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
@@ -32,14 +36,21 @@ class OppdragController(
     value = [ApiResponse(
       responseCode = "200",
       description = "Returnerer oppdragets ID.",
+      content = [(Content(
+        array = (ArraySchema(schema = Schema(implementation = OppdragResponse::class)))
+      ))]
     ), ApiResponse(
       responseCode = "204",
-      description = "Oppdraget finnes ikke.",
-      content = [Content()]
+      description = "Oppdraget finnes ikke."
     )]
   )
-  fun hentOppdrag(oppdragId: Int): ResponseEntity<OppdragResponse> {
-    return ResponseEntity.ok(oppdragService.hentOppdrag(oppdragId))
+  fun hentOppdrag(oppdragId: Int): ResponseEntity<*> {
+    val oppdragResponse = oppdragService.hentOppdrag(oppdragId)
+    return if (oppdragResponse != null)
+      ResponseEntity.ok(oppdragService.hentOppdrag(oppdragId)) else
+      ResponseEntity.status(HttpStatus.NO_CONTENT)
+        .header(HttpHeaders.WARNING, "Det finnes ingen oppdrag med angitt oppdragsId: $oppdragId")
+        .build<Any>()
   }
 }
 

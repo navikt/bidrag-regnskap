@@ -1,6 +1,5 @@
 package no.nav.bidrag.regnskap.service
 
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
@@ -44,16 +43,16 @@ class OppdragServiceTest {
         skyldnerIdent = skyldnerIdent
       )
 
-      val oppdragResponse = oppdragService.hentOppdrag(1)
+      val oppdragResponse = oppdragService.hentOppdrag(1)!!
 
       oppdragResponse.type shouldBe stonadType.name
       oppdragResponse.skyldnerIdent shouldBe skyldnerIdent
     }
 
     @Test
-    fun `skal kaste feil om oppdrag ikke eksisterer`() {
+    fun `skal være tom om oppdrag ikke eksisterer`() {
       every { persistenceService.hentOppdrag(any()) } returns null
-      shouldThrow<IllegalStateException> { oppdragService.hentOppdrag(1) }
+      oppdragService.hentOppdrag(1) shouldBe null
     }
   }
 

@@ -6,6 +6,7 @@ import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class OppdragsperiodeService(
@@ -37,7 +38,7 @@ class OppdragsperiodeService(
   fun opprettNyeOppdragsperioder(
     hendelse: Hendelse, oppdrag: Oppdrag
   ): List<Oppdragsperiode> {
-    return hendelse.periodeListe.map {
+    return hendelse.periodeListe.filter { it.beløp != null }.map {
         Oppdragsperiode(
           vedtakId = hendelse.vedtakId,
           gjelderIdent = sakConsumer.hentBmFraSak(hendelse.sakId),
@@ -54,9 +55,8 @@ class OppdragsperiodeService(
     }
   }
 
-  fun settAktivTilDatoPåEksisterendeOppdragsperioder(oppdrag: Oppdrag, nyeOppdragsperioder: List<Oppdragsperiode>) {
+  fun settAktivTilDatoPåEksisterendeOppdragsperioder(oppdrag: Oppdrag, periodeFra: LocalDate) {
     oppdrag.oppdragsperioder?.filter { it.aktivTil == null }?.forEach {
-      val periodeFra = nyeOppdragsperioder.first().periodeFra
       if (it.periodeTil != null && periodeFra.isAfter(it.periodeTil)) {
         it.aktivTil = it.periodeTil
       } else if (periodeFra.isBefore(it.periodeFra)) {

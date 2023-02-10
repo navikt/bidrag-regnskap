@@ -81,4 +81,46 @@ data class Oppdragsperiode(
         "delytelseId = $delytelseId , " +
         "aktivTil = $aktivTil )"
   }
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as Oppdragsperiode
+
+    if (oppdragsperiodeId != other.oppdragsperiodeId) return false
+    if (oppdrag != other.oppdrag) return false
+    if (vedtakId != other.vedtakId) return false
+    if (gjelderIdent != other.gjelderIdent) return false
+    if (mottakerIdent != other.mottakerIdent) return false
+    if (beløp != other.beløp) return false
+    if (valuta != other.valuta) return false
+    if (periodeFra != other.periodeFra) return false
+    if (periodeTil != other.periodeTil) return false
+    if (vedtaksdato != other.vedtaksdato) return false
+    if (opprettetAv != other.opprettetAv) return false
+    if (delytelseId != other.delytelseId) return false
+    if (aktivTil != other.aktivTil) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    var result = oppdragsperiodeId
+    result = 31 * result + (oppdrag?.hashCode() ?: 0)
+    result = 31 * result + vedtakId
+    result = 31 * result + gjelderIdent.hashCode()
+    result = 31 * result + mottakerIdent.hashCode()
+    result = 31 * result + beløp.hashCode()
+    result = 31 * result + valuta.hashCode()
+    result = 31 * result + periodeFra.hashCode()
+    result = 31 * result + (periodeTil?.hashCode() ?: 0)
+    result = 31 * result + vedtaksdato.hashCode()
+    result = 31 * result + opprettetAv.hashCode()
+    result = 31 * result + (delytelseId ?: 0)
+    result = 31 * result + (aktivTil?.hashCode() ?: 0)
+    return result
+  }
+
+
 }

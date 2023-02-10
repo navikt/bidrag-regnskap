@@ -41,7 +41,7 @@ class KravService(
     propagation = Propagation.REQUIRES_NEW
   )
   fun sendKrav(oppdragId: Int) {
-    LOGGER.info("Starter overføring av krav til skatt for oppdragId: $oppdragId")
+    LOGGER.info("Starter overføring av krav til skatt for oppdrag: $oppdragId")
 
     val oppdrag = persistenceService.hentOppdrag(oppdragId) ?: error("Det finnes ingen oppdrag med angitt oppdragsId: $oppdragId")
 
@@ -61,6 +61,7 @@ class KravService(
     val skattResponse = skattConsumer.sendKrav(opprettSkattKravRequest(alleIkkeOverførteKonteringer))
 
     lagreOverføringAvKrav(skattResponse, alleIkkeOverførteKonteringer, oppdrag)
+    LOGGER.info("Overføring til skatt fullført for oppdrag: $oppdragId")
   }
 
   private fun lagreOverføringAvKrav(

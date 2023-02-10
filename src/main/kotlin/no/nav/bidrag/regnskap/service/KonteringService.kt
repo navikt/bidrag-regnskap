@@ -7,6 +7,7 @@ import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
 import no.nav.bidrag.regnskap.dto.enumer.Type
 import no.nav.bidrag.regnskap.dto.oppdrag.KonteringResponse
 import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
+import no.nav.bidrag.regnskap.dto.vedtak.Periode
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
@@ -45,7 +46,6 @@ class KonteringService(
         )
       }
     }
-
     return konteringResponser
   }
 
@@ -102,34 +102,51 @@ class KonteringService(
   }
 
 
-  fun opprettKorreksjonskonteringerForAlleredeOversendteKonteringer(
+  fun opprettKorreksjonskonteringer(
     oppdrag: Oppdrag,
     nyeOppdragsperioder: List<Oppdragsperiode>
   ) {
     val overførteKonteringerListe = finnAlleOverførteKontering(oppdrag)
 
     nyeOppdragsperioder.forEach { nyOppdragsperiode ->
-      val perioderForNyOppdrasperiode = hentAllePerioderForOppdragsperiode(nyOppdragsperiode)
+      val perioderForNyOppdragsperiode =
+        hentAllePerioderMellomDato(nyOppdragsperiode.periodeFra, nyOppdragsperiode.periodeTil)
+      opprettKorreksjonskonteringForAlleredeOversendteKonteringer(perioderForNyOppdragsperiode, overførteKonteringerListe)
+    }
+  }
 
-      overførteKonteringerListe.forEach { kontering ->
-        val korreksjonskode = Transaksjonskode.valueOf(kontering.transaksjonskode).korreksjonskode
+  fun opprettKorreksjonskonteringer(
+    oppdrag: Oppdrag,
+    periode: Periode
+  ) {
+    val overførteKonteringerListe = finnAlleOverførteKontering(oppdrag)
 
-        if (korreksjonskode != null
-          && !erOverførtKonteringAlleredeKorrigert(kontering, overførteKonteringerListe)
-          && (erPeriodeOverlappende(perioderForNyOppdrasperiode, kontering)
-              || slutterNyeOppdragsperiodeFørOverførteKonteringsPeriode(kontering, perioderForNyOppdrasperiode)
-              || erKonteringGebyr(kontering))
-        ) {
-          persistenceService.lagreKontering(
-            Kontering(
-              oppdragsperiode = kontering.oppdragsperiode,
-              overføringsperiode = kontering.overføringsperiode,
-              transaksjonskode = korreksjonskode,
-              type = Type.ENDRING.toString(),
-              søknadType = kontering.søknadType
-            )
+    val perioderForPeriode = hentAllePerioderMellomDato(periode.periodeFomDato, periode.periodeTilDato)
+    opprettKorreksjonskonteringForAlleredeOversendteKonteringer(perioderForPeriode, overførteKonteringerListe)
+  }
+
+  private fun opprettKorreksjonskonteringForAlleredeOversendteKonteringer(
+    perioderForOppdragsperiode: List<YearMonth>,
+    overførteKonteringerListe: List<Kontering>
+  ) {
+    overførteKonteringerListe.forEach { kontering ->
+      val korreksjonskode = Transaksjonskode.valueOf(kontering.transaksjonskode).korreksjonskode
+
+      if (korreksjonskode != null
+        && !erOverførtKonteringAlleredeKorrigert(kontering, overførteKonteringerListe)
+        && (erPeriodeOverlappende(perioderForOppdragsperiode, kontering)
+            || slutterNyeOppdragsperiodeFørOverførteKonteringsPeriode(kontering, perioderForOppdragsperiode)
+            || erKonteringGebyr(kontering))
+      ) {
+        kontering.oppdragsperiode?.konteringer = kontering.oppdragsperiode?.konteringer?.plus(
+          Kontering(
+            oppdragsperiode = kontering.oppdragsperiode,
+            overføringsperiode = kontering.overføringsperiode,
+            transaksjonskode = korreksjonskode,
+            type = Type.ENDRING.toString(),
+            søknadType = kontering.søknadType
           )
-        }
+        )
       }
     }
   }
@@ -166,33 +183,31 @@ class KonteringService(
   private fun hentAllePerioderForOppdragsperiodeForOverførtPeriode(
     oppdragsperiode: Oppdragsperiode
   ): List<YearMonth> {
-    val perioderForOppdrasperiode = hentAllePerioderForOppdragsperiode(oppdragsperiode)
+    val perioderForOppdrasperiode = hentAllePerioderMellomDato(oppdragsperiode.periodeFra, oppdragsperiode.periodeTil)
     val sisteOverførtePeriode = persistenceService.finnSisteOverførtePeriode()
 
     //Filtrer etter det ut alle perioder som er senere enn siste overførte periode da disse konteringene ikke skal opprettes før påløpsfilen genereres.
     return perioderForOppdrasperiode.filter { it.isBefore(sisteOverførtePeriode.plusMonths(1)) }
   }
 
-  private fun hentAllePerioderForOppdragsperiode(
-    oppdragsperiode: Oppdragsperiode
+  private fun hentAllePerioderMellomDato(
+    periodeFraForOppdragsperiode: LocalDate,
+    periodeTilForOppdragsperiode: LocalDate?
   ): List<YearMonth> {
-    var periodeTil = oppdragsperiode.periodeTil
     val sisteOverførtePeriode = persistenceService.finnSisteOverførtePeriode()
 
-    if (periodeTil == null) {
-      periodeTil = LocalDate.of(
-        sisteOverførtePeriode.year, sisteOverførtePeriode.month, 1
-      ).plusMonths(1)
-    }
+    val periodeTil = periodeTilForOppdragsperiode
+      ?: LocalDate.of(sisteOverførtePeriode.year, sisteOverførtePeriode.month, 1).plusMonths(1)
 
-    if (periodeTil!!.isBefore(oppdragsperiode.periodeFra)) {
+    if (periodeTil.isBefore(periodeFraForOppdragsperiode)) {
       return emptyList()
     }
 
-    // Finner alle perioder som er mellom fra og med periodeFra og til og med periodeTil (Om den eksisterer, ellers brukes siste overførte periode)
-    return Stream.iterate(oppdragsperiode.periodeFra) { date: LocalDate -> date.plusMonths(1) }.limit(
+    // Finner alle perioder som er mellom fra og med periodeFra og til og med periodeTil
+    // (Om den eksisterer, ellers brukes siste overførte periode)
+    return Stream.iterate(periodeFraForOppdragsperiode) { date: LocalDate -> date.plusMonths(1) }.limit(
       ChronoUnit.MONTHS.between(
-        oppdragsperiode.periodeFra, periodeTil
+        periodeFraForOppdragsperiode, periodeTil
       )
     ).map { it.format(DateTimeFormatter.ofPattern("yyyy-MM")) }.map { YearMonth.parse(it) }.collect(Collectors.toList())
   }

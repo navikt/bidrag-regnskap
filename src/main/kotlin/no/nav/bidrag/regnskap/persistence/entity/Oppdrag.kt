@@ -64,4 +64,40 @@ data class Oppdrag(
         "endretTidspunkt = $endretTidspunkt , " +
         "engangsbeløpId = $engangsbeløpId )"
   }
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as Oppdrag
+
+    if (oppdragId != other.oppdragId) return false
+    if (stønadType != other.stønadType) return false
+    if (vedtakType != other.vedtakType) return false
+    if (sakId != other.sakId) return false
+    if (kravhaverIdent != other.kravhaverIdent) return false
+    if (skyldnerIdent != other.skyldnerIdent) return false
+    if (eksternReferanse != other.eksternReferanse) return false
+    if (utsattTilDato != other.utsattTilDato) return false
+    if (endretTidspunkt != other.endretTidspunkt) return false
+    if (engangsbeløpId != other.engangsbeløpId) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    var result = oppdragId
+    result = 31 * result + stønadType.hashCode()
+    result = 31 * result + vedtakType.hashCode()
+    result = 31 * result + sakId.hashCode()
+    result = 31 * result + (kravhaverIdent?.hashCode() ?: 0)
+    result = 31 * result + skyldnerIdent.hashCode()
+    result = 31 * result + (eksternReferanse?.hashCode() ?: 0)
+    result = 31 * result + (utsattTilDato?.hashCode() ?: 0)
+    result = 31 * result + (endretTidspunkt?.hashCode() ?: 0)
+    result = 31 * result + (engangsbeløpId ?: 0)
+    return result
+  }
+
+
 }

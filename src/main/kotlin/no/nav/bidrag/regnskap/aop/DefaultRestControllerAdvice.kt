@@ -42,14 +42,6 @@ class DefaultRestControllerAdvice {
   }
 
   @ResponseBody
-  @ExceptionHandler(NoSuchElementException::class)
-  fun handleNoSuchElementException(exception: java.util.NoSuchElementException): ResponseEntity<*> {
-    LOGGER.error("Fant ingen gyldig verdi: ${exception.message}}", exception)
-    return ResponseEntity.status(HttpStatus.NO_CONTENT)
-      .build<Any>()
-  }
-
-  @ResponseBody
   @ExceptionHandler(MaskinportenClientException::class)
   fun handleMaskinportenClientExcpetion(exception: MaskinportenClientException): ResponseEntity<*> {
     LOGGER.error("Noe gikk galt ved kall til maskinporten: ${exception.message}}", exception)
