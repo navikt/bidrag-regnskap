@@ -5,13 +5,15 @@ kafka:
   pool: nav-dev
 database:
   navn: bidrag-regnskap-main
+bucket:
+  navn: bidrag-regnskap
 maskinporten:
   url: https://ver2.maskinporten.no
 env:
   SKATT_URL: https://bidrag-stubs.dev.intern.nav.no
   SKATT_SCOPE: dev-gcp.bidrag.bidrag-stubs
   TOPIC_VEDTAK: bidrag.vedtak
-  BUCKET_NAME: bidrag-regnskap
+  BUCKET_NAME: bucket.navn
   SFTP_HOST: sftp-q.nav.no
   SAK_URL: https://bidrag-sak.dev-fss-pub.nais.io
   SAK_SCOPE: https://dev-fss.bidrag.bidrag-sak

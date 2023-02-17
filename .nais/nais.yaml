@@ -63,4 +63,4 @@ spec:
           - name: bidrag-regnskap-db
             envVarPrefix: DB
     buckets:
-      - name: {{ BUCKET_NAME }}
+      - name: {{ bucket.navn }}
