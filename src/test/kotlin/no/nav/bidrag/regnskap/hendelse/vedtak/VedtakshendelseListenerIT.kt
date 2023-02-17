@@ -15,6 +15,7 @@ import no.nav.bidrag.behandling.felles.enums.EngangsbelopType
 import no.nav.bidrag.behandling.felles.enums.EngangsbelopType.*
 import no.nav.bidrag.behandling.felles.enums.StonadType
 import no.nav.bidrag.behandling.felles.enums.StonadType.*
+import no.nav.bidrag.commons.util.PersonidentGenerator
 import no.nav.bidrag.regnskap.BidragRegnskapLocal
 import no.nav.bidrag.regnskap.consumer.KravApiWireMock
 import no.nav.bidrag.regnskap.consumer.SakApiWireMock
@@ -31,7 +32,6 @@ import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
 import no.nav.bidrag.regnskap.service.KravService
 import no.nav.bidrag.regnskap.service.PersistenceService
 import no.nav.bidrag.regnskap.utils.TestData
-import no.nav.bidrag.regnskap.utils.TestDataGenerator
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.*
@@ -298,8 +298,8 @@ internal class VedtakshendelseListenerIT {
     skrivTilTestdatafil(listOf(kontering), "Ettergivelse tilbakekreving")
   }
 
-  val skyldnerIdent = TestDataGenerator.genererPersonnummer()
-  val kravhaverIdent = TestDataGenerator.genererPersonnummer()
+  val skyldnerIdent = PersonidentGenerator.genererPersonnummer()
+  val kravhaverIdent = PersonidentGenerator.genererPersonnummer()
 
   @Test
   @Order(12)
@@ -334,10 +334,10 @@ internal class VedtakshendelseListenerIT {
     skrivTilTestdatafil(konteringer, "Oppdaterer bidragsforskudds med 50 øre og endrer til å slutte 2 mnd tidligere.")
   }
 
-  val bmBidrag = TestDataGenerator.genererPersonnummer()
-  val bpBidrag = TestDataGenerator.genererPersonnummer()
-  val barn1Bidrag = TestDataGenerator.genererPersonnummer()
-  val barn2Bidrag = TestDataGenerator.genererPersonnummer()
+  val bmBidrag = PersonidentGenerator.genererPersonnummer()
+  val bpBidrag = PersonidentGenerator.genererPersonnummer()
+  val barn1Bidrag = PersonidentGenerator.genererPersonnummer()
+  val barn2Bidrag = PersonidentGenerator.genererPersonnummer()
 
   @Test
   @Order(14)
@@ -417,9 +417,9 @@ internal class VedtakshendelseListenerIT {
     )
   }
 
-  val bpOppfostring = TestDataGenerator.genererPersonnummer()
-  val barn1Oppfostring = TestDataGenerator.genererPersonnummer()
-  val barn2Oppfostring = TestDataGenerator.genererPersonnummer()
+  val bpOppfostring = PersonidentGenerator.genererPersonnummer()
+  val barn1Oppfostring = PersonidentGenerator.genererPersonnummer()
+  val barn2Oppfostring = PersonidentGenerator.genererPersonnummer()
 
   @Test
   @Order(16)
@@ -519,8 +519,8 @@ internal class VedtakshendelseListenerIT {
     )
   }
 
-  val skyldnerIdEktefelleBidrag = TestDataGenerator.genererPersonnummer()
-  val kravhaverIdEktefellebidrag = TestDataGenerator.genererPersonnummer()
+  val skyldnerIdEktefelleBidrag = PersonidentGenerator.genererPersonnummer()
+  val kravhaverIdEktefellebidrag = PersonidentGenerator.genererPersonnummer()
 
   @Test
   @Order(20)
@@ -669,12 +669,12 @@ internal class VedtakshendelseListenerIT {
   private fun hentFilOgSendPåKafka(
     filnavn: String,
     antallOverføringerSåLangt: Int,
-    kravhaverIdent: String = TestDataGenerator.genererPersonnummer(),
-    mottaker: String = TestDataGenerator.genererPersonnummer(),
-    bm: String = TestDataGenerator.genererPersonnummer(),
-    bp: String = TestDataGenerator.genererPersonnummer(),
-    barn1: String = TestDataGenerator.genererPersonnummer(),
-    barn2: String = TestDataGenerator.genererPersonnummer(),
+    kravhaverIdent: String = PersonidentGenerator.genererPersonnummer(),
+    mottaker: String = PersonidentGenerator.genererPersonnummer(),
+    bm: String = PersonidentGenerator.genererPersonnummer(),
+    bp: String = PersonidentGenerator.genererPersonnummer(),
+    barn1: String = PersonidentGenerator.genererPersonnummer(),
+    barn2: String = PersonidentGenerator.genererPersonnummer(),
   ): VedtakHendelse {
     val vedtakFilString = leggInnGenererteIdenter(hentTestfil(filnavn), kravhaverIdent, mottaker, bm, bp, barn1, barn2)
 
@@ -743,7 +743,7 @@ internal class VedtakshendelseListenerIT {
     barn1: String,
     barn2: String,
   ): String {
-    return vedtakFil.replace("\"skyldnerId\": \"\"", "\"skyldnerId\" : \"${TestDataGenerator.genererPersonnummer()}\"")
+    return vedtakFil.replace("\"skyldnerId\": \"\"", "\"skyldnerId\" : \"${PersonidentGenerator.genererPersonnummer()}\"")
       .replace("\"kravhaverId\": \"\"", "\"kravhaverId\" : \"$kravhaverIdent\"")
       .replace("\"mottakerId\": \"\"", "\"mottakerId\" : \"$mottaker\"")
       .replace("\"skyldnerId\": \"BP\"", "\"skyldnerId\" : \"$bp\"")

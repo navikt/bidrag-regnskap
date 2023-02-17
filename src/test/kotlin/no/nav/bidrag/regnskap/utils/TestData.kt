@@ -2,6 +2,7 @@ package no.nav.bidrag.regnskap.utils
 
 import no.nav.bidrag.behandling.felles.enums.StonadType
 import no.nav.bidrag.behandling.felles.enums.VedtakType
+import no.nav.bidrag.commons.util.PersonidentGenerator
 import no.nav.bidrag.regnskap.dto.enumer.Søknadstype
 import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
 import no.nav.bidrag.regnskap.dto.enumer.Type
@@ -26,9 +27,9 @@ object TestData {
     stonadType: StonadType = StonadType.BIDRAG,
     vedtakType: VedtakType = VedtakType.FASTSETTELSE,
     sakId: String = "123456",
-    skyldnerIdent: String = TestDataGenerator.genererPersonnummer(),
+    skyldnerIdent: String = PersonidentGenerator.genererPersonnummer(),
     oppdragsperioder: List<Oppdragsperiode>? = listOf(opprettOppdragsperiode()),
-    kravhaverIdent: String = TestDataGenerator.genererPersonnummer(),
+    kravhaverIdent: String = PersonidentGenerator.genererPersonnummer(),
     utsattTilDato: LocalDate? = null,
     endretTidspunkt: LocalDateTime? = null,
     engangsbeløpId: Int? = null
@@ -51,9 +52,9 @@ object TestData {
     engangsbelopId: Int? = null,
     type: String = StonadType.BIDRAG.name,
     vedtakType: VedtakType = VedtakType.FASTSETTELSE,
-    kravhaverIdent: String = TestDataGenerator.genererPersonnummer(),
-    skyldnerIdent: String = TestDataGenerator.genererPersonnummer(),
-    mottakerIdent: String = TestDataGenerator.genererPersonnummer(),
+    kravhaverIdent: String = PersonidentGenerator.genererPersonnummer(),
+    skyldnerIdent: String = PersonidentGenerator.genererPersonnummer(),
+    mottakerIdent: String = PersonidentGenerator.genererPersonnummer(),
     sakId: String = "Sak123",
     vedtakId: Int = 12345,
     vedtakDato: LocalDate = LocalDate.now(),
@@ -99,8 +100,8 @@ object TestData {
     oppdragsperiodeId: Int = 0,
     oppdrag: Oppdrag? = null,
     vedtakId: Int = 654321,
-    gjelderIdent: String = TestDataGenerator.genererPersonnummer(),
-    mottakerIdent: String = TestDataGenerator.genererPersonnummer(),
+    gjelderIdent: String = PersonidentGenerator.genererPersonnummer(),
+    mottakerIdent: String = PersonidentGenerator.genererPersonnummer(),
     belop: BigDecimal = BigDecimal(7500),
     valuta: String = "NOK",
     periodeFra: LocalDate = LocalDate.now().minusMonths(1),

@@ -2,7 +2,7 @@ package no.nav.bidrag.regnskap.consumer
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
-import no.nav.bidrag.regnskap.utils.TestDataGenerator
+import no.nav.bidrag.commons.util.PersonidentGenerator
 import wiremock.com.google.common.net.HttpHeaders
 
 class SakApiWireMock {
@@ -29,7 +29,7 @@ class SakApiWireMock {
              "kategori": "N",
              "roller": [
                {
-                 "fodselsnummer": "${TestDataGenerator.genererPersonnummer()}",
+                 "fodselsnummer": "${PersonidentGenerator.genererPersonnummer()}",
                  "type": "BA"
                }
              ]

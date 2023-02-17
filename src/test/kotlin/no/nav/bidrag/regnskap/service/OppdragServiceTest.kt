@@ -8,8 +8,8 @@ import io.mockk.junit5.MockKExtension
 import io.mockk.verify
 import no.nav.bidrag.behandling.felles.enums.EngangsbelopType
 import no.nav.bidrag.behandling.felles.enums.StonadType
+import no.nav.bidrag.commons.util.PersonidentGenerator
 import no.nav.bidrag.regnskap.utils.TestData
-import no.nav.bidrag.regnskap.utils.TestDataGenerator.genererPersonnummer
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -36,7 +36,7 @@ class OppdragServiceTest {
     @Test
     fun `skal hente eksisterende oppdrag`() {
       val stonadType = StonadType.BIDRAG
-      val skyldnerIdent = genererPersonnummer()
+      val skyldnerIdent = PersonidentGenerator.genererPersonnummer()
 
       every { persistenceService.hentOppdrag(any()) } returns TestData.opprettOppdrag(
         stonadType = stonadType,

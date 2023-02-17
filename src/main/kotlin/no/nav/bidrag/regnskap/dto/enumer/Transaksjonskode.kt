@@ -20,7 +20,7 @@ enum class Transaksjonskode(val korreksjonskode: String?, val negativtBeløp: Bo
   H3(null, true),
   I1(null, true),   //Motregning
   K1(null, true),   //Ettergivelse
-  K2(null, false),  //Direkte oppgjør (innbetalt beløp)
+  K2(null, true),   //Direkte oppgjør (innbetalt beløp)
   K3(null, false);  //Tilbakekreving ettergivelse
 
   companion object {
