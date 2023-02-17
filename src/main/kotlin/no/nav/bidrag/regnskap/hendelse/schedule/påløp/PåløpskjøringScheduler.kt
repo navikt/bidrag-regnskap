@@ -17,7 +17,7 @@ private val LOGGER = LoggerFactory.getLogger(PåløpskjøringScheduler::class.ja
 
 @Configuration
 @EnableScheduling
-@EnableSchedulerLock(defaultLockAtMostFor = "10m")
+@EnableSchedulerLock(defaultLockAtMostFor = "10m", defaultLockAtLeastFor = "2m")
 class PåløpskjøringScheduler(
   private val persistenceService: PersistenceService, private val påløpskjøringService: PåløpskjøringService
 ) {

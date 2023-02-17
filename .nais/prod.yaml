@@ -1,19 +1,17 @@
 name: bidrag-regnskap
 ingresses:
   - https://bidrag-regnskap.intern.nav.no
-azure:
-  skatt_url: bidrag-stubs.dev.intern.nav.no #TODO: LEGGE INN URL
-  skatt_scope: dev-gcp.bidrag.bidrag-stubs
-  sak_url: bidrag-sak.prod-fss-pub.nais.io
-  sak_scope: prod-fss.bidrag.bidrag-sak
 kafka:
   pool: nav-prod
-kafka-topic-vedtak: bidrag.vedtak
 database:
   navn: bidrag-regnskap-prod
-bucket:
-  navn: bidrag-regnskap-prod
-sftp:
-  host: sftp.nav.no
 maskinporten:
   url: https://maskinporten.no
+env:
+  SKATT_URL: https://bidrag-stubs.dev.intern.nav.no
+  SKATT_SCOPE: dev-gcp.bidrag.bidrag-stubs
+  TOPIC_VEDTAK: bidrag.vedtak
+  BUCKET_NAME: bidrag-regnskap-prod
+  SFTP_HOST: sftp.nav.no
+  SAK_URL: https://bidrag-sak.prod-fss-pub.nais.io
+  SAK_SCOPE: https://prod-fss.bidrag.bidrag-sak

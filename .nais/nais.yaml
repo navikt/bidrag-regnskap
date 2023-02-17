@@ -9,6 +9,11 @@ spec:
   azure:
     application:
       enabled: true
+      allowAllUsers: true
+      claims:
+        extra:
+          - "NAVident"
+          - "azp_name"
   secureLogs:
     enabled: true
   image: {{ image }}
@@ -46,21 +51,10 @@ spec:
   envFrom:
     - secret: bidrag-regnskap-sftp-private-key
   env:
-    - name: SKATT_URL
-      value: https://{{ azure.skatt_url }}
-    - name: SKATT_SCOPE
-      value: {{ azure.skatt_scope }}
-    - name: TOPIC_VEDTAK
-      value: {{ kafka-topic-vedtak }}
-    - name: BUCKET_NAME
-      value: {{ bucket.navn }}
-    - name: SFTP_HOST
-      value: {{ sftp.host }}
-    - name: SAK_URL
-      value: https://{{ azure.skatt_url }}
-    - name: SAK_SCOPE
-      value: https://{{ azure.sak_scope }}
-
+  {{#each env}}
+    - name: {{@key}}
+      value: "{{this}}"
+  {{/each}}
   gcp:
     sqlInstances:
       - name: {{ database.navn }}
@@ -69,4 +63,4 @@ spec:
           - name: bidrag-regnskap-db
             envVarPrefix: DB
     buckets:
-      - name: {{ bucket.navn }}
+      - name: {{ BUCKET_NAME }}
