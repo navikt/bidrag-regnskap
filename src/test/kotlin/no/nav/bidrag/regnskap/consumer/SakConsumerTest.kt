@@ -6,12 +6,12 @@ import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
+import no.nav.bidrag.commons.util.PersonidentGenerator
 import no.nav.bidrag.regnskap.dto.sak.BidragSak
 import no.nav.bidrag.regnskap.dto.sak.RolleDto
 import no.nav.bidrag.regnskap.dto.sak.enumer.Bidragssakstatus
 import no.nav.bidrag.regnskap.dto.sak.enumer.Rolletype
 import no.nav.bidrag.regnskap.dto.sak.enumer.Sakskategori
-import no.nav.bidrag.regnskap.utils.TestDataGenerator
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -68,7 +68,7 @@ internal class SakConsumerTest {
       Sakskategori.N,
       roller = listOf(
         RolleDto(
-          TestDataGenerator.genererPersonnummer(),
+          PersonidentGenerator.genererPersonnummer(),
           rolletype
         )
       )
