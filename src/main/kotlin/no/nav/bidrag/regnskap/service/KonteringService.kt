@@ -106,7 +106,7 @@ class KonteringService(
     oppdrag: Oppdrag,
     nyeOppdragsperioder: List<Oppdragsperiode>
   ) {
-    val overførteKonteringerListe = finnAlleOverførteKontering(oppdrag)
+    val overførteKonteringerListe = hentAlleKonteringerForOppdrag(oppdrag)
 
     nyeOppdragsperioder.forEach { nyOppdragsperiode ->
       val perioderForNyOppdragsperiode =
@@ -119,7 +119,7 @@ class KonteringService(
     oppdrag: Oppdrag,
     periode: Periode
   ) {
-    val overførteKonteringerListe = finnAlleOverførteKontering(oppdrag)
+    val overførteKonteringerListe = hentAlleKonteringerForOppdrag(oppdrag)
 
     val perioderForPeriode = hentAllePerioderMellomDato(periode.periodeFomDato, periode.periodeTilDato)
     opprettKorreksjonskonteringForAlleredeOversendteKonteringer(perioderForPeriode, overførteKonteringerListe)
@@ -223,11 +223,11 @@ class KonteringService(
     return false
   }
 
-  fun finnAlleOverførteKontering(oppdrag: Oppdrag): List<Kontering> {
+  fun hentAlleKonteringerForOppdrag(oppdrag: Oppdrag): List<Kontering> {
     val periodeListe = mutableListOf<Kontering>()
     oppdrag.oppdragsperioder?.forEach { oppdragsperiode ->
       oppdragsperiode.konteringer?.forEach { kontering ->
-        if (kontering.overføringstidspunkt != null) periodeListe.add(kontering)
+        periodeListe.add(kontering)
       }
     }
     return periodeListe

@@ -47,10 +47,10 @@ class OppdragService(
     val oppdrag: Oppdrag? = hentOppdrag(hendelse)
 
     return if (oppdrag != null) {
-      LOGGER.debug("Fant eksisterende oppdrag med id: ${oppdrag.oppdragId} for vedtakID: ${hendelse.vedtakId}" + "\nOppdaterer oppdrag..")
+      LOGGER.info("Fant eksisterende oppdrag med id: ${oppdrag.oppdragId} for vedtakID: ${hendelse.vedtakId}" + "\nOppdaterer oppdrag..")
       oppdaterOppdrag(hendelse, oppdrag)
     } else {
-      LOGGER.debug("Fant ikke eksisterende oppdrag for vedtakID: ${hendelse.vedtakId}." + "\nOpprettet nytt oppdrag..")
+      LOGGER.info("Fant ikke eksisterende oppdrag for vedtakID: ${hendelse.vedtakId}." + "\nOpprettet nytt oppdrag..")
       opprettNyttOppdrag(hendelse)
     }
   }
@@ -90,6 +90,8 @@ class OppdragService(
 
     val oppdragId = persistenceService.lagreOppdrag(oppdrag)
 
+    LOGGER.info("Oppdrag med ID: $oppdragId er opprettet.")
+
     return oppdragId
   }
 
@@ -111,6 +113,8 @@ class OppdragService(
 
       persistenceService.lagreOppdrag(oppdrag)
     }
+    LOGGER.info("Oppdrag med ID: ${oppdrag.oppdragId} er oppdatert.")
+
     return oppdrag.oppdragId
   }
 
