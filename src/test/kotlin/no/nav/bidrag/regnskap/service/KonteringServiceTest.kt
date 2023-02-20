@@ -167,7 +167,7 @@ class KonteringServiceTest {
   inner class FinnOverforteKonteringer {
 
     @Test
-    fun `Skal finne alle overforte konteringer`() {
+    fun `Skal finne alle konteringer`() {
 
       val overforingstidspunkt = LocalDateTime.now()
       val oppdrag = TestData.opprettOppdrag(
@@ -188,11 +188,9 @@ class KonteringServiceTest {
         )
       )
 
-      val overforteKonteringerListe = konteringService.finnAlleOverførteKontering(oppdrag)
+      val overforteKonteringerListe = konteringService.hentAlleKonteringerForOppdrag(oppdrag)
 
-      overforteKonteringerListe shouldHaveSize 2
-      overforteKonteringerListe[0].overføringstidspunkt shouldBe overforingstidspunkt
-      overforteKonteringerListe[1].overføringstidspunkt shouldBe overforingstidspunkt.minusMonths(1)
+      overforteKonteringerListe shouldHaveSize 3
     }
   }
 }
