@@ -18,7 +18,7 @@ springdoc:
     path: /
 
 maskinporten:
-  tokenUrl: ${MASKINPORTEN_ISSUER}/token
+  tokenUrl: ${MASKINPORTEN_ISSUER}token
   audience: ${MASKINPORTEN_ISSUER}
   clientId: ${MASKINPORTEN_CLIENT_ID}
   scope: ${MASKINPORTEN_SCOPES}
