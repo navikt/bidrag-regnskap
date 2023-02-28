@@ -13,6 +13,7 @@ import no.nav.bidrag.behandling.felles.enums.EngangsbelopType
 import no.nav.bidrag.behandling.felles.enums.StonadType
 import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
@@ -26,8 +27,17 @@ class VedtakshendelseServiceTest {
   @MockK(relaxed = true)
   private lateinit var kravService: KravService
 
+  @MockK(relaxed = true)
+  private lateinit var persistenceService: PersistenceService
+
   @InjectMockKs
   private lateinit var vedtakshendelseService: VedtakshendelseService
+
+  @BeforeEach
+  fun setup() {
+    every { persistenceService.harAktivtDriftsavvik() } returns false
+    every { kravService.erVedlikeholdsmodusPåslått() } returns false
+  }
 
   @Test
   fun `skal mappe vedtakshendelse uten feil`() {
