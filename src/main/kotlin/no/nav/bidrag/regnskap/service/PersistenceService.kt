@@ -135,8 +135,12 @@ class PersistenceService(
     return driftsavvikRepository.findAllByTidspunktTilAfterOrTidspunktTilIsNull(LocalDateTime.now())
   }
 
-  fun hentDriftsavvik(pageable: Pageable): List<Driftsavvik> {
+  fun hentFlereDriftsavvik(pageable: Pageable): List<Driftsavvik> {
     return driftsavvikRepository.findAll(pageable).toList()
+  }
+
+  fun hentDriftsavvik(driftsavvikId: Int): Driftsavvik? {
+    return driftsavvikRepository.findByIdOrNull(driftsavvikId)
   }
 
   fun hentDriftsavvikForPåløp(påløpId: Int): Driftsavvik? {

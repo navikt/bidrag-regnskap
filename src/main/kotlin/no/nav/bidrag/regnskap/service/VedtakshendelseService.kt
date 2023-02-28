@@ -30,8 +30,8 @@ class VedtakshendelseService(
   fun behandleHendelse(hendelse: String) {
     val vedtakHendelse = mapVedtakHendelse(hendelse)
 
-    LOGGER.debug("Behandler vedakHendelse for vedtakid: ${vedtakHendelse.id}")
-    SECURE_LOGGER.debug("Behandler vedtakHendelse: $vedtakHendelse")
+    LOGGER.info("Behandler vedakHendelse for vedtakid: ${vedtakHendelse.id}")
+    SECURE_LOGGER.info("Behandler vedtakHendelse: $vedtakHendelse")
 
     vedtakHendelse.stonadsendringListe?.forEach {
       opprettOppdragForStonadsending(vedtakHendelse, it)
@@ -41,7 +41,7 @@ class VedtakshendelseService(
       opprettOppdragForEngangsbelop(vedtakHendelse, it)
     }
 
-    LOGGER.debug("Ferdig med behandling av vedtakshendelse: ${vedtakHendelse.id}")
+    LOGGER.info("Ferdig med behandling av vedtakshendelse: ${vedtakHendelse.id}")
   }
 
   fun mapVedtakHendelse(hendelse: String): VedtakHendelse {
@@ -132,10 +132,10 @@ class VedtakshendelseService(
 
   private fun sendKrav(oppdragId: Int) {
     if (harAktiveDriftAvvik()) {
-      LOGGER.debug("Det finnes aktive driftsavvik. Starter derfor ikke overføring av konteringer for oppdrag: $oppdragId.")
+      LOGGER.info("Det finnes aktive driftsavvik. Starter derfor ikke overføring av konteringer for oppdrag: $oppdragId.")
       return
     } else if (erVedlikeholdsmodusPåslått()) {
-      LOGGER.debug("Vedlikeholdsmodus er påslått! Starter derfor ikke overføring av kontering for oppdrag: $oppdragId.")
+      LOGGER.info("Vedlikeholdsmodus er påslått! Starter derfor ikke overføring av kontering for oppdrag: $oppdragId.")
       return
     }
     kravService.sendKrav(oppdragId)
