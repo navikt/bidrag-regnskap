@@ -157,7 +157,10 @@ class KonteringService(
   private fun slutterNyeOppdragsperiodeFørOverførteKonteringsPeriode(
     kontering: Kontering,
     perioderForNyOppdrasperiode: List<YearMonth>
-  ) = YearMonth.parse(kontering.overføringsperiode).isAfter(perioderForNyOppdrasperiode.max())
+  ): Boolean {
+    val maxOppdragsperiode = perioderForNyOppdrasperiode.maxOrNull() ?: return false
+    return YearMonth.parse(kontering.overføringsperiode).isAfter(maxOppdragsperiode)
+  }
 
   private fun erPeriodeOverlappende(
     perioderForNyOppdrasperiode: List<YearMonth>,
