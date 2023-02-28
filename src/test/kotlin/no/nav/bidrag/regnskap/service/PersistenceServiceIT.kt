@@ -199,7 +199,7 @@ internal class PersistenceServiceIT {
       val gammeltDriftsavvikId = persistenceService.lagreDriftsavvik(gammeltDriftsavvik)
       val harAktivtDriftsavvik = persistenceService.harAktivtDriftsavvik()
       val faktiskAktivtDriftsavvik = persistenceService.hentAlleAktiveDriftsavvik()
-      val alleDriftsavvik = persistenceService.hentDriftsavvik(Pageable.ofSize(100))
+      val alleDriftsavvik = persistenceService.hentFlereDriftsavvik(Pageable.ofSize(100))
 
       aktivtDriftsavvikId shouldNotBe null
       gammeltDriftsavvikId shouldNotBe null
