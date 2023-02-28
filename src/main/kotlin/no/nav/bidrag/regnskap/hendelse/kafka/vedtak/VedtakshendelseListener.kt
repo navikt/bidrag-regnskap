@@ -12,9 +12,7 @@ class VedtakshendelseListener(
   private val vedtakshendelseService: VedtakshendelseService
 ) {
 
-  @KafkaListener(
-    groupId = "bidrag-regnskap", topics = ["\${TOPIC_VEDTAK}"], errorHandler = "vedtakshendelseErrorHandler"
-  )
+  @KafkaListener(groupId = "bidrag-regnskap", topics = ["\${TOPIC_VEDTAK}"])
   fun lesHendelse(hendelse: String) {
     try {
       vedtakshendelseService.behandleHendelse(hendelse)

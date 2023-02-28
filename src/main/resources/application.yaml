@@ -63,7 +63,7 @@ spring:
           password: ${KAFKA_CREDSTORE_PASSWORD}
     consumer:
       auto-offset-reset: earliest
-      max-poll-records: 50
+      max-poll-records: 10
       enable-auto-commit: false
     listener:
       ackMode: RECORD
