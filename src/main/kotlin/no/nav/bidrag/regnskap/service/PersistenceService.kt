@@ -70,6 +70,7 @@ class PersistenceService(
   fun hentOverføringKontering(pageable: Pageable): List<OverføringKontering> {
     return overføringKonteringRepository.findAll(pageable).toList()
   }
+
   fun hentOverføringKonteringMedFeil(pageable: Pageable): List<OverføringKontering> {
     return overføringKonteringRepository.findByFeilmeldingIsNotNull(pageable).toList()
   }
