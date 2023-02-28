@@ -19,7 +19,8 @@ private val objectMapper = ObjectMapper().registerModule(KotlinModule.Builder().
 @Service
 class VedtakshendelseService(
   private val oppdragService: OppdragService,
-  private val kravService: KravService
+  private val kravService: KravService,
+  private val persistenceService: PersistenceService
 ) {
 
   companion object {
@@ -71,7 +72,7 @@ class VedtakshendelseService(
       )
       val oppdragId = oppdragService.lagreHendelse(hendelse)
 
-      kravService.sendKrav(oppdragId)
+      sendKrav(oppdragId)
     }
   }
 
@@ -125,8 +126,27 @@ class VedtakshendelseService(
       )
       val oppdragId = oppdragService.lagreHendelse(hendelse)
 
-      kravService.sendKrav(oppdragId)
+      sendKrav(oppdragId)
     }
+  }
+
+  private fun sendKrav(oppdragId: Int) {
+    if (harAktiveDriftAvvik()) {
+      LOGGER.debug("Det finnes aktive driftsavvik. Starter derfor ikke overføring av konteringer for oppdrag: $oppdragId.")
+      return
+    } else if (erVedlikeholdsmodusPåslått()) {
+      LOGGER.debug("Vedlikeholdsmodus er påslått! Starter derfor ikke overføring av kontering for oppdrag: $oppdragId.")
+      return
+    }
+    kravService.sendKrav(oppdragId)
+  }
+
+  private fun erVedlikeholdsmodusPåslått(): Boolean {
+    return kravService.erVedlikeholdsmodusPåslått()
+  }
+
+  private fun harAktiveDriftAvvik(): Boolean {
+    return persistenceService.harAktivtDriftsavvik()
   }
 
   private fun leggTilIdent(ident: String): String {
