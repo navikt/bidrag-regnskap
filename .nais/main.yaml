@@ -13,7 +13,7 @@ env:
   SKATT_URL: https://bidrag-stubs.dev.intern.nav.no
   SKATT_SCOPE: dev-gcp.bidrag.bidrag-stubs
   TOPIC_VEDTAK: bidrag.vedtak
-  BUCKET_NAME: bucket.navn
+  BUCKET_NAME: bidrag-regnskap
   SFTP_HOST: sftp-q.nav.no
   SAK_URL: https://bidrag-sak.dev-fss-pub.nais.io
   SAK_SCOPE: https://dev-fss.bidrag.bidrag-sak
