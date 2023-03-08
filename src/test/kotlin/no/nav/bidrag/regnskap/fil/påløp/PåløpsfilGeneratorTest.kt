@@ -6,7 +6,6 @@ import io.mockk.junit5.MockKExtension
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
-import no.nav.bidrag.regnskap.fil.PåløpsfilGenerator
 import no.nav.bidrag.regnskap.fil.overføring.FiloverføringTilElinKlient
 import no.nav.bidrag.regnskap.persistence.bucket.GcpFilBucket
 import no.nav.bidrag.regnskap.utils.TestData

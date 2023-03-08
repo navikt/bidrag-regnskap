@@ -189,14 +189,14 @@ class KravService(
   ): List<Oppdragsperiode> {
     val oppdragsperioder = mutableListOf<Oppdragsperiode>()
 
-    oppdrag.oppdragsperioder?.forEach { oppdragsperiode ->
+    oppdrag.oppdragsperioder.forEach { oppdragsperiode ->
       if (finnesDetIkkeOverførteKonteringer(oppdragsperiode)) oppdragsperioder.add(oppdragsperiode)
     }
     return oppdragsperioder
   }
 
   private fun finnesDetIkkeOverførteKonteringer(oppdragsperiode: Oppdragsperiode): Boolean {
-    oppdragsperiode.konteringer?.forEach { kontering ->
+    oppdragsperiode.konteringer.forEach { kontering ->
       if (kontering.overføringstidspunkt == null) {
         return true
       }
@@ -208,7 +208,7 @@ class KravService(
     val konteringer = mutableListOf<Kontering>()
 
     oppdragsperioder.forEach { oppdragsperiode ->
-      konteringer.addAll(oppdragsperiode.konteringer!!.filter { kontering ->
+      konteringer.addAll(oppdragsperiode.konteringer.filter { kontering ->
         kontering.overføringstidspunkt == null
       })
     }

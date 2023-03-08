@@ -1,41 +1,40 @@
 package no.nav.bidrag.regnskap.service
 
+import io.kotest.matchers.collections.shouldBeUnique
+import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.types.shouldBeSameInstanceAs
 import io.mockk.every
-import io.mockk.impl.annotations.InjectMockKs
-import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
-import io.mockk.verify
+import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import no.nav.bidrag.behandling.felles.enums.VedtakType
 import no.nav.bidrag.regnskap.consumer.SkattConsumer
-import no.nav.bidrag.regnskap.fil.PåløpsfilGenerator
+import no.nav.bidrag.regnskap.dto.enumer.Søknadstype
+import no.nav.bidrag.regnskap.dto.enumer.Type
+import no.nav.bidrag.regnskap.fil.påløp.PåløpsfilGenerator
+import no.nav.bidrag.regnskap.util.PeriodeUtils.hentAllePerioderMellomDato
 import no.nav.bidrag.regnskap.utils.TestData
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import java.time.LocalDate
+import java.time.YearMonth
 
 @ExtendWith(MockKExtension::class)
 class PåløpskjøringServiceTest {
 
-  @MockK(relaxed = true)
-  private lateinit var persistenceService: PersistenceService
+  private val persistenceService = mockk<PersistenceService>(relaxed = true)
+  private val påløpsfilGenerator = mockk<PåløpsfilGenerator>(relaxed = true)
+  private val skattConsumer = mockk<SkattConsumer>(relaxed = true)
 
-  @MockK(relaxed = true)
-  private lateinit var konteringService: KonteringService
-
-  @MockK(relaxed = true)
-  private lateinit var påløpsfilGenerator: PåløpsfilGenerator
-
-  @MockK(relaxed = true)
-  private lateinit var skattConsumer: SkattConsumer
-
-  @InjectMockKs
-  private lateinit var påløpskjøringService: PåløpskjøringService
+  private val påløpskjøringService =
+    PåløpskjøringService(persistenceService, ManglendeKonteringerService(), påløpsfilGenerator, skattConsumer)
 
   @Test
-  fun `skal ved påløpskjøring kun starte eldste ikke kjørte påløpsperiode`() {
+  fun `Skal ved påløpskjøring kun starte eldste ikke kjørte påløpsperiode`() {
     val påløp1 = TestData.opprettPåløp(påløpId = 1, fullførtTidspunkt = null, forPeriode = "2022-01")
     val påløp2 = TestData.opprettPåløp(påløpId = 2, fullførtTidspunkt = null, forPeriode = "2022-02")
     val påløpListe = listOf(påløp1, påløp2)
@@ -49,37 +48,152 @@ class PåløpskjøringServiceTest {
 
   @Test
   @OptIn(ExperimentalCoroutinesApi::class)
-  fun `skal ikke opprette konteringer for utgåtte oppdragsperioder`() = runTest {
-    val påløp = TestData.opprettPåløp(påløpId = 1, forPeriode = "2022-03")
-    val utgåttOppdragsperiode = TestData.opprettOppdragsperiode(
-      periodeFra = LocalDate.of(2022, 1, 1),
-      periodeTil = LocalDate.of(2022, 3, 1)
-    )
-    val oppdragsperioder = listOf(utgåttOppdragsperiode)
+  fun `Skal opprette konteringer for alle oppdragsperioder som ikke allerede har fått opprettet alle konteringer for en fastsettelse av et bidrag uten korreksjoner`() =
+    runTest {
+      val påløp = TestData.opprettPåløp(påløpId = 1, forPeriode = "2023-01")
 
-    every { persistenceService.hentAlleOppdragsperioderSomErAktiveForPeriode(any()) } returns oppdragsperioder
+      val oppdrag = TestData.opprettOppdrag(oppdragsperioder = emptyList())
+      val oppdragsperiodeMedManglendeKonteringer = TestData.opprettOppdragsperiode(
+        periodeFra = LocalDate.of(2022, 1, 1),
+        periodeTil = null,
+        konteringer = emptyList(),
+        aktivTil = null,
+        konteringerFullførtOpprettet = false,
+        oppdrag = oppdrag
+      )
+      oppdrag.oppdragsperioder = listOf(oppdragsperiodeMedManglendeKonteringer)
 
-    påløpskjøringService.startPåløpskjøring(påløp, false)
+      every { persistenceService.hentAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer() } returns listOf(
+        oppdragsperiodeMedManglendeKonteringer
+      )
 
-    verify { persistenceService.lagreOppdragsperiode(utgåttOppdragsperiode) }
-    verify { konteringService.opprettLøpendeKonteringerPåOppdragsperioder(emptyList(), påløp.forPeriode) }
-  }
+      påløpskjøringService.startPåløpskjøring(påløp, false, true)
+
+      val perioderMellomDato = hentAllePerioderMellomDato(
+        oppdragsperiodeMedManglendeKonteringer.periodeFra,
+        oppdragsperiodeMedManglendeKonteringer.periodeTil,
+        YearMonth.parse(påløp.forPeriode)
+      )
+
+      val konteringer = oppdragsperiodeMedManglendeKonteringer.konteringer
+      konteringer.sortedBy { it.overføringsperiode }
+
+      konteringer shouldHaveSize perioderMellomDato.size
+      konteringer.shouldBeUnique()
+      konteringer[0].type shouldBe Type.NY.name
+      konteringer.subList(1, konteringer.size).none { it.type == Type.NY.name } shouldBe true
+      konteringer.subList(1, konteringer.size).all { it.type == Type.ENDRING.name } shouldBe true
+      konteringer.all { it.søknadType == Søknadstype.EN.name } shouldBe true
+      konteringer.all { it.sendtIPåløpsfil } shouldBe true
+      konteringer.forEachIndexed { index, kontering ->
+        val periodeForKontering = perioderMellomDato[index]
+        kontering.overføringsperiode shouldBe periodeForKontering.toString()
+      }
+    }
 
   @Test
   @OptIn(ExperimentalCoroutinesApi::class)
-  fun `skal opprette konteringer for løpende oppdragsperioder`() = runTest {
-    val påløp = TestData.opprettPåløp(påløpId = 2, forPeriode = "2022-03")
-    val løpendeOppdragsperiode = TestData.opprettOppdragsperiode(
-      periodeFra = LocalDate.of(2022, 1, 1),
-      periodeTil = LocalDate.of(2022, 4, 1)
-    )
-    val oppdragsperioder = listOf(løpendeOppdragsperiode)
+  fun `Skal opprette konteringer for alle oppdragsperioder som ikke allerede har fått opprettet alle konteringer for en fastsettelse av et bidrag med korreksjoner`() =
+    runTest {
+      val påløp = TestData.opprettPåløp(påløpId = 1, forPeriode = "2023-01")
 
-    every { persistenceService.hentAlleOppdragsperioderSomErAktiveForPeriode(any()) } returns oppdragsperioder
+      val oppdrag = TestData.opprettOppdrag(oppdragsperioder = emptyList())
+      val oppdragsperiodeMedManglendeKonteringer1 = TestData.opprettOppdragsperiode(
+        oppdragsperiodeId = 1,
+        periodeFra = LocalDate.of(2021, 6, 1),
+        periodeTil = LocalDate.of(2022, 1, 1),
+        konteringer = emptyList(),
+        aktivTil = LocalDate.of(2022, 1, 1),
+        konteringerFullførtOpprettet = false,
+        oppdrag = oppdrag
+      )
+      val oppdragsperiodeMedManglendeKonteringer2 = TestData.opprettOppdragsperiode(
+        oppdragsperiodeId = 2,
+        periodeFra = LocalDate.of(2022, 1, 1),
+        periodeTil = null,
+        konteringer = emptyList(),
+        aktivTil = null,
+        konteringerFullførtOpprettet = false,
+        oppdrag = oppdrag
+      )
+      val oppdragsperioder = listOf(oppdragsperiodeMedManglendeKonteringer1, oppdragsperiodeMedManglendeKonteringer2)
+      oppdrag.oppdragsperioder = oppdragsperioder
 
-    påløpskjøringService.startPåløpskjøring(påløp, false)
+      every { persistenceService.hentAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer() } returns oppdragsperioder
 
-    verify(exactly = 0) { persistenceService.lagreOppdragsperiode(any()) }
-    verify { konteringService.opprettLøpendeKonteringerPåOppdragsperioder(oppdragsperioder, påløp.forPeriode) }
-  }
+      påløpskjøringService.startPåløpskjøring(påløp, false, true)
+
+      val perioderMellomDato = hentAllePerioderMellomDato(
+        oppdragsperiodeMedManglendeKonteringer1.periodeFra,
+        oppdragsperiodeMedManglendeKonteringer2.periodeTil,
+        YearMonth.parse(påløp.forPeriode)
+      )
+
+      val konteringer = oppdragsperiodeMedManglendeKonteringer1.konteringer.plus(oppdragsperiodeMedManglendeKonteringer2.konteringer)
+      konteringer.sortedBy { it.overføringsperiode }
+
+      konteringer shouldHaveSize perioderMellomDato.size
+      konteringer.shouldBeUnique()
+      konteringer[0].type shouldBe Type.NY.name
+      konteringer.subList(1, konteringer.size).none { it.type == Type.NY.name } shouldBe true
+      konteringer.subList(1, konteringer.size).all { it.type == Type.ENDRING.name } shouldBe true
+      konteringer.all { it.søknadType == Søknadstype.EN.name } shouldBe true
+      konteringer.all { it.sendtIPåløpsfil } shouldBe true
+      konteringer.forEachIndexed { index, kontering ->
+        val periodeForKontering = perioderMellomDato[index]
+        kontering.overføringsperiode shouldBe periodeForKontering.toString()
+      }
+      oppdragsperiodeMedManglendeKonteringer1.konteringerFullførtOpprettet shouldBe true
+      oppdragsperiodeMedManglendeKonteringer1.aktivTil shouldNotBe null
+      oppdragsperiodeMedManglendeKonteringer2.konteringerFullførtOpprettet shouldBe false
+      oppdragsperiodeMedManglendeKonteringer2.aktivTil shouldBe null
+    }
+
+  @Test
+  @OptIn(ExperimentalCoroutinesApi::class)
+  fun `Skal opprette konteringer for alle oppdragsperioder som ikke allerede har fått opprettet alle konteringer for en indeksregulering`() =
+    runTest {
+      val påløp = TestData.opprettPåløp(påløpId = 1, forPeriode = "2023-01")
+
+      val oppdrag = TestData.opprettOppdrag(oppdragsperioder = emptyList())
+      val oppdragsperiodeMedManglendeKonteringer = TestData.opprettOppdragsperiode(
+        periodeFra = LocalDate.of(2022, 1, 1),
+        periodeTil = null,
+        konteringer = emptyList(),
+        vedtakType = VedtakType.INDEKSREGULERING,
+        aktivTil = null,
+        konteringerFullførtOpprettet = false,
+        oppdrag = oppdrag
+      )
+      oppdrag.oppdragsperioder = listOf(oppdragsperiodeMedManglendeKonteringer)
+
+      every { persistenceService.hentAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer() } returns listOf(
+        oppdragsperiodeMedManglendeKonteringer
+      )
+
+      påløpskjøringService.startPåløpskjøring(påløp, false, true)
+
+      val perioderMellomDato = hentAllePerioderMellomDato(
+        oppdragsperiodeMedManglendeKonteringer.periodeFra,
+        oppdragsperiodeMedManglendeKonteringer.periodeTil,
+        YearMonth.parse(påløp.forPeriode)
+      )
+
+      val konteringer = oppdragsperiodeMedManglendeKonteringer.konteringer
+      konteringer.sortedBy { it.overføringsperiode }
+
+      konteringer shouldHaveSize perioderMellomDato.size
+      konteringer.shouldBeUnique()
+      konteringer[0].type shouldBe Type.NY.name
+      konteringer[0].søknadType shouldBe Søknadstype.IN.name
+      konteringer.subList(1, konteringer.size).none { it.type == Type.NY.name } shouldBe true
+      konteringer.subList(1, konteringer.size).none { it.søknadType == Søknadstype.IN.name } shouldBe true
+      konteringer.subList(1, konteringer.size).all { it.type == Type.ENDRING.name } shouldBe true
+      konteringer.subList(1, konteringer.size).all { it.søknadType == Søknadstype.EN.name } shouldBe true
+      konteringer.all { it.sendtIPåløpsfil } shouldBe true
+      konteringer.forEachIndexed { index, kontering ->
+        val periodeForKontering = perioderMellomDato[index]
+        kontering.overføringsperiode shouldBe periodeForKontering.toString()
+      }
+    }
 }

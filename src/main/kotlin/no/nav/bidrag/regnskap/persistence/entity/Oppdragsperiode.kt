@@ -7,12 +7,14 @@ import java.time.LocalDate
 import javax.persistence.CascadeType
 import javax.persistence.Column
 import javax.persistence.Entity
+import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
 import javax.persistence.OneToMany
+import javax.persistence.OrderBy
 
 @Entity(name = "oppdragsperioder")
 @DynamicInsert
@@ -29,6 +31,9 @@ data class Oppdragsperiode(
 
   @Column(name = "vedtak_id")
   val vedtakId: Int,
+
+  @Column(name = "vedtak_type")
+  var vedtakType: String,
 
   @Column(name = "gjelder_ident")
   val gjelderIdent: String,
@@ -54,6 +59,9 @@ data class Oppdragsperiode(
   @Column(name = "opprettet_av")
   val opprettetAv: String,
 
+  @Column(name = "konteringer_fullfort_opprettet")
+  var konteringerFullførtOpprettet: Boolean = false,
+
   @Column(name = "delytelses_id")
   @ColumnDefault("nextval('delytelsesId_seq')")
   val delytelseId: Int?,
@@ -61,8 +69,9 @@ data class Oppdragsperiode(
   @Column(name = "aktiv_til")
   var aktivTil: LocalDate? = null,
 
-  @OneToMany(mappedBy = "oppdragsperiode", cascade = [CascadeType.ALL])
-  var konteringer: List<Kontering>? = null,
+  @OneToMany(mappedBy = "oppdragsperiode", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+  @OrderBy("konteringId")
+  var konteringer: List<Kontering> = emptyList(),
 ) {
 
   override fun toString(): String {
@@ -70,6 +79,7 @@ data class Oppdragsperiode(
         "(oppdragsperiodeId = $oppdragsperiodeId , " +
         "oppdragId = ${oppdrag?.oppdragId} , " +
         "vedtakId = $vedtakId , " +
+        "vedtakType = $vedtakType , " +
         "gjelderIdent = $gjelderIdent , " +
         "mottakerIdent = $mottakerIdent , " +
         "beløp = $beløp , " +
@@ -78,6 +88,7 @@ data class Oppdragsperiode(
         "periodeTil = $periodeTil , " +
         "vedtaksdato = $vedtaksdato , " +
         "opprettetAv = $opprettetAv , " +
+        "konteringerFullførtOpprettet = $konteringerFullførtOpprettet , " +
         "delytelseId = $delytelseId , " +
         "aktivTil = $aktivTil )"
   }
@@ -91,6 +102,7 @@ data class Oppdragsperiode(
     if (oppdragsperiodeId != other.oppdragsperiodeId) return false
     if (oppdrag != other.oppdrag) return false
     if (vedtakId != other.vedtakId) return false
+    if (vedtakType != other.vedtakType) return false
     if (gjelderIdent != other.gjelderIdent) return false
     if (mottakerIdent != other.mottakerIdent) return false
     if (beløp != other.beløp) return false
@@ -99,6 +111,7 @@ data class Oppdragsperiode(
     if (periodeTil != other.periodeTil) return false
     if (vedtaksdato != other.vedtaksdato) return false
     if (opprettetAv != other.opprettetAv) return false
+    if (konteringerFullførtOpprettet != other.konteringerFullførtOpprettet) return false
     if (delytelseId != other.delytelseId) return false
     if (aktivTil != other.aktivTil) return false
 
@@ -109,6 +122,7 @@ data class Oppdragsperiode(
     var result = oppdragsperiodeId
     result = 31 * result + (oppdrag?.hashCode() ?: 0)
     result = 31 * result + vedtakId
+    result = 31 * result + vedtakType.hashCode()
     result = 31 * result + gjelderIdent.hashCode()
     result = 31 * result + mottakerIdent.hashCode()
     result = 31 * result + beløp.hashCode()
@@ -117,6 +131,7 @@ data class Oppdragsperiode(
     result = 31 * result + (periodeTil?.hashCode() ?: 0)
     result = 31 * result + vedtaksdato.hashCode()
     result = 31 * result + opprettetAv.hashCode()
+    result = 31 * result + konteringerFullførtOpprettet.hashCode()
     result = 31 * result + (delytelseId ?: 0)
     result = 31 * result + (aktivTil?.hashCode() ?: 0)
     return result

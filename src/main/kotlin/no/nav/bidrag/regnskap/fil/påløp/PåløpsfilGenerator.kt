@@ -1,4 +1,4 @@
-package no.nav.bidrag.regnskap.fil
+package no.nav.bidrag.regnskap.fil.påløp
 
 import kotlinx.coroutines.yield
 import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode

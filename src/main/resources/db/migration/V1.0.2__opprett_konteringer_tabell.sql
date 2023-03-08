@@ -8,7 +8,9 @@ CREATE TABLE IF NOT EXISTS konteringer
     type                 text    NOT NULL,
     soknad_type          text,
     gebyr_rolle          text,
-    sendt_i_palopsfil    boolean NOT NULL
+    sendt_i_palopsfil    boolean NOT NULL,
+    opprettet_tidspunkt  timestamp DEFAULT current_timestamp
 );
 
 CREATE INDEX konteringer_overforingstidspunkt_index ON konteringer (overforingstidspunkt);
+CREATE INDEX oppdragsperiode_id_index ON konteringer (oppdragsperiode_id);

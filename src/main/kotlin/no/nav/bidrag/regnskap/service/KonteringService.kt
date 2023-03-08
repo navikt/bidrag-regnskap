@@ -1,7 +1,5 @@
 package no.nav.bidrag.regnskap.service
 
-import no.nav.bidrag.behandling.felles.enums.EngangsbelopType
-import no.nav.bidrag.behandling.felles.enums.VedtakType
 import no.nav.bidrag.regnskap.dto.enumer.Søknadstype
 import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
 import no.nav.bidrag.regnskap.dto.enumer.Type
@@ -11,27 +9,21 @@ import no.nav.bidrag.regnskap.dto.vedtak.Periode
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
-import org.slf4j.LoggerFactory
+import no.nav.bidrag.regnskap.util.KonteringUtils.vurderSøknadsType
+import no.nav.bidrag.regnskap.util.KonteringUtils.vurderType
+import no.nav.bidrag.regnskap.util.PeriodeUtils
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 import java.time.YearMonth
-import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
-import java.util.stream.Collectors
-import java.util.stream.Stream
 
-private val LOGGER = LoggerFactory.getLogger(KonteringService::class.java)
 
 @Service
-class KonteringService(
-  private val persistenceService: PersistenceService
-) {
+class KonteringService {
 
   fun hentKonteringer(oppdrag: Oppdrag): List<KonteringResponse> {
     val konteringResponser = mutableListOf<KonteringResponse>()
 
-    oppdrag.oppdragsperioder?.forEach { oppdragsperiode ->
-      oppdragsperiode.konteringer?.forEach { kontering ->
+    oppdrag.oppdragsperioder.forEach { oppdragsperiode ->
+      oppdragsperiode.konteringer.forEach { kontering ->
         konteringResponser.add(
           KonteringResponse(
             konteringId = kontering.konteringId,
@@ -49,94 +41,57 @@ class KonteringService(
     return konteringResponser
   }
 
-  fun opprettNyeKonteringerPåOppdragsperioder(
-    oppdragsperioder: List<Oppdragsperiode>, hendelse: Hendelse, oppdatering: Boolean = false
+  fun opprettNyeKonteringerPåOppdragsperiode(
+    oppdragsperiode: Oppdragsperiode,
+    hendelse: Hendelse,
+    sisteOverførtePeriode: YearMonth,
   ) {
-    oppdragsperioder.forEachIndexed { indexOppdragsperiode, oppdragsperiode ->
-      val konteringListe = mutableListOf<Kontering>()
-      val perioderForOppdrasperiode = hentAllePerioderForOppdragsperiodeForOverførtPeriode(oppdragsperiode)
+    val perioderForOppdragsperiode =
+      hentAllePerioderForOppdragsperiodeForSisteOverførtePeriode(oppdragsperiode, sisteOverførtePeriode)
 
-      perioderForOppdrasperiode.forEachIndexed { indexPeriode, periode ->
-        konteringListe.add(
-          Kontering(
-            transaksjonskode = Transaksjonskode.hentTransaksjonskodeForType(hendelse.type).name,
-            overføringsperiode = periode.toString(),
-            type = vurderOmNyEllerEndring(indexOppdragsperiode, indexPeriode, oppdatering),
-            søknadType = finnSøknadsType(hendelse),
-            oppdragsperiode = oppdragsperiode
-          )
+    perioderForOppdragsperiode.forEachIndexed { indexPeriode, periode ->
+      oppdragsperiode.konteringer = oppdragsperiode.konteringer.plus(
+        Kontering(
+          transaksjonskode = Transaksjonskode.hentTransaksjonskodeForType(hendelse.type).name,
+          overføringsperiode = periode.toString(),
+          type = vurderType(oppdragsperiode),
+          søknadType = vurderSøknadsType(hendelse, indexPeriode),
+          oppdragsperiode = oppdragsperiode
         )
-      }
-      oppdragsperiode.konteringer = konteringListe
+      )
     }
   }
 
-  fun opprettLøpendeKonteringerPåOppdragsperioder(løpendeOppdragsperioder: List<Oppdragsperiode>, forPeriode: String) {
-    løpendeOppdragsperioder.forEach { oppdragsperiode ->
-
-      if (oppdragsperiode.konteringer?.filter { it.overføringsperiode == forPeriode }?.isNotEmpty() == true) {
-        LOGGER.debug(
-          "Kontering for periode: $forPeriode i oppdragsperiode: ${oppdragsperiode.oppdragsperiodeId} er allerede opprettet!" +
-              "Dette kan komme av tidligere kjøring av påløpsfil som har blitt avbrutt underveis."
-        )
-      } else {
-        persistenceService.lagreKontering(
-          Kontering(
-            transaksjonskode = Transaksjonskode.hentTransaksjonskodeForType(oppdragsperiode.oppdrag!!.stønadType).name,
-            overføringsperiode = forPeriode,
-            type = vurderType(oppdragsperiode),
-            søknadType = Søknadstype.EN.name,
-            oppdragsperiode = oppdragsperiode,
-            sendtIPåløpsfil = true
-          )
-        )
-      }
-    }
-  }
-
-  private fun vurderType(oppdragsperiode: Oppdragsperiode): String {
-    if (oppdragsperiode.oppdrag?.oppdragsperioder?.filter { it.konteringer?.isNotEmpty() == true }?.isEmpty() == true) {
-      return Type.NY.name
-    }
-    return Type.ENDRING.name
-  }
-
-
-  fun opprettKorreksjonskonteringer(
-    oppdrag: Oppdrag,
-    nyeOppdragsperioder: List<Oppdragsperiode>
-  ) {
+  fun opprettKorreksjonskonteringer(oppdrag: Oppdrag, periode: Periode, sisteOverførtePeriode: YearMonth) {
     val overførteKonteringerListe = hentAlleKonteringerForOppdrag(oppdrag)
 
-    nyeOppdragsperioder.forEach { nyOppdragsperiode ->
-      val perioderForNyOppdragsperiode =
-        hentAllePerioderMellomDato(nyOppdragsperiode.periodeFra, nyOppdragsperiode.periodeTil)
-      opprettKorreksjonskonteringForAlleredeOversendteKonteringer(perioderForNyOppdragsperiode, overførteKonteringerListe)
-    }
-  }
-
-  fun opprettKorreksjonskonteringer(
-    oppdrag: Oppdrag,
-    periode: Periode
-  ) {
-    val overførteKonteringerListe = hentAlleKonteringerForOppdrag(oppdrag)
-
-    val perioderForPeriode = hentAllePerioderMellomDato(periode.periodeFomDato, periode.periodeTilDato)
+    val perioderForPeriode =
+      PeriodeUtils.hentAllePerioderMellomDato(periode.periodeFomDato, periode.periodeTilDato, sisteOverførtePeriode)
     opprettKorreksjonskonteringForAlleredeOversendteKonteringer(perioderForPeriode, overførteKonteringerListe)
   }
 
+  fun opprettKorreksjonskonteringer(oppdrag: Oppdrag, oppdragsperiode: Oppdragsperiode, sisteOverførtePeriode: YearMonth) {
+    val overførteKonteringerListe = hentAlleKonteringerForOppdrag(oppdrag)
+
+    opprettKorreksjonskonteringForAlleredeOversendteKonteringer(
+      PeriodeUtils.hentAllePerioderMellomDato(oppdragsperiode.periodeFra, oppdragsperiode.periodeTil, sisteOverførtePeriode),
+      overførteKonteringerListe
+    )
+  }
+
   private fun opprettKorreksjonskonteringForAlleredeOversendteKonteringer(
-    perioderForOppdragsperiode: List<YearMonth>,
-    overførteKonteringerListe: List<Kontering>
+    perioderForOppdragsperiode: List<YearMonth>, overførteKonteringerListe: List<Kontering>
   ) {
     overførteKonteringerListe.forEach { kontering ->
       val korreksjonskode = Transaksjonskode.valueOf(kontering.transaksjonskode).korreksjonskode
 
-      if (korreksjonskode != null
-        && !erOverførtKonteringAlleredeKorrigert(kontering, overførteKonteringerListe)
-        && (erPeriodeOverlappende(perioderForOppdragsperiode, kontering)
-            || slutterNyeOppdragsperiodeFørOverførteKonteringsPeriode(kontering, perioderForOppdragsperiode)
-            || erKonteringGebyr(kontering))
+      if (korreksjonskode != null && !erOverførtKonteringAlleredeKorrigert(
+          kontering, overførteKonteringerListe
+        ) && (erPeriodeOverlappende(
+          perioderForOppdragsperiode, kontering
+        ) || slutterNyeOppdragsperiodeFørOverførteKonteringsPeriode(kontering, perioderForOppdragsperiode) || erKonteringGebyr(
+          kontering
+        ))
       ) {
         kontering.oppdragsperiode?.konteringer = kontering.oppdragsperiode?.konteringer?.plus(
           Kontering(
@@ -146,73 +101,33 @@ class KonteringService(
             type = Type.ENDRING.toString(),
             søknadType = kontering.søknadType
           )
-        )
+        )!!
       }
     }
   }
 
-  private fun erKonteringGebyr(kontering: Kontering) =
-    (kontering.søknadType == Søknadstype.FABM.name || kontering.søknadType == Søknadstype.FABP.name)
+  private fun erKonteringGebyr(kontering: Kontering): Boolean {
+    return (kontering.søknadType == Søknadstype.FABM.name || kontering.søknadType == Søknadstype.FABP.name)
+  }
 
   private fun slutterNyeOppdragsperiodeFørOverførteKonteringsPeriode(
-    kontering: Kontering,
-    perioderForNyOppdrasperiode: List<YearMonth>
+    kontering: Kontering, perioderForNyOppdrasperiode: List<YearMonth>
   ): Boolean {
     val maxOppdragsperiode = perioderForNyOppdrasperiode.maxOrNull() ?: return false
     return YearMonth.parse(kontering.overføringsperiode).isAfter(maxOppdragsperiode)
   }
 
-  private fun erPeriodeOverlappende(
-    perioderForNyOppdrasperiode: List<YearMonth>,
-    kontering: Kontering
-  ) = perioderForNyOppdrasperiode.contains(YearMonth.parse(kontering.overføringsperiode))
-
-  private fun vurderOmNyEllerEndring(indexOppdragsperiode: Int, indexPeriode: Int, oppdatering: Boolean): String {
-    return if (indexOppdragsperiode == 0 && indexPeriode == 0 && !oppdatering) Type.NY.toString() else Type.ENDRING.toString()
+  private fun erPeriodeOverlappende(perioderForNyOppdrasperiode: List<YearMonth>, kontering: Kontering): Boolean {
+    return perioderForNyOppdrasperiode.contains(YearMonth.parse(kontering.overføringsperiode))
   }
 
-  private fun finnSøknadsType(hendelse: Hendelse): String {
-    return if (hendelse.vedtakType == VedtakType.INDEKSREGULERING) {
-      Søknadstype.IN.name
-    } else if (hendelse.type == EngangsbelopType.GEBYR_MOTTAKER.name) {
-      Søknadstype.FABM.name
-    } else if (hendelse.type == EngangsbelopType.GEBYR_SKYLDNER.name) {
-      Søknadstype.FABP.name
-    } else {
-      Søknadstype.EN.name
-    }
-  }
-
-  private fun hentAllePerioderForOppdragsperiodeForOverførtPeriode(
-    oppdragsperiode: Oppdragsperiode
+  private fun hentAllePerioderForOppdragsperiodeForSisteOverførtePeriode(
+    oppdragsperiode: Oppdragsperiode, sisteOverførtePeriode: YearMonth
   ): List<YearMonth> {
-    val perioderForOppdrasperiode = hentAllePerioderMellomDato(oppdragsperiode.periodeFra, oppdragsperiode.periodeTil)
-    val sisteOverførtePeriode = persistenceService.finnSisteOverførtePeriode()
+    return PeriodeUtils.hentAllePerioderMellomDato(
+      oppdragsperiode.periodeFra, oppdragsperiode.periodeTil, sisteOverførtePeriode
+    ).filter { it.isBefore(sisteOverførtePeriode.plusMonths(1)) }
 
-    //Filtrer etter det ut alle perioder som er senere enn siste overførte periode da disse konteringene ikke skal opprettes før påløpsfilen genereres.
-    return perioderForOppdrasperiode.filter { it.isBefore(sisteOverførtePeriode.plusMonths(1)) }
-  }
-
-  private fun hentAllePerioderMellomDato(
-    periodeFraForOppdragsperiode: LocalDate,
-    periodeTilForOppdragsperiode: LocalDate?
-  ): List<YearMonth> {
-    val sisteOverførtePeriode = persistenceService.finnSisteOverførtePeriode()
-
-    val periodeTil = periodeTilForOppdragsperiode
-      ?: LocalDate.of(sisteOverførtePeriode.year, sisteOverførtePeriode.month, 1).plusMonths(1)
-
-    if (periodeTil.isBefore(periodeFraForOppdragsperiode)) {
-      return emptyList()
-    }
-
-    // Finner alle perioder som er mellom fra og med periodeFra og til og med periodeTil
-    // (Om den eksisterer, ellers brukes siste overførte periode)
-    return Stream.iterate(periodeFraForOppdragsperiode) { date: LocalDate -> date.plusMonths(1) }.limit(
-      ChronoUnit.MONTHS.between(
-        periodeFraForOppdragsperiode, periodeTil
-      )
-    ).map { it.format(DateTimeFormatter.ofPattern("yyyy-MM")) }.map { YearMonth.parse(it) }.collect(Collectors.toList())
   }
 
   private fun erOverførtKonteringAlleredeKorrigert(
@@ -228,8 +143,8 @@ class KonteringService(
 
   fun hentAlleKonteringerForOppdrag(oppdrag: Oppdrag): List<Kontering> {
     val periodeListe = mutableListOf<Kontering>()
-    oppdrag.oppdragsperioder?.forEach { oppdragsperiode ->
-      oppdragsperiode.konteringer?.forEach { kontering ->
+    oppdrag.oppdragsperioder.forEach { oppdragsperiode ->
+      oppdragsperiode.konteringer.forEach { kontering ->
         periodeListe.add(kontering)
       }
     }

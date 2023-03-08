@@ -25,10 +25,9 @@ object TestData {
   fun opprettOppdrag(
     oppdragId: Int = 0,
     stonadType: StonadType = StonadType.BIDRAG,
-    vedtakType: VedtakType = VedtakType.FASTSETTELSE,
     sakId: String = "123456",
     skyldnerIdent: String = PersonidentGenerator.genererPersonnummer(),
-    oppdragsperioder: List<Oppdragsperiode>? = listOf(opprettOppdragsperiode()),
+    oppdragsperioder: List<Oppdragsperiode> = listOf(opprettOppdragsperiode()),
     kravhaverIdent: String = PersonidentGenerator.genererPersonnummer(),
     utsattTilDato: LocalDate? = null,
     endretTidspunkt: LocalDateTime? = null,
@@ -37,7 +36,6 @@ object TestData {
     return Oppdrag(
       oppdragId = oppdragId,
       stønadType = stonadType.toString(),
-      vedtakType = vedtakType.toString(),
       sakId = sakId,
       skyldnerIdent = skyldnerIdent,
       oppdragsperioder = oppdragsperioder,
@@ -100,23 +98,26 @@ object TestData {
     oppdragsperiodeId: Int = 0,
     oppdrag: Oppdrag? = null,
     vedtakId: Int = 654321,
+    vedtakType: VedtakType = VedtakType.FASTSETTELSE,
     gjelderIdent: String = PersonidentGenerator.genererPersonnummer(),
     mottakerIdent: String = PersonidentGenerator.genererPersonnummer(),
     belop: BigDecimal = BigDecimal(7500),
     valuta: String = "NOK",
     periodeFra: LocalDate = LocalDate.now().minusMonths(1),
-    periodeTil: LocalDate = LocalDate.now().plusMonths(1),
+    periodeTil: LocalDate? = LocalDate.now().plusMonths(1),
     vedtaksdato: LocalDate = LocalDate.now(),
     opprettetAv: String = "Saksbehandler",
+    konteringerFullførtOpprettet: Boolean = false,
     delytelseId: Int? = Random.nextInt(),
     aktivTil: LocalDate? = null,
-    konteringer: List<Kontering>? = listOf(opprettKontering())
+    konteringer: List<Kontering> = listOf(opprettKontering())
 
   ): Oppdragsperiode {
     return Oppdragsperiode(
       oppdragsperiodeId = oppdragsperiodeId,
       oppdrag = oppdrag,
       vedtakId = vedtakId,
+      vedtakType = vedtakType.toString(),
       gjelderIdent = gjelderIdent,
       mottakerIdent = mottakerIdent,
       beløp = belop,
@@ -125,6 +126,7 @@ object TestData {
       periodeTil = periodeTil,
       vedtaksdato = vedtaksdato,
       opprettetAv = opprettetAv,
+      konteringerFullførtOpprettet = konteringerFullførtOpprettet,
       delytelseId = delytelseId,
       aktivTil = aktivTil,
       konteringer = konteringer

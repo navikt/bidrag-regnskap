@@ -25,7 +25,7 @@ class AvstemmingsfilerScheduler(
     LockAssert.assertLocked()
 
     val dato = LocalDate.now().minusDays(1)
-    LOGGER.debug("Starter schedulert generering av avstemmingsfiler for $dato.")
+    LOGGER.info("Starter schedulert generering av avstemmingsfiler for $dato.")
 
     avstemmingService.startAvstemming(dato)
   }

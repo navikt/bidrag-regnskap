@@ -5,10 +5,12 @@ import java.time.LocalDateTime
 import javax.persistence.CascadeType
 import javax.persistence.Column
 import javax.persistence.Entity
+import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.OneToMany
+import javax.persistence.OrderBy
 import javax.persistence.Version
 
 @Entity(name = "oppdrag")
@@ -21,9 +23,6 @@ data class Oppdrag(
 
   @Column(name = "stonad_type")
   val stønadType: String,
-
-  @Column(name = "vedtak_type")
-  var vedtakType: String,
 
   @Column(name = "sak_id")
   val sakId: String,
@@ -47,15 +46,15 @@ data class Oppdrag(
   @Column(name = "engangsbelop_id")
   var engangsbeløpId: Int? = null,
 
-  @OneToMany(mappedBy = "oppdrag", cascade = [CascadeType.ALL])
-  var oppdragsperioder: List<Oppdragsperiode>? = null
+  @OneToMany(mappedBy = "oppdrag", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+  @OrderBy("oppdragsperiodeId")
+  var oppdragsperioder: List<Oppdragsperiode> = emptyList()
 ) {
 
   override fun toString(): String {
     return this::class.simpleName +
         "(oppdragId = $oppdragId , " +
         "stønadType = $stønadType , " +
-        "vedtakType = $vedtakType , " +
         "sakId = $sakId , " +
         "kravhaverIdent = $kravhaverIdent , " +
         "skyldnerIdent = $skyldnerIdent , " +
@@ -73,7 +72,6 @@ data class Oppdrag(
 
     if (oppdragId != other.oppdragId) return false
     if (stønadType != other.stønadType) return false
-    if (vedtakType != other.vedtakType) return false
     if (sakId != other.sakId) return false
     if (kravhaverIdent != other.kravhaverIdent) return false
     if (skyldnerIdent != other.skyldnerIdent) return false
@@ -88,7 +86,6 @@ data class Oppdrag(
   override fun hashCode(): Int {
     var result = oppdragId
     result = 31 * result + stønadType.hashCode()
-    result = 31 * result + vedtakType.hashCode()
     result = 31 * result + sakId.hashCode()
     result = 31 * result + (kravhaverIdent?.hashCode() ?: 0)
     result = 31 * result + skyldnerIdent.hashCode()

@@ -12,6 +12,7 @@ import no.nav.security.token.support.core.api.Protected
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -38,9 +39,9 @@ class PåløpskjøringController(
       content = [Content()]
     )]
   )
-  fun startPåløpskjøring(): ResponseEntity<Int> {
+  fun startPåløpskjøring(@RequestParam(required = true) genererFil: Boolean): ResponseEntity<Int> {
     val påløp = påløpskjøringService.hentPåløp() ?: return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
-    runBlocking { påløpskjøringService.startPåløpskjøring(påløp, false) }
+    runBlocking { påløpskjøringService.startPåløpskjøring(påløp, false, genererFil) }
     return ResponseEntity.status(HttpStatus.CREATED).body(påløp.påløpId)
   }
 

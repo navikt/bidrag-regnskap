@@ -33,7 +33,7 @@ class PåløpskjøringScheduler(
       if (it != null) {
         if (it.kjøredato.isBefore(LocalDateTime.now())) {
           runBlocking {
-            påløpskjøringService.startPåløpskjøring(it, true)
+            påløpskjøringService.startPåløpskjøring(it, true, true)
           }
         }
         else {
