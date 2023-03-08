@@ -4,8 +4,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.yield
 import no.nav.bidrag.regnskap.consumer.SkattConsumer
 import no.nav.bidrag.regnskap.dto.enumer.Årsakskode
 import no.nav.bidrag.regnskap.dto.påløp.Vedlikeholdsmodus
@@ -37,18 +37,18 @@ class PåløpskjøringService(
   @Transactional
   fun hentPåløp() = persistenceService.hentIkkeKjørtePåløp().minByOrNull { it.forPeriode }
 
-  suspend fun startPåløpskjøring(påløp: Påløp, schedulertKjøring: Boolean, genererFil: Boolean) = coroutineScope {
-    påløpskjøringJob = launch {
-      withContext(Dispatchers.IO) {
-        validerDriftsavvik(påløp, schedulertKjøring)
-        if(genererFil) endreElinVedlikeholdsmodus(Årsakskode.PAALOEP_GENERERES, "Påløp for ${påløp.forPeriode} genereres hos NAV.")
-        opprettKonteringerForAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer(påløp)
-        genererPåløpsfil(påløp, genererFil)
-        fullførPåløp(påløp)
-        if(genererFil) endreElinVedlikeholdsmodus(Årsakskode.PAALOEP_LEVERT, "Påløp for ${påløp.forPeriode} er ferdig generert fra NAV.")
-        avsluttDriftsavvik(påløp)
-      }
-    }
+  fun startPåløpskjøring(påløp: Påløp, schedulertKjøring: Boolean, genererFil: Boolean) {
+    validerDriftsavvik(påløp, schedulertKjøring)
+    if (genererFil) endreElinVedlikeholdsmodus(
+      Årsakskode.PAALOEP_GENERERES, "Påløp for ${påløp.forPeriode} genereres hos NAV."
+    )
+    opprettKonteringerForAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer(påløp)
+    genererPåløpsfil(påløp, genererFil)
+    fullførPåløp(påløp)
+    if (genererFil) endreElinVedlikeholdsmodus(
+      Årsakskode.PAALOEP_LEVERT, "Påløp for ${påløp.forPeriode} er ferdig generert fra NAV."
+    )
+    avsluttDriftsavvik(påløp)
   }
 
   fun stoppPågåendePåløpskjøring() {
@@ -85,20 +85,19 @@ class PåløpskjøringService(
   }
 
   @Transactional
-  suspend fun opprettKonteringerForAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer(påløp: Påløp) {
+  fun opprettKonteringerForAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer(påløp: Påløp) {
     val påløpsPeriode = LocalDate.parse(påløp.forPeriode + "-01")
     val oppdragsperioderSomIkkeHarOpprettetAlleKonteringer =
       persistenceService.hentAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer()
 
     oppdragsperioderSomIkkeHarOpprettetAlleKonteringer.forEach {
-      yield()
       if (it.aktivTil == null && it.periodeTil != null && erFørsteDatoSammeSomEllerTidligereEnnAndreDato(
-          it.periodeTil,
-          påløpsPeriode
+          it.periodeTil, påløpsPeriode
         )
       ) {
         it.aktivTil = it.periodeTil
       }
+
       manglendeKonteringerService.opprettManglendeKonteringerForOppdragsperiode(it, YearMonth.parse(påløp.forPeriode))
 
       if (it.aktivTil != null && erFørsteDatoSammeSomEllerTidligereEnnAndreDato(it.aktivTil!!, påløpsPeriode)) {
@@ -110,18 +109,25 @@ class PåløpskjøringService(
   }
 
   @Transactional
-  suspend fun genererPåløpsfil(påløp: Påløp, genererFil: Boolean) {
+  fun genererPåløpsfil(påløp: Påløp, genererFil: Boolean) {
     LOGGER.info("Starter generering av påløpsfil...")
     val konteringer = persistenceService.hentAlleIkkeOverførteKonteringer()
-    if (genererFil) påløpsfilGenerator.skrivPåløpsfilOgLastOppPåFilsluse(konteringer, påløp)
+    if (genererFil) runBlocking { skrivPåløpsfilOgLastOppPåFilsluse(konteringer, påløp) }
     settKonteringTilOverførtOgOpprettOverføringKontering(konteringer)
     LOGGER.info("Påløpsfil er ferdig skrevet med ${konteringer.size} konteringer og lastet opp til filsluse.")
   }
 
-  private suspend fun settKonteringTilOverførtOgOpprettOverføringKontering(konteringer: List<Kontering>) {
+  private suspend fun skrivPåløpsfilOgLastOppPåFilsluse(konteringer: List<Kontering>, påløp: Påløp) = coroutineScope {
+    påløpskjøringJob = launch {
+      withContext(Dispatchers.IO) {
+        påløpsfilGenerator.skrivPåløpsfilOgLastOppPåFilsluse(konteringer, påløp)
+      }
+    }
+  }
+
+  private fun settKonteringTilOverførtOgOpprettOverføringKontering(konteringer: List<Kontering>) {
     val timestamp = LocalDateTime.now()
     konteringer.forEach {
-      yield()
       it.overføringstidspunkt = timestamp
       persistenceService.lagreKontering(it)
       persistenceService.lagreOverføringKontering(

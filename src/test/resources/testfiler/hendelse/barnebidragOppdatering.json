@@ -20,9 +20,9 @@
       "endring": true,
       "periodeListe": [
         {
-          "fomDato": "2023-03-01",
+          "fomDato": "2022-03-01",
           "tilDato": null,
-          "belop": null,
+          "belop": 5520.00,
           "valutakode": "NOK",
           "resultatkode": "KBB"
         }
@@ -39,9 +39,9 @@
       "endring": true,
       "periodeListe": [
         {
-          "fomDato": "2023-03-01",
+          "fomDato": "2022-03-01",
           "tilDato": null,
-          "belop": null,
+          "belop": 4950.00,
           "valutakode": "NOK",
           "resultatkode": "KBB"
         }

@@ -382,10 +382,6 @@ internal class VedtakshendelseListenerIT {
   @Test
   @Order(15)
   fun `skal oppdatere bidrag`() {
-    await().atMost(TEN_SECONDS).until {
-      return@until persistenceService.hentOppdrag(10) != null
-    }
-
     val vedtakHendelse = hentFilOgSendPåKafka(
       filnavn = "barnebidragOppdatering.json",
       antallOverføringerSåLangt = 59,
@@ -402,11 +398,6 @@ internal class VedtakshendelseListenerIT {
     skrivTilTestdatafil(
       hentAlleOppdaterteOgNyeKonteringerForOppdragVedOppdatering(oppdrag1), "Oppdaterer barnebidrag for barn 1 med 10kr."
     )
-
-
-    await().atMost(TEN_SECONDS).until {
-      return@until persistenceService.hentOppdrag(11) != null
-    }
 
     val oppdrag2 = assertStønader(
       11, vedtakHendelse, BIDRAG, 3, 1, B1, Søknadstype.EN, B3, 1

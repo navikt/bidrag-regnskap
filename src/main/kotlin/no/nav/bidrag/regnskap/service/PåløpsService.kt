@@ -27,7 +27,7 @@ class PåløpsService(
       )
     }
 
-    return påløpResponseListe.sortedBy { YearMonth.parse(it.forPeriode) }
+    return påløpResponseListe.sortedByDescending { YearMonth.parse(it.forPeriode) }
   }
 
   fun lagrePåløp(påløpRequest: PåløpRequest): Int {

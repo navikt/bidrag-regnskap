@@ -7,7 +7,6 @@ import java.time.LocalDate
 import javax.persistence.CascadeType
 import javax.persistence.Column
 import javax.persistence.Entity
-import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
@@ -69,7 +68,7 @@ data class Oppdragsperiode(
   @Column(name = "aktiv_til")
   var aktivTil: LocalDate? = null,
 
-  @OneToMany(mappedBy = "oppdragsperiode", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+  @OneToMany(mappedBy = "oppdragsperiode", cascade = [CascadeType.ALL])
   @OrderBy("konteringId")
   var konteringer: List<Kontering> = emptyList(),
 ) {
