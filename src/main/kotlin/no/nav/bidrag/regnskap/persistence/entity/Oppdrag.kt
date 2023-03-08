@@ -5,7 +5,6 @@ import java.time.LocalDateTime
 import javax.persistence.CascadeType
 import javax.persistence.Column
 import javax.persistence.Entity
-import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
@@ -46,7 +45,7 @@ data class Oppdrag(
   @Column(name = "engangsbelop_id")
   var engangsbeløpId: Int? = null,
 
-  @OneToMany(mappedBy = "oppdrag", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+  @OneToMany(mappedBy = "oppdrag", cascade = [CascadeType.ALL])
   @OrderBy("oppdragsperiodeId")
   var oppdragsperioder: List<Oppdragsperiode> = emptyList()
 ) {
