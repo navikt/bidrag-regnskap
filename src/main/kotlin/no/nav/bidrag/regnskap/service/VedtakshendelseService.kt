@@ -131,7 +131,7 @@ class VedtakshendelseService(
   }
 
   private fun sendKrav(oppdragId: Int) {
-    if (harAktiveDriftAvvik()) {
+    if (harAktiveDriftAvvik()) { //TODO() kan caches cachable 30 sec
       LOGGER.info("Det finnes aktive driftsavvik. Starter derfor ikke overføring av konteringer for oppdrag: $oppdragId.")
       return
     } else if (erVedlikeholdsmodusPåslått()) {

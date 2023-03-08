@@ -1,8 +1,8 @@
 package no.nav.bidrag.regnskap.service
 
+import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
-import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
@@ -71,22 +71,18 @@ class KonteringServiceTest {
   inner class OpprettKontering {
     @Test
     fun `Skal opprette nye konteringer`() {
-      val oppdragsperiode = listOf(
-        TestData.opprettOppdragsperiode(
-          konteringer = emptyList(),
-          periodeFra = LocalDate.now().minusMonths(3).withDayOfMonth(1),
-          periodeTil = LocalDate.now().minusMonths(1).withDayOfMonth(1)
-        )
+      val oppdragsperiode = TestData.opprettOppdragsperiode(
+        konteringer = emptyList(),
+        periodeFra = LocalDate.now().minusMonths(3).withDayOfMonth(1),
+        periodeTil = LocalDate.now().minusMonths(1).withDayOfMonth(1)
       )
       val hendelse = TestData.opprettHendelse()
 
-      every { persistenceService.finnSisteOverførtePeriode() } returns YearMonth.of(
-        LocalDate.now().year, LocalDate.now().month
-      )
+      val sisteOverførtePeriode = YearMonth.of(LocalDate.now().year, LocalDate.now().month)
 
-      konteringService.opprettNyeKonteringerPåOppdragsperioder(oppdragsperiode, hendelse)
+      konteringService.opprettNyeKonteringerPåOppdragsperiode(oppdragsperiode, hendelse, sisteOverførtePeriode)
 
-      oppdragsperiode[0].konteringer!! shouldHaveSize 2
+      oppdragsperiode.konteringer shouldHaveSize 2
     }
 
     @Test
@@ -118,13 +114,9 @@ class KonteringServiceTest {
         )
       )
 
-      every { persistenceService.finnSisteOverførtePeriode() } returns YearMonth.of(
-        now.year, now.month
-      ).plusMonths(5)
+      val sisteOverførtePeriode = YearMonth.of(now.year, now.month).plusMonths(5)
 
-      konteringService.opprettKorreksjonskonteringer(
-        oppdrag, listOf(nyOppdragsperiode)
-      )
+      shouldNotThrowAny { konteringService.opprettKorreksjonskonteringer(oppdrag, nyOppdragsperiode, sisteOverførtePeriode) }
     }
 
     @Test
@@ -151,13 +143,9 @@ class KonteringServiceTest {
         )
       )
 
-      every { persistenceService.finnSisteOverførtePeriode() } returns YearMonth.of(
-        now.year, now.month
-      ).plusMonths(5)
+      val sisteOverførtePeriode = YearMonth.of(now.year, now.month).plusMonths(5)
 
-      konteringService.opprettKorreksjonskonteringer(
-        oppdrag, listOf(nyOppdragsperiode)
-      )
+      konteringService.opprettKorreksjonskonteringer(oppdrag, nyOppdragsperiode, sisteOverførtePeriode)
 
       verify(exactly = 0) { persistenceService.lagreKontering(any()) }
     }

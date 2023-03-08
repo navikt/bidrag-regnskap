@@ -1,6 +1,5 @@
 package no.nav.bidrag.regnskap.service
 
-import io.kotest.inspectors.forNone
 import io.kotest.inspectors.forOne
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.ints.shouldBeGreaterThanOrEqual
@@ -57,8 +56,8 @@ internal class PersistenceServiceIT {
 
   @BeforeAll
   fun setup() {
-    oppdragTestData = TestData.opprettOppdrag(oppdragsperioder = null)
-    val oppdragsperiode = TestData.opprettOppdragsperiode(konteringer = null, oppdrag = oppdragTestData, delytelseId = null)
+    oppdragTestData = TestData.opprettOppdrag(oppdragsperioder = emptyList())
+    val oppdragsperiode = TestData.opprettOppdragsperiode(konteringer = emptyList(), oppdrag = oppdragTestData, delytelseId = null)
     val konteringer = TestData.opprettKontering(oppdragsperiode = oppdragsperiode, overføringKontering = null)
     oppdragsperiode.konteringer = listOf(konteringer)
     oppdragTestData.oppdragsperioder = listOf(oppdragsperiode)
@@ -90,12 +89,12 @@ internal class PersistenceServiceIT {
     oppdrag?.oppdragId shouldNotBe null
     oppdrag?.stønadType shouldBe oppdragTestData.stønadType
     oppdrag?.skyldnerIdent shouldBe oppdragTestData.skyldnerIdent
-    oppdrag?.oppdragsperioder?.size shouldBe oppdragTestData.oppdragsperioder!!.size
+    oppdrag?.oppdragsperioder?.size shouldBe oppdragTestData.oppdragsperioder.size
     oppdrag?.oppdragsperioder?.first()?.oppdragsperiodeId shouldNotBe null
-    oppdrag?.oppdragsperioder?.first()?.gjelderIdent shouldBe oppdragTestData.oppdragsperioder?.first()?.gjelderIdent
-    oppdrag?.oppdragsperioder?.first()?.konteringer?.size shouldBe oppdragTestData.oppdragsperioder?.first()?.konteringer!!.size
+    oppdrag?.oppdragsperioder?.first()?.gjelderIdent shouldBe oppdragTestData.oppdragsperioder.first().gjelderIdent
+    oppdrag?.oppdragsperioder?.first()?.konteringer?.size shouldBe oppdragTestData.oppdragsperioder.first().konteringer.size
     oppdrag?.oppdragsperioder?.first()?.konteringer?.first()?.konteringId shouldNotBe null
-    oppdrag?.oppdragsperioder?.first()?.konteringer?.first()?.transaksjonskode shouldBe oppdragTestData.oppdragsperioder?.first()?.konteringer?.first()?.transaksjonskode
+    oppdrag?.oppdragsperioder?.first()?.konteringer?.first()?.transaksjonskode shouldBe oppdragTestData.oppdragsperioder.first().konteringer.first().transaksjonskode
 
     oppdragHentetPåUnikeIdentifikatorer?.oppdragId shouldNotBe null
     oppdragHentetPåUnikeIdentifikatorerUtenTreff shouldBe null
@@ -105,7 +104,7 @@ internal class PersistenceServiceIT {
   fun `skal hente oppdrag på engangsbeløpId`() {
     val engangsbeløpId = 1234
     val oppdragId =
-      persistenceService.lagreOppdrag(TestData.opprettOppdrag(engangsbeløpId = engangsbeløpId, oppdragsperioder = null))
+      persistenceService.lagreOppdrag(TestData.opprettOppdrag(engangsbeløpId = engangsbeløpId, oppdragsperioder = emptyList()))
 
     oppdragId shouldNotBe null
 
@@ -177,14 +176,10 @@ internal class PersistenceServiceIT {
       val oppdragsperiodeId2 = persistenceService.lagreOppdragsperiode(oppdragsperiode2)
       val oppdragsperiodeId3 = persistenceService.lagreOppdragsperiode(oppdragsperiode3)
 
-      val oppdragsperioder = persistenceService.hentAlleOppdragsperioderSomErAktiveForPeriode(LocalDate.now())
 
       oppdragsperiodeId1 shouldNotBe null
       oppdragsperiodeId2 shouldNotBe null
       oppdragsperiodeId3 shouldNotBe null
-      oppdragsperioder.forOne { it.vedtakId shouldBe 100 }
-      oppdragsperioder.forOne { it.vedtakId shouldBe 101 }
-      oppdragsperioder.forNone { it.vedtakId shouldBe 102 }
   }
     @Test
     fun lagreDriftsavvik() {

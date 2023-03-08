@@ -597,10 +597,10 @@ internal class VedtakshendelseListenerIT {
 
     oppdrag.stønadType shouldBe stønadstype.name
     oppdrag.eksternReferanse shouldBe vedtakHendelse.eksternReferanse
-    oppdrag.oppdragsperioder?.size shouldBe antallOppdragsperioder
+    oppdrag.oppdragsperioder.size shouldBe antallOppdragsperioder
     oppdrag.sakId shouldBe vedtakHendelse.stonadsendringListe!![stonadsendringIndex].sakId
-    oppdrag.oppdragsperioder?.subList(antallOppdragsperioder - antallOpprettetIGjeldendeFil, antallOppdragsperioder)
-      ?.forEachIndexed { i: Int, oppdragsperiode: Oppdragsperiode ->
+    oppdrag.oppdragsperioder.subList(antallOppdragsperioder - antallOpprettetIGjeldendeFil, antallOppdragsperioder)
+      .forEachIndexed { i: Int, oppdragsperiode: Oppdragsperiode ->
         oppdragsperiode.vedtaksdato shouldBe vedtakHendelse.vedtakTidspunkt.toLocalDate()
         oppdragsperiode.vedtakId shouldBe vedtakHendelse.id
         oppdragsperiode.opprettetAv shouldBe vedtakHendelse.opprettetAv
@@ -616,11 +616,11 @@ internal class VedtakshendelseListenerIT {
           vedtakHendelse.stonadsendringListe!![stonadsendringIndex].periodeListe[i].tilDato
         )
 
-        oppdragsperiode.konteringer?.size shouldBe månederForKontering.size
-        oppdragsperiode.konteringer?.forEach { kontering ->
+        oppdragsperiode.konteringer.size shouldBe månederForKontering.size
+        oppdragsperiode.konteringer.forEach { kontering ->
           kontering.overføringKontering?.size shouldBe 1
           kontering.transaksjonskode shouldBeIn listOf(forventetTransaksjonskode.name, forventetKorreksjonskode?.name)
-          kontering.type shouldBe if (kontering === oppdrag.oppdragsperioder!![0].konteringer!![0]) NY.name else ENDRING.name
+          kontering.type shouldBe if (kontering === oppdrag.oppdragsperioder[0].konteringer[0]) NY.name else ENDRING.name
           kontering.søknadType shouldBe forventetSøknadstype.name
           kontering.sendtIPåløpsfil shouldBe false
           kontering.overføringsperiode shouldBeIn månederForKontering
@@ -649,18 +649,18 @@ internal class VedtakshendelseListenerIT {
   ): List<Kontering> {
     val oppdrag = persistenceService.hentOppdrag(oppdragId) ?: error("Det finnes ingen oppdrag med angitt oppdragsId: $oppdragId")
 
-    oppdrag.oppdragsperioder!! shouldHaveSize 2
-    oppdrag.oppdragsperioder!![0].beløp shouldNotBe oppdrag.oppdragsperioder!![1].beløp
+    oppdrag.oppdragsperioder shouldHaveSize 2
+    oppdrag.oppdragsperioder[0].beløp shouldNotBe oppdrag.oppdragsperioder[1].beløp
 
-    oppdrag.oppdragsperioder!![0].konteringer!! shouldHaveSize 2
-    oppdrag.oppdragsperioder!![0].konteringer!![0].transaksjonskode shouldBe forventetTransaksjonskode.name
-    oppdrag.oppdragsperioder!![0].konteringer!![0].type shouldBe NY.name
-    oppdrag.oppdragsperioder!![0].konteringer!![1].transaksjonskode shouldBe forventetKorreksjonskode.name
-    oppdrag.oppdragsperioder!![0].konteringer!![1].type shouldBe ENDRING.name
-    oppdrag.oppdragsperioder!![1].konteringer!! shouldHaveSize 1
-    oppdrag.oppdragsperioder!![1].konteringer!![0].transaksjonskode shouldBe forventetTransaksjonskode.name
-    oppdrag.oppdragsperioder!![1].konteringer!![0].type shouldBe ENDRING.name
-    oppdrag.oppdragsperioder!![1].delytelseId shouldBe forventetDelytelsesId
+    oppdrag.oppdragsperioder[0].konteringer shouldHaveSize 2
+    oppdrag.oppdragsperioder[0].konteringer[0].transaksjonskode shouldBe forventetTransaksjonskode.name
+    oppdrag.oppdragsperioder[0].konteringer[0].type shouldBe NY.name
+    oppdrag.oppdragsperioder[0].konteringer[1].transaksjonskode shouldBe forventetKorreksjonskode.name
+    oppdrag.oppdragsperioder[0].konteringer[1].type shouldBe ENDRING.name
+    oppdrag.oppdragsperioder[1].konteringer shouldHaveSize 1
+    oppdrag.oppdragsperioder[1].konteringer[0].transaksjonskode shouldBe forventetTransaksjonskode.name
+    oppdrag.oppdragsperioder[1].konteringer[0].type shouldBe ENDRING.name
+    oppdrag.oppdragsperioder[1].delytelseId shouldBe forventetDelytelsesId
 
     val konteringer = hentAlleKonteringerForOppdrag(oppdrag)
     return konteringer
@@ -704,7 +704,7 @@ internal class VedtakshendelseListenerIT {
       oppdrag.sakId shouldBe vedtakHendelse.engangsbelopListe!![engangsbeløpIndex].sakId
     }
 
-    val oppdragsperiode = oppdrag.oppdragsperioder!!.first()
+    val oppdragsperiode = oppdrag.oppdragsperioder.first()
     assertSoftly {
       oppdragsperiode.oppdrag shouldBeSameInstanceAs oppdrag
       oppdragsperiode.vedtakId shouldBe vedtakHendelse.id
@@ -756,8 +756,8 @@ internal class VedtakshendelseListenerIT {
 
   private fun hentAlleKonteringerForOppdrag(oppdrag: Oppdrag): List<Kontering> {
     val konteringer = mutableListOf<Kontering>()
-    oppdrag.oppdragsperioder?.forEach { oppdragsperiode ->
-      oppdragsperiode.konteringer?.forEach { kontering ->
+    oppdrag.oppdragsperioder.forEach { oppdragsperiode ->
+      oppdragsperiode.konteringer.forEach { kontering ->
         konteringer.add(kontering)
       }
     }
@@ -767,12 +767,12 @@ internal class VedtakshendelseListenerIT {
   private fun hentAlleOppdaterteOgNyeKonteringerForOppdragVedOppdatering(oppdrag: Oppdrag): List<Kontering> {
     val konteringer = mutableListOf<Kontering>()
 
-    oppdrag.oppdragsperioder!![oppdrag.oppdragsperioder!!.size - 2].konteringer?.forEach { kontering ->
+    oppdrag.oppdragsperioder[oppdrag.oppdragsperioder.size - 2].konteringer.forEach { kontering ->
       if (Transaksjonskode.valueOf(kontering.transaksjonskode).korreksjonskode == null) {
         konteringer.add(kontering)
       }
     }
-    oppdrag.oppdragsperioder!!.last().konteringer?.forEach { kontering ->
+    oppdrag.oppdragsperioder.last().konteringer.forEach { kontering ->
       konteringer.add(kontering)
     }
     return konteringer

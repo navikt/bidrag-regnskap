@@ -116,8 +116,8 @@ class PersistenceService(
     return lagretKontering.konteringId
   }
 
-  fun hentAlleOppdragsperioderSomErAktiveForPeriode(periode: LocalDate): List<Oppdragsperiode> {
-    return oppdragsperiodeRepository.findAllByAktivTilIsNullOrAktivTilAfter(periode)
+  fun hentAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer(): List<Oppdragsperiode> {
+    return oppdragsperiodeRepository.findAllByKonteringerFullførtOpprettetIsFalseOrderByOppdragAscOppdragsperiodeIdAsc()
   }
 
   fun lagreOppdragsperiode(oppdragsperiode: Oppdragsperiode): Int {
