@@ -30,6 +30,7 @@ class OppdragsperiodeService(
         vedtaksdato = it.vedtaksdato.toString(),
         opprettetAv = it.opprettetAv,
         delytelseId = it.delytelseId.toString(),
+        referanse = it.eksternReferanse,
         aktivTil = it.aktivTil.toString(),
         konteringer = konteringService.hentKonteringer(oppdrag)
       )
@@ -49,6 +50,7 @@ class OppdragsperiodeService(
       vedtaksdato = hendelse.vedtakDato,
       opprettetAv = hendelse.opprettetAv,
       delytelseId = periode.referanse,
+      eksternReferanse = hendelse.eksternReferanse,
       oppdrag = oppdrag
     )
   }

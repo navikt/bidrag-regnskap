@@ -587,13 +587,13 @@ internal class VedtakshendelseListenerIT {
     val oppdrag = persistenceService.hentOppdrag(oppdragId) ?: error("Det finnes ingen oppdrag med angitt oppdragsId: $oppdragId")
 
     oppdrag.stønadType shouldBe stønadstype.name
-    oppdrag.eksternReferanse shouldBe vedtakHendelse.eksternReferanse
     oppdrag.oppdragsperioder.size shouldBe antallOppdragsperioder
     oppdrag.sakId shouldBe vedtakHendelse.stonadsendringListe!![stonadsendringIndex].sakId
     oppdrag.oppdragsperioder.subList(antallOppdragsperioder - antallOpprettetIGjeldendeFil, antallOppdragsperioder)
       .forEachIndexed { i: Int, oppdragsperiode: Oppdragsperiode ->
         oppdragsperiode.vedtaksdato shouldBe vedtakHendelse.vedtakTidspunkt.toLocalDate()
         oppdragsperiode.vedtakId shouldBe vedtakHendelse.id
+        oppdragsperiode.eksternReferanse shouldBe vedtakHendelse.eksternReferanse
         oppdragsperiode.opprettetAv shouldBe vedtakHendelse.opprettetAv
         oppdragsperiode.mottakerIdent shouldBe vedtakHendelse.stonadsendringListe!![stonadsendringIndex].mottakerId
         oppdragsperiode.delytelseId shouldNotBe null

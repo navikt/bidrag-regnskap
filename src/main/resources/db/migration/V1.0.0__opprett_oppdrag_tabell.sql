@@ -5,7 +5,6 @@ CREATE TABLE IF NOT EXISTS oppdrag
     sak_id              text NOT NULL,
     kravhaver_ident     text,
     skyldner_ident      text NOT NULL,
-    ekstern_referanse   text,
     utsatt_til_dato     date,
     endret_tidspunkt    timestamp,
     engangsbelop_id     integer,

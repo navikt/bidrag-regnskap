@@ -55,6 +55,9 @@ data class Oppdragsperiode(
   @Column(name = "vedtaksdato")
   val vedtaksdato: LocalDate,
 
+  @Column(name = "aktiv_til")
+  var aktivTil: LocalDate? = null,
+
   @Column(name = "opprettet_av")
   val opprettetAv: String,
 
@@ -65,8 +68,8 @@ data class Oppdragsperiode(
   @ColumnDefault("nextval('delytelsesId_seq')")
   val delytelseId: Int?,
 
-  @Column(name = "aktiv_til")
-  var aktivTil: LocalDate? = null,
+  @Column(name = "ekstern_referanse")
+  val eksternReferanse: String? = null,
 
   @OneToMany(mappedBy = "oppdragsperiode", cascade = [CascadeType.ALL])
   @OrderBy("konteringId")
@@ -89,6 +92,7 @@ data class Oppdragsperiode(
         "opprettetAv = $opprettetAv , " +
         "konteringerFullførtOpprettet = $konteringerFullførtOpprettet , " +
         "delytelseId = $delytelseId , " +
+        "eksternReferanse = $eksternReferanse , " +
         "aktivTil = $aktivTil )"
   }
 
@@ -112,6 +116,7 @@ data class Oppdragsperiode(
     if (opprettetAv != other.opprettetAv) return false
     if (konteringerFullførtOpprettet != other.konteringerFullførtOpprettet) return false
     if (delytelseId != other.delytelseId) return false
+    if (eksternReferanse != other.eksternReferanse) return false
     if (aktivTil != other.aktivTil) return false
 
     return true
@@ -132,6 +137,7 @@ data class Oppdragsperiode(
     result = 31 * result + opprettetAv.hashCode()
     result = 31 * result + konteringerFullførtOpprettet.hashCode()
     result = 31 * result + (delytelseId ?: 0)
+    result = 31 * result + (eksternReferanse?.hashCode() ?: 0)
     result = 31 * result + (aktivTil?.hashCode() ?: 0)
     return result
   }

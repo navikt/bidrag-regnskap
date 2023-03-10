@@ -91,6 +91,12 @@ data class OppdragsperiodeResponse(
   val delytelseId: String,
 
   @field:Schema(
+    description = "Referanse til gebyr.",
+    example = "ABC123"
+  )
+  val referanse: String?,
+
+  @field:Schema(
     description = "Felt for å se om oppdragsperioden er aktiv og da hvilken dato den er aktiv til.",
     format = "date",
     example = "2022-01-01"

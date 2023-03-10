@@ -12,11 +12,12 @@ CREATE TABLE IF NOT EXISTS oppdragsperioder
     valuta                         text    NOT NULL,
     periode_fra                    date    NOT NULL,
     periode_til                    date,
+    aktiv_til                      date,
     vedtaksdato                    date    NOT NULL,
     opprettet_av                   text    NOT NULL,
     konteringer_fullfort_opprettet boolean   DEFAULT false,
     delytelses_id                  integer   DEFAULT nextval('delytelsesId_seq'),
-    aktiv_til                      date,
+    ekstern_referanse              text,
     opprettet_tidspunkt            timestamp DEFAULT current_timestamp,
     CONSTRAINT delytelses_id_unique UNIQUE (delytelses_id)
 );
