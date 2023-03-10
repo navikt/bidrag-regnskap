@@ -9,10 +9,10 @@ bucket:
   navn: bidrag-regnskap-feature
 maskinporten:
   url: https://test.maskinporten.no
-  scope: nav:bidrag/v1/bidragskravq4
+elin_subscription_key: bidrag-regnskap-elin-subscription-key-dev
 env:
   SKATT_URL: https://api-preprod.nav.no/bidrag/v1/bidragskravq4
-  SKATT_SCOPE: dev-gcp.bidrag.bidrag-stubs
+  SKATT_SCOPE: dev-gcp.bidrag.bidrag-stubs #TODO() Fjerne?
   TOPIC_VEDTAK: bidrag.vedtak-feature
   BUCKET_NAME: bidrag-regnskap-feature
   SFTP_HOST: sftp-q.nav.no
@@ -20,3 +20,4 @@ env:
   SAK_SCOPE: https://dev-fss.bidrag.bidrag-sak-feature
   JAVA_OPTS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005
   MASKINPORTEN_SCOPES: "nav:bidrag/v1/bidragskravq4"
+  SUBSCRIPTION_KEY: 567300efcd244c2689ec89be254b8865
