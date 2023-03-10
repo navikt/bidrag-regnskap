@@ -26,7 +26,6 @@ class OppdragService(
       sakId = oppdrag.sakId,
       kravhaverIdent = oppdrag.kravhaverIdent,
       skyldnerIdent = oppdrag.skyldnerIdent,
-      referanse = oppdrag.eksternReferanse,
       endretTidspunkt = oppdrag.endretTidspunkt.toString(),
       engangsbelopId = oppdrag.engangsbeløpId,
       oppdragsperioder = oppdragsperiodeService.hentOppdragsperioderMedKonteringer(oppdrag)
@@ -97,7 +96,6 @@ class OppdragService(
       sakId = hendelse.sakId,
       kravhaverIdent = hendelse.kravhaverIdent,
       skyldnerIdent = hendelse.skyldnerIdent,
-      eksternReferanse = hendelse.eksternReferanse,
       utsattTilDato = hendelse.utsattTilDato,
       engangsbeløpId = hendelse.engangsbeløpId
     )
