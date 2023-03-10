@@ -41,7 +41,7 @@ spec:
     enabled: true
     scopes:
       consumes:
-        - name: "nav:bidrag/v1/bidragskrav"
+        - name: {{ maskinporten.scope }}
   ingresses:
   {{#each ingresses as |url|}}
     - {{url}}
