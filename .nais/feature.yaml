@@ -9,8 +9,9 @@ bucket:
   navn: bidrag-regnskap-feature
 maskinporten:
   url: https://ver2.maskinporten.no
+  scope: "nav:bidrag/v1/bidragskravq4"
 env:
-  SKATT_URL: https://bidrag-stubs.dev.intern.nav.no
+  SKATT_URL: https://api-preprod.nav.no/bidrag/v1/bidragskravq4
   SKATT_SCOPE: dev-gcp.bidrag.bidrag-stubs
   TOPIC_VEDTAK: bidrag.vedtak-feature
   BUCKET_NAME: bidrag-regnskap-feature

@@ -23,9 +23,9 @@ class SkattConsumer(
 ) {
 
   companion object {
-    const val KRAV_PATH = "/ekstern/skatt/api/krav"
-    const val LIVENESS_PATH = "/ekstern/skatt/api/liveness"
-    const val VEDLIKEHOLDSMODUS_PATH = "/ekstern/skatt/api/vedlikeholdsmodus"
+    const val KRAV_PATH = "/api/krav"
+    const val LIVENESS_PATH = "/api/liveness"
+    const val VEDLIKEHOLDSMODUS_PATH = "/api/vedlikeholdsmodus"
   }
 
   fun sendKrav(krav: Krav): ResponseEntity<String> {
