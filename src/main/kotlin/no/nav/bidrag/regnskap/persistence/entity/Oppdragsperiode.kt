@@ -31,6 +31,9 @@ data class Oppdragsperiode(
   @Column(name = "vedtak_id")
   val vedtakId: Int,
 
+  @Column(name = "referanse")
+  val referanse: String?,
+
   @Column(name = "vedtak_type")
   var vedtakType: String,
 
@@ -55,6 +58,9 @@ data class Oppdragsperiode(
   @Column(name = "vedtaksdato")
   val vedtaksdato: LocalDate,
 
+  @Column(name = "aktiv_til")
+  var aktivTil: LocalDate? = null,
+
   @Column(name = "opprettet_av")
   val opprettetAv: String,
 
@@ -65,8 +71,8 @@ data class Oppdragsperiode(
   @ColumnDefault("nextval('delytelsesId_seq')")
   val delytelseId: Int?,
 
-  @Column(name = "aktiv_til")
-  var aktivTil: LocalDate? = null,
+  @Column(name = "ekstern_referanse")
+  val eksternReferanse: String? = null,
 
   @OneToMany(mappedBy = "oppdragsperiode", cascade = [CascadeType.ALL])
   @OrderBy("konteringId")
@@ -78,6 +84,7 @@ data class Oppdragsperiode(
         "(oppdragsperiodeId = $oppdragsperiodeId , " +
         "oppdragId = ${oppdrag?.oppdragId} , " +
         "vedtakId = $vedtakId , " +
+        "referanse = $referanse , " +
         "vedtakType = $vedtakType , " +
         "gjelderIdent = $gjelderIdent , " +
         "mottakerIdent = $mottakerIdent , " +
@@ -89,6 +96,7 @@ data class Oppdragsperiode(
         "opprettetAv = $opprettetAv , " +
         "konteringerFullførtOpprettet = $konteringerFullførtOpprettet , " +
         "delytelseId = $delytelseId , " +
+        "eksternReferanse = $eksternReferanse , " +
         "aktivTil = $aktivTil )"
   }
 
@@ -101,6 +109,7 @@ data class Oppdragsperiode(
     if (oppdragsperiodeId != other.oppdragsperiodeId) return false
     if (oppdrag != other.oppdrag) return false
     if (vedtakId != other.vedtakId) return false
+    if (referanse != other.referanse) return false
     if (vedtakType != other.vedtakType) return false
     if (gjelderIdent != other.gjelderIdent) return false
     if (mottakerIdent != other.mottakerIdent) return false
@@ -112,6 +121,7 @@ data class Oppdragsperiode(
     if (opprettetAv != other.opprettetAv) return false
     if (konteringerFullførtOpprettet != other.konteringerFullførtOpprettet) return false
     if (delytelseId != other.delytelseId) return false
+    if (eksternReferanse != other.eksternReferanse) return false
     if (aktivTil != other.aktivTil) return false
 
     return true
@@ -121,6 +131,7 @@ data class Oppdragsperiode(
     var result = oppdragsperiodeId
     result = 31 * result + (oppdrag?.hashCode() ?: 0)
     result = 31 * result + vedtakId
+    result = 31 * result + (referanse?.hashCode() ?: 0)
     result = 31 * result + vedtakType.hashCode()
     result = 31 * result + gjelderIdent.hashCode()
     result = 31 * result + mottakerIdent.hashCode()
@@ -132,6 +143,7 @@ data class Oppdragsperiode(
     result = 31 * result + opprettetAv.hashCode()
     result = 31 * result + konteringerFullførtOpprettet.hashCode()
     result = 31 * result + (delytelseId ?: 0)
+    result = 31 * result + (eksternReferanse?.hashCode() ?: 0)
     result = 31 * result + (aktivTil?.hashCode() ?: 0)
     return result
   }

@@ -50,9 +50,9 @@ class PersistenceService(
     )
   }
 
-  fun hentOppdragPåEngangsbeløpId(engangsbeløpId: Int): Oppdrag? {
-    LOGGER.debug("Henter oppdrag på engangsbeløpId: $engangsbeløpId")
-    return oppdragRepository.findByEngangsbeløpId(engangsbeløpId)
+  fun hentOppdragPåReferanseOgOmgjørVedtakId(referanse: String, omgjørVedtakId: Int): Oppdrag? {
+    LOGGER.debug("Henter oppdrag på referanse: $referanse og omgjørVedtakId: $omgjørVedtakId")
+    return oppdragsperiodeRepository.findByReferanseAndVedtakId(referanse, omgjørVedtakId)?.oppdrag
   }
 
   fun lagreOppdrag(oppdrag: Oppdrag): Int {

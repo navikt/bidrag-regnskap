@@ -21,6 +21,7 @@ class OppdragsperiodeService(
         oppdragsperiodeId = it.oppdragsperiodeId,
         oppdragId = it.oppdrag?.oppdragId,
         vedtakId = it.vedtakId,
+        referanse = it.referanse,
         gjelderIdent = it.gjelderIdent,
         mottakerIdent = it.mottakerIdent,
         belop = it.beløp,
@@ -30,6 +31,7 @@ class OppdragsperiodeService(
         vedtaksdato = it.vedtaksdato.toString(),
         opprettetAv = it.opprettetAv,
         delytelseId = it.delytelseId.toString(),
+        eksternReferanse = it.eksternReferanse,
         aktivTil = it.aktivTil.toString(),
         konteringer = konteringService.hentKonteringer(oppdrag)
       )
@@ -39,6 +41,7 @@ class OppdragsperiodeService(
   fun opprettNyOppdragsperiode(hendelse: Hendelse, periode: Periode, oppdrag: Oppdrag): Oppdragsperiode {
     return Oppdragsperiode(
       vedtakId = hendelse.vedtakId,
+      referanse = hendelse.referanse,
       vedtakType = hendelse.vedtakType.toString(),
       gjelderIdent = sakConsumer.hentBmFraSak(hendelse.sakId),
       mottakerIdent = hendelse.mottakerIdent,
@@ -48,30 +51,10 @@ class OppdragsperiodeService(
       periodeTil = periode.periodeTilDato,
       vedtaksdato = hendelse.vedtakDato,
       opprettetAv = hendelse.opprettetAv,
-      delytelseId = periode.referanse,
+      delytelseId = periode.delytelsesId,
+      eksternReferanse = hendelse.eksternReferanse,
       oppdrag = oppdrag
     )
-  }
-
-  fun opprettNyeOppdragsperioder(
-    hendelse: Hendelse, oppdrag: Oppdrag
-  ): List<Oppdragsperiode> {
-    return hendelse.periodeListe.map {
-      Oppdragsperiode(
-        vedtakId = hendelse.vedtakId,
-        vedtakType = hendelse.vedtakType.toString(),
-        gjelderIdent = sakConsumer.hentBmFraSak(hendelse.sakId),
-        mottakerIdent = hendelse.mottakerIdent,
-        beløp = it.beløp!!,
-        valuta = it.valutakode!!,
-        periodeFra = it.periodeFomDato,
-        periodeTil = it.periodeTilDato,
-        vedtaksdato = hendelse.vedtakDato,
-        opprettetAv = hendelse.opprettetAv,
-        delytelseId = it.referanse,
-        oppdrag = oppdrag
-      )
-    }
   }
 
   fun settAktivTilDatoPåEksisterendeOppdragsperioder(oppdrag: Oppdrag, nyOppdragsperiodePeriodeFra: LocalDate) {

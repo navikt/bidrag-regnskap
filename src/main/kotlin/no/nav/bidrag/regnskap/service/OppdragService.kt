@@ -26,9 +26,7 @@ class OppdragService(
       sakId = oppdrag.sakId,
       kravhaverIdent = oppdrag.kravhaverIdent,
       skyldnerIdent = oppdrag.skyldnerIdent,
-      referanse = oppdrag.eksternReferanse,
       endretTidspunkt = oppdrag.endretTidspunkt.toString(),
-      engangsbelopId = oppdrag.engangsbeløpId,
       oppdragsperioder = oppdragsperiodeService.hentOppdragsperioderMedKonteringer(oppdrag)
     )
   }
@@ -44,10 +42,6 @@ class OppdragService(
     val erOppdatering = hentetOppdrag != null
     val oppdrag = hentetOppdrag ?: opprettOppdrag(hendelse)
     val sisteOverførtePeriode = persistenceService.finnSisteOverførtePeriode()
-
-    if (hendelse.endretEngangsbeløpId != null) {
-      oppdrag.engangsbeløpId = hendelse.engangsbeløpId
-    }
 
     hendelse.periodeListe.forEach { periode ->
       if (periode.beløp != null) {
@@ -77,9 +71,9 @@ class OppdragService(
   }
 
   private fun hentOppdrag(hendelse: Hendelse): Oppdrag? {
-    if (hendelse.endretEngangsbeløpId != null) {
-      return persistenceService.hentOppdragPåEngangsbeløpId(hendelse.endretEngangsbeløpId)
-    } else if (hendelse.engangsbeløpId == null) {
+    if (hendelse.referanse != null && hendelse.omgjørVedtakId != null) {
+      return persistenceService.hentOppdragPåReferanseOgOmgjørVedtakId(hendelse.referanse, hendelse.omgjørVedtakId)
+    } else if (hendelse.referanse == null) {
       return persistenceService.hentOppdragPaUnikeIdentifikatorer(
         hendelse.type,
         hendelse.kravhaverIdent,
@@ -97,9 +91,8 @@ class OppdragService(
       sakId = hendelse.sakId,
       kravhaverIdent = hendelse.kravhaverIdent,
       skyldnerIdent = hendelse.skyldnerIdent,
-      eksternReferanse = hendelse.eksternReferanse,
       utsattTilDato = hendelse.utsattTilDato,
-      engangsbeløpId = hendelse.engangsbeløpId
+      //TODO(Sette omgjortVedtakId og referanse
     )
   }
 

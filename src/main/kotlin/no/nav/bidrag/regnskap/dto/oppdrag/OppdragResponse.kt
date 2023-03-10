@@ -42,23 +42,11 @@ data class OppdragResponse(
   val skyldnerIdent: String,
 
   @field:Schema(
-    description = "Referanse til gebyr.",
-    example = "ABC123"
-  )
-  val referanse: String?,
-
-  @field:Schema(
     description = "Sist endret tidspunkt for oppdraget.",
     format = "date-time",
     example = "2022-02-01:00:00:00",
   )
   val endretTidspunkt: String?,
-
-  @field:Schema(
-    description = "Referanse til IDen til engangsbeløp. Vil ikke eksistere for stønader.",
-    example = "123",
-  )
-  val engangsbelopId: Int?,
 
   @field:Schema(
     description = "Liste over alle oppdragsperioder til oppdraget."

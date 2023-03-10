@@ -10,8 +10,6 @@
   ],
   "engangsbelopListe": [
     {
-      "id": "21",
-      "endrerId": "20",
       "type": "SAERTILSKUDD",
       "sakId": "2200400",
       "skyldnerId": "",
@@ -19,6 +17,8 @@
       "mottakerId": "",
       "belop": "15010.40",
       "valutakode": "NOK",
+      "referanse": "SARTILSKUDD_REFERANSE",
+      "omgjorVedtakId": "800",
       "resultatkode": "GIGI",
       "innkreving": "JA",
       "endring": true

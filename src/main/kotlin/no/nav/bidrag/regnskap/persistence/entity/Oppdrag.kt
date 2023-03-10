@@ -32,18 +32,12 @@ data class Oppdrag(
   @Column(name = "skyldner_ident")
   val skyldnerIdent: String,
 
-  @Column(name = "ekstern_referanse")
-  val eksternReferanse: String? = null,
-
   @Column(name = "utsatt_til_dato")
   var utsattTilDato: LocalDate? = null,
 
   @Column(name = "endret_tidspunkt")
   @Version
   var endretTidspunkt: LocalDateTime? = null,
-
-  @Column(name = "engangsbelop_id")
-  var engangsbeløpId: Int? = null,
 
   @OneToMany(mappedBy = "oppdrag", cascade = [CascadeType.ALL])
   @OrderBy("oppdragsperiodeId")
@@ -57,10 +51,8 @@ data class Oppdrag(
         "sakId = $sakId , " +
         "kravhaverIdent = $kravhaverIdent , " +
         "skyldnerIdent = $skyldnerIdent , " +
-        "eksternReferanse = $eksternReferanse , " +
         "utsattTilDato = $utsattTilDato , " +
-        "endretTidspunkt = $endretTidspunkt , " +
-        "engangsbeløpId = $engangsbeløpId )"
+        "endretTidspunkt = $endretTidspunkt )"
   }
 
   override fun equals(other: Any?): Boolean {
@@ -74,10 +66,8 @@ data class Oppdrag(
     if (sakId != other.sakId) return false
     if (kravhaverIdent != other.kravhaverIdent) return false
     if (skyldnerIdent != other.skyldnerIdent) return false
-    if (eksternReferanse != other.eksternReferanse) return false
     if (utsattTilDato != other.utsattTilDato) return false
     if (endretTidspunkt != other.endretTidspunkt) return false
-    if (engangsbeløpId != other.engangsbeløpId) return false
 
     return true
   }
@@ -88,10 +78,8 @@ data class Oppdrag(
     result = 31 * result + sakId.hashCode()
     result = 31 * result + (kravhaverIdent?.hashCode() ?: 0)
     result = 31 * result + skyldnerIdent.hashCode()
-    result = 31 * result + (eksternReferanse?.hashCode() ?: 0)
     result = 31 * result + (utsattTilDato?.hashCode() ?: 0)
     result = 31 * result + (endretTidspunkt?.hashCode() ?: 0)
-    result = 31 * result + (engangsbeløpId ?: 0)
     return result
   }
 

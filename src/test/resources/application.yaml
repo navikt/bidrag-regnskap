@@ -1,4 +1,4 @@
-SKATT_URL: https://bidrag-stubs.dev.intern.nav.no
+SKATT_URL: https://bidrag-stubs.dev.intern.nav.no/ekstern/skatt
 SKATT_SCOPE: dev-gcp.bidrag.bidrag-stubs
 SAK_URL: https://bidrag-sak-feature.dev-fss-pub.nais.io
 SAK_SCOPE: dev-fss.bidrag.bidrag-sak-feature
@@ -11,6 +11,7 @@ TOPIC_VEDTAK: bidrag.vedtak-feature
 KAFKA_BOOTSTRAP_SERVERS: localhost:9092
 KAFKA_BROKERS: localhost:9092
 BUCKET_NAME: bidrag-regnskap-dev
+ELIN_SUBSCRIPTION_KEY: ingenSubKeyLokaltKunForApiPortalen
 
 springdoc:
   packages-to-scan: no.nav.bidrag.regnskap.controller

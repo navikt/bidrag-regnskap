@@ -42,6 +42,8 @@ spec:
     scopes:
       consumes:
         - name: "nav:bidrag/v1/bidragskrav"
+        - name: "nav:bidrag/v1/bidragskravq2"
+        - name: "nav:bidrag/v1/bidragskravq4"
   ingresses:
   {{#each ingresses as |url|}}
     - {{url}}
@@ -50,6 +52,7 @@ spec:
     pool: {{ kafka.pool }}
   envFrom:
     - secret: bidrag-regnskap-sftp-private-key
+    - secret: {{ elin_subscription_key }}
   env:
   {{#each env}}
     - name: {{@key}}

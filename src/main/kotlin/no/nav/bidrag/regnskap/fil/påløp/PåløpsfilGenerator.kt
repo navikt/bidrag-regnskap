@@ -182,7 +182,7 @@ class PåløpsfilGenerator(
     konteringBr10Element.appendChild(attestantId)
 
     val tekst = dokument.createElement("tekst")
-    tekst.textContent = kontering.oppdragsperiode?.oppdrag?.eksternReferanse
+    tekst.textContent = kontering.oppdragsperiode?.eksternReferanse
     konteringBr10Element.appendChild(tekst)
 
     val refFagsystemId = dokument.createElement("refFagsystemId")

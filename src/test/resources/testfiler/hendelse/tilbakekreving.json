@@ -1,17 +1,15 @@
 {
   "kilde": "MANUELT",
+  "id": 1337,
   "type": "FASTSETTELSE",
   "opprettetAv": "D101753",
   "vedtakTidspunkt": "2021-02-15T00:00:00.000000000",
   "enhetId": "4849",
-  "eksternReferanse": null,
   "utsattTilDato": null,
   "opprettetTidspunkt": "2022-02-15T12:00:00.254988482",
   "stonadsendringListe": [],
   "engangsbelopListe": [
     {
-      "id": "30",
-      "endrerId": null,
       "type": "TILBAKEKREVING",
       "sakId": "1313296",
       "skyldnerId": "",
@@ -20,7 +18,8 @@
       "belop": 3315.00,
       "valutakode": "NOK",
       "resultatkode": "TB",
-      "referanse": "26398673",
+      "referanse": "TILBAKEKREVING_REFERANSE",
+      "delytelseId": "26398673",
       "innkreving": "JA",
       "endring": true
     }

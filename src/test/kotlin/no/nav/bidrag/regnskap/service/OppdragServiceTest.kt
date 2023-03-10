@@ -6,7 +6,6 @@ import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.verify
-import no.nav.bidrag.behandling.felles.enums.EngangsbelopType
 import no.nav.bidrag.behandling.felles.enums.StonadType
 import no.nav.bidrag.commons.util.PersonidentGenerator
 import no.nav.bidrag.regnskap.utils.TestData
@@ -64,18 +63,7 @@ class OppdragServiceTest {
     fun `skal opprette oppdrag`() {
       val hendelse = TestData.opprettHendelse()
 
-      every { oppdragsperiodeService.opprettNyeOppdragsperioder(any(), any()) } returns listOf(TestData.opprettOppdragsperiode())
-
-      val oppdragId = oppdragService.lagreEllerOppdaterOppdrag(null, hendelse)
-
-      oppdragId shouldBe 0
-    }
-
-    @Test
-    fun `skal opprette oppdrag med engangsbeløpId satt`() {
-      val hendelse = TestData.opprettHendelse(engangsbelopId = 123, type = EngangsbelopType.GEBYR_MOTTAKER.name)
-
-      every { oppdragsperiodeService.opprettNyeOppdragsperioder(any(), any()) } returns listOf(TestData.opprettOppdragsperiode())
+      every { oppdragsperiodeService.opprettNyOppdragsperiode(any(), any(), any()) } returns TestData.opprettOppdragsperiode()
 
       val oppdragId = oppdragService.lagreEllerOppdaterOppdrag(null, hendelse)
 
@@ -92,7 +80,7 @@ class OppdragServiceTest {
       val hendelse = TestData.opprettHendelse()
       val oppdrag = TestData.opprettOppdrag()
 
-      every { oppdragsperiodeService.opprettNyeOppdragsperioder(any(), any()) } returns listOf(TestData.opprettOppdragsperiode())
+      every { oppdragsperiodeService.opprettNyOppdragsperiode(any(), any(), any()) } returns TestData.opprettOppdragsperiode()
 
       oppdragService.lagreEllerOppdaterOppdrag(oppdrag, hendelse)
 

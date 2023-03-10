@@ -5,7 +5,6 @@
   "opprettetAv": "B138788",
   "vedtakTidspunkt": "2022-01-02T00:00:00.000000000",
   "enhetId": "4849",
-  "eksternReferanse": null,
   "utsattTilDato": null,
   "opprettetTidspunkt": "2022-01-02T16:00:23.254988482",
   "stonadsendringListe": [
@@ -25,7 +24,7 @@
           "belop": 4820.00,
           "valutakode": "NOK",
           "resultatkode": "KBB",
-          "referanse": "26683715"
+          "delytelseId": "26683715"
         },
         {
           "fomDato": "2022-03-01",
@@ -33,7 +32,7 @@
           "belop": 5510.00,
           "valutakode": "NOK",
           "resultatkode": "KBB",
-          "referanse": "26683717"
+          "delytelseId": "26683717"
         }
       ]
     },
@@ -53,7 +52,7 @@
           "belop": 4820.00,
           "valutakode": "NOK",
           "resultatkode": "KBB",
-          "referanse": "26683716"
+          "delytelseId": "26683716"
         },
         {
           "fomDato": "2022-03-01",
@@ -61,14 +60,13 @@
           "belop": 4940.00,
           "valutakode": "NOK",
           "resultatkode": "KBB",
-          "referanse": "26683718"
+          "delytelseId": "26683718"
         }
       ]
     }
   ],
   "engangsbelopListe": [
     {
-      "id": "100",
       "type": "GEBYR_SKYLDNER",
       "sakId": "2203234",
       "skyldnerId": "BP",
@@ -77,12 +75,12 @@
       "belop": 1223.00,
       "valutakode": "NOK",
       "resultatkode": "GIGI",
-      "referanse": "26683719",
+      "referanse": "BARNEBIDRAG-REFERANSE1",
+      "delytelseId": "26683719",
       "innkreving": "JA",
       "endring": true
     },
     {
-      "id": "101",
       "type": "GEBYR_MOTTAKER",
       "sakId": "2203234",
       "skyldnerId": "BM",
@@ -91,7 +89,8 @@
       "belop": 1223.00,
       "valutakode": "NOK",
       "resultatkode": "GIGI",
-      "referanse": "26683720",
+      "referanse": "BARNEBIDRAG-REFERANSE2",
+      "delytelseId": "26683720",
       "innkreving": "JA",
       "endring": true
     }

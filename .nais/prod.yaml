@@ -9,11 +9,13 @@ bucket:
   navn: bidrag-regnskap-prod
 maskinporten:
   url: https://maskinporten.no
+elin_subscription_key: bidrag-regnskap-elin-subscription-key-prod #TODO() Opprette key for prod
 env:
-  SKATT_URL: https://bidrag-stubs.dev.intern.nav.no
+  SKATT_URL: https://bidrag-stubs.dev.intern.nav.no #TODO()
   SKATT_SCOPE: dev-gcp.bidrag.bidrag-stubs
   TOPIC_VEDTAK: bidrag.vedtak
   BUCKET_NAME: bidrag-regnskap-prod
   SFTP_HOST: sftp.nav.no
   SAK_URL: https://bidrag-sak.prod-fss-pub.nais.io
   SAK_SCOPE: https://prod-fss.bidrag.bidrag-sak
+  MASKINPORTEN_SCOPES: "nav:bidrag/v1/bidragskrav"

@@ -8,9 +8,10 @@ database:
 bucket:
   navn: bidrag-regnskap
 maskinporten:
-  url: https://ver2.maskinporten.no
+  url: https://test.maskinporten.no
+elin_subscription_key: bidrag-regnskap-elin-subscription-key-dev
 env:
-  SKATT_URL: https://bidrag-stubs.dev.intern.nav.no
+  SKATT_URL: https://api-preprod.nav.no/bidrag/v1/bidragskrav
   SKATT_SCOPE: dev-gcp.bidrag.bidrag-stubs
   TOPIC_VEDTAK: bidrag.vedtak
   BUCKET_NAME: bidrag-regnskap
@@ -18,3 +19,4 @@ env:
   SAK_URL: https://bidrag-sak.dev-fss-pub.nais.io
   SAK_SCOPE: https://dev-fss.bidrag.bidrag-sak
   JAVA_OPTS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005
+  MASKINPORTEN_SCOPES: "nav:bidrag/v1/bidragskrav"

@@ -10,7 +10,6 @@
   ],
   "engangsbelopListe": [
     {
-      "id": "11",
       "type": "GEBYR_SKYLDNER",
       "sakId": "2200381",
       "skyldnerId": "",
@@ -19,7 +18,8 @@
       "belop": "1700",
       "valutakode": "NOK",
       "resultatkode": "GIGI",
-      "referanse": "12345",
+      "referanse": "GEBYR_SKYLDNER_REFERANSE",
+      "delytelseId": "12345",
       "innkreving": "JA",
       "endring": true
     }

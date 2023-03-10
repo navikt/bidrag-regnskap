@@ -8,5 +8,5 @@ data class Periode(
   val valutakode: String?,
   val periodeFomDato: LocalDate,
   val periodeTilDato: LocalDate?,
-  val referanse: Int?
+  val delytelsesId: Int?
   )

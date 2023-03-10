@@ -5,13 +5,10 @@ CREATE TABLE IF NOT EXISTS oppdrag
     sak_id              text NOT NULL,
     kravhaver_ident     text,
     skyldner_ident      text NOT NULL,
-    ekstern_referanse   text,
     utsatt_til_dato     date,
     endret_tidspunkt    timestamp,
-    engangsbelop_id     integer,
     opprettet_tidspunkt timestamp DEFAULT current_timestamp
 );
 
 CREATE INDEX endret_tidspunkt_index ON oppdrag (endret_tidspunkt);
-CREATE INDEX oppdrag_engangsbelop_id_index ON oppdrag (engangsbelop_id);
 CREATE INDEX unike_identifikatorer_index ON oppdrag (stonad_type, kravhaver_ident, skyldner_ident, sak_id);
