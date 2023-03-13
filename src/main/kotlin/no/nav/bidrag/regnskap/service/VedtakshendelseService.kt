@@ -66,8 +66,9 @@ class VedtakshendelseService(
         vedtakId = vedtakHendelse.id,
         vedtakDato = vedtakHendelse.vedtakTidspunkt.toLocalDate(),
         opprettetAv = vedtakHendelse.opprettetAv,
-        eksternReferanse = vedtakHendelse.eksternReferanse,
+        eksternReferanse = stonadsendring.eksternReferanse,
         utsattTilDato = vedtakHendelse.utsattTilDato,
+        omgjørVedtakId = stonadsendring.omgjorVedtakId,
         periodeListe = mapPeriodelisteTilDomene(stonadsendring.periodeListe)
       )
       val oppdragId = oppdragService.lagreHendelse(hendelse)
@@ -89,7 +90,7 @@ class VedtakshendelseService(
           valutakode = periode.valutakode,
           periodeFomDato = periode.fomDato,
           periodeTilDato = periode.tilDato,
-          referanse = periode.referanse?.let { Integer.valueOf(it) }
+          delytelsesId = periode.delytelseId?.let { Integer.valueOf(it) }
         )
       )
     }
@@ -101,8 +102,6 @@ class VedtakshendelseService(
 
     if(erInnkrevingOgEndring(engangsbelop.innkreving, engangsbelop.endring)) {
       val hendelse = Hendelse(
-        engangsbeløpId = engangsbelop.id,
-        endretEngangsbeløpId = engangsbelop.endrerId,
         type = engangsbelop.type.name,
         vedtakType = vedtakHendelse.type,
         kravhaverIdent = leggTilIdent(engangsbelop.kravhaverId),
@@ -112,15 +111,17 @@ class VedtakshendelseService(
         vedtakId = vedtakHendelse.id,
         vedtakDato = vedtakHendelse.vedtakTidspunkt.toLocalDate(),
         opprettetAv = vedtakHendelse.opprettetAv,
-        eksternReferanse = vedtakHendelse.eksternReferanse,
+        eksternReferanse = engangsbelop.eksternReferanse,
         utsattTilDato = vedtakHendelse.utsattTilDato,
+        referanse = engangsbelop.referanse,
+        omgjørVedtakId = engangsbelop.omgjorVedtakId,
         periodeListe = listOf(
           Periode(
             periodeFomDato = vedtakHendelse.vedtakTidspunkt.toLocalDate().withDayOfMonth(1),
             periodeTilDato = vedtakHendelse.vedtakTidspunkt.toLocalDate().withDayOfMonth(1).plusMonths(1),
             beløp = engangsbelop.belop,
             valutakode = engangsbelop.valutakode,
-            referanse = engangsbelop.referanse?.let { Integer.valueOf(it) }
+            delytelsesId = engangsbelop.delytelseId?.let { Integer.valueOf(it) }
           )
         )
       )

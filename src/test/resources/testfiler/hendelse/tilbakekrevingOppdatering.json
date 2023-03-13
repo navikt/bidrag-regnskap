@@ -4,14 +4,11 @@
   "opprettetAv": "D101753",
   "vedtakTidspunkt": "2021-02-16T00:00:00.000000000",
   "enhetId": "4849",
-  "eksternReferanse": null,
   "utsattTilDato": null,
   "opprettetTidspunkt": "2022-02-16T12:00:00.254988482",
   "stonadsendringListe": [],
   "engangsbelopListe": [
     {
-      "id": "31",
-      "endrerId": "30",
       "type": "TILBAKEKREVING",
       "sakId": "1313296",
       "skyldnerId": "",
@@ -21,6 +18,8 @@
       "valutakode": "NOK",
       "resultatkode": "TB",
       "innkreving": "JA",
+      "referanse": "TILBAKEKREVING_REFERANSE",
+      "omgjorVedtakId": "1337",
       "endring": true
     }
   ],

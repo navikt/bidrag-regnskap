@@ -4,7 +4,6 @@
   "opprettetAv": "L105567",
   "vedtakTidspunkt": "2022-06-27T00:00:00.000000000",
   "enhetId": "4820",
-  "eksternReferanse": null,
   "utsattTilDato": null,
   "opprettetTidspunkt": "2022-06-27T16:00:23.254988482",
   "stonadsendringListe": [
@@ -24,7 +23,7 @@
           "belop": 6330.00,
           "valutakode": "NOK",
           "resultatkode": "KBB",
-          "referanse": "26679759"
+          "delytelseId": "26679759"
         },
         {
           "fomDato": "2022-03-01",
@@ -32,7 +31,7 @@
           "belop": 6340.00,
           "valutakode": "NOK",
           "resultatkode": "KBB",
-          "referanse": "26679760"
+          "delytelseId": "26679760"
         },
         {
           "fomDato": "2022-04-01",
@@ -40,7 +39,7 @@
           "belop": 6440.00,
           "valutakode": "NOK",
           "resultatkode": "KBB",
-          "referanse": "26679761"
+          "delytelseId": "26679761"
         }
       ]
     }

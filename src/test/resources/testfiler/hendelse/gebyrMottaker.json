@@ -10,7 +10,6 @@
   ],
   "engangsbelopListe": [
     {
-      "id": "13",
       "type": "GEBYR_MOTTAKER",
       "sakId": "2200382",
       "skyldnerId": "",
@@ -18,8 +17,9 @@
       "mottakerId": "NAV",
       "belop": "1700",
       "valutakode": "NOK",
+      "referanse": "GEBYR_MOTTAKER_REFERANSE",
       "resultatkode": "GIGI",
-      "referanse": "123456",
+      "delytelseId": "123456",
       "innkreving": "JA",
       "endring": true
     }

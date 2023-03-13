@@ -101,21 +101,26 @@ internal class PersistenceServiceIT {
   }
 
   @Test
-  fun `skal hente oppdrag på engangsbeløpId`() {
-    val engangsbeløpId = 1234
-    val oppdragId =
-      persistenceService.lagreOppdrag(TestData.opprettOppdrag(engangsbeløpId = engangsbeløpId, oppdragsperioder = emptyList()))
+  fun `skal hente oppdrag på referanse og vedtakId`() {
+    val referanse = "ReferanseSomFinnes"
 
-    oppdragId shouldNotBe null
+    val nyttOppdrag = TestData.opprettOppdrag()
+    val oppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = nyttOppdrag, referanse = referanse, vedtakId = 123)
+    nyttOppdrag.oppdragsperioder = listOf(oppdragsperiode)
+    val oppdragsperiodeId = persistenceService.lagreOppdragsperiode(oppdragsperiode)
+    persistenceService.lagreOppdrag(nyttOppdrag)
 
-    val oppdrag = persistenceService.hentOppdragPåEngangsbeløpId(engangsbeløpId)
 
-    oppdrag?.engangsbeløpId shouldBe engangsbeløpId
+    oppdragsperiodeId shouldNotBe null
+
+    val oppdrag = persistenceService.hentOppdragPåReferanseOgOmgjørVedtakId(referanse, 123)
+
+    oppdrag?.oppdragsperioder?.first()?.referanse shouldBe referanse
   }
 
   @Test
-  fun `skal returne null ved ingen treff på engangsbeløpId`() {
-    val oppdrag = persistenceService.hentOppdragPåEngangsbeløpId(12346)
+  fun `skal returne null ved ingen treff på referanse og vedtakId`() {
+    val oppdrag = persistenceService.hentOppdragPåReferanseOgOmgjørVedtakId("ReferanseSomIkkeFinnes", 123)
     oppdrag shouldBe null
   }
 

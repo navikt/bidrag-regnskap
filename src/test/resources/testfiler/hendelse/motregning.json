@@ -4,7 +4,6 @@
   "opprettetAv": "E158931",
   "vedtakTidspunkt": "2021-06-30T00:00:00.000000000",
   "enhetId": "9401",
-  "eksternReferanse": null,
   "utsattTilDato": null,
   "opprettetTidspunkt": "2021-06-30T16:00:23.254988482",
   "stonadsendringListe": [
@@ -24,7 +23,7 @@
           "belop": 815.00,
           "valutakode": "NOK",
           "resultatkode": "IV",
-          "referanse": "26681362"
+          "delytelseId": "26681362"
         }
       ]
     }

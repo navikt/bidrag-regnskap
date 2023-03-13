@@ -150,7 +150,7 @@ internal class VedtakshendelseListenerIT {
     val vedtakHendelse = hentFilOgSendPåKafka("gebyrSkyldner.json", 1)
 
     val kontering = assertVedOpprettelseAvEngangsbeløp(
-      1, vedtakHendelse, GEBYR_SKYLDNER, G1, Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].referanse), FABP
+      1, vedtakHendelse, GEBYR_SKYLDNER, G1, Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].delytelseId), FABP
     )
 
     skrivTilTestdatafil(listOf(kontering), "Gebyr for skyldner")
@@ -178,7 +178,7 @@ internal class VedtakshendelseListenerIT {
     val vedtakHendelse = hentFilOgSendPåKafka("gebyrMottaker.json", 4)
 
     val kontering = assertVedOpprettelseAvEngangsbeløp(
-      2, vedtakHendelse, GEBYR_MOTTAKER, G1, Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].referanse), FABM
+      2, vedtakHendelse, GEBYR_MOTTAKER, G1, Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].delytelseId), FABM
     )
 
     skrivTilTestdatafil(listOf(kontering), "Gebyr for mottaker")
@@ -234,7 +234,7 @@ internal class VedtakshendelseListenerIT {
     val vedtakHendelse = hentFilOgSendPåKafka("tilbakekreving.json", 10)
 
     val kontering = assertVedOpprettelseAvEngangsbeløp(
-      4, vedtakHendelse, TILBAKEKREVING, H1, Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].referanse), Søknadstype.EN
+      4, vedtakHendelse, TILBAKEKREVING, H1, Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].delytelseId), Søknadstype.EN
     )
 
     skrivTilTestdatafil(listOf(kontering), "Tilbakekreving")
@@ -263,7 +263,7 @@ internal class VedtakshendelseListenerIT {
     val vedtakHendelse = hentFilOgSendPåKafka("ettergivelse.json", 14)
 
     val kontering = assertVedOpprettelseAvEngangsbeløp(
-      5, vedtakHendelse, ETTERGIVELSE, K1, Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].referanse), Søknadstype.EN
+      5, vedtakHendelse, ETTERGIVELSE, K1, Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].delytelseId), Søknadstype.EN
     )
 
     skrivTilTestdatafil(listOf(kontering), "Ettergivelse")
@@ -275,7 +275,7 @@ internal class VedtakshendelseListenerIT {
     val vedtakHendelse = hentFilOgSendPåKafka("direkteOppgjor.json", 15)
 
     val kontering = assertVedOpprettelseAvEngangsbeløp(
-      7, vedtakHendelse, DIREKTE_OPPGJOR, K2, Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].referanse), Søknadstype.EN
+      7, vedtakHendelse, DIREKTE_OPPGJOR, K2, Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].delytelseId), Søknadstype.EN
     )
 
     skrivTilTestdatafil(listOf(kontering), "Direkte oppgjør")
@@ -291,7 +291,7 @@ internal class VedtakshendelseListenerIT {
       vedtakHendelse,
       ETTERGIVELSE_TILBAKEKREVING,
       K3,
-      Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].referanse),
+      Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].delytelseId),
       Søknadstype.EN
     )
 
@@ -360,7 +360,7 @@ internal class VedtakshendelseListenerIT {
     )
 
     val gebyrBp = assertVedOpprettelseAvEngangsbeløp(
-      12, vedtakHendelse, GEBYR_SKYLDNER, G1, Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].referanse), FABP
+      12, vedtakHendelse, GEBYR_SKYLDNER, G1, Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].delytelseId), FABP
     )
 
     val gebyrBm = assertVedOpprettelseAvEngangsbeløp(
@@ -368,7 +368,7 @@ internal class VedtakshendelseListenerIT {
       vedtakHendelse,
       GEBYR_MOTTAKER,
       G1,
-      Integer.valueOf(vedtakHendelse.engangsbelopListe!![1].referanse),
+      Integer.valueOf(vedtakHendelse.engangsbelopListe!![1].delytelseId),
       FABM,
       engangsbeløpIndex = 1
     )
@@ -593,7 +593,7 @@ internal class VedtakshendelseListenerIT {
       .forEachIndexed { i: Int, oppdragsperiode: Oppdragsperiode ->
         oppdragsperiode.vedtaksdato shouldBe vedtakHendelse.vedtakTidspunkt.toLocalDate()
         oppdragsperiode.vedtakId shouldBe vedtakHendelse.id
-        oppdragsperiode.eksternReferanse shouldBe vedtakHendelse.eksternReferanse
+        oppdragsperiode.eksternReferanse shouldBe vedtakHendelse.stonadsendringListe!![stonadsendringIndex].eksternReferanse
         oppdragsperiode.opprettetAv shouldBe vedtakHendelse.opprettetAv
         oppdragsperiode.mottakerIdent shouldBe vedtakHendelse.stonadsendringListe!![stonadsendringIndex].mottakerId
         oppdragsperiode.delytelseId shouldNotBe null
@@ -690,13 +690,13 @@ internal class VedtakshendelseListenerIT {
   ): Kontering {
     val oppdrag = persistenceService.hentOppdrag(oppdragId) ?: error("Det finnes ingen oppdrag med angitt oppdragsId: $oppdragId")
     assertSoftly {
-      oppdrag.engangsbeløpId shouldBe vedtakHendelse.engangsbelopListe!![engangsbeløpIndex].id
       oppdrag.stønadType shouldBe forventetEngangsbeløpType.name
       oppdrag.sakId shouldBe vedtakHendelse.engangsbelopListe!![engangsbeløpIndex].sakId
     }
 
     val oppdragsperiode = oppdrag.oppdragsperioder.first()
     assertSoftly {
+      oppdragsperiode.referanse shouldBe vedtakHendelse.engangsbelopListe!![engangsbeløpIndex].referanse
       oppdragsperiode.oppdrag shouldBeSameInstanceAs oppdrag
       oppdragsperiode.vedtakId shouldBe vedtakHendelse.id
       oppdragsperiode.beløp shouldBe vedtakHendelse.engangsbelopListe!![engangsbeløpIndex].belop

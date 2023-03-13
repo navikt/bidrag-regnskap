@@ -11,6 +11,4 @@ interface OppdragRepository : JpaRepository<Oppdrag, Int> {
     sakId: String
   ): Oppdrag?
 
-  fun findByEngangsbeløpId(engangsbeløpId: Int): Oppdrag?
-
 }

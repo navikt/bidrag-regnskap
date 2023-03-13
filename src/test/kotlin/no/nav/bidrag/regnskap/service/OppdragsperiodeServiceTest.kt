@@ -7,6 +7,7 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import no.nav.bidrag.regnskap.consumer.SakConsumer
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
+import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
 import no.nav.bidrag.regnskap.utils.TestData
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -58,7 +59,17 @@ class OppdragsperiodeServiceTest {
       val oppdrag = TestData.opprettOppdrag()
 
 
-      val nyeOppdragsperioder = oppdragsperiodeService.opprettNyeOppdragsperioder(hendelse, oppdrag)
+      val nyeOppdragsperioder = mutableListOf<Oppdragsperiode>()
+
+      hendelse.periodeListe.forEach { periode ->
+        nyeOppdragsperioder.add(
+          oppdragsperiodeService.opprettNyOppdragsperiode(
+            hendelse,
+            periode,
+            oppdrag
+          )
+        )
+      }
 
       nyeOppdragsperioder[0].mottakerIdent shouldBe hendelse.mottakerIdent
       nyeOppdragsperioder[0].beløp shouldBe hendelse.periodeListe[0].beløp
