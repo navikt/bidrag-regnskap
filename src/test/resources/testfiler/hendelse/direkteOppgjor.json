@@ -4,13 +4,11 @@
   "opprettetAv": "O163248",
   "vedtakTidspunkt": "2022-02-28T00:00:00.000000000",
   "enhetId": "4817",
-  "eksternReferanse": null,
   "utsattTilDato": null,
   "opprettetTidspunkt": "2022-02-28T16:00:23.254988482",
   "stonadsendringListe": [],
   "engangsbelopListe": [
     {
-      "id": "42",
       "type": "DIREKTE_OPPGJOR",
       "sakId": "0809546",
       "skyldnerId": "",
@@ -19,7 +17,8 @@
       "belop": 7999.00,
       "valutakode": "NOK",
       "resultatkode": "HE",
-      "referanse": "26681272",
+      "referanse": "DIREKTE_OPPGOR_REFERANSE",
+      "delytelseId": "26681272",
       "innkreving": "JA",
       "endring": true
     }

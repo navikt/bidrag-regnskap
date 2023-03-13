@@ -4,7 +4,6 @@
   "opprettetAv": "J141208",
   "vedtakTidspunkt": "2022-05-01T00:00:00.000000000",
   "enhetId": "4833",
-  "eksternReferanse": null,
   "utsattTilDato": null,
   "opprettetTidspunkt": "2022-05-01T16:00:23.254988482",
   "stonadsendringListe": [
@@ -24,7 +23,7 @@
           "belop": 5000.00,
           "valutakode": "NOK",
           "resultatkode": "IV",
-          "referanse": "26683039"
+          "delytelseId": "26683039"
         }
       ]
     },
@@ -44,7 +43,7 @@
           "belop": 5000.00,
           "valutakode": "NOK",
           "resultatkode": "IV",
-          "referanse": "26683038"
+          "delytelseId": "26683038"
         }
       ]
     }

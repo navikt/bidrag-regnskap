@@ -158,7 +158,6 @@ class VedtakshendelseServiceTest {
         ,
         "engangsbelopListe":[
           {
-            "id":"1",
             "type":"GEBYR_SKYLDNER",
             "sakId":"789",
             "skyldnerId":"11111111111",
@@ -168,6 +167,7 @@ class VedtakshendelseServiceTest {
             "valutakode":"NOK",
             "resultatkode":"GIGI",
             "innkreving":"JA",
+            "referanse":"REFERANSE",
             "endring":true
           }
         ],

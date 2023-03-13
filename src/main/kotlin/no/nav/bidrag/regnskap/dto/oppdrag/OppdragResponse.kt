@@ -49,12 +49,6 @@ data class OppdragResponse(
   val endretTidspunkt: String?,
 
   @field:Schema(
-    description = "Referanse til IDen til engangsbeløp. Vil ikke eksistere for stønader.",
-    example = "123",
-  )
-  val engangsbelopId: Int?,
-
-  @field:Schema(
     description = "Liste over alle oppdragsperioder til oppdraget."
   )
   val oppdragsperioder: List<OppdragsperiodeResponse>

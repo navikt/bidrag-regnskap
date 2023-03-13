@@ -30,6 +30,12 @@ data class OppdragsperiodeResponse(
   val vedtakId: Int,
 
   @field:Schema(
+    description = "Referanse for vedtaket oppdraget gjelder for.",
+    example = "SøknadsidVedtakA-Rolleid"
+  )
+  val referanse: String?,
+
+  @field:Schema(
     description = "Personident (FNR/DNR) til bidragsmottaker i bidragssaken. " +
         "I saker der bidragsmottaker ikke er satt benyttes et dummynr 22222222226",
     example = "12345678910"
@@ -91,10 +97,10 @@ data class OppdragsperiodeResponse(
   val delytelseId: String,
 
   @field:Schema(
-    description = "Referanse til gebyr.",
+    description = "Ekstern referanse til gebyr.",
     example = "ABC123"
   )
-  val referanse: String?,
+  val eksternReferanse: String?,
 
   @field:Schema(
     description = "Felt for å se om oppdragsperioden er aktiv og da hvilken dato den er aktiv til.",

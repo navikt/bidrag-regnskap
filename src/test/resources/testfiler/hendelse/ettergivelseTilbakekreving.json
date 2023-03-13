@@ -4,13 +4,11 @@
   "opprettetAv": "B121269",
   "vedtakTidspunkt": "2018-04-18T00:00:00.000000000",
   "enhetId": "4849",
-  "eksternReferanse": null,
   "utsattTilDato": null,
   "opprettetTidspunkt": "2018-04-18T16:00:23.254988482",
   "stonadsendringListe": [],
   "engangsbelopListe": [
     {
-      "id": "43",
       "type": "ETTERGIVELSE_TILBAKEKREVING",
       "sakId": "0411765",
       "skyldnerId": "",
@@ -19,7 +17,8 @@
       "belop": 36279.00,
       "valutakode": "NOK",
       "resultatkode": "HE",
-      "referanse": "25314875",
+      "referanse": "ETTERGIVELSE_TILBAKEKREVING_REFERANSE",
+      "delytelseId": "25314875",
       "innkreving": "JA",
       "endring": true
     }

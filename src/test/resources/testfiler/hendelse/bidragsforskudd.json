@@ -5,7 +5,6 @@
   "opprettetAv": "F102622",
   "vedtakTidspunkt": "2022-05-18T00:00:00.000000000",
   "enhetId": "4806",
-  "eksternReferanse": null,
   "utsattTilDato": null,
   "opprettetTidspunkt": "2022-05-18T16:00:23.254988482",
   "stonadsendringListe": [
@@ -25,7 +24,7 @@
           "belop": 0,
           "valutakode": "NOK",
           "resultatkode": "OHI",
-          "referanse": "26608652"
+          "delytelseId": "26608652"
         },
         {
           "fomDato": "2021-12-01",
@@ -33,7 +32,7 @@
           "belop": 850.00,
           "valutakode": "NOK",
           "resultatkode": "50",
-          "referanse": "26608653"
+          "delytelseId": "26608653"
         },
         {
           "fomDato": "2022-01-01",
@@ -41,7 +40,7 @@
           "belop": 1710.00,
           "valutakode": "NOK",
           "resultatkode": "100",
-          "referanse": "26608654"
+          "delytelseId": "26608654"
         }
       ]
     }

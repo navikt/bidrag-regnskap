@@ -31,6 +31,9 @@ data class Oppdragsperiode(
   @Column(name = "vedtak_id")
   val vedtakId: Int,
 
+  @Column(name = "referanse")
+  val referanse: String?,
+
   @Column(name = "vedtak_type")
   var vedtakType: String,
 
@@ -81,6 +84,7 @@ data class Oppdragsperiode(
         "(oppdragsperiodeId = $oppdragsperiodeId , " +
         "oppdragId = ${oppdrag?.oppdragId} , " +
         "vedtakId = $vedtakId , " +
+        "referanse = $referanse , " +
         "vedtakType = $vedtakType , " +
         "gjelderIdent = $gjelderIdent , " +
         "mottakerIdent = $mottakerIdent , " +
@@ -105,6 +109,7 @@ data class Oppdragsperiode(
     if (oppdragsperiodeId != other.oppdragsperiodeId) return false
     if (oppdrag != other.oppdrag) return false
     if (vedtakId != other.vedtakId) return false
+    if (referanse != other.referanse) return false
     if (vedtakType != other.vedtakType) return false
     if (gjelderIdent != other.gjelderIdent) return false
     if (mottakerIdent != other.mottakerIdent) return false
@@ -126,6 +131,7 @@ data class Oppdragsperiode(
     var result = oppdragsperiodeId
     result = 31 * result + (oppdrag?.hashCode() ?: 0)
     result = 31 * result + vedtakId
+    result = 31 * result + (referanse?.hashCode() ?: 0)
     result = 31 * result + vedtakType.hashCode()
     result = 31 * result + gjelderIdent.hashCode()
     result = 31 * result + mottakerIdent.hashCode()

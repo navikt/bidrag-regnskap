@@ -31,7 +31,6 @@ object TestData {
     kravhaverIdent: String = PersonidentGenerator.genererPersonnummer(),
     utsattTilDato: LocalDate? = null,
     endretTidspunkt: LocalDateTime? = null,
-    engangsbeløpId: Int? = null
   ): Oppdrag {
     return Oppdrag(
       oppdragId = oppdragId,
@@ -42,12 +41,10 @@ object TestData {
       kravhaverIdent = kravhaverIdent,
       utsattTilDato = utsattTilDato,
       endretTidspunkt = endretTidspunkt,
-      engangsbeløpId = engangsbeløpId
     )
   }
 
   fun opprettHendelse(
-    engangsbelopId: Int? = null,
     type: String = StonadType.BIDRAG.name,
     vedtakType: VedtakType = VedtakType.FASTSETTELSE,
     kravhaverIdent: String = PersonidentGenerator.genererPersonnummer(),
@@ -62,7 +59,6 @@ object TestData {
     periodeListe: List<Periode> = listOf(opprettPeriodeDomene())
   ): Hendelse {
     return Hendelse(
-      engangsbeløpId = engangsbelopId,
       type = type,
       vedtakType = vedtakType,
       kravhaverIdent = kravhaverIdent,
@@ -90,7 +86,7 @@ object TestData {
       valutakode = valutakode,
       periodeFomDato = periodeFomDato,
       periodeTilDato = periodeTilDato,
-      referanse = referanse
+      delytelsesId = referanse
     )
   }
 
@@ -99,6 +95,7 @@ object TestData {
     oppdrag: Oppdrag? = null,
     vedtakId: Int = 654321,
     vedtakType: VedtakType = VedtakType.FASTSETTELSE,
+    referanse: String? = null,
     gjelderIdent: String = PersonidentGenerator.genererPersonnummer(),
     mottakerIdent: String = PersonidentGenerator.genererPersonnummer(),
     belop: BigDecimal = BigDecimal(7500),
@@ -117,6 +114,7 @@ object TestData {
       oppdragsperiodeId = oppdragsperiodeId,
       oppdrag = oppdrag,
       vedtakId = vedtakId,
+      referanse = referanse,
       vedtakType = vedtakType.toString(),
       gjelderIdent = gjelderIdent,
       mottakerIdent = mottakerIdent,
