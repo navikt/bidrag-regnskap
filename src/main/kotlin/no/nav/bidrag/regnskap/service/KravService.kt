@@ -157,7 +157,7 @@ class KravService(
     )
   }
 
-  fun opprettSkattKravRequest(konteringerListe: List<Kontering>): Krav {
+  fun opprettSkattKravRequest(konteringerListe: List<Kontering>): List<Krav> {
     val kravKonteringerListe = mutableListOf<Kravkontering>()
     konteringerListe.forEach { kontering ->
       kravKonteringerListe.add(
@@ -182,7 +182,7 @@ class KravService(
         )
       )
     }
-    return Krav(kravKonteringerListe)
+    return listOf(Krav(kravKonteringerListe))
   }
 
   private fun hentOppdragsperioderMedIkkeOverførteKonteringer(
