@@ -7,6 +7,7 @@ import no.nav.bidrag.regnskap.dto.enumer.Søknadstype
 import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
 import no.nav.bidrag.regnskap.dto.enumer.Type
 import no.nav.bidrag.regnskap.dto.krav.Krav
+import no.nav.bidrag.regnskap.dto.krav.Kravliste
 import no.nav.bidrag.regnskap.dto.krav.Kravkontering
 import no.nav.bidrag.regnskap.dto.krav.KravResponse
 import no.nav.bidrag.regnskap.dto.krav.Kravfeil
@@ -157,7 +158,7 @@ class KravService(
     )
   }
 
-  fun opprettSkattKravRequest(konteringerListe: List<Kontering>): List<Krav> {
+  fun opprettSkattKravRequest(konteringerListe: List<Kontering>): Kravliste {
     val kravKonteringerListe = mutableListOf<Kravkontering>()
     konteringerListe.forEach { kontering ->
       kravKonteringerListe.add(
@@ -182,7 +183,7 @@ class KravService(
         )
       )
     }
-    return listOf(Krav(kravKonteringerListe))
+    return Kravliste(listOf(Krav(kravKonteringerListe)))
   }
 
   private fun hentOppdragsperioderMedIkkeOverførteKonteringer(

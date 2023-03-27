@@ -1,9 +1,11 @@
 package no.nav.bidrag.regnskap.consumer
 
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.oshai.KotlinLogging
-import kafka.zk.ClusterIdZNode.toJson
 import no.nav.bidrag.regnskap.SECURE_LOGGER
-import no.nav.bidrag.regnskap.dto.krav.Krav
+import no.nav.bidrag.regnskap.dto.krav.Kravliste
 import no.nav.bidrag.regnskap.dto.påløp.Vedlikeholdsmodus
 import no.nav.bidrag.regnskap.maskinporten.MaskinportenClient
 import org.springframework.beans.factory.annotation.Value
@@ -18,6 +20,7 @@ import org.springframework.web.client.RestTemplate
 import java.net.URI
 
 private val LOGGER = KotlinLogging.logger { }
+private val objectMapper = jacksonObjectMapper().registerModule(JavaTimeModule()).configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
 
 @Service
 class SkattConsumer(
@@ -34,13 +37,13 @@ class SkattConsumer(
         const val VEDLIKEHOLDSMODUS_PATH = "/api/vedlikeholdsmodus"
     }
 
-    fun sendKrav(krav: List<Krav>): ResponseEntity<String> {
-        SECURE_LOGGER.info("Overfører krav til skatt: ${toJson(krav.toString())}")
+    fun sendKrav(kravliste: Kravliste): ResponseEntity<String> {
+        SECURE_LOGGER.info("Overfører krav til skatt: ${objectMapper.writeValueAsString(kravliste)}")
         return try {
             restTemplate.exchange(
                 opprettSkattUrl(KRAV_PATH),
                 HttpMethod.POST,
-                HttpEntity<List<Krav>>(krav, opprettHttpHeaders()),
+                HttpEntity<Kravliste>(kravliste, opprettHttpHeaders()),
                 String::class.java
             )
         } catch (e: HttpStatusCodeException) {
