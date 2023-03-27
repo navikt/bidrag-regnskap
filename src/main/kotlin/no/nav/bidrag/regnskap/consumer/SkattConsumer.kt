@@ -39,7 +39,7 @@ class SkattConsumer(
             restTemplate.exchange(
                 opprettSkattUrl(KRAV_PATH),
                 HttpMethod.POST,
-                HttpEntity<Krav>(krav, opprettHttpHeaders()),
+                HttpEntity<List<Krav>>(listOf(krav), opprettHttpHeaders()),
                 String::class.java
             )
         } catch (e: HttpStatusCodeException) {
