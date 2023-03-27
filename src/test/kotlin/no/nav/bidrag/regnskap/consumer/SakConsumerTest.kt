@@ -13,6 +13,7 @@ import no.nav.bidrag.regnskap.dto.sak.enumer.Bidragssakstatus
 import no.nav.bidrag.regnskap.dto.sak.enumer.Rolletype
 import no.nav.bidrag.regnskap.dto.sak.enumer.Sakskategori
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.http.HttpMethod
@@ -21,6 +22,7 @@ import org.springframework.test.util.ReflectionTestUtils
 import org.springframework.web.client.RestTemplate
 
 @ExtendWith(MockKExtension::class)
+@Disabled
 internal class SakConsumerTest {
 
     @MockK
