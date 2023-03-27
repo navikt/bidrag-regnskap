@@ -6,7 +6,6 @@ import no.nav.bidrag.regnskap.dto.sak.enumer.Rolletype
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpMethod
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
@@ -28,18 +27,19 @@ class SakConsumer(
         val headers = HttpHeaders().apply { set("header", sakId) }
         val requestEntity = HttpEntity("parameters", headers)
 
-        return try {
-            val responseEntity = restTemplate.exchange(
-                sakUrl + SAK_PATH,
-                HttpMethod.GET,
-                requestEntity,
-                BidragSak::class.java
-            )
-            hentFødselsnummerTilBmFraSak(responseEntity) ?: DUMMY_NUMMER
-        } catch (e: Exception) {
-            LOGGER.error("Noe gikk feil i kommunikasjon med bidrag-sak! Feilmelding: ${e.stackTrace}")
-            throw e
-        }
+        return DUMMY_NUMMER
+//        return try {
+//            val responseEntity = restTemplate.exchange(
+//                sakUrl + SAK_PATH,
+//                HttpMethod.GET,
+//                requestEntity,
+//                BidragSak::class.java
+//            )
+//            hentFødselsnummerTilBmFraSak(responseEntity) ?: DUMMY_NUMMER
+//        } catch (e: Exception) {
+//            LOGGER.error("Noe gikk feil i kommunikasjon med bidrag-sak! Feilmelding: ${e.stackTrace}")
+//            throw e
+//        }
     }
 
     private fun hentFødselsnummerTilBmFraSak(responseEntity: ResponseEntity<BidragSak>): String? {
