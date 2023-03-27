@@ -1,5 +1,7 @@
 package no.nav.bidrag.regnskap.consumer
 
+import io.github.oshai.KotlinLogging
+import no.nav.bidrag.regnskap.SECURE_LOGGER
 import no.nav.bidrag.regnskap.dto.krav.Krav
 import no.nav.bidrag.regnskap.dto.påløp.Vedlikeholdsmodus
 import no.nav.bidrag.regnskap.maskinporten.MaskinportenClient
@@ -13,6 +15,8 @@ import org.springframework.stereotype.Service
 import org.springframework.web.client.HttpStatusCodeException
 import org.springframework.web.client.RestTemplate
 import java.net.URI
+
+private val LOGGER = KotlinLogging.logger { }
 
 @Service
 class SkattConsumer(
@@ -30,6 +34,7 @@ class SkattConsumer(
     }
 
     fun sendKrav(krav: Krav): ResponseEntity<String> {
+        SECURE_LOGGER.info("Overfører krav til skatt: $krav")
         return try {
             restTemplate.exchange(
                 opprettSkattUrl(KRAV_PATH),
@@ -43,6 +48,7 @@ class SkattConsumer(
     }
 
     fun oppdaterVedlikeholdsmodus(vedlikeholdsmodus: Vedlikeholdsmodus): ResponseEntity<Any> {
+        LOGGER.info { "Oppdaterer vedlikeholdsmodud til følgende: $vedlikeholdsmodus" }
         return restTemplate.exchange(
             opprettSkattUrl(VEDLIKEHOLDSMODUS_PATH),
             HttpMethod.POST,
@@ -52,6 +58,7 @@ class SkattConsumer(
     }
 
     fun hentStatusPåVedlikeholdsmodus(): ResponseEntity<Any> {
+        LOGGER.info { "Henter status på vedlikeholdsmodus." }
         return try {
             restTemplate.exchange(
                 opprettSkattUrl(LIVENESS_PATH),
