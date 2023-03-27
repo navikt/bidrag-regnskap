@@ -1,6 +1,7 @@
 package no.nav.bidrag.regnskap.consumer
 
 import io.github.oshai.KotlinLogging
+import kafka.zk.ClusterIdZNode.toJson
 import no.nav.bidrag.regnskap.SECURE_LOGGER
 import no.nav.bidrag.regnskap.dto.krav.Krav
 import no.nav.bidrag.regnskap.dto.påløp.Vedlikeholdsmodus
@@ -33,13 +34,13 @@ class SkattConsumer(
         const val VEDLIKEHOLDSMODUS_PATH = "/api/vedlikeholdsmodus"
     }
 
-    fun sendKrav(krav: Krav): ResponseEntity<String> {
-        SECURE_LOGGER.info("Overfører krav til skatt: $krav")
+    fun sendKrav(krav: List<Krav>): ResponseEntity<String> {
+        SECURE_LOGGER.info("Overfører krav til skatt: ${toJson(krav.toString())}")
         return try {
             restTemplate.exchange(
                 opprettSkattUrl(KRAV_PATH),
                 HttpMethod.POST,
-                HttpEntity<List<Krav>>(listOf(krav), opprettHttpHeaders()),
+                HttpEntity<List<Krav>>(krav, opprettHttpHeaders()),
                 String::class.java
             )
         } catch (e: HttpStatusCodeException) {
