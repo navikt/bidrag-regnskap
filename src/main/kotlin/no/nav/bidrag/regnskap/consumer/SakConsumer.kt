@@ -1,5 +1,6 @@
 package no.nav.bidrag.regnskap.consumer
 
+import io.github.oshai.KotlinLogging
 import no.nav.bidrag.regnskap.dto.sak.BidragSak
 import no.nav.bidrag.regnskap.dto.sak.enumer.Rolletype
 import org.springframework.beans.factory.annotation.Value
@@ -8,8 +9,9 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
-import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
+
+private val LOGGER = KotlinLogging.logger { }
 
 @Service
 class SakConsumer(
@@ -34,8 +36,9 @@ class SakConsumer(
                 BidragSak::class.java
             )
             hentFødselsnummerTilBmFraSak(responseEntity) ?: DUMMY_NUMMER
-        } catch (e: HttpClientErrorException) {
-            DUMMY_NUMMER
+        } catch (e: Exception) {
+            LOGGER.error("Noe gikk feil i kommunikasjon med bidrag-sak! Feilmelding: ${e.stackTrace}")
+            throw e
         }
     }
 

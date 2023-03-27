@@ -35,6 +35,7 @@
     <testcontainers.version>1.17.6</testcontainers.version>
     <spring-kafka.version>2.9.3</spring-kafka.version>
     <scala.version>2.13.10</scala.version>
+    <kotlin-logging-jwv.version>4.0.0-beta-22</kotlin-logging-jwv.version>
   </properties>
 
   <repositories>
@@ -283,6 +284,11 @@
       <groupId>io.micrometer</groupId>
       <artifactId>micrometer-registry-prometheus</artifactId>
       <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.github.oshai</groupId>
+      <artifactId>kotlin-logging-jvm</artifactId>
+      <version>${kotlin-logging-jwv.version}</version>
     </dependency>
 
     <!--Test-->
