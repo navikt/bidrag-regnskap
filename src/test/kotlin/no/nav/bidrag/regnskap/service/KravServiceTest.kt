@@ -34,7 +34,7 @@ class KravServiceTest {
 
     val oppdragsId = 1
     val now = LocalDate.now()
-    val batchUid = "{\"batchUid\":\"asijdk-32546s-jhsjhs\"}"
+    val batchUid = "{\"BatchUid\":\"asijdk-32546s-jhsjhs\", \"ValidationMessages\":[]}"
 
 
     @Test

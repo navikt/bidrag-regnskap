@@ -21,7 +21,7 @@ class KravApiWireMock {
                 WireMock.aResponse().withStatus(202).withBody(
                     """
             {
-              "batchUid": "STUBBED-BATCHUID"
+              "BatchUid": "STUBBED-BATCHUID"
             }
                """
                 )
