@@ -71,7 +71,7 @@ class KravService(
   ) {
     when (skattResponse.statusCode) {
       HttpStatus.ACCEPTED -> {
-        SECURE_LOGGER.debug("Mottok svar fra skatt: \n${skattResponse}")
+        SECURE_LOGGER.info("Mottok svar fra skatt: \n${skattResponse}")
         val kravResponse = objectMapper.readValue(skattResponse.body, KravResponse::class.java)
         lagreVellykketOverføringAvKrav(alleIkkeOverførteKonteringer, kravResponse, oppdrag)
       }
