@@ -12,6 +12,7 @@ maskinporten:
 elin_subscription_key: bidrag-regnskap-elin-subscription-key-prod #TODO() Opprette key for prod
 env:
   SKATT_URL: https://bidrag-stubs.dev.intern.nav.no #TODO()
+  SKATT_HOST: bidrag-stubs.dev.intern.nav.no #TODO()
   SKATT_SCOPE: dev-gcp.bidrag.bidrag-stubs
   TOPIC_VEDTAK: bidrag.vedtak
   BUCKET_NAME: bidrag-regnskap-prod

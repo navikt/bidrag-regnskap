@@ -67,3 +67,7 @@ spec:
             envVarPrefix: DB
     buckets:
       - name: {{ bucket.navn }}
+  accessPolicy:
+    outbound:
+      external:
+        - host: {{ env.SKATT_HOST }}

@@ -26,7 +26,6 @@ import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.HttpServerErrorException
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.YearMonth
 
 private val LOGGER = LoggerFactory.getLogger(KravService::class.java)
 private val objectMapper = jacksonObjectMapper()

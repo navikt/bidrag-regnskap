@@ -12,6 +12,7 @@ maskinporten:
 elin_subscription_key: bidrag-regnskap-elin-subscription-key-dev
 env:
   SKATT_URL: https://api-preprod.nav.no/bidrag/v1/bidragskravq4
+  SKATT_HOST: api-preprod.nav.no
   SKATT_SCOPE: dev-gcp.bidrag.bidrag-stubs #TODO() Fjerne?
   TOPIC_VEDTAK: bidrag.vedtak-feature
   BUCKET_NAME: bidrag-regnskap-feature

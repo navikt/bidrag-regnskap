@@ -12,6 +12,7 @@ maskinporten:
 elin_subscription_key: bidrag-regnskap-elin-subscription-key-dev
 env:
   SKATT_URL: https://api-preprod.nav.no/bidrag/v1/bidragskrav
+  SKATT_HOST: api-preprod.nav.no
   SKATT_SCOPE: dev-gcp.bidrag.bidrag-stubs
   TOPIC_VEDTAK: bidrag.vedtak
   BUCKET_NAME: bidrag-regnskap
