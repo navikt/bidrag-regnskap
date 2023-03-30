@@ -8,7 +8,6 @@ import io.kotest.matchers.shouldNotBe
 import no.nav.bidrag.regnskap.BidragRegnskapLocal
 import no.nav.bidrag.regnskap.utils.TestData
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -32,198 +31,196 @@ import java.time.LocalDateTime
 @SpringBootTest(classes = [BidragRegnskapLocal::class])
 internal class PersistenceServiceIT {
 
-  companion object {
-    private var postgreSqlDb = PostgreSQLContainer("postgres:latest").apply {
-      withDatabaseName("bidrag-regnskap")
-      withUsername("cloudsqliamuser")
-      withPassword("admin")
-      start()
+    companion object {
+        private var postgreSqlDb = PostgreSQLContainer("postgres:latest").apply {
+            withDatabaseName("bidrag-regnskap")
+            withUsername("cloudsqliamuser")
+            withPassword("admin")
+            start()
+        }
+
+        @JvmStatic
+        @DynamicPropertySource
+        fun properties(registry: DynamicPropertyRegistry) {
+            registry.add("spring.datasource.url", postgreSqlDb::getJdbcUrl)
+            registry.add("spring.datasource.username", postgreSqlDb::getUsername)
+            registry.add("spring.datasource.password", postgreSqlDb::getPassword)
+        }
     }
 
-    @JvmStatic
-    @DynamicPropertySource
-    fun properties(registry: DynamicPropertyRegistry) {
-      registry.add("spring.datasource.url", postgreSqlDb::getJdbcUrl)
-      registry.add("spring.datasource.username", postgreSqlDb::getUsername)
-      registry.add("spring.datasource.password", postgreSqlDb::getPassword)
+    @Autowired
+    private lateinit var persistenceService: PersistenceService
+
+    private lateinit var oppdragTestData: no.nav.bidrag.regnskap.persistence.entity.Oppdrag
+
+    @BeforeAll
+    fun setup() {
+        oppdragTestData = TestData.opprettOppdrag(oppdragsperioder = emptyList())
+        val oppdragsperiode = TestData.opprettOppdragsperiode(konteringer = emptyList(), oppdrag = oppdragTestData, delytelseId = null)
+        val konteringer = TestData.opprettKontering(oppdragsperiode = oppdragsperiode, overføringKontering = null)
+        oppdragsperiode.konteringer = listOf(konteringer)
+        oppdragTestData.oppdragsperioder = listOf(oppdragsperiode)
     }
-  }
 
-  @Autowired
-  private lateinit var persistenceService: PersistenceService
+    @Test
+    fun `skal lagre oppdrag`() {
+        val oppdragId = persistenceService.lagreOppdrag(oppdragTestData)
 
-  private lateinit var oppdragTestData: no.nav.bidrag.regnskap.persistence.entity.Oppdrag
+        oppdragId shouldNotBe null
 
-  @BeforeAll
-  fun setup() {
-    oppdragTestData = TestData.opprettOppdrag(oppdragsperioder = emptyList())
-    val oppdragsperiode = TestData.opprettOppdragsperiode(konteringer = emptyList(), oppdrag = oppdragTestData, delytelseId = null)
-    val konteringer = TestData.opprettKontering(oppdragsperiode = oppdragsperiode, overføringKontering = null)
-    oppdragsperiode.konteringer = listOf(konteringer)
-    oppdragTestData.oppdragsperioder = listOf(oppdragsperiode)
-  }
+        val oppdrag = persistenceService.hentOppdrag(oppdragId)
 
-  @Test
-  fun `skal lagre oppdrag`() {
-    val oppdragId = persistenceService.lagreOppdrag(oppdragTestData)
+        val oppdragHentetPåUnikeIdentifikatorer = persistenceService.hentOppdragPaUnikeIdentifikatorer(
+            oppdragTestData.stønadType,
+            oppdragTestData.kravhaverIdent,
+            oppdragTestData.skyldnerIdent,
+            oppdragTestData.sakId
+        )
 
-    oppdragId shouldNotBe null
+        val oppdragHentetPåUnikeIdentifikatorerUtenTreff = persistenceService.hentOppdragPaUnikeIdentifikatorer(
+            oppdragTestData.stønadType,
+            "ingentreff",
+            oppdragTestData.skyldnerIdent,
+            oppdragTestData.sakId
+        )
 
-    val oppdrag = persistenceService.hentOppdrag(oppdragId)
+        oppdrag shouldNotBe null
+        oppdrag?.oppdragId shouldNotBe null
+        oppdrag?.stønadType shouldBe oppdragTestData.stønadType
+        oppdrag?.skyldnerIdent shouldBe oppdragTestData.skyldnerIdent
+        oppdrag?.oppdragsperioder?.size shouldBe oppdragTestData.oppdragsperioder.size
+        oppdrag?.oppdragsperioder?.first()?.oppdragsperiodeId shouldNotBe null
+        oppdrag?.oppdragsperioder?.first()?.gjelderIdent shouldBe oppdragTestData.oppdragsperioder.first().gjelderIdent
+        oppdrag?.oppdragsperioder?.first()?.konteringer?.size shouldBe oppdragTestData.oppdragsperioder.first().konteringer.size
+        oppdrag?.oppdragsperioder?.first()?.konteringer?.first()?.konteringId shouldNotBe null
+        oppdrag?.oppdragsperioder?.first()?.konteringer?.first()?.transaksjonskode shouldBe oppdragTestData.oppdragsperioder.first().konteringer.first().transaksjonskode
 
-    val oppdragHentetPåUnikeIdentifikatorer = persistenceService.hentOppdragPaUnikeIdentifikatorer(
-      oppdragTestData.stønadType,
-      oppdragTestData.kravhaverIdent,
-      oppdragTestData.skyldnerIdent,
-      oppdragTestData.sakId
-    )
+        oppdragHentetPåUnikeIdentifikatorer?.oppdragId shouldNotBe null
+        oppdragHentetPåUnikeIdentifikatorerUtenTreff shouldBe null
+    }
 
-    val oppdragHentetPåUnikeIdentifikatorerUtenTreff = persistenceService.hentOppdragPaUnikeIdentifikatorer(
-      oppdragTestData.stønadType,
-      "ingentreff",
-      oppdragTestData.skyldnerIdent,
-      oppdragTestData.sakId
-    )
+    @Test
+    fun `skal hente oppdrag på referanse og vedtakId`() {
+        val referanse = "ReferanseSomFinnes"
 
-    oppdrag shouldNotBe null
-    oppdrag?.oppdragId shouldNotBe null
-    oppdrag?.stønadType shouldBe oppdragTestData.stønadType
-    oppdrag?.skyldnerIdent shouldBe oppdragTestData.skyldnerIdent
-    oppdrag?.oppdragsperioder?.size shouldBe oppdragTestData.oppdragsperioder.size
-    oppdrag?.oppdragsperioder?.first()?.oppdragsperiodeId shouldNotBe null
-    oppdrag?.oppdragsperioder?.first()?.gjelderIdent shouldBe oppdragTestData.oppdragsperioder.first().gjelderIdent
-    oppdrag?.oppdragsperioder?.first()?.konteringer?.size shouldBe oppdragTestData.oppdragsperioder.first().konteringer.size
-    oppdrag?.oppdragsperioder?.first()?.konteringer?.first()?.konteringId shouldNotBe null
-    oppdrag?.oppdragsperioder?.first()?.konteringer?.first()?.transaksjonskode shouldBe oppdragTestData.oppdragsperioder.first().konteringer.first().transaksjonskode
+        val nyttOppdrag = TestData.opprettOppdrag()
+        val oppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = nyttOppdrag, referanse = referanse, vedtakId = 123)
+        nyttOppdrag.oppdragsperioder = listOf(oppdragsperiode)
+        val oppdragsperiodeId = persistenceService.lagreOppdragsperiode(oppdragsperiode)
+        persistenceService.lagreOppdrag(nyttOppdrag)
 
-    oppdragHentetPåUnikeIdentifikatorer?.oppdragId shouldNotBe null
-    oppdragHentetPåUnikeIdentifikatorerUtenTreff shouldBe null
-  }
+        oppdragsperiodeId shouldNotBe null
 
-  @Test
-  fun `skal hente oppdrag på referanse og vedtakId`() {
-    val referanse = "ReferanseSomFinnes"
+        val oppdrag = persistenceService.hentOppdragPåReferanseOgOmgjørVedtakId(referanse, 123)
 
-    val nyttOppdrag = TestData.opprettOppdrag()
-    val oppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = nyttOppdrag, referanse = referanse, vedtakId = 123)
-    nyttOppdrag.oppdragsperioder = listOf(oppdragsperiode)
-    val oppdragsperiodeId = persistenceService.lagreOppdragsperiode(oppdragsperiode)
-    persistenceService.lagreOppdrag(nyttOppdrag)
+        oppdrag?.oppdragsperioder?.first()?.referanse shouldBe referanse
+    }
 
+    @Test
+    fun `skal returne null ved ingen treff på referanse og vedtakId`() {
+        val oppdrag = persistenceService.hentOppdragPåReferanseOgOmgjørVedtakId("ReferanseSomIkkeFinnes", 123)
+        oppdrag shouldBe null
+    }
 
-    oppdragsperiodeId shouldNotBe null
+    @Test
+    fun `skal opprette overføringKontering`() {
+        val overføringKonteringId = persistenceService.lagreOverføringKontering(TestData.opprettOverføringKontering())
+        val overføringKonteringMedFeilId =
+            persistenceService.lagreOverføringKontering(TestData.opprettOverføringKontering(feilmelding = "TestFeil"))
+        val overføringKonteringerListe = persistenceService.hentOverføringKontering(Pageable.ofSize(10))
+        val overføringKonteringerMedFeilListe = persistenceService.hentOverføringKonteringMedFeil(Pageable.ofSize(10))
 
-    val oppdrag = persistenceService.hentOppdragPåReferanseOgOmgjørVedtakId(referanse, 123)
+        overføringKonteringId shouldNotBe null
+        overføringKonteringMedFeilId shouldNotBe null
+        overføringKonteringerListe.size shouldBeGreaterThanOrEqual 2
+        overføringKonteringerMedFeilListe.size shouldBeGreaterThanOrEqual 1
+    }
 
-    oppdrag?.oppdragsperioder?.first()?.referanse shouldBe referanse
-  }
+    @Test
+    fun `skal lagre nytt påløp`() {
+        val påløpJan = TestData.opprettPåløp(forPeriode = "2022-01")
+        val påløpFeb = TestData.opprettPåløp(forPeriode = "2022-02")
 
-  @Test
-  fun `skal returne null ved ingen treff på referanse og vedtakId`() {
-    val oppdrag = persistenceService.hentOppdragPåReferanseOgOmgjørVedtakId("ReferanseSomIkkeFinnes", 123)
-    oppdrag shouldBe null
-  }
+        val påløpJanId = persistenceService.lagrePåløp(påløpJan)
+        val påløpFebId = persistenceService.lagrePåløp(påløpFeb)
 
-  @Test
-  fun `skal opprette overføringKontering`() {
-    val overføringKonteringId = persistenceService.lagreOverføringKontering(TestData.opprettOverføringKontering())
-    val overføringKonteringMedFeilId =
-      persistenceService.lagreOverføringKontering(TestData.opprettOverføringKontering(feilmelding = "TestFeil"))
-    val overføringKonteringerListe = persistenceService.hentOverføringKontering(Pageable.ofSize(10))
-    val overføringKonteringerMedFeilListe = persistenceService.hentOverføringKonteringMedFeil(Pageable.ofSize(10))
+        påløpJanId shouldNotBe null
+        påløpFebId shouldNotBe null
 
-    overføringKonteringId shouldNotBe null
-    overføringKonteringMedFeilId shouldNotBe null
-    overføringKonteringerListe.size shouldBeGreaterThanOrEqual 2
-    overføringKonteringerMedFeilListe.size shouldBeGreaterThanOrEqual 1
-  }
+        val påløpListe = persistenceService.hentPåløp()
 
-  @Test
-  fun `skal lagre nytt påløp`() {
-    val påløpJan = TestData.opprettPåløp(forPeriode = "2022-01")
-    val påløpFeb = TestData.opprettPåløp(forPeriode = "2022-02")
+        påløpListe.map { it.forPeriode }.toList() shouldContainAll listOf(påløpJan.forPeriode, påløpFeb.forPeriode)
+    }
 
-    val påløpJanId = persistenceService.lagrePåløp(påløpJan)
-    val påløpFebId = persistenceService.lagrePåløp(påløpFeb)
+    @Test
+    fun lagreKontering() {
+        val oversendtKontering = TestData.opprettKontering(overføringKontering = null, overforingstidspunkt = LocalDateTime.now())
+        val kontering = TestData.opprettKontering(overføringKontering = null, overforingstidspunkt = null)
 
-    påløpJanId shouldNotBe null
-    påløpFebId shouldNotBe null
+        val konteringId = persistenceService.lagreKontering(kontering)
+        val oversendtKonteringId = persistenceService.lagreKontering(oversendtKontering)
+        val ikkeOverførteKonteringer = persistenceService.hentAlleIkkeOverførteKonteringer()
+        val konteringerForDato = persistenceService.hentAlleKonteringerForDato(LocalDate.now())
 
-    val påløpListe = persistenceService.hentPåløp()
-
-    påløpListe.map { it.forPeriode }.toList() shouldContainAll listOf(påløpJan.forPeriode, påløpFeb.forPeriode)
-  }
-
-  @Test
-  fun lagreKontering() {
-    val oversendtKontering = TestData.opprettKontering(overføringKontering = null, overforingstidspunkt = LocalDateTime.now())
-    val kontering = TestData.opprettKontering(overføringKontering = null, overforingstidspunkt = null)
-
-    val konteringId = persistenceService.lagreKontering(kontering)
-    val oversendtKonteringId = persistenceService.lagreKontering(oversendtKontering)
-    val ikkeOverførteKonteringer = persistenceService.hentAlleIkkeOverførteKonteringer()
-    val konteringerForDato = persistenceService.hentAlleKonteringerForDato(LocalDate.now())
-
-    konteringId shouldNotBe null
-    oversendtKonteringId shouldNotBe null
-    konteringerForDato.forOne { it.konteringId shouldBe oversendtKonteringId }
-    ikkeOverførteKonteringer.forOne { it.konteringId shouldBe konteringId }
-  }
-
+        konteringId shouldNotBe null
+        oversendtKonteringId shouldNotBe null
+        konteringerForDato.forOne { it.konteringId shouldBe oversendtKonteringId }
+        ikkeOverførteKonteringer.forOne { it.konteringId shouldBe konteringId }
+    }
 
     @Test
     fun lagreOppdragsperiode() {
-      val oppdragsperiode1 = TestData.opprettOppdragsperiode(vedtakId = 100, aktivTil = null)
-      val oppdragsperiode2 = TestData.opprettOppdragsperiode(vedtakId = 101, aktivTil = LocalDate.now().plusDays(1))
-      val oppdragsperiode3 = TestData.opprettOppdragsperiode(vedtakId = 102, aktivTil = LocalDate.now().minusDays(1))
+        val oppdragsperiode1 = TestData.opprettOppdragsperiode(vedtakId = 100, aktivTil = null)
+        val oppdragsperiode2 = TestData.opprettOppdragsperiode(vedtakId = 101, aktivTil = LocalDate.now().plusDays(1))
+        val oppdragsperiode3 = TestData.opprettOppdragsperiode(vedtakId = 102, aktivTil = LocalDate.now().minusDays(1))
 
-      val oppdragsperiodeId1 = persistenceService.lagreOppdragsperiode(oppdragsperiode1)
-      val oppdragsperiodeId2 = persistenceService.lagreOppdragsperiode(oppdragsperiode2)
-      val oppdragsperiodeId3 = persistenceService.lagreOppdragsperiode(oppdragsperiode3)
+        val oppdragsperiodeId1 = persistenceService.lagreOppdragsperiode(oppdragsperiode1)
+        val oppdragsperiodeId2 = persistenceService.lagreOppdragsperiode(oppdragsperiode2)
+        val oppdragsperiodeId3 = persistenceService.lagreOppdragsperiode(oppdragsperiode3)
 
+        oppdragsperiodeId1 shouldNotBe null
+        oppdragsperiodeId2 shouldNotBe null
+        oppdragsperiodeId3 shouldNotBe null
+    }
 
-      oppdragsperiodeId1 shouldNotBe null
-      oppdragsperiodeId2 shouldNotBe null
-      oppdragsperiodeId3 shouldNotBe null
-  }
     @Test
     fun lagreDriftsavvik() {
-      val aktivtDriftsavvik =
-        TestData.opprettDriftsavvik(tidspunktFra = LocalDateTime.now(), tidspunktTil = LocalDateTime.now().plusMinutes(10))
-      val gammeltDriftsavvik = TestData.opprettDriftsavvik(
-        tidspunktFra = LocalDateTime.now().minusMinutes(10),
-        tidspunktTil = LocalDateTime.now().minusMinutes(1)
-      )
+        val aktivtDriftsavvik =
+            TestData.opprettDriftsavvik(tidspunktFra = LocalDateTime.now(), tidspunktTil = LocalDateTime.now().plusMinutes(10))
+        val gammeltDriftsavvik = TestData.opprettDriftsavvik(
+            tidspunktFra = LocalDateTime.now().minusMinutes(10),
+            tidspunktTil = LocalDateTime.now().minusMinutes(1)
+        )
 
-      val aktivtDriftsavvikId = persistenceService.lagreDriftsavvik(aktivtDriftsavvik)
-      val gammeltDriftsavvikId = persistenceService.lagreDriftsavvik(gammeltDriftsavvik)
-      val harAktivtDriftsavvik = persistenceService.harAktivtDriftsavvik()
-      val faktiskAktivtDriftsavvik = persistenceService.hentAlleAktiveDriftsavvik()
-      val alleDriftsavvik = persistenceService.hentFlereDriftsavvik(Pageable.ofSize(100))
+        val aktivtDriftsavvikId = persistenceService.lagreDriftsavvik(aktivtDriftsavvik)
+        val gammeltDriftsavvikId = persistenceService.lagreDriftsavvik(gammeltDriftsavvik)
+        val harAktivtDriftsavvik = persistenceService.harAktivtDriftsavvik()
+        val faktiskAktivtDriftsavvik = persistenceService.hentAlleAktiveDriftsavvik()
+        val alleDriftsavvik = persistenceService.hentFlereDriftsavvik(Pageable.ofSize(100))
 
-      aktivtDriftsavvikId shouldNotBe null
-      gammeltDriftsavvikId shouldNotBe null
-      harAktivtDriftsavvik shouldBe true
-      faktiskAktivtDriftsavvik.forOne { it.driftsavvikId shouldBe aktivtDriftsavvikId }
-      alleDriftsavvik.map { it.driftsavvikId }.toList() shouldContainAll listOf(aktivtDriftsavvikId, gammeltDriftsavvikId)
+        aktivtDriftsavvikId shouldNotBe null
+        gammeltDriftsavvikId shouldNotBe null
+        harAktivtDriftsavvik shouldBe true
+        faktiskAktivtDriftsavvik.forOne { it.driftsavvikId shouldBe aktivtDriftsavvikId }
+        alleDriftsavvik.map { it.driftsavvikId }.toList() shouldContainAll listOf(aktivtDriftsavvikId, gammeltDriftsavvikId)
     }
 
     @Test
     fun hentDriftsavvikForPåløp() {
-      val påløpId = persistenceService.lagrePåløp(
-        TestData.opprettPåløp(
-          forPeriode = "1900-01",
-          fullførtTidspunkt = LocalDateTime.now().minusYears(100)
+        val påløpId = persistenceService.lagrePåløp(
+            TestData.opprettPåløp(
+                forPeriode = "1900-01",
+                fullførtTidspunkt = LocalDateTime.now().minusYears(100)
+            )
         )
-      )
-      val driftsavvikMedPåløp = TestData.opprettDriftsavvik(
-        påløpId = påløpId,
-        tidspunktFra = LocalDateTime.now().minusMinutes(10),
-        tidspunktTil = LocalDateTime.now().minusMinutes(1)
-      )
-      persistenceService.lagreDriftsavvik(driftsavvikMedPåløp)
-      val driftsavvikForPåløp = persistenceService.hentDriftsavvikForPåløp(påløpId)
+        val driftsavvikMedPåløp = TestData.opprettDriftsavvik(
+            påløpId = påløpId,
+            tidspunktFra = LocalDateTime.now().minusMinutes(10),
+            tidspunktTil = LocalDateTime.now().minusMinutes(1)
+        )
+        persistenceService.lagreDriftsavvik(driftsavvikMedPåløp)
+        val driftsavvikForPåløp = persistenceService.hentDriftsavvikForPåløp(påløpId)
 
-      driftsavvikForPåløp shouldNotBe null
+        driftsavvikForPåløp shouldNotBe null
     }
 }

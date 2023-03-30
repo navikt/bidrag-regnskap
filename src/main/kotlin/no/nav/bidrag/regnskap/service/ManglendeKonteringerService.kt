@@ -16,25 +16,25 @@ private val LOGGER = LoggerFactory.getLogger(ManglendeKonteringerService::class.
 @Service
 class ManglendeKonteringerService {
 
-  @Transactional
-  fun opprettManglendeKonteringerForOppdragsperiode(oppdragsperiode: Oppdragsperiode, påløpsPeriode: YearMonth) {
-    val perioderMellomDato = hentAllePerioderMellomDato(oppdragsperiode.periodeFra, oppdragsperiode.periodeTil, påløpsPeriode)
+    @Transactional
+    fun opprettManglendeKonteringerForOppdragsperiode(oppdragsperiode: Oppdragsperiode, påløpsPeriode: YearMonth) {
+        val perioderMellomDato = hentAllePerioderMellomDato(oppdragsperiode.periodeFra, oppdragsperiode.periodeTil, påløpsPeriode)
 
-    perioderMellomDato.forEachIndexed { periodeIndex, periode ->
-      if (oppdragsperiode.konteringer.any { it.overføringsperiode == periode.toString() }) {
-        LOGGER.debug("Kontering for periode: $periode i oppdragsperiode: ${oppdragsperiode.oppdragsperiodeId} er allerede opprettet.")
-      } else {
-        oppdragsperiode.konteringer = oppdragsperiode.konteringer.plus(
-          Kontering(
-            transaksjonskode = Transaksjonskode.hentTransaksjonskodeForType(oppdragsperiode.oppdrag!!.stønadType).name,
-            overføringsperiode = periode.toString(),
-            type = vurderType(oppdragsperiode),
-            søknadType = vurderSøknadsType(oppdragsperiode.vedtakType, periodeIndex),
-            oppdragsperiode = oppdragsperiode,
-            sendtIPåløpsfil = true
-          )
-        )
-      }
+        perioderMellomDato.forEachIndexed { periodeIndex, periode ->
+            if (oppdragsperiode.konteringer.any { it.overføringsperiode == periode.toString() }) {
+                LOGGER.debug("Kontering for periode: $periode i oppdragsperiode: ${oppdragsperiode.oppdragsperiodeId} er allerede opprettet.")
+            } else {
+                oppdragsperiode.konteringer = oppdragsperiode.konteringer.plus(
+                    Kontering(
+                        transaksjonskode = Transaksjonskode.hentTransaksjonskodeForType(oppdragsperiode.oppdrag!!.stønadType).name,
+                        overføringsperiode = periode.toString(),
+                        type = vurderType(oppdragsperiode),
+                        søknadType = vurderSøknadsType(oppdragsperiode.vedtakType, periodeIndex),
+                        oppdragsperiode = oppdragsperiode,
+                        sendtIPåløpsfil = true
+                    )
+                )
+            }
+        }
     }
-  }
 }

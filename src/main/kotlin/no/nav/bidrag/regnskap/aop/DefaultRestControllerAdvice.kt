@@ -13,40 +13,39 @@ import org.springframework.web.client.HttpStatusCodeException
 
 @RestControllerAdvice
 class DefaultRestControllerAdvice {
-  companion object {
-    private val LOGGER = LoggerFactory.getLogger(DefaultRestControllerAdvice::class.java)
-  }
+    companion object {
+        private val LOGGER = LoggerFactory.getLogger(DefaultRestControllerAdvice::class.java)
+    }
 
-  @ResponseBody
-  @ExceptionHandler(Exception::class)
-  fun handleOtherExceptions(exception: Exception): ResponseEntity<*> {
-    LOGGER.warn("Det skjedde en ukjent feil: ${exception.message}", exception)
-    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-      .header(HttpHeaders.WARNING, "Det skjedde en ukjent feil: ${exception.message}}")
-      .build<Any>()
-  }
+    @ResponseBody
+    @ExceptionHandler(Exception::class)
+    fun handleOtherExceptions(exception: Exception): ResponseEntity<*> {
+        LOGGER.warn("Det skjedde en ukjent feil: ${exception.message}", exception)
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .header(HttpHeaders.WARNING, "Det skjedde en ukjent feil: ${exception.message}}")
+            .build<Any>()
+    }
 
-  @ResponseBody
-  @ExceptionHandler(JwtTokenUnauthorizedException::class)
-  fun handleUnauthorizedException(exception: JwtTokenUnauthorizedException): ResponseEntity<*> {
-    LOGGER.warn("Ugyldig eller manglende sikkerhetstoken: ${exception.message}", exception)
-    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-      .header(HttpHeaders.WARNING, "Ugyldig eller manglende sikkerhetstoken").build<Any>()
-  }
+    @ResponseBody
+    @ExceptionHandler(JwtTokenUnauthorizedException::class)
+    fun handleUnauthorizedException(exception: JwtTokenUnauthorizedException): ResponseEntity<*> {
+        LOGGER.warn("Ugyldig eller manglende sikkerhetstoken: ${exception.message}", exception)
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .header(HttpHeaders.WARNING, "Ugyldig eller manglende sikkerhetstoken").build<Any>()
+    }
 
-  @ResponseBody
-  @ExceptionHandler(HttpStatusCodeException::class)
-  fun handleFlereAktivePerioderException(exception: HttpStatusCodeException): ResponseEntity<*> {
-    LOGGER.error(exception.message)
-    return ResponseEntity.status(exception.statusCode).body(exception.message)
-  }
+    @ResponseBody
+    @ExceptionHandler(HttpStatusCodeException::class)
+    fun handleFlereAktivePerioderException(exception: HttpStatusCodeException): ResponseEntity<*> {
+        LOGGER.error(exception.message)
+        return ResponseEntity.status(exception.statusCode).body(exception.message)
+    }
 
-  @ResponseBody
-  @ExceptionHandler(MaskinportenClientException::class)
-  fun handleMaskinportenClientExcpetion(exception: MaskinportenClientException): ResponseEntity<*> {
-    LOGGER.error("Noe gikk galt ved kall til maskinporten: ${exception.message}}", exception)
-    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-      .body(exception.message)
-  }
-
+    @ResponseBody
+    @ExceptionHandler(MaskinportenClientException::class)
+    fun handleMaskinportenClientExcpetion(exception: MaskinportenClientException): ResponseEntity<*> {
+        LOGGER.error("Noe gikk galt ved kall til maskinporten: ${exception.message}}", exception)
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(exception.message)
+    }
 }

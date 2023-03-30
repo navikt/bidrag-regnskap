@@ -9,53 +9,53 @@ import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
 import no.nav.bidrag.regnskap.fil.overføring.FiloverføringTilElinKlient
 import no.nav.bidrag.regnskap.persistence.bucket.GcpFilBucket
 import no.nav.bidrag.regnskap.utils.TestData
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(MockKExtension::class)
 class PåløpsfilGeneratorTest {
 
-  @MockK(relaxed = true)
-  private lateinit var gcpFilBucket: GcpFilBucket
-  @MockK(relaxed = true)
-  private lateinit var filoverføringTilElinKlient: FiloverføringTilElinKlient
+    @MockK(relaxed = true)
+    private lateinit var gcpFilBucket: GcpFilBucket
 
-  @InjectMockKs
-  private lateinit var påløpsfilGenerator: PåløpsfilGenerator
+    @MockK(relaxed = true)
+    private lateinit var filoverføringTilElinKlient: FiloverføringTilElinKlient
 
-  @Test
-  @OptIn(ExperimentalCoroutinesApi::class)
-  fun `skal skrive påløpsfil`() = runTest {
+    @InjectMockKs
+    private lateinit var påløpsfilGenerator: PåløpsfilGenerator
 
-    val oppdrag = TestData.opprettOppdrag(oppdragId = 1)
-    val oppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = oppdrag)
-    val kontering1 = TestData.opprettKontering(
-      konteringId = 1,
-      transaksjonskode = Transaksjonskode.A1.toString(),
-      oppdragsperiode = oppdragsperiode
-    )
-    val kontering2 = TestData.opprettKontering(
-      konteringId = 2,
-      transaksjonskode = Transaksjonskode.B1.toString(),
-      oppdragsperiode = oppdragsperiode)
-    val konteringer = listOf(kontering1, kontering2)
-    oppdrag.oppdragsperioder = listOf(oppdragsperiode)
-    oppdragsperiode.konteringer = konteringer
+    @Test
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun `skal skrive påløpsfil`() = runTest {
+        val oppdrag = TestData.opprettOppdrag(oppdragId = 1)
+        val oppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = oppdrag)
+        val kontering1 = TestData.opprettKontering(
+            konteringId = 1,
+            transaksjonskode = Transaksjonskode.A1.toString(),
+            oppdragsperiode = oppdragsperiode
+        )
+        val kontering2 = TestData.opprettKontering(
+            konteringId = 2,
+            transaksjonskode = Transaksjonskode.B1.toString(),
+            oppdragsperiode = oppdragsperiode
+        )
+        val konteringer = listOf(kontering1, kontering2)
+        oppdrag.oppdragsperioder = listOf(oppdragsperiode)
+        oppdragsperiode.konteringer = konteringer
 
-    val oppdrag2 = TestData.opprettOppdrag(oppdragId = 2)
-    val oppdragsperiode2 = TestData.opprettOppdragsperiode(oppdrag = oppdrag2)
-    val kontering3 = TestData.opprettKontering(
-      konteringId = 3,
-      transaksjonskode = Transaksjonskode.H1.toString(),
-      oppdragsperiode = oppdragsperiode2)
-    val konteringer2 = listOf(kontering3)
-    oppdrag2.oppdragsperioder = listOf(oppdragsperiode2)
-    oppdragsperiode2.konteringer = konteringer2
+        val oppdrag2 = TestData.opprettOppdrag(oppdragId = 2)
+        val oppdragsperiode2 = TestData.opprettOppdragsperiode(oppdrag = oppdrag2)
+        val kontering3 = TestData.opprettKontering(
+            konteringId = 3,
+            transaksjonskode = Transaksjonskode.H1.toString(),
+            oppdragsperiode = oppdragsperiode2
+        )
+        val konteringer2 = listOf(kontering3)
+        oppdrag2.oppdragsperioder = listOf(oppdragsperiode2)
+        oppdragsperiode2.konteringer = konteringer2
 
-    val påløp = TestData.opprettPåløp()
+        val påløp = TestData.opprettPåløp()
 
-
-    påløpsfilGenerator.skrivPåløpsfilOgLastOppPåFilsluse(konteringer + konteringer2, påløp)
-  }
+        påløpsfilGenerator.skrivPåløpsfilOgLastOppPåFilsluse(konteringer + konteringer2, påløp)
+    }
 }

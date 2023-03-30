@@ -14,34 +14,33 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.http.HttpStatus
 
 @ExtendWith(MockKExtension::class)
-class PåløpskjøringControllerTest{
+class PåløpskjøringControllerTest {
 
+    @MockK(relaxed = true)
+    private lateinit var påløpskjøringService: PåløpskjøringService
 
-  @MockK(relaxed = true)
-  private lateinit var påløpskjøringService: PåløpskjøringService
+    @InjectMockKs
+    private lateinit var påløpskjøringController: PåløpskjøringController
 
-  @InjectMockKs
-  private lateinit var påløpskjøringController: PåløpskjøringController
+    @Test
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun `skal ved påløpskjøring returnere 201`() = runTest {
+        val påløp = TestData.opprettPåløp(påløpId = 1, fullførtTidspunkt = null, forPeriode = "2022-01")
 
-  @Test
-  @OptIn(ExperimentalCoroutinesApi::class)
-  fun `skal ved påløpskjøring returnere 201`() = runTest {
-    val påløp = TestData.opprettPåløp(påløpId = 1, fullførtTidspunkt = null, forPeriode = "2022-01")
+        every { påløpskjøringService.hentPåløp() } returns påløp
 
-    every { påløpskjøringService.hentPåløp() } returns påløp
+        val response = påløpskjøringController.startPåløpskjøring(false)
 
-    val response = påløpskjøringController.startPåløpskjøring(false)
+        response.statusCode shouldBe HttpStatus.CREATED
+    }
 
-    response.statusCode shouldBe HttpStatus.CREATED
-  }
+    @Test
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun `skal om det ikke finnes ikke kjørte påløpsperioder returnere 204`() = runTest {
+        every { påløpskjøringService.hentPåløp() } returns null
 
-  @Test
-  @OptIn(ExperimentalCoroutinesApi::class)
-  fun `skal om det ikke finnes ikke kjørte påløpsperioder returnere 204`() = runTest {
-    every { påløpskjøringService.hentPåløp() } returns null
+        val response = påløpskjøringController.startPåløpskjøring(false)
 
-    val response = påløpskjøringController.startPåløpskjøring(false)
-
-    response.statusCode shouldBe HttpStatus.NO_CONTENT
-  }
+        response.statusCode shouldBe HttpStatus.NO_CONTENT
+    }
 }

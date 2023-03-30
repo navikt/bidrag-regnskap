@@ -4,7 +4,7 @@ import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 
 class ByteArrayOutputStreamTilByteBuffer : ByteArrayOutputStream() {
-  fun toByteBuffer(): ByteBuffer {
-    return ByteBuffer.wrap(buf, 0, count)
-  }
+    fun toByteBuffer(): ByteBuffer {
+        return ByteBuffer.wrap(buf, 0, count)
+    }
 }

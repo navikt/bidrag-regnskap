@@ -15,31 +15,33 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @Protected
 @Tag(
-  name = "Vedtak hendelse"
+    name = "Vedtak hendelse"
 )
 class VedtakshendelseController(
-  private val vedtakshendelseService: VedtakshendelseService
+    private val vedtakshendelseService: VedtakshendelseService
 ) {
 
-  @PostMapping("/vedtakHendelse")
-  @Operation(
-    summary = "Manuelt legg inn meldinger fra kafka topic'en bidrag.vedtak",
-    description = "Operasjon for å lagre sende inn en kafka melding.",
-    security = [SecurityRequirement(name = "bearer-key")]
-  )
-  @ApiResponses(
-    value = [ApiResponse(
-      responseCode = "200",
-      description = "Meldingen er lest vellykket.",
-      content = [Content()]
-    ), ApiResponse(
-      responseCode = "400",
-      description = "Noe er galt med meldingen.",
-      content = [Content()]
-    )]
-  )
-  fun opprettHendelse(vedtakHendelse: String): ResponseEntity<Any> {
-    vedtakshendelseService.behandleHendelse(vedtakHendelse)
-    return ResponseEntity.ok().build()
-  }
+    @PostMapping("/vedtakHendelse")
+    @Operation(
+        summary = "Manuelt legg inn meldinger fra kafka topic'en bidrag.vedtak",
+        description = "Operasjon for å lagre sende inn en kafka melding.",
+        security = [SecurityRequirement(name = "bearer-key")]
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Meldingen er lest vellykket.",
+                content = [Content()]
+            ), ApiResponse(
+                responseCode = "400",
+                description = "Noe er galt med meldingen.",
+                content = [Content()]
+            )
+        ]
+    )
+    fun opprettHendelse(vedtakHendelse: String): ResponseEntity<Any> {
+        vedtakshendelseService.behandleHendelse(vedtakHendelse)
+        return ResponseEntity.ok().build()
+    }
 }

@@ -9,16 +9,16 @@ import org.springframework.kafka.annotation.KafkaListener
 private val LOGGER = LoggerFactory.getLogger(VedtakshendelseListener::class.java)
 
 class VedtakshendelseListener(
-  private val vedtakshendelseService: VedtakshendelseService
+    private val vedtakshendelseService: VedtakshendelseService
 ) {
 
-  @KafkaListener(groupId = "bidrag-regnskap", topics = ["\${TOPIC_VEDTAK}"])
-  fun lesHendelse(hendelse: String) {
-    try {
-      vedtakshendelseService.behandleHendelse(hendelse)
-    } catch (e: JacksonException) {
-      LOGGER.error("Mapping av hendelse feilet! Se secure log for mer informasjon.")
-      SECURE_LOGGER.error("Mapping av hendelse feilet! Hendelse: $hendelse Feil: $e")
+    @KafkaListener(groupId = "bidrag-regnskap", topics = ["\${TOPIC_VEDTAK}"])
+    fun lesHendelse(hendelse: String) {
+        try {
+            vedtakshendelseService.behandleHendelse(hendelse)
+        } catch (e: JacksonException) {
+            LOGGER.error("Mapping av hendelse feilet! Se secure log for mer informasjon.")
+            SECURE_LOGGER.error("Mapping av hendelse feilet! Hendelse: $hendelse Feil: $e")
+        }
     }
-  }
 }

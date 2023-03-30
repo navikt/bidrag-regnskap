@@ -6,12 +6,12 @@ import java.time.LocalDate
 
 @Service
 class AvstemmingService(
-  private val avstemmingsfilGenerator: AvstemmingsfilGenerator,
-  private val persistenceService: PersistenceService
+    private val avstemmingsfilGenerator: AvstemmingsfilGenerator,
+    private val persistenceService: PersistenceService
 ) {
 
-  fun startAvstemming(dato: LocalDate) {
-    val konteringer = persistenceService.hentAlleKonteringerForDato(dato)
-    avstemmingsfilGenerator.skrivAvstemmingsfil(konteringer, dato)
-  }
+    fun startAvstemming(dato: LocalDate) {
+        val konteringer = persistenceService.hentAlleKonteringerForDato(dato)
+        avstemmingsfilGenerator.skrivAvstemmingsfil(konteringer, dato)
+    }
 }

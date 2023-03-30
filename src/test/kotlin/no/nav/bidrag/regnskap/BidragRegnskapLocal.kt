@@ -17,7 +17,7 @@ import org.springframework.test.context.ActiveProfiles
 class BidragRegnskapLocal
 
 fun main(args: Array<String>) {
-  val app = SpringApplication(BidragRegnskapLocal::class.java)
-  app.setAdditionalProfiles("local", "nais")
-  app.run(*args)
+    val app = SpringApplication(BidragRegnskapLocal::class.java)
+    app.setAdditionalProfiles("local", "nais")
+    app.run(*args)
 }

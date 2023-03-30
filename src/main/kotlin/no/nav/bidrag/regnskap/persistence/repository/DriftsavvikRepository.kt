@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 
 interface DriftsavvikRepository : JpaRepository<Driftsavvik, Int> {
 
-  fun findAllByTidspunktTilAfterOrTidspunktTilIsNull(tidspunktTil: LocalDateTime): List<Driftsavvik>
+    fun findAllByTidspunktTilAfterOrTidspunktTilIsNull(tidspunktTil: LocalDateTime): List<Driftsavvik>
 
-  fun findByPåløpId(påløpId: Int): Driftsavvik?
+    fun findByPåløpId(påløpId: Int): Driftsavvik?
 }

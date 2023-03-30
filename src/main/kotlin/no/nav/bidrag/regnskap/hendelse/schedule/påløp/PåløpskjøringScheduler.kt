@@ -19,29 +19,29 @@ private val LOGGER = LoggerFactory.getLogger(PåløpskjøringScheduler::class.ja
 @EnableScheduling
 @EnableSchedulerLock(defaultLockAtMostFor = "10m", defaultLockAtLeastFor = "2m")
 class PåløpskjøringScheduler(
-  private val persistenceService: PersistenceService, private val påløpskjøringService: PåløpskjøringService
+    private val persistenceService: PersistenceService,
+    private val påløpskjøringService: PåløpskjøringService
 ) {
 
-  @Scheduled(cron = "\${scheduler.påløpkjøring.cron}")
-  @SchedulerLock(name = "skedulertPåløpskjøring")
-  @Transactional
-  fun skedulertPåløpskjøring() {
-    LockAssert.assertLocked()
+    @Scheduled(cron = "\${scheduler.påløpkjøring.cron}")
+    @SchedulerLock(name = "skedulertPåløpskjøring")
+    @Transactional
+    fun skedulertPåløpskjøring() {
+        LockAssert.assertLocked()
 
-    LOGGER.info("Starter skedulert påløpskjøring..")
-    persistenceService.hentIkkeKjørtePåløp().minByOrNull { it.forPeriode }.let {
-      if (it != null) {
-        if (it.kjøredato.isBefore(LocalDateTime.now())) {
-          runBlocking {
-            påløpskjøringService.startPåløpskjøring(it, true, true)
-          }
+        LOGGER.info("Starter skedulert påløpskjøring..")
+        persistenceService.hentIkkeKjørtePåløp().minByOrNull { it.forPeriode }.let {
+            if (it != null) {
+                if (it.kjøredato.isBefore(LocalDateTime.now())) {
+                    runBlocking {
+                        påløpskjøringService.startPåløpskjøring(it, true, true)
+                    }
+                } else {
+                    LOGGER.info("Fant ingen påløp som skulle kjøres på dette tidspunkt. Neste påløpskjøring er for periode: ${it.forPeriode} som kjøres: ${it.kjøredato}")
+                }
+            } else {
+                LOGGER.error("Det finnes ingen fremtidige planlagte påløp! Påløpsfil kommer ikke til å generes før dette legges inn!")
+            }
         }
-        else {
-          LOGGER.info("Fant ingen påløp som skulle kjøres på dette tidspunkt. Neste påløpskjøring er for periode: ${it.forPeriode} som kjøres: ${it.kjøredato}")
-        }
-      } else {
-        LOGGER.error("Det finnes ingen fremtidige planlagte påløp! Påløpsfil kommer ikke til å generes før dette legges inn!")
-      }
     }
-  }
 }
