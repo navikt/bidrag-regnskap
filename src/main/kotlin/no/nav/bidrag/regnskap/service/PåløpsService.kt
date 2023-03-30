@@ -8,33 +8,34 @@ import java.time.YearMonth
 
 @Service
 class PåløpsService(
-  val persistenceService: PersistenceService,
+    val persistenceService: PersistenceService
 ) {
 
-  fun hentPåløp(): List<PåløpResponse> {
-    val påløpListe = persistenceService.hentPåløp()
+    fun hentPåløp(): List<PåløpResponse> {
+        val påløpListe = persistenceService.hentPåløp()
 
-    val påløpResponseListe = mutableListOf<PåløpResponse>()
+        val påløpResponseListe = mutableListOf<PåløpResponse>()
 
-    påløpListe.forEach { påløp ->
-      påløpResponseListe.add(
-        PåløpResponse(
-          påløpId = påløp.påløpId,
-          kjoredato = påløp.kjøredato.toString(),
-          fullfortTidspunkt = påløp.fullførtTidspunkt.toString(),
-          forPeriode = påløp.forPeriode
-        )
-      )
+        påløpListe.forEach { påløp ->
+            påløpResponseListe.add(
+                PåløpResponse(
+                    påløpId = påløp.påløpId,
+                    kjoredato = påløp.kjøredato.toString(),
+                    fullfortTidspunkt = påløp.fullførtTidspunkt.toString(),
+                    forPeriode = påløp.forPeriode
+                )
+            )
+        }
+
+        return påløpResponseListe.sortedByDescending { YearMonth.parse(it.forPeriode) }
     }
 
-    return påløpResponseListe.sortedByDescending { YearMonth.parse(it.forPeriode) }
-  }
+    fun lagrePåløp(påløpRequest: PåløpRequest): Int {
+        val påløp = Påløp(
+            kjøredato = påløpRequest.kjoredato,
+            forPeriode = påløpRequest.forPeriode.toString()
+        )
 
-  fun lagrePåløp(påløpRequest: PåløpRequest): Int {
-    val påløp = Påløp(
-      kjøredato = påløpRequest.kjoredato, forPeriode = påløpRequest.forPeriode.toString()
-    )
-
-    return persistenceService.lagrePåløp(påløp)
-  }
+        return persistenceService.lagrePåløp(påløp)
+    }
 }

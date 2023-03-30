@@ -15,17 +15,18 @@ import org.springframework.web.client.RestTemplate
 @EnableSecurityConfiguration
 class RestTemplateConfiguration {
 
-  @Bean
-  @Scope("prototype")
-  fun baseRestTemplate(
-    @Value("\${NAIS_APP_NAME}") naisAppName: String, metricsRestTemplateCustomizer: MetricsRestTemplateCustomizer
-  ): RestTemplate {
-    val restTemplate = HttpHeaderRestTemplate()
-    restTemplate.requestFactory = HttpComponentsClientHttpRequestFactory()
-    restTemplate.withDefaultHeaders()
-    restTemplate.addHeaderGenerator("Nav-Callid") { CorrelationId.fetchCorrelationIdForThread() }
-    restTemplate.addHeaderGenerator("Nav-Consumer-Id") { naisAppName }
-    metricsRestTemplateCustomizer.customize(restTemplate)
-    return restTemplate
-  }
+    @Bean
+    @Scope("prototype")
+    fun baseRestTemplate(
+        @Value("\${NAIS_APP_NAME}") naisAppName: String,
+        metricsRestTemplateCustomizer: MetricsRestTemplateCustomizer
+    ): RestTemplate {
+        val restTemplate = HttpHeaderRestTemplate()
+        restTemplate.requestFactory = HttpComponentsClientHttpRequestFactory()
+        restTemplate.withDefaultHeaders()
+        restTemplate.addHeaderGenerator("Nav-Callid") { CorrelationId.fetchCorrelationIdForThread() }
+        restTemplate.addHeaderGenerator("Nav-Consumer-Id") { naisAppName }
+        metricsRestTemplateCustomizer.customize(restTemplate)
+        return restTemplate
+    }
 }

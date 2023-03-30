@@ -7,21 +7,21 @@ import wiremock.com.google.common.net.HttpHeaders
 
 class SakApiWireMock {
 
-  companion object {
-    private const val PORT = 8098
-  }
+    companion object {
+        private const val PORT = 8098
+    }
 
-  private val mock = WireMockServer(PORT)
+    private val mock = WireMockServer(PORT)
 
-  init {
-    mock.start()
-  }
+    init {
+        mock.start()
+    }
 
-  internal fun sakMedGyldigResponse() {
-    mock.stubFor(
-      WireMock.get(WireMock.urlEqualTo(SakConsumer.SAK_PATH)).willReturn(
-        WireMock.aResponse().withHeader(HttpHeaders.CONTENT_TYPE, "application/json").withStatus(200).withBody(
-          """
+    internal fun sakMedGyldigResponse() {
+        mock.stubFor(
+            WireMock.get(WireMock.urlEqualTo(SakConsumer.SAK_PATH)).willReturn(
+                WireMock.aResponse().withHeader(HttpHeaders.CONTENT_TYPE, "application/json").withStatus(200).withBody(
+                    """
            {
              "eierfogd": "eierfogd",
              "saksnummer": "123",
@@ -35,8 +35,8 @@ class SakApiWireMock {
              ]
            }
         """
+                )
+            )
         )
-      )
-    )
-  }
+    }
 }

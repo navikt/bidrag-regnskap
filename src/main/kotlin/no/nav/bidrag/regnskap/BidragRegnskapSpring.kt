@@ -18,7 +18,7 @@ val SECURE_LOGGER: Logger = LoggerFactory.getLogger("secureLogger")
 class BidragRegnskap
 
 fun main(args: Array<String>) {
-  val app = SpringApplication(BidragRegnskap::class.java)
-  app.setAdditionalProfiles(if (args.isEmpty()) PROFILE_NAIS else args[0])
-  app.run(*args)
+    val app = SpringApplication(BidragRegnskap::class.java)
+    app.setAdditionalProfiles(if (args.isEmpty()) PROFILE_NAIS else args[0])
+    app.run(*args)
 }

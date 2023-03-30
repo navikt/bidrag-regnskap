@@ -21,10 +21,10 @@ import javax.sql.DataSource
 @OpenAPIDefinition(info = Info(title = "bidrag-regnskap", version = "v1"), security = [SecurityRequirement(name = "bearer-key")])
 class BidragRegnskapConfiguration {
 
-  @Bean
-  fun lockProvider(dataSource: DataSource): LockProvider {
-    return JdbcTemplateLockProvider(
-      JdbcTemplateLockProvider.Configuration.builder().withJdbcTemplate(JdbcTemplate(dataSource)).usingDbTime().build()
-    )
-  }
+    @Bean
+    fun lockProvider(dataSource: DataSource): LockProvider {
+        return JdbcTemplateLockProvider(
+            JdbcTemplateLockProvider.Configuration.builder().withJdbcTemplate(JdbcTemplate(dataSource)).usingDbTime().build()
+        )
+    }
 }

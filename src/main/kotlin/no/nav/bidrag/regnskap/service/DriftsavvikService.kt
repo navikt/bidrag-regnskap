@@ -8,30 +8,29 @@ import java.time.LocalDateTime
 
 @Service
 class DriftsavvikService(
-  private val persistenceService: PersistenceService
+    private val persistenceService: PersistenceService
 ) {
 
-  fun hentFlereDriftsavvik(antallDriftsavvik: Int): List<Driftsavvik> {
-    return persistenceService.hentFlereDriftsavvik(PageRequest.of(0, antallDriftsavvik))
-  }
+    fun hentFlereDriftsavvik(antallDriftsavvik: Int): List<Driftsavvik> {
+        return persistenceService.hentFlereDriftsavvik(PageRequest.of(0, antallDriftsavvik))
+    }
 
-  fun hentAlleAktiveDriftsavvik(): List<Driftsavvik> {
-    return persistenceService.hentAlleAktiveDriftsavvik()
-  }
+    fun hentAlleAktiveDriftsavvik(): List<Driftsavvik> {
+        return persistenceService.hentAlleAktiveDriftsavvik()
+    }
 
-  fun lagreDriftsavvik(tidspunktFra: LocalDateTime, tidspunktTil: LocalDateTime?, opprettetAv: String?, årsak: String?): Int {
-    return persistenceService.lagreDriftsavvik(
-      Driftsavvik(tidspunktFra = tidspunktFra, tidspunktTil = tidspunktTil, opprettetAv = opprettetAv, årsak = årsak)
-    )
-  }
+    fun lagreDriftsavvik(tidspunktFra: LocalDateTime, tidspunktTil: LocalDateTime?, opprettetAv: String?, årsak: String?): Int {
+        return persistenceService.lagreDriftsavvik(
+            Driftsavvik(tidspunktFra = tidspunktFra, tidspunktTil = tidspunktTil, opprettetAv = opprettetAv, årsak = årsak)
+        )
+    }
 
-  @Transactional
-  fun endreDriftsavvik(driftsavvikId: Int, tidspunktTil: LocalDateTime?): Int? {
-    val driftsavvik = persistenceService.hentDriftsavvik(driftsavvikId) ?: return null
+    @Transactional
+    fun endreDriftsavvik(driftsavvikId: Int, tidspunktTil: LocalDateTime?): Int? {
+        val driftsavvik = persistenceService.hentDriftsavvik(driftsavvikId) ?: return null
 
-    driftsavvik.tidspunktTil = tidspunktTil
+        driftsavvik.tidspunktTil = tidspunktTil
 
-    return persistenceService.lagreDriftsavvik(driftsavvik)
-  }
-
+        return persistenceService.lagreDriftsavvik(driftsavvik)
+    }
 }

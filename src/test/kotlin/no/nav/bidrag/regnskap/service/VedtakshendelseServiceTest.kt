@@ -12,7 +12,7 @@ import io.mockk.verify
 import no.nav.bidrag.behandling.felles.enums.EngangsbelopType
 import no.nav.bidrag.behandling.felles.enums.StonadType
 import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertDoesNotThrow
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -21,55 +21,55 @@ import org.junit.jupiter.api.extension.ExtendWith
 @ExtendWith(MockKExtension::class)
 class VedtakshendelseServiceTest {
 
-  @MockK(relaxed = true)
-  private lateinit var oppdragService: OppdragService
+    @MockK(relaxed = true)
+    private lateinit var oppdragService: OppdragService
 
-  @MockK(relaxed = true)
-  private lateinit var kravService: KravService
+    @MockK(relaxed = true)
+    private lateinit var kravService: KravService
 
-  @MockK(relaxed = true)
-  private lateinit var persistenceService: PersistenceService
+    @MockK(relaxed = true)
+    private lateinit var persistenceService: PersistenceService
 
-  @InjectMockKs
-  private lateinit var vedtakshendelseService: VedtakshendelseService
+    @InjectMockKs
+    private lateinit var vedtakshendelseService: VedtakshendelseService
 
-  @BeforeEach
-  fun setup() {
-    every { persistenceService.harAktivtDriftsavvik() } returns false
-    every { kravService.erVedlikeholdsmodusPåslått() } returns false
-  }
+    @BeforeEach
+    fun setup() {
+        every { persistenceService.harAktivtDriftsavvik() } returns false
+        every { kravService.erVedlikeholdsmodusPåslått() } returns false
+    }
 
-  @Test
-  fun `skal mappe vedtakshendelse uten feil`() {
-    val hendelse = opprettVedtakshendelse()
+    @Test
+    fun `skal mappe vedtakshendelse uten feil`() {
+        val hendelse = opprettVedtakshendelse()
 
-    val vedtakHendelse = vedtakshendelseService.mapVedtakHendelse(hendelse)
+        val vedtakHendelse = vedtakshendelseService.mapVedtakHendelse(hendelse)
 
-    vedtakHendelse shouldNotBe null
-    vedtakHendelse.id shouldBe 123
-    vedtakHendelse.engangsbelopListe?.shouldHaveSize(1)
-    vedtakHendelse.stonadsendringListe?.shouldHaveSize(1)
-  }
+        vedtakHendelse shouldNotBe null
+        vedtakHendelse.id shouldBe 123
+        vedtakHendelse.engangsbelopListe?.shouldHaveSize(1)
+        vedtakHendelse.stonadsendringListe?.shouldHaveSize(1)
+    }
 
-  @Test
-  fun `skal opprette oppdrag for stonadsendringer og engangsbeløp`() {
-    val hendelseCaptor = mutableListOf<Hendelse>()
-    val hendelse = opprettVedtakshendelse()
+    @Test
+    fun `skal opprette oppdrag for stonadsendringer og engangsbeløp`() {
+        val hendelseCaptor = mutableListOf<Hendelse>()
+        val hendelse = opprettVedtakshendelse()
 
-    every { oppdragService.lagreHendelse(capture(hendelseCaptor)) } returns 1
+        every { oppdragService.lagreHendelse(capture(hendelseCaptor)) } returns 1
 
-    vedtakshendelseService.behandleHendelse(hendelse)
+        vedtakshendelseService.behandleHendelse(hendelse)
 
-    verify(exactly = 2) { oppdragService.lagreHendelse(any()) }
-    hendelseCaptor[0].type shouldBe StonadType.BIDRAG.name
-    hendelseCaptor[1].type shouldBe EngangsbelopType.GEBYR_SKYLDNER.name
-  }
+        verify(exactly = 2) { oppdragService.lagreHendelse(any()) }
+        hendelseCaptor[0].type shouldBe StonadType.BIDRAG.name
+        hendelseCaptor[1].type shouldBe EngangsbelopType.GEBYR_SKYLDNER.name
+    }
 
-  @Test
-  fun `Skal lese vedtakshendelse uten feil`() {
-    assertDoesNotThrow {
-      vedtakshendelseService.mapVedtakHendelse(
-        """
+    @Test
+    fun `Skal lese vedtakshendelse uten feil`() {
+        assertDoesNotThrow {
+            vedtakshendelseService.mapVedtakHendelse(
+                """
         {
           "kilde":"MANUELT",
           "type":"INDEKSREGULERING",
@@ -86,16 +86,16 @@ class VedtakshendelseServiceTest {
             "correlationId": "12345"
           }
         }
-      """.trimIndent()
-      )
+                """.trimIndent()
+            )
+        }
     }
-  }
 
-  @Test
-  fun `Skal lese vedtakshendelse med feil`() {
-    assertThrows<InvalidFormatException> {
-      vedtakshendelseService.mapVedtakHendelse(
-        """
+    @Test
+    fun `Skal lese vedtakshendelse med feil`() {
+        assertThrows<InvalidFormatException> {
+            vedtakshendelseService.mapVedtakHendelse(
+                """
         {
           "type":"ÅRSAVGIFT",
           "vedtakTidspunkt":"2022-01-01T00:00:00.000000000",
@@ -113,13 +113,13 @@ class VedtakshendelseServiceTest {
             "correlationId": "12345"
           }
         }
-      """.trimIndent()
-      )
+                """.trimIndent()
+            )
+        }
     }
-  }
 
-  private fun opprettVedtakshendelse(): String {
-    return """
+    private fun opprettVedtakshendelse(): String {
+        return """
       {
         "kilde":"MANUELT",
         "type":"INNKREVING",
@@ -175,5 +175,5 @@ class VedtakshendelseServiceTest {
             "correlationId": "12345"
           }
       }"""
-  }
+    }
 }

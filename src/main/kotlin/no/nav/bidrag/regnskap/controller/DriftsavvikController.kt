@@ -24,79 +24,106 @@ import java.time.LocalDateTime
 @Protected
 @Tag(name = "Driftsavvik")
 class DriftsavvikController(
-  private val driftsavvikService: DriftsavvikService
+    private val driftsavvikService: DriftsavvikService
 ) {
 
-  @GetMapping("/aktiveDriftsavvik")
-  @Operation(
-    summary = "Henter alle aktive driftsavvik", security = [SecurityRequirement(name = "bearer-key")]
-  )
-  @ApiResponses(
-    value = [ApiResponse(
-      responseCode = "200", description = "Aktive driftsavvik blr returnert.", content = [Content()]
-    )]
-  )
-  fun hentAlleAktiveDriftsavvik(): ResponseEntity<List<Driftsavvik>> {
-    return ResponseEntity.ok(driftsavvikService.hentAlleAktiveDriftsavvik())
-  }
+    @GetMapping("/aktiveDriftsavvik")
+    @Operation(
+        summary = "Henter alle aktive driftsavvik",
+        security = [SecurityRequirement(name = "bearer-key")]
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Aktive driftsavvik blr returnert.",
+                content = [Content()]
+            )
+        ]
+    )
+    fun hentAlleAktiveDriftsavvik(): ResponseEntity<List<Driftsavvik>> {
+        return ResponseEntity.ok(driftsavvikService.hentAlleAktiveDriftsavvik())
+    }
 
-  @GetMapping("/driftsavvik")
-  @Operation(
-    summary = "Henter siste driftsavvik", security = [SecurityRequirement(name = "bearer-key")]
-  )
-  @ApiResponses(
-    value = [ApiResponse(
-      responseCode = "200", description = "Driftsavvik ble returnert.", content = [Content()]
-    )]
-  )
-  fun hentDriftsavvik(antallDriftsavvik: Int): ResponseEntity<List<Driftsavvik>> {
-    return ResponseEntity.ok(driftsavvikService.hentFlereDriftsavvik(antallDriftsavvik))
-  }
+    @GetMapping("/driftsavvik")
+    @Operation(
+        summary = "Henter siste driftsavvik",
+        security = [SecurityRequirement(name = "bearer-key")]
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Driftsavvik ble returnert.",
+                content = [Content()]
+            )
+        ]
+    )
+    fun hentDriftsavvik(antallDriftsavvik: Int): ResponseEntity<List<Driftsavvik>> {
+        return ResponseEntity.ok(driftsavvikService.hentFlereDriftsavvik(antallDriftsavvik))
+    }
 
+    @PostMapping("/driftsavvik")
+    @Operation(
+        summary = "Oppretter nytt driftsavvik",
+        security = [SecurityRequirement(name = "bearer-key")]
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Driftsavvik ble opprettet.",
+                content = [Content()]
+            )
+        ]
+    )
+    @Parameters(
+        value = [
+            Parameter(name = "tidspunktFra", example = "2022-01-01T10:00:00"), Parameter(
+                name = "tidspunktTil",
+                example = "2022-01-02T10:00:00"
+            )
+        ]
+    )
+    fun lagreDriftsavvik(
+        @RequestParam(required = true)
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+        tidspunktFra: LocalDateTime,
+        @RequestParam(required = false)
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+        tidspunktTil: LocalDateTime?,
+        @RequestParam(required = false) opprettetAv: String?,
+        @RequestParam(required = false) årsak: String?
+    ): ResponseEntity<Int> {
+        return ResponseEntity.ok(driftsavvikService.lagreDriftsavvik(tidspunktFra, tidspunktTil, opprettetAv, årsak))
+    }
 
-  @PostMapping("/driftsavvik")
-  @Operation(
-    summary = "Oppretter nytt driftsavvik", security = [SecurityRequirement(name = "bearer-key")]
-  )
-  @ApiResponses(
-    value = [ApiResponse(
-      responseCode = "200", description = "Driftsavvik ble opprettet.", content = [Content()]
-    )]
-  )
-  @Parameters(
-    value = [Parameter(name = "tidspunktFra", example = "2022-01-01T10:00:00"), Parameter(
-      name = "tidspunktTil",
-      example = "2022-01-02T10:00:00"
-    )]
-  )
-  fun lagreDriftsavvik(
-    @RequestParam(required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) tidspunktFra: LocalDateTime,
-    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) tidspunktTil: LocalDateTime?,
-    @RequestParam(required = false) opprettetAv: String?,
-    @RequestParam(required = false) årsak: String?
-  ): ResponseEntity<Int> {
-    return ResponseEntity.ok(driftsavvikService.lagreDriftsavvik(tidspunktFra, tidspunktTil, opprettetAv, årsak))
-  }
+    @PutMapping("/driftsavvik")
+    @Operation(
+        summary = "Sett tidspunktTil for et driftsavvik",
+        security = [SecurityRequirement(name = "bearer-key")]
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Driftsavvik ble endret.",
+                content = [Content()]
+            )
+        ]
+    )
+    @Parameters(
+        value = [Parameter(name = "tidspunktTil", example = "2022-01-02T10:00:00")]
+    )
+    fun endreDriftsavvik(
+        @RequestParam(required = true) driftsavvikId: Int,
+        @RequestParam(required = false)
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+        tidspunktTil: LocalDateTime?
+    ): ResponseEntity<*> {
+        val driftsavvik = driftsavvikService.endreDriftsavvik(driftsavvikId, tidspunktTil) ?: return ResponseEntity.badRequest()
+            .body("Finner ingen driftsavvik med id: $driftsavvikId")
 
-  @PutMapping("/driftsavvik")
-  @Operation(
-    summary = "Sett tidspunktTil for et driftsavvik", security = [SecurityRequirement(name = "bearer-key")]
-  )
-  @ApiResponses(
-    value = [ApiResponse(
-      responseCode = "200", description = "Driftsavvik ble endret.", content = [Content()]
-    )]
-  )
-  @Parameters(
-    value = [Parameter(name = "tidspunktTil", example = "2022-01-02T10:00:00")]
-  )
-  fun endreDriftsavvik(
-    @RequestParam(required = true) driftsavvikId: Int,
-    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) tidspunktTil: LocalDateTime?,
-  ): ResponseEntity<*> {
-    val driftsavvik = driftsavvikService.endreDriftsavvik(driftsavvikId, tidspunktTil) ?: return ResponseEntity.badRequest()
-      .body("Finner ingen driftsavvik med id: $driftsavvikId")
-
-    return ResponseEntity.ok(driftsavvik)
-  }
+        return ResponseEntity.ok(driftsavvik)
+    }
 }

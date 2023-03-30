@@ -16,18 +16,17 @@ private val LOGGER = LoggerFactory.getLogger((AvstemmingsfilerScheduler::class.j
 @EnableScheduling
 @EnableSchedulerLock(defaultLockAtMostFor = "10m")
 class AvstemmingsfilerScheduler(
-  private val avstemmingService: AvstemmingService
+    private val avstemmingService: AvstemmingService
 ) {
 
-  @Scheduled(cron = "\${scheduler.avstemning.cron}")
-  @SchedulerLock(name = "skedulertOpprettelseAvAvstemmingsfiler")
-  fun skedulertOpprettelseAvAvstemmingsfiler() {
-    LockAssert.assertLocked()
+    @Scheduled(cron = "\${scheduler.avstemning.cron}")
+    @SchedulerLock(name = "skedulertOpprettelseAvAvstemmingsfiler")
+    fun skedulertOpprettelseAvAvstemmingsfiler() {
+        LockAssert.assertLocked()
 
-    val dato = LocalDate.now().minusDays(1)
-    LOGGER.info("Starter schedulert generering av avstemmingsfiler for $dato.")
+        val dato = LocalDate.now().minusDays(1)
+        LOGGER.info("Starter schedulert generering av avstemmingsfiler for $dato.")
 
-    avstemmingService.startAvstemming(dato)
-  }
-
+        avstemmingService.startAvstemming(dato)
+    }
 }

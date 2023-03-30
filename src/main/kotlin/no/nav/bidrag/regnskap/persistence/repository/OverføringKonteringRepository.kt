@@ -7,6 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface OverføringKonteringRepository : JpaRepository<OverføringKontering, Int> {
 
-  fun findByFeilmeldingIsNotNull(pageable: Pageable) : Page<OverføringKontering>
-
+    fun findByFeilmeldingIsNotNull(pageable: Pageable): Page<OverføringKontering>
 }

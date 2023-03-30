@@ -23,55 +23,55 @@ import org.springframework.web.client.RestTemplate
 @ExtendWith(MockKExtension::class)
 internal class SakConsumerTest {
 
-  @MockK
-  private lateinit var restTemplate: RestTemplate
+    @MockK
+    private lateinit var restTemplate: RestTemplate
 
-  @InjectMockKs
-  private lateinit var sakConsumer: SakConsumer
+    @InjectMockKs
+    private lateinit var sakConsumer: SakConsumer
 
-  private val sakUrl = "localhost:8080"
-  private val SAK_PATH = "/bidrag-sak/sak"
-  private val DUMMY_NUMMER = "22222222226"
+    private val sakUrl = "localhost:8080"
+    private val SAK_PATH = "/bidrag-sak/sak"
+    private val DUMMY_NUMMER = "22222222226"
 
-  @BeforeEach
-  fun setup() {
-    ReflectionTestUtils.setField(sakConsumer, "sakUrl", sakUrl)
-  }
+    @BeforeEach
+    fun setup() {
+        ReflectionTestUtils.setField(sakConsumer, "sakUrl", sakUrl)
+    }
 
-  @Test
-  fun `skal hente ut fødelsnummer fra bm`() {
-    every { restTemplate.exchange(sakUrl + SAK_PATH, HttpMethod.GET, any(), BidragSak::class.java) } returns ResponseEntity.ok(
-      opprettBidragSak(Rolletype.BM)
-    )
-
-    val fødelsnummer = sakConsumer.hentBmFraSak("123")
-
-    fødelsnummer shouldNotBe DUMMY_NUMMER
-  }
-
-  @Test
-  fun `skal bruke dummynr om det ikke finnes en bm på sak`() {
-    every { restTemplate.exchange(sakUrl + SAK_PATH, HttpMethod.GET, any(), BidragSak::class.java) } returns ResponseEntity.ok(
-      opprettBidragSak(Rolletype.BP)
-    )
-
-    val fødelsnummer = sakConsumer.hentBmFraSak("123")
-
-    fødelsnummer shouldBe DUMMY_NUMMER
-  }
-
-  private fun opprettBidragSak(rolletype: Rolletype): BidragSak {
-    return BidragSak(
-      "eierfogd",
-      "123",
-      Bidragssakstatus.NY,
-      Sakskategori.N,
-      roller = listOf(
-        RolleDto(
-          PersonidentGenerator.genererPersonnummer(),
-          rolletype
+    @Test
+    fun `skal hente ut fødelsnummer fra bm`() {
+        every { restTemplate.exchange(sakUrl + SAK_PATH, HttpMethod.GET, any(), BidragSak::class.java) } returns ResponseEntity.ok(
+            opprettBidragSak(Rolletype.BM)
         )
-      )
-    )
-  }
+
+        val fødelsnummer = sakConsumer.hentBmFraSak("123")
+
+        fødelsnummer shouldNotBe DUMMY_NUMMER
+    }
+
+    @Test
+    fun `skal bruke dummynr om det ikke finnes en bm på sak`() {
+        every { restTemplate.exchange(sakUrl + SAK_PATH, HttpMethod.GET, any(), BidragSak::class.java) } returns ResponseEntity.ok(
+            opprettBidragSak(Rolletype.BP)
+        )
+
+        val fødelsnummer = sakConsumer.hentBmFraSak("123")
+
+        fødelsnummer shouldBe DUMMY_NUMMER
+    }
+
+    private fun opprettBidragSak(rolletype: Rolletype): BidragSak {
+        return BidragSak(
+            "eierfogd",
+            "123",
+            Bidragssakstatus.NY,
+            Sakskategori.N,
+            roller = listOf(
+                RolleDto(
+                    PersonidentGenerator.genererPersonnummer(),
+                    rolletype
+                )
+            )
+        )
+    }
 }

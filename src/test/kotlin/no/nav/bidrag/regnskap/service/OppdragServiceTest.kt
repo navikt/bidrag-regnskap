@@ -12,79 +12,76 @@ import no.nav.bidrag.regnskap.utils.TestData
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import java.util.*
 
 @ExtendWith(MockKExtension::class)
 class OppdragServiceTest {
 
-  @MockK(relaxed = true)
-  private lateinit var persistenceService: PersistenceService
+    @MockK(relaxed = true)
+    private lateinit var persistenceService: PersistenceService
 
-  @MockK(relaxed = true)
-  private lateinit var oppdragsperiodeService: OppdragsperiodeService
+    @MockK(relaxed = true)
+    private lateinit var oppdragsperiodeService: OppdragsperiodeService
 
-  @MockK(relaxed = true)
-  private lateinit var konteringService: KonteringService
+    @MockK(relaxed = true)
+    private lateinit var konteringService: KonteringService
 
-  @InjectMockKs
-  private lateinit var oppdragService: OppdragService
+    @InjectMockKs
+    private lateinit var oppdragService: OppdragService
 
-  @Nested
-  inner class HentOppdrag {
+    @Nested
+    inner class HentOppdrag {
 
-    @Test
-    fun `skal hente eksisterende oppdrag`() {
-      val stonadType = StonadType.BIDRAG
-      val skyldnerIdent = PersonidentGenerator.genererPersonnummer()
+        @Test
+        fun `skal hente eksisterende oppdrag`() {
+            val stonadType = StonadType.BIDRAG
+            val skyldnerIdent = PersonidentGenerator.genererPersonnummer()
 
-      every { persistenceService.hentOppdrag(any()) } returns TestData.opprettOppdrag(
-        stonadType = stonadType,
-        skyldnerIdent = skyldnerIdent
-      )
+            every { persistenceService.hentOppdrag(any()) } returns TestData.opprettOppdrag(
+                stonadType = stonadType,
+                skyldnerIdent = skyldnerIdent
+            )
 
-      val oppdragResponse = oppdragService.hentOppdrag(1)!!
+            val oppdragResponse = oppdragService.hentOppdrag(1)!!
 
-      oppdragResponse.type shouldBe stonadType.name
-      oppdragResponse.skyldnerIdent shouldBe skyldnerIdent
+            oppdragResponse.type shouldBe stonadType.name
+            oppdragResponse.skyldnerIdent shouldBe skyldnerIdent
+        }
+
+        @Test
+        fun `skal være tom om oppdrag ikke eksisterer`() {
+            every { persistenceService.hentOppdrag(any()) } returns null
+            oppdragService.hentOppdrag(1) shouldBe null
+        }
     }
 
-    @Test
-    fun `skal være tom om oppdrag ikke eksisterer`() {
-      every { persistenceService.hentOppdrag(any()) } returns null
-      oppdragService.hentOppdrag(1) shouldBe null
+    @Nested
+    inner class OpprettOppdrag {
+
+        @Test
+        fun `skal opprette oppdrag`() {
+            val hendelse = TestData.opprettHendelse()
+
+            every { oppdragsperiodeService.opprettNyOppdragsperiode(any(), any(), any()) } returns TestData.opprettOppdragsperiode()
+
+            val oppdragId = oppdragService.lagreEllerOppdaterOppdrag(null, hendelse)
+
+            oppdragId shouldBe 0
+        }
     }
-  }
 
+    @Nested
+    inner class OppdaterOppdrag {
 
-  @Nested
-  inner class OpprettOppdrag {
+        @Test
+        fun `skal oppdatere oppdrag`() {
+            val hendelse = TestData.opprettHendelse()
+            val oppdrag = TestData.opprettOppdrag()
 
-    @Test
-    fun `skal opprette oppdrag`() {
-      val hendelse = TestData.opprettHendelse()
+            every { oppdragsperiodeService.opprettNyOppdragsperiode(any(), any(), any()) } returns TestData.opprettOppdragsperiode()
 
-      every { oppdragsperiodeService.opprettNyOppdragsperiode(any(), any(), any()) } returns TestData.opprettOppdragsperiode()
+            oppdragService.lagreEllerOppdaterOppdrag(oppdrag, hendelse)
 
-      val oppdragId = oppdragService.lagreEllerOppdaterOppdrag(null, hendelse)
-
-      oppdragId shouldBe 0
+            verify { persistenceService.lagreOppdrag(oppdrag) }
+        }
     }
-  }
-
-
-  @Nested
-  inner class OppdaterOppdrag {
-
-    @Test
-    fun `skal oppdatere oppdrag`() {
-      val hendelse = TestData.opprettHendelse()
-      val oppdrag = TestData.opprettOppdrag()
-
-      every { oppdragsperiodeService.opprettNyOppdragsperiode(any(), any(), any()) } returns TestData.opprettOppdragsperiode()
-
-      oppdragService.lagreEllerOppdaterOppdrag(oppdrag, hendelse)
-
-      verify { persistenceService.lagreOppdrag(oppdrag) }
-    }
-  }
 }

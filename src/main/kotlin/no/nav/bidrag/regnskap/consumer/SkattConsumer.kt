@@ -16,68 +16,68 @@ import java.net.URI
 
 @Service
 class SkattConsumer(
-  @Value("\${SKATT_URL}") private val skattUrl: String,
-  @Value("\${maskinporten.scope}") private val scope: String,
-  @Value("\${ELIN_SUBSCRIPTION_KEY}") private val subscriptionKey: String,
-  private val restTemplate: RestTemplate,
-  private val maskinportenClient: MaskinportenClient
+    @Value("\${SKATT_URL}") private val skattUrl: String,
+    @Value("\${maskinporten.scope}") private val scope: String,
+    @Value("\${ELIN_SUBSCRIPTION_KEY}") private val subscriptionKey: String,
+    private val restTemplate: RestTemplate,
+    private val maskinportenClient: MaskinportenClient
 ) {
 
-  companion object {
-    const val KRAV_PATH = "/api/krav"
-    const val LIVENESS_PATH = "/api/liveness"
-    const val VEDLIKEHOLDSMODUS_PATH = "/api/vedlikeholdsmodus"
-  }
-
-  fun sendKrav(krav: Krav): ResponseEntity<String> {
-    return try {
-      restTemplate.exchange(
-        opprettSkattUrl(KRAV_PATH),
-        HttpMethod.POST,
-        HttpEntity<Krav>(krav, opprettHttpHeaders()),
-        String::class.java
-      )
-    } catch (e: HttpStatusCodeException) {
-      ResponseEntity.status(e.statusCode).body(e.responseBodyAsString)
+    companion object {
+        const val KRAV_PATH = "/api/krav"
+        const val LIVENESS_PATH = "/api/liveness"
+        const val VEDLIKEHOLDSMODUS_PATH = "/api/vedlikeholdsmodus"
     }
-  }
 
-  fun oppdaterVedlikeholdsmodus(vedlikeholdsmodus: Vedlikeholdsmodus): ResponseEntity<Any> {
-    return restTemplate.exchange(
-        opprettSkattUrl(VEDLIKEHOLDSMODUS_PATH),
-        HttpMethod.POST,
-        HttpEntity<Vedlikeholdsmodus>(vedlikeholdsmodus, opprettHttpHeaders()),
-        Any::class.java
-      )
-  }
-
-  fun hentStatusPåVedlikeholdsmodus(): ResponseEntity<Any> {
-    return try {
-      restTemplate.exchange(
-        opprettSkattUrl(LIVENESS_PATH),
-        HttpMethod.GET,
-        HttpEntity<String>(opprettHttpHeaders()),
-        Any::class.java
-      )
-    } catch (e: HttpStatusCodeException) {
-      ResponseEntity.status(e.statusCode).body(e.responseBodyAsString)
+    fun sendKrav(krav: Krav): ResponseEntity<String> {
+        return try {
+            restTemplate.exchange(
+                opprettSkattUrl(KRAV_PATH),
+                HttpMethod.POST,
+                HttpEntity<Krav>(krav, opprettHttpHeaders()),
+                String::class.java
+            )
+        } catch (e: HttpStatusCodeException) {
+            ResponseEntity.status(e.statusCode).body(e.responseBodyAsString)
+        }
     }
-  }
 
-  private fun opprettSkattUrl(path: String): URI {
-    return URI.create(skattUrl + path)
-  }
+    fun oppdaterVedlikeholdsmodus(vedlikeholdsmodus: Vedlikeholdsmodus): ResponseEntity<Any> {
+        return restTemplate.exchange(
+            opprettSkattUrl(VEDLIKEHOLDSMODUS_PATH),
+            HttpMethod.POST,
+            HttpEntity<Vedlikeholdsmodus>(vedlikeholdsmodus, opprettHttpHeaders()),
+            Any::class.java
+        )
+    }
 
-  private fun opprettHttpHeaders(): HttpHeaders {
-    val httpHeaders = HttpHeaders()
-    httpHeaders.set("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-    httpHeaders.set("Accept", MediaType.APPLICATION_JSON_VALUE)
-    httpHeaders.set("Authorization", "Bearer " + hentJwtToken())
-    httpHeaders.set("Ocp-Apim-Subscription-Key", subscriptionKey)
-    return httpHeaders
-  }
+    fun hentStatusPåVedlikeholdsmodus(): ResponseEntity<Any> {
+        return try {
+            restTemplate.exchange(
+                opprettSkattUrl(LIVENESS_PATH),
+                HttpMethod.GET,
+                HttpEntity<String>(opprettHttpHeaders()),
+                Any::class.java
+            )
+        } catch (e: HttpStatusCodeException) {
+            ResponseEntity.status(e.statusCode).body(e.responseBodyAsString)
+        }
+    }
 
-  private fun hentJwtToken(): String {
-    return maskinportenClient.hentMaskinportenToken(scope).parsedString
-  }
+    private fun opprettSkattUrl(path: String): URI {
+        return URI.create(skattUrl + path)
+    }
+
+    private fun opprettHttpHeaders(): HttpHeaders {
+        val httpHeaders = HttpHeaders()
+        httpHeaders.set("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+        httpHeaders.set("Accept", MediaType.APPLICATION_JSON_VALUE)
+        httpHeaders.set("Authorization", "Bearer " + hentJwtToken())
+        httpHeaders.set("Ocp-Apim-Subscription-Key", subscriptionKey)
+        return httpHeaders
+    }
+
+    private fun hentJwtToken(): String {
+        return maskinportenClient.hentMaskinportenToken(scope).parsedString
+    }
 }
