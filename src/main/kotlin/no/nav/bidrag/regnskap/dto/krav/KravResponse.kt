@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.media.Schema
 @Schema(name = "KravResponse", description = "Svar med referanse til videre behandling av konteringene.")
 data class KravResponse(
 
-  @JsonProperty("BatchUid")
-  val batchUid: String
+    @JsonProperty("BatchUid")
+    val batchUid: String
 )
-
