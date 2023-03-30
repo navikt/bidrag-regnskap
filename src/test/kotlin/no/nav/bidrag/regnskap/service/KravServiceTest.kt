@@ -12,7 +12,7 @@ import no.nav.bidrag.regnskap.utils.TestData
 import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.springframework.http.HttpStatus.*
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.HttpServerErrorException
@@ -36,11 +36,11 @@ class KravServiceTest {
     val now = LocalDate.now()
     val batchUid = "{\"BatchUid\":\"asijdk-32546s-jhsjhs\", \"ValidationMessages\":[]}"
 
-
     @Test
     fun `skal sende kontering til skatt når oppdragsperioden er innenfor innsendt periode`() {
         every { persistenceService.hentOppdrag(oppdragsId) } returns opprettOppdragForPeriode(
-            now.minusMonths(3), now.plusMonths(1)
+            now.minusMonths(3),
+            now.plusMonths(1)
         )
         every { skattConsumer.sendKrav(any()) } returns ResponseEntity.accepted().body(batchUid)
 
@@ -52,7 +52,8 @@ class KravServiceTest {
     @Test
     fun `skal sende kontering om perioden kun er for en måned`() {
         every { persistenceService.hentOppdrag(oppdragsId) } returns opprettOppdragForPeriode(
-            now, now.plusMonths(1)
+            now,
+            now.plusMonths(1)
         )
         every { skattConsumer.sendKrav(any()) } returns ResponseEntity.accepted().body(batchUid)
 
@@ -64,7 +65,8 @@ class KravServiceTest {
     @Test
     fun `skal kaste feil om kontering ikke går igjennom validering`() {
         every { persistenceService.hentOppdrag(oppdragsId) } returns opprettOppdragForPeriode(
-            now, now.plusMonths(1)
+            now,
+            now.plusMonths(1)
         )
         every { skattConsumer.sendKrav(any()) } returns ResponseEntity.badRequest().body(
             """
@@ -81,9 +83,10 @@ class KravServiceTest {
     @Test
     fun `skal kaste feil om tjenesten er slått av`() {
         every { persistenceService.hentOppdrag(oppdragsId) } returns opprettOppdragForPeriode(
-            now, now.plusMonths(1)
+            now,
+            now.plusMonths(1)
         )
-        every { skattConsumer.sendKrav(any()) } returns ResponseEntity.status(SERVICE_UNAVAILABLE).body(batchUid)
+        every { skattConsumer.sendKrav(any()) } returns ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(batchUid)
 
         shouldThrow<HttpServerErrorException> {
             kravService.sendKrav(oppdragId = oppdragsId)
@@ -93,9 +96,10 @@ class KravServiceTest {
     @Test
     fun `skal kaste feil om autentisering feiler`() {
         every { persistenceService.hentOppdrag(oppdragsId) } returns opprettOppdragForPeriode(
-            now, now.plusMonths(1)
+            now,
+            now.plusMonths(1)
         )
-        every { skattConsumer.sendKrav(any()) } returns ResponseEntity.status(UNAUTHORIZED).body(batchUid)
+        every { skattConsumer.sendKrav(any()) } returns ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(batchUid)
 
         shouldThrow<JwtTokenUnauthorizedException> {
             kravService.sendKrav(oppdragId = oppdragsId)
@@ -130,7 +134,9 @@ class KravServiceTest {
         return TestData.opprettOppdrag(
             oppdragsperioder = listOf(
                 TestData.opprettOppdragsperiode(
-                    periodeTil = periodeTil, periodeFra = periodeFra, konteringer = listOf(
+                    periodeTil = periodeTil,
+                    periodeFra = periodeFra,
+                    konteringer = listOf(
                         TestData.opprettKontering(
                             oppdragsperiode = TestData.opprettOppdragsperiode(
                                 oppdrag = TestData.opprettOppdrag()
