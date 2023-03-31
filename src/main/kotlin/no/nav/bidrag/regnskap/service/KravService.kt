@@ -11,6 +11,7 @@ import no.nav.bidrag.regnskap.dto.krav.KravResponse
 import no.nav.bidrag.regnskap.dto.krav.Kravfeil
 import no.nav.bidrag.regnskap.dto.krav.Kravkontering
 import no.nav.bidrag.regnskap.dto.krav.Kravliste
+import no.nav.bidrag.regnskap.maskinporten.MaskinportenClientException
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
@@ -85,15 +86,22 @@ class KravService(
             }
 
             HttpStatus.SERVICE_UNAVAILABLE -> {
-                LOGGER.info("Tjenesten hos skatt er slått av. Dette kan skje enten ved innlesing av påløpsfil eller ved andre uventede feil.")
+                LOGGER.error(
+                    "Skatt svarte med uventet statuskode: ${skattResponse.statusCode}. " +
+                            "Tjenesten hos skatt er slått av. Dette kan skje enten ved innlesing av påløpsfil eller ved andre uventede feil. " +
+                            "Feilmelding: ${skattResponse.body}"
+                )
                 lagreFeiletOverføringAvKrav(alleIkkeOverførteKonteringer, skattResponse.statusCode.toString())
                 throw HttpServerErrorException(skattResponse.statusCode)
             }
 
             HttpStatus.UNAUTHORIZED, HttpStatus.FORBIDDEN -> {
-                LOGGER.info("Bidrag-Regnskap er ikke autorisert eller mangler rettigheter for kallet mot skatt.")
+                LOGGER.error(
+                    "Skatt svarte med uventet statuskode: ${skattResponse.statusCode}. " +
+                            "Bidrag-Regnskap er ikke autorisert eller mangler rettigheter for kallet mot skatt. Feilmelding: ${skattResponse.body}"
+                )
                 lagreFeiletOverføringAvKrav(alleIkkeOverførteKonteringer, skattResponse.statusCode.toString())
-                throw JwtTokenUnauthorizedException()
+                throw MaskinportenClientException("Bidrag-Regnskap er ikke autorisert eller mangler rettigheter for kallet mot skatt. Feilmelding: ${skattResponse.body}")
             }
 
             else -> {

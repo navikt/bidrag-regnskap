@@ -7,9 +7,9 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.verify
 import no.nav.bidrag.regnskap.consumer.SkattConsumer
+import no.nav.bidrag.regnskap.maskinporten.MaskinportenClientException
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.utils.TestData
-import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.http.HttpStatus
@@ -101,7 +101,7 @@ class KravServiceTest {
         )
         every { skattConsumer.sendKrav(any()) } returns ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(batchUid)
 
-        shouldThrow<JwtTokenUnauthorizedException> {
+        shouldThrow<MaskinportenClientException> {
             kravService.sendKrav(oppdragId = oppdragsId)
         }
     }
