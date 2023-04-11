@@ -11,7 +11,6 @@ import java.time.YearMonth
 
 internal class KonteringUtilsTest {
 
-
     @Nested
     inner class VurderType {
 
@@ -26,7 +25,6 @@ internal class KonteringUtilsTest {
         fun setup() {
             oppdrag.oppdragsperioder = oppdrag.oppdragsperioder.plus(oppdragsperiode)
         }
-
 
         @Test
         fun `Skal vurdere til type NY dersom det ikke finnes noen kontering for den perioden`() {
