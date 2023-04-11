@@ -88,8 +88,8 @@ class KravService(
             HttpStatus.SERVICE_UNAVAILABLE -> {
                 LOGGER.error(
                     "Skatt svarte med uventet statuskode: ${skattResponse.statusCode}. " +
-                            "Tjenesten hos skatt er slått av. Dette kan skje enten ved innlesing av påløpsfil eller ved andre uventede feil. " +
-                            "Feilmelding: ${skattResponse.body}"
+                        "Tjenesten hos skatt er slått av. Dette kan skje enten ved innlesing av påløpsfil eller ved andre uventede feil. " +
+                        "Feilmelding: ${skattResponse.body}"
                 )
                 lagreFeiletOverføringAvKrav(alleIkkeOverførteKonteringer, skattResponse.statusCode.toString())
                 throw HttpServerErrorException(skattResponse.statusCode)
@@ -98,7 +98,7 @@ class KravService(
             HttpStatus.UNAUTHORIZED, HttpStatus.FORBIDDEN -> {
                 LOGGER.error(
                     "Skatt svarte med uventet statuskode: ${skattResponse.statusCode}. " +
-                            "Bidrag-Regnskap er ikke autorisert eller mangler rettigheter for kallet mot skatt. Feilmelding: ${skattResponse.body}"
+                        "Bidrag-Regnskap er ikke autorisert eller mangler rettigheter for kallet mot skatt. Feilmelding: ${skattResponse.body}"
                 )
                 lagreFeiletOverføringAvKrav(alleIkkeOverførteKonteringer, skattResponse.statusCode.toString())
                 throw MaskinportenClientException("Bidrag-Regnskap er ikke autorisert eller mangler rettigheter for kallet mot skatt. Feilmelding: ${skattResponse.body}")
