@@ -6,10 +6,11 @@ import no.nav.bidrag.regnskap.dto.enumer.Søknadstype
 import no.nav.bidrag.regnskap.dto.enumer.Type
 import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
+import java.time.YearMonth
 
 object KonteringUtils {
 
-    fun vurderSøknadsType(hendelse: Hendelse, indexPeriode: Int): String {
+    fun vurderSøknadType(hendelse: Hendelse, indexPeriode: Int): String {
         return if (hendelse.vedtakType == VedtakType.INDEKSREGULERING && indexPeriode == 0) {
             Søknadstype.IN.name
         } else if (hendelse.type == EngangsbelopType.GEBYR_MOTTAKER.name) {
@@ -21,7 +22,7 @@ object KonteringUtils {
         }
     }
 
-    fun vurderSøknadsType(vedtakType: String, indexPeriode: Int): String {
+    fun vurderSøknadType(vedtakType: String, indexPeriode: Int): String {
         return if (vedtakType == VedtakType.INDEKSREGULERING.name && indexPeriode == 0) {
             Søknadstype.IN.name
         } else if (vedtakType == EngangsbelopType.GEBYR_MOTTAKER.name) {
@@ -33,10 +34,13 @@ object KonteringUtils {
         }
     }
 
-    fun vurderType(oppdragsperiode: Oppdragsperiode): String {
-        if (oppdragsperiode.oppdrag?.oppdragsperioder?.none { it.konteringer.isNotEmpty() } == true) {
+    fun vurderType(oppdragsperiode: Oppdragsperiode, periode: YearMonth): String {
+        if (finnesKonteringForPeriode(oppdragsperiode, periode)) {
             return Type.NY.name
         }
         return Type.ENDRING.name
     }
+
+    private fun finnesKonteringForPeriode(oppdragsperiode: Oppdragsperiode, periode: YearMonth) =
+        oppdragsperiode.oppdrag?.oppdragsperioder?.none { it.konteringer.any { kontering -> kontering.overføringsperiode == periode.toString() } } == true
 }

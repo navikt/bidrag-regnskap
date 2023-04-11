@@ -631,7 +631,7 @@ internal class VedtakshendelseListenerIT {
 
         skrivTilTestdatafil(
             hentAlleOppdaterteOgNyeKonteringerForOppdragVedOppdatering(oppdrag),
-            "Oppdaterer 18 års bidrag med 1 mnd lenger varighet og +100kr."
+            "Oppdaterer 18 års bidrag med 1 mnd lenger varighet, til å starte 1 mnd før og +100kr."
         )
     }
 
@@ -755,7 +755,6 @@ internal class VedtakshendelseListenerIT {
                 oppdragsperiode.konteringer.forEach { kontering ->
                     kontering.overføringKontering?.size shouldBe 1
                     kontering.transaksjonskode shouldBeIn listOf(forventetTransaksjonskode.name, forventetKorreksjonskode?.name)
-                    kontering.type shouldBe if (kontering === oppdrag.oppdragsperioder[0].konteringer[0]) NY.name else ENDRING.name
                     kontering.søknadType shouldBe forventetSøknadstype.name
                     kontering.sendtIPåløpsfil shouldBe false
                     kontering.overføringsperiode shouldBeIn månederForKontering
