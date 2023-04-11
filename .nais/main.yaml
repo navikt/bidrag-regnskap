@@ -1,6 +1,6 @@
 name: bidrag-regnskap
 ingresses:
-  - https://bidrag-regnskap.dev.intern.nav.no
+  - https://bidrag-regnskap.intern.dev.nav.no
 kafka:
   pool: nav-dev
 database:
