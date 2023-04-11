@@ -3,7 +3,7 @@ package no.nav.bidrag.regnskap.service
 import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
-import no.nav.bidrag.regnskap.util.KonteringUtils.vurderSøknadsType
+import no.nav.bidrag.regnskap.util.KonteringUtils.vurderSøknadType
 import no.nav.bidrag.regnskap.util.KonteringUtils.vurderType
 import no.nav.bidrag.regnskap.util.PeriodeUtils.hentAllePerioderMellomDato
 import org.slf4j.LoggerFactory
@@ -28,8 +28,8 @@ class ManglendeKonteringerService {
                     Kontering(
                         transaksjonskode = Transaksjonskode.hentTransaksjonskodeForType(oppdragsperiode.oppdrag!!.stønadType).name,
                         overføringsperiode = periode.toString(),
-                        type = vurderType(oppdragsperiode),
-                        søknadType = vurderSøknadsType(oppdragsperiode.vedtakType, periodeIndex),
+                        type = vurderType(oppdragsperiode, periode),
+                        søknadType = vurderSøknadType(oppdragsperiode.vedtakType, periodeIndex),
                         oppdragsperiode = oppdragsperiode,
                         sendtIPåløpsfil = true
                     )

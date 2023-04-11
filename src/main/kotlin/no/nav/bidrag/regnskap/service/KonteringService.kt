@@ -9,7 +9,7 @@ import no.nav.bidrag.regnskap.dto.vedtak.Periode
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
-import no.nav.bidrag.regnskap.util.KonteringUtils.vurderSøknadsType
+import no.nav.bidrag.regnskap.util.KonteringUtils.vurderSøknadType
 import no.nav.bidrag.regnskap.util.KonteringUtils.vurderType
 import no.nav.bidrag.regnskap.util.PeriodeUtils
 import org.springframework.stereotype.Service
@@ -53,8 +53,8 @@ class KonteringService {
                 Kontering(
                     transaksjonskode = Transaksjonskode.hentTransaksjonskodeForType(hendelse.type).name,
                     overføringsperiode = periode.toString(),
-                    type = vurderType(oppdragsperiode),
-                    søknadType = vurderSøknadsType(hendelse, indexPeriode),
+                    type = vurderType(oppdragsperiode, periode),
+                    søknadType = vurderSøknadType(hendelse, indexPeriode),
                     oppdragsperiode = oppdragsperiode
                 )
             )
