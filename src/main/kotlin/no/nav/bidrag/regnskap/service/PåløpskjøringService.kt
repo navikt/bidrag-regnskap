@@ -100,17 +100,13 @@ class PåløpskjøringService(
             persistenceService.hentAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer()
 
         oppdragsperioderSomIkkeHarOpprettetAlleKonteringer.forEach {
-            if (it.aktivTil == null && it.periodeTil != null && erFørsteDatoSammeSomEllerTidligereEnnAndreDato(
-                    it.periodeTil,
-                    påløpsPeriode
-                )
-            ) {
+            if (it.aktivTil == null && erFørsteDatoSammeSomEllerTidligereEnnAndreDato(it.periodeTil, påløpsPeriode)) {
                 it.aktivTil = it.periodeTil
             }
 
             manglendeKonteringerService.opprettManglendeKonteringerForOppdragsperiode(it, YearMonth.parse(påløp.forPeriode))
 
-            if (it.aktivTil != null && erFørsteDatoSammeSomEllerTidligereEnnAndreDato(it.aktivTil!!, påløpsPeriode)) {
+            if (erFørsteDatoSammeSomEllerTidligereEnnAndreDato(it.aktivTil, påløpsPeriode)) {
                 it.konteringerFullførtOpprettet = true
             }
 

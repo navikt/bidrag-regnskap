@@ -44,22 +44,18 @@ class OppdragService(
         val sisteOverførtePeriode = persistenceService.finnSisteOverførtePeriode()
 
         hendelse.periodeListe.forEach { periode ->
-            if (periode.beløp != null) {
-                val oppdragsperiode = oppdragsperiodeService.opprettNyOppdragsperiode(hendelse, periode, oppdrag)
-                if (erOppdatering) {
-                    konteringService.opprettKorreksjonskonteringer(oppdrag, oppdragsperiode, sisteOverførtePeriode)
-                }
-                oppdragsperiodeService.settAktivTilDatoPåEksisterendeOppdragsperioder(oppdrag, oppdragsperiode.periodeFra)
-                oppdrag.oppdragsperioder = oppdrag.oppdragsperioder.plus(oppdragsperiode)
-                konteringService.opprettNyeKonteringerPåOppdragsperiode(
-                    oppdragsperiode,
-                    hendelse,
-                    sisteOverførtePeriode
-                )
-            } else {
-                konteringService.opprettKorreksjonskonteringer(oppdrag, periode, sisteOverførtePeriode)
-                oppdragsperiodeService.settAktivTilDatoPåEksisterendeOppdragsperioder(oppdrag, periode.periodeFomDato)
+            val oppdragsperiode = oppdragsperiodeService.opprettNyOppdragsperiode(hendelse, periode, oppdrag)
+            if (erOppdatering) {
+                konteringService.opprettKorreksjonskonteringer(oppdrag, oppdragsperiode, sisteOverførtePeriode)
+                konteringService.opprettManglendeKonteringerVedOppstartAvOpphørtOppdragsperiode(oppdrag, oppdragsperiode, sisteOverførtePeriode)
             }
+            oppdragsperiodeService.settAktivTilDatoPåEksisterendeOppdragsperioder(oppdrag, oppdragsperiode.periodeFra)
+            oppdrag.oppdragsperioder = oppdrag.oppdragsperioder.plus(oppdragsperiode)
+            konteringService.opprettNyeKonteringerPåOppdragsperiode(
+                oppdragsperiode,
+                hendelse,
+                sisteOverførtePeriode
+            )
         }
 
         oppdatererVerdierPåOppdrag(hendelse, oppdrag)
@@ -92,7 +88,6 @@ class OppdragService(
             kravhaverIdent = hendelse.kravhaverIdent,
             skyldnerIdent = hendelse.skyldnerIdent,
             utsattTilDato = hendelse.utsattTilDato
-            // TODO(Sette omgjortVedtakId og referanse
         )
     }
 

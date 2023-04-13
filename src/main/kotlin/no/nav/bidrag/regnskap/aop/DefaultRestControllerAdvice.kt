@@ -33,7 +33,7 @@ class DefaultRestControllerAdvice {
 
     @ResponseBody
     @ExceptionHandler(Exception::class)
-    fun handleUnauthorizedException(exception: Exception): ResponseEntity<*> {
+    fun handleException(exception: Exception): ResponseEntity<*> {
         LOGGER.warn(exception) { "Det skjedde en ukjent feil" }
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
             .header(HttpHeaders.WARNING, "Det skjedde en ukjent feil: " + exception.message).build<Any>()

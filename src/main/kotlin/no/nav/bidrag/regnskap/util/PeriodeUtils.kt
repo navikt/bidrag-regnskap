@@ -36,9 +36,9 @@ object PeriodeUtils {
     }
 
     fun erFørsteDatoSammeSomEllerTidligereEnnAndreDato(
-        førsteDato: LocalDate,
+        førsteDato: LocalDate?,
         andreDato: LocalDate
     ): Boolean {
-        return førsteDato.isBefore(andreDato) || førsteDato.isEqual(andreDato)
+        return førsteDato != null && (førsteDato.isBefore(andreDato) || førsteDato.isEqual(andreDato))
     }
 }
