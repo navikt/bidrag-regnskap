@@ -58,7 +58,7 @@ class PersistenceService(
 
     fun hentOppdragPåReferanseOgOmgjørVedtakId(referanse: String, omgjørVedtakId: Int): Oppdrag? {
         LOGGER.debug("Henter oppdrag på referanse: $referanse og omgjørVedtakId: $omgjørVedtakId")
-        return oppdragsperiodeRepository.findByReferanseAndVedtakId(referanse, omgjørVedtakId)?.oppdrag
+        return oppdragsperiodeRepository.findByReferanseAndVedtakId(referanse, omgjørVedtakId).firstOrNull()?.oppdrag
     }
 
     fun lagreOppdrag(oppdrag: Oppdrag): Int {
@@ -123,7 +123,7 @@ class PersistenceService(
     }
 
     fun hentAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer(): List<Oppdragsperiode> {
-        return oppdragsperiodeRepository.findAllByKonteringerFullførtOpprettetIsFalseOrderByOppdragAscOppdragsperiodeIdAsc()
+        return oppdragsperiodeRepository.findAllByKonteringerFullførtOpprettetIsFalseAndOpphørendeOppdragsperiodeIsFalseOrderByOppdragAscOppdragsperiodeIdAsc()
     }
 
     fun lagreOppdragsperiode(oppdragsperiode: Oppdragsperiode): Int {

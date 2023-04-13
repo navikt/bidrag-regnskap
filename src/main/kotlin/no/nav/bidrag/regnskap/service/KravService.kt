@@ -108,7 +108,7 @@ class KravService(
                 LOGGER.error("Skatt svarte med uventet statuskode: ${skattResponse.statusCode}. Feilmelding: ${skattResponse.body}")
                 val kravfeil = objectMapper.readValue(skattResponse.body, Kravfeil::class.java)
                 lagreFeiletOverføringAvKrav(alleIkkeOverførteKonteringer, kravfeil.toString())
-                throw IllegalStateException("Skatt svarte med uventet statuskode. ${skattResponse.statusCode}. Feilmelding: ${skattResponse.body}")
+                throw HttpServerErrorException(skattResponse.statusCode, "Skatt svarte med uventet statuskode. ${skattResponse.statusCode}. Feilmelding: ${skattResponse.body}")
             }
         }
     }

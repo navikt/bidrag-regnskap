@@ -7,6 +7,7 @@ import no.nav.bidrag.regnskap.dto.vedtak.Periode
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
 import org.springframework.stereotype.Service
+import java.math.BigDecimal
 import java.time.LocalDate
 
 @Service
@@ -45,15 +46,16 @@ class OppdragsperiodeService(
             vedtakType = hendelse.vedtakType.toString(),
             gjelderIdent = sakConsumer.hentBmFraSak(hendelse.sakId),
             mottakerIdent = hendelse.mottakerIdent,
-            beløp = periode.beløp!!,
-            valuta = periode.valutakode!!,
+            beløp = periode.beløp ?: BigDecimal.ZERO,
+            valuta = periode.valutakode ?: "NOK",
             periodeFra = periode.periodeFomDato,
             periodeTil = periode.periodeTilDato,
             vedtaksdato = hendelse.vedtakDato,
             opprettetAv = hendelse.opprettetAv,
             delytelseId = periode.delytelsesId,
             eksternReferanse = hendelse.eksternReferanse,
-            oppdrag = oppdrag
+            oppdrag = oppdrag,
+            opphørendeOppdragsperiode = periode.beløp == null
         )
     }
 

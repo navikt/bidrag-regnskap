@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS oppdragsperioder
     periode_fra                    date    NOT NULL,
     periode_til                    date,
     aktiv_til                      date,
+    opphorende_oppdragsperiode     boolean   DEFAULT false,
     vedtaksdato                    date    NOT NULL,
     opprettet_av                   text    NOT NULL,
     konteringer_fullfort_opprettet boolean   DEFAULT false,
@@ -27,4 +28,5 @@ CREATE INDEX aktiv_til_index ON oppdragsperioder (aktiv_til);
 CREATE INDEX oppdrag_id_index ON oppdragsperioder (oppdrag_id);
 CREATE INDEX vedtak_id_og_referanse_index ON oppdragsperioder (vedtak_id, referanse);
 CREATE INDEX konteringer_fullfort_index ON oppdragsperioder (konteringer_fullfort_opprettet);
+CREATE INDEX konteringer_fullfort_opprettet_index ON oppdragsperioder (konteringer_fullfort_opprettet);
 CREATE INDEX konteringer_fullfort_oppdrag_id_og_oppdragsperiode_id_index ON oppdragsperioder (oppdragsperiode_id, oppdrag_id, konteringer_fullfort_opprettet)

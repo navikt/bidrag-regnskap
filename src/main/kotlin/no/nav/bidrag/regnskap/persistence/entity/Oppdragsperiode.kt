@@ -61,6 +61,9 @@ data class Oppdragsperiode(
     @Column(name = "aktiv_til")
     var aktivTil: LocalDate? = null,
 
+    @Column(name = "opphorende_oppdragsperiode")
+    var opphørendeOppdragsperiode: Boolean = false,
+
     @Column(name = "opprettet_av")
     val opprettetAv: String,
 
@@ -97,6 +100,7 @@ data class Oppdragsperiode(
             "konteringerFullførtOpprettet = $konteringerFullførtOpprettet , " +
             "delytelseId = $delytelseId , " +
             "eksternReferanse = $eksternReferanse , " +
+            "opphørendeOppdragsperiode = $opphørendeOppdragsperiode , " +
             "aktivTil = $aktivTil )"
     }
 
@@ -122,6 +126,7 @@ data class Oppdragsperiode(
         if (konteringerFullførtOpprettet != other.konteringerFullførtOpprettet) return false
         if (delytelseId != other.delytelseId) return false
         if (eksternReferanse != other.eksternReferanse) return false
+        if (opphørendeOppdragsperiode != other.opphørendeOppdragsperiode) return false
         if (aktivTil != other.aktivTil) return false
 
         return true
@@ -144,6 +149,7 @@ data class Oppdragsperiode(
         result = 31 * result + konteringerFullførtOpprettet.hashCode()
         result = 31 * result + (delytelseId ?: 0)
         result = 31 * result + (eksternReferanse?.hashCode() ?: 0)
+        result = 31 * result + (opphørendeOppdragsperiode.hashCode())
         result = 31 * result + (aktivTil?.hashCode() ?: 0)
         return result
     }

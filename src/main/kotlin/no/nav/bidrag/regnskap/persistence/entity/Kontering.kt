@@ -33,11 +33,17 @@ data class Kontering(
     @Column(name = "overforingstidspunkt")
     var overføringstidspunkt: LocalDateTime? = null,
 
+    @Column(name = "behandlingsstatus_ok_tidspunkt")
+    var behandlingsstatusOkTidspunkt: LocalDateTime? = null,
+
     @Column(name = "type")
     val type: String,
 
     @Column(name = "soknad_type")
     val søknadType: String,
+
+    @Column(name = "siste_referansekode")
+    val sisteReferansekode: String? = null,
 
     @Column(name = "sendt_i_palopsfil")
     var sendtIPåløpsfil: Boolean = false,
@@ -54,8 +60,10 @@ data class Kontering(
             "transaksjonskode = $transaksjonskode , " +
             "overføringsperiode = $overføringsperiode , " +
             "overføringstidspunkt = $overføringstidspunkt , " +
+            "behandlingsstatusOkTidspunkt = $behandlingsstatusOkTidspunkt , " +
             "type = $type , " +
             "søknadType = $søknadType , " +
+            "sisteReferansekode = $sisteReferansekode , " +
             "sendtIPåløpsfil = $sendtIPåløpsfil )"
     }
 
@@ -70,8 +78,10 @@ data class Kontering(
         if (transaksjonskode != other.transaksjonskode) return false
         if (overføringsperiode != other.overføringsperiode) return false
         if (overføringstidspunkt != other.overføringstidspunkt) return false
+        if (behandlingsstatusOkTidspunkt != other.behandlingsstatusOkTidspunkt) return false
         if (type != other.type) return false
         if (søknadType != other.søknadType) return false
+        if (sisteReferansekode != other.sisteReferansekode) return false
         if (sendtIPåløpsfil != other.sendtIPåløpsfil) return false
 
         return true
@@ -83,8 +93,10 @@ data class Kontering(
         result = 31 * result + transaksjonskode.hashCode()
         result = 31 * result + overføringsperiode.hashCode()
         result = 31 * result + (overføringstidspunkt?.hashCode() ?: 0)
+        result = 31 * result + (behandlingsstatusOkTidspunkt?.hashCode() ?: 0)
         result = 31 * result + type.hashCode()
         result = 31 * result + søknadType.hashCode()
+        result = 31 * result + (sisteReferansekode?.hashCode() ?: 0)
         result = 31 * result + sendtIPåløpsfil.hashCode()
         return result
     }
