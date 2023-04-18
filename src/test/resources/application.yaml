@@ -29,6 +29,8 @@ maskinporten:
 scheduler:
   sendkrav:
     cron: "0 */10 * * * *" #Hvert 10. minutt
+  behandlingsstatus:
+    cron: "0 5,15,25,35,45,55 * * * *" #Hvert 10. minutt med 5 minutter offset
   avstemning:
     cron: "0 0 1 * * *" #Hver dag kl 01:00
   påløpkjøring:

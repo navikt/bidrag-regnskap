@@ -36,7 +36,7 @@ class DriftsavvikController(
         value = [
             ApiResponse(
                 responseCode = "200",
-                description = "Aktive driftsavvik blr returnert.",
+                description = "Konteringene er behandlet OK.",
                 content = [Content()]
             )
         ]

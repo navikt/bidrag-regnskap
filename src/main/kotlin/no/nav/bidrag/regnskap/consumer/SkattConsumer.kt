@@ -75,6 +75,20 @@ class SkattConsumer(
         }
     }
 
+    fun sjekkBehandlingsstatus(batchUid: String): ResponseEntity<Any> {
+        LOGGER.info { "Henter behandlingsstatus for batchUid: $batchUid" }
+        return try {
+            restTemplate.exchange(
+                opprettSkattUrl("$KRAV_PATH/$batchUid"),
+                HttpMethod.GET,
+                HttpEntity<String>(opprettHttpHeaders()),
+                Any::class.java
+            )
+        } catch (e: HttpStatusCodeException) {
+            ResponseEntity.status(e.statusCode).body(e.responseBodyAsString)
+        }
+    }
+
     private fun opprettSkattUrl(path: String): URI {
         return URI.create(skattUrl + path)
     }
