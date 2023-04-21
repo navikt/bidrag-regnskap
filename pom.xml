@@ -41,7 +41,13 @@
   <repositories>
     <repository>
       <id>github</id>
-      <url>https://maven.pkg.github.com/navikt/bidrag-commons</url>
+      <name>GitHub felles Apache Maven Packages for navikt</name>
+      <url>https://maven.pkg.github.com/navikt/maven-release/</url>
+    </repository>
+    <repository>
+      <id>confluent</id>
+      <name>Confluent kafka</name>
+      <url>https://packages.confluent.io/maven/</url>
     </repository>
   </repositories>
 
