@@ -7,7 +7,6 @@ import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
-
 @Service
 class BehandlingsstatusService(
     private val skattConsumer: SkattConsumer,
@@ -32,7 +31,7 @@ class BehandlingsstatusService(
             } else {
                 feilmeldinger[key] = {
                     "Behandling av konteringer for batchuid $key har feilet. " +
-                            "\nFeilmedling: $behandlingsstatusResponse"
+                        "\nFeilmedling: $behandlingsstatusResponse"
                 }.toString()
             }
         }

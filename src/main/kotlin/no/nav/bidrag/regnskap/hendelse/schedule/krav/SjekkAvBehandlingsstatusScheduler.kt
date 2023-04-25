@@ -26,7 +26,7 @@ class SjekkAvBehandlingsstatusScheduler(
     fun skedulertSjekkAvBehandlingsstatus() {
         LockAssert.assertLocked()
         LOGGER.info { "Starter schedulert sjekk av behandlingsstatus for allerede overførte konteringer." }
-        if (kravSchedulerUtils.harAktiveDriftAvvik()) {
+        if (kravSchedulerUtils.harAktivtDriftsavvik()) {
             LOGGER.warn { "Det finnes aktive driftsavvik. Starter derfor ikke sjekk av behandlingsstatus." }
             return
         } else if (kravSchedulerUtils.erVedlikeholdsmodusPåslått()) {
@@ -46,13 +46,11 @@ class SjekkAvBehandlingsstatusScheduler(
 
         LOGGER.info { "${konteringerSomIkkeHarFåttGodkjentBehandlingsstatus.size} har nå fått sjekket behandlingsstatus." }
         if (feiledeOverføringer.isNotEmpty()) {
-
             val feilmeldingSammenslått = feiledeOverføringer.entries.joinToString("\n") { "${it.key}: ${it.value}" }
 
-            //TODO() Om feil varsle på slack med alle batchUid som har feil
+            // TODO() Om feil varsle på slack med alle batchUid som har feil
 
             LOGGER.error { "Det har oppstått feil ved overføring av krav på følgende batchUider med følgende feilmelding:\n $feilmeldingSammenslått" }
         }
     }
-
 }
