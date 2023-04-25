@@ -16,6 +16,7 @@ env:
   TOPIC_VEDTAK: bidrag.vedtak-feature
   BUCKET_NAME: bidrag-regnskap-feature
   SFTP_HOST: sftp-q.nav.no
+  SFTP_SKAL_OVERFORE_FIL: false
   SAK_URL: https://bidrag-sak-feature.dev-fss-pub.nais.io
   SAK_HOST: bidrag-sak-feature.dev-fss-pub.nais.io
   SAK_SCOPE: https://dev-fss.bidrag.bidrag-sak-feature
