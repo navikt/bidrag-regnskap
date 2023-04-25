@@ -99,7 +99,7 @@ class PersistenceService(
     fun finnSisteOverførtePeriode(): YearMonth {
         LOGGER.debug("Henter siste overførte periode.")
         try {
-            val sisteOverførtePeriode = YearMonth.parse(påløpRepository.finnSisteOverførtePeriodeForPåløp())
+            val sisteOverførtePeriode = YearMonth.parse(påløpRepository.finnSisteOverførtePeriodeForPåløp() ?: "1001-01")
             LOGGER.debug("Siste overførte periode var: $sisteOverførtePeriode.")
             return sisteOverførtePeriode
         } catch (e: EmptyResultDataAccessException) {
@@ -110,6 +110,10 @@ class PersistenceService(
 
     fun hentAlleIkkeOverførteKonteringer(): List<Kontering> {
         return konteringRepository.findAllByOverføringstidspunktIsNull()
+    }
+
+    fun hentAlleKonteringerUtenBehandlingsstatusOk(): List<Kontering> {
+        return konteringRepository.findAllByBehandlingsstatusOkTidspunktIsNullAndOverføringstidspunktIsNotNullAndSisteReferansekodeIsNotNull()
     }
 
     fun hentAlleKonteringerForDato(dato: LocalDate): List<Kontering> {

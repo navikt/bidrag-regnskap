@@ -43,7 +43,7 @@ data class Kontering(
     val søknadType: String,
 
     @Column(name = "siste_referansekode")
-    val sisteReferansekode: String? = null,
+    var sisteReferansekode: String? = null,
 
     @Column(name = "sendt_i_palopsfil")
     var sendtIPåløpsfil: Boolean = false,

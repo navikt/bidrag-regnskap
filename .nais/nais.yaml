@@ -70,4 +70,5 @@ spec:
   accessPolicy:
     outbound:
       external:
+        - host: {{ env.BIDRAG_SAK_HOST }}
         - host: {{ env.SKATT_HOST }}

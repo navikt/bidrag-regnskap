@@ -10,7 +10,7 @@ interface PåløpRepository : JpaRepository<Påløp, Int> {
         value = "SELECT max(for_periode) FROM palop WHERE fullfort_tidspunkt IS NOT NULL",
         nativeQuery = true
     )
-    fun finnSisteOverførtePeriodeForPåløp(): String
+    fun finnSisteOverførtePeriodeForPåløp(): String?
 
     fun findAllByFullførtTidspunktIsNull(): List<Påløp>
 }

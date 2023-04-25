@@ -125,6 +125,7 @@ class KravService(
         alleIkkeOverforteKonteringer.forEach { kontering ->
             val now = LocalDateTime.now()
             kontering.overføringstidspunkt = now
+            kontering.sisteReferansekode = kravResponse.batchUid
 
             persistenceService.lagreOverføringKontering(
                 opprettOverføringKontering(
