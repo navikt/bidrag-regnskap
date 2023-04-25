@@ -14,4 +14,6 @@ interface KonteringRepository : JpaRepository<Kontering, Int> {
         nativeQuery = true
     )
     fun hentAlleKonteringerForDato(dato: LocalDate): List<Kontering>
+
+    fun findAllByBehandlingsstatusOkTidspunktIsNullAndOverføringstidspunktIsNotNullAndSisteReferansekodeIsNotNull(): List<Kontering>
 }

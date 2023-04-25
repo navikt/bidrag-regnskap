@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.bidrag.regnskap.consumer.SkattConsumer
+import no.nav.bidrag.regnskap.dto.behandlingsstatus.BehandlingsstatusResponse
 import no.nav.security.token.support.core.api.Protected
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -33,7 +34,7 @@ class BehandlingsstatusController(
             )
         ]
     )
-    fun hentBehandlingsstatus(batchUid: String): ResponseEntity<Any> {
+    fun hentBehandlingsstatus(batchUid: String): ResponseEntity<BehandlingsstatusResponse> {
         return skattConsumer.sjekkBehandlingsstatus(batchUid)
     }
 }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.oshai.KotlinLogging
 import no.nav.bidrag.regnskap.SECURE_LOGGER
+import no.nav.bidrag.regnskap.dto.behandlingsstatus.BehandlingsstatusResponse
 import no.nav.bidrag.regnskap.dto.krav.Kravliste
 import no.nav.bidrag.regnskap.dto.påløp.Vedlikeholdsmodus
 import no.nav.bidrag.regnskap.maskinporten.MaskinportenClient
@@ -75,18 +76,14 @@ class SkattConsumer(
         }
     }
 
-    fun sjekkBehandlingsstatus(batchUid: String): ResponseEntity<Any> {
+    fun sjekkBehandlingsstatus(batchUid: String): ResponseEntity<BehandlingsstatusResponse> {
         LOGGER.info { "Henter behandlingsstatus for batchUid: $batchUid" }
-        return try {
-            restTemplate.exchange(
-                opprettSkattUrl("$KRAV_PATH/$batchUid"),
-                HttpMethod.GET,
-                HttpEntity<String>(opprettHttpHeaders()),
-                Any::class.java
-            )
-        } catch (e: HttpStatusCodeException) {
-            ResponseEntity.status(e.statusCode).body(e.responseBodyAsString)
-        }
+        return restTemplate.exchange(
+            opprettSkattUrl("$KRAV_PATH/$batchUid"),
+            HttpMethod.GET,
+            HttpEntity<String>(opprettHttpHeaders()),
+            BehandlingsstatusResponse::class.java
+        )
     }
 
     private fun opprettSkattUrl(path: String): URI {
