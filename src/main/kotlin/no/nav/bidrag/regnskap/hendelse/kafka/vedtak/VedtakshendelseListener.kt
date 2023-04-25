@@ -26,10 +26,12 @@ class VedtakshendelseListener(
         } catch (e: JacksonException) {
             LOGGER.error(
                 "Mapping av hendelse feilet for kafkamelding med offsett: $offset, key: $key, recieved_partition: $partition!" +
-                        "\nSe secure log for mer informasjon."
+                    "\nSe secure log for mer informasjon."
             )
-            SECURE_LOGGER.error("Mapping av hendelse feilet for kafkamelding med offsett: $offset, key: $key, recieved_partition: $partition! " +
-                    "\nFeil: $e \n\nHendelse: $hendelse")
+            SECURE_LOGGER.error(
+                "Mapping av hendelse feilet for kafkamelding med offsett: $offset, key: $key, recieved_partition: $partition! " +
+                    "\nFeil: $e \n\nHendelse: $hendelse"
+            )
         }
     }
 }

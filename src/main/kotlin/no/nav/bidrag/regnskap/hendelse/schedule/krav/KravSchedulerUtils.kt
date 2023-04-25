@@ -14,7 +14,7 @@ class KravSchedulerUtils(
         return kravService.erVedlikeholdsmodusPåslått()
     }
 
-    fun harAktiveDriftAvvik(): Boolean {
+    fun harAktivtDriftsavvik(): Boolean {
         return persistenceService.harAktivtDriftsavvik()
     }
 }

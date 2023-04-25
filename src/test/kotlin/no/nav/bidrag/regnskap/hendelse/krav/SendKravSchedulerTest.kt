@@ -9,6 +9,7 @@ import io.mockk.just
 import io.mockk.mockkStatic
 import io.mockk.verify
 import net.javacrumbs.shedlock.core.LockAssert
+import no.nav.bidrag.regnskap.hendelse.schedule.krav.KravSchedulerUtils
 import no.nav.bidrag.regnskap.hendelse.schedule.krav.SendKravScheduler
 import no.nav.bidrag.regnskap.service.KravService
 import no.nav.bidrag.regnskap.service.PersistenceService
@@ -28,6 +29,9 @@ internal class SendKravSchedulerTest {
     @MockK
     private lateinit var kravService: KravService
 
+    @MockK
+    private lateinit var kravSchedulerUtils: KravSchedulerUtils
+
     @InjectMockKs
     private lateinit var sendKravScheduler: SendKravScheduler
 
@@ -39,7 +43,7 @@ internal class SendKravSchedulerTest {
 
     @Test
     fun `skal ikke sende over når det finnes aktivt driftsavvik`() {
-        every { persistenceService.harAktivtDriftsavvik() } returns true
+        every { kravSchedulerUtils.harAktivtDriftsavvik() } returns true
 
         sendKravScheduler.skedulertOverforingAvKrav()
 
@@ -48,8 +52,8 @@ internal class SendKravSchedulerTest {
 
     @Test
     fun `skal ikke sende over om vedlikeholdsmodus er påslått`() {
-        every { persistenceService.harAktivtDriftsavvik() } returns false
-        every { kravService.erVedlikeholdsmodusPåslått() } returns true
+        every { kravSchedulerUtils.harAktivtDriftsavvik() } returns false
+        every { kravSchedulerUtils.erVedlikeholdsmodusPåslått() } returns true
 
         sendKravScheduler.skedulertOverforingAvKrav()
 
@@ -58,8 +62,8 @@ internal class SendKravSchedulerTest {
 
     @Test
     fun `skal ikke sende over om det ikke finnes ikke overførte konteringer`() {
-        every { persistenceService.harAktivtDriftsavvik() } returns false
-        every { kravService.erVedlikeholdsmodusPåslått() } returns false
+        every { kravSchedulerUtils.harAktivtDriftsavvik() } returns false
+        every { kravSchedulerUtils.erVedlikeholdsmodusPåslått() } returns false
         every { persistenceService.hentAlleIkkeOverførteKonteringer() } returns emptyList()
         every { persistenceService.finnSisteOverførtePeriode() } returns YearMonth.now()
 
@@ -74,8 +78,8 @@ internal class SendKravSchedulerTest {
         val oppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = oppdrag)
         val kontering = TestData.opprettKontering(oppdragsperiode = oppdragsperiode)
 
-        every { persistenceService.harAktivtDriftsavvik() } returns false
-        every { kravService.erVedlikeholdsmodusPåslått() } returns false
+        every { kravSchedulerUtils.harAktivtDriftsavvik() } returns false
+        every { kravSchedulerUtils.erVedlikeholdsmodusPåslått() } returns false
         every { persistenceService.hentAlleIkkeOverførteKonteringer() } returns listOf(kontering)
         every { persistenceService.finnSisteOverførtePeriode() } returns YearMonth.now()
         every { kravService.sendKrav(any()) } just Runs
@@ -91,8 +95,8 @@ internal class SendKravSchedulerTest {
         val oppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = oppdrag)
         val kontering = TestData.opprettKontering(oppdragsperiode = oppdragsperiode)
 
-        every { persistenceService.harAktivtDriftsavvik() } returns false
-        every { kravService.erVedlikeholdsmodusPåslått() } returns false
+        every { kravSchedulerUtils.harAktivtDriftsavvik() } returns false
+        every { kravSchedulerUtils.erVedlikeholdsmodusPåslått() } returns false
         every { persistenceService.hentAlleIkkeOverførteKonteringer() } returns listOf(kontering)
         every { persistenceService.finnSisteOverførtePeriode() } returns YearMonth.now()
 
@@ -107,8 +111,8 @@ internal class SendKravSchedulerTest {
         val oppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = oppdrag)
         val kontering = TestData.opprettKontering(oppdragsperiode = oppdragsperiode)
 
-        every { persistenceService.harAktivtDriftsavvik() } returns false
-        every { kravService.erVedlikeholdsmodusPåslått() } returns false
+        every { kravSchedulerUtils.harAktivtDriftsavvik() } returns false
+        every { kravSchedulerUtils.erVedlikeholdsmodusPåslått() } returns false
         every { persistenceService.hentAlleIkkeOverførteKonteringer() } returns listOf(kontering)
         every { persistenceService.finnSisteOverførtePeriode() } returns YearMonth.now()
         every { kravService.sendKrav(any()) } just Runs

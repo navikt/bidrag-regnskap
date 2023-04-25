@@ -29,7 +29,7 @@ class SendKravScheduler(
     fun skedulertOverforingAvKrav() {
         LockAssert.assertLocked()
         LOGGER.info { "Starter schedulert overføring av alle konteringer som ikke har blitt overført." }
-        if (kravSchedulerUtils.harAktiveDriftAvvik()) {
+        if (kravSchedulerUtils.harAktivtDriftsavvik()) {
             LOGGER.info { "Det finnes aktive driftsavvik. Starter derfor ikke overføring av krav." }
             return
         } else if (kravSchedulerUtils.erVedlikeholdsmodusPåslått()) {
