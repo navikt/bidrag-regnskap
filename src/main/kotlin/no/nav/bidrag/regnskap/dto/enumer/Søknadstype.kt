@@ -1,7 +1,7 @@
 package no.nav.bidrag.regnskap.dto.enumer
 
 enum class Søknadstype {
-    IN,
+    IR,
     FABM,
     FABP,
     EN

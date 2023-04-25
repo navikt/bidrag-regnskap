@@ -179,8 +179,8 @@ class PåløpskjøringServiceTest {
 
             konteringer shouldHaveSize perioderMellomDato.size
             konteringer.shouldBeUnique()
-            konteringer[0].søknadType shouldBe Søknadstype.IN.name
-            konteringer.subList(1, konteringer.size).none { it.søknadType == Søknadstype.IN.name } shouldBe true
+            konteringer[0].søknadType shouldBe Søknadstype.IR.name
+            konteringer.subList(1, konteringer.size).none { it.søknadType == Søknadstype.IR.name } shouldBe true
             konteringer.all { it.type == Type.NY.name } shouldBe true
             konteringer.subList(1, konteringer.size).all { it.søknadType == Søknadstype.EN.name } shouldBe true
             konteringer.all { it.sendtIPåløpsfil } shouldBe true
