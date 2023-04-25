@@ -38,10 +38,10 @@ class AvstemmingsfilGenerator(
             gcpFilBucket.lagreFil(avstemmingMappe + avstemmingSummeringFilnavn, avstemningSummeringFil)
         }
 
+        LOGGER.info("AvstemmingKontering- og avstemmingSummeringsfil er ferdig skrevet med ${konteringer.size} konteringer.")
+
         filoverføringTilElinKlient.lastOppFilTilFilsluse(avstemmingMappe, avstemmingKonteringFilnavn)
         filoverføringTilElinKlient.lastOppFilTilFilsluse(avstemmingMappe, avstemmingSummeringFilnavn)
-
-        LOGGER.info("AvstemmingKontering- og avstemmingSummeringsfil er ferdig skrevet med ${konteringer.size} konteringer og lastet opp til filsluse.")
     }
 
     private fun opprettAvstemmingFil(

@@ -26,6 +26,10 @@ class FiloverføringTilElinKlient(
     }
 
     fun lastOppFilTilFilsluse(filmappe: String, filnavn: String) {
+        if (!config.skalOverforeFil) {
+            LOGGER.info("Miljøet er konfigurert til å ikke overføre fil til SFTP. Fil blir derfor kun lastet opp til bucket.")
+            return
+        }
         LOGGER.info("Start oppkobling mot filsluse...")
         var session: Session? = null
         val channel: ChannelSftp?

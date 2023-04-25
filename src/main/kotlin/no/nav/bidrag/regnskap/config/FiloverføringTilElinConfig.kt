@@ -11,7 +11,8 @@ class FiloverføringTilElinConfig(
     val host: String,
     val port: Int,
     var privateKey: String,
-    val directory: String = "inbound"
+    val directory: String = "inbound",
+    val skalOverforeFil: Boolean
 ) {
 
     companion object {
