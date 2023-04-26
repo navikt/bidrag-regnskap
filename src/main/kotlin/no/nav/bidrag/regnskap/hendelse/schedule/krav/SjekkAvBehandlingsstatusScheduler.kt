@@ -5,6 +5,7 @@ import net.javacrumbs.shedlock.core.LockAssert
 import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
 import no.nav.bidrag.regnskap.service.BehandlingsstatusService
+import no.nav.bidrag.regnskap.slack.SlackService
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
@@ -17,7 +18,8 @@ private val LOGGER = KotlinLogging.logger { }
 @EnableSchedulerLock(defaultLockAtMostFor = "10m")
 class SjekkAvBehandlingsstatusScheduler(
     private val behandlingsstatusService: BehandlingsstatusService,
-    private val kravSchedulerUtils: KravSchedulerUtils
+    private val kravSchedulerUtils: KravSchedulerUtils,
+    private val slackService: SlackService
 ) {
 
     @Scheduled(cron = "\${scheduler.behandlingsstatus.cron}")
@@ -48,8 +50,7 @@ class SjekkAvBehandlingsstatusScheduler(
         if (feiledeOverføringer.isNotEmpty()) {
             val feilmeldingSammenslått = feiledeOverføringer.entries.joinToString("\n") { "${it.key}: ${it.value}" }
 
-            // TODO() Om feil varsle på slack med alle batchUid som har feil
-
+            slackService.sendMelding("@channel :ohno: Sjekk av behandlingsstatus feilet for følgende batchUid:\n $feilmeldingSammenslått")
             LOGGER.error { "Det har oppstått feil ved overføring av krav på følgende batchUider med følgende feilmelding:\n $feilmeldingSammenslått" }
         }
     }

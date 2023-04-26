@@ -5,6 +5,7 @@ import com.jcraft.jsch.JSch
 import com.jcraft.jsch.Session
 import no.nav.bidrag.regnskap.config.FiloverføringTilElinConfig
 import no.nav.bidrag.regnskap.persistence.bucket.GcpFilBucket
+import no.nav.bidrag.regnskap.slack.SlackService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
@@ -13,7 +14,8 @@ private val LOGGER = LoggerFactory.getLogger(FiloverføringTilElinKlient::class.
 @Service
 class FiloverføringTilElinKlient(
     private val config: FiloverføringTilElinConfig,
-    private val gcpFilBucket: GcpFilBucket
+    private val gcpFilBucket: GcpFilBucket,
+    private val slackService: SlackService
 ) {
 
     private val jSch = JSch().apply {
@@ -45,8 +47,19 @@ class FiloverføringTilElinKlient(
             channel.cd(config.directory)
             channel.put(gcpFilBucket.hentFil(filmappe + filnavn), filnavn)
             LOGGER.info("Fil: $filnavn har blitt lastet opp på filsluse!")
+        } catch (e: Exception) {
+            slackService.sendMelding(
+                "@channel :Warning: Noe gikk galt ved overføring av ${filmappe + filnavn} til ELIN! :Warning:" +
+                    "\n\nFeilmelding: ${e.message}" +
+                    "\n${gcpMelding(filmappe + filnavn)}"
+            )
+            throw e
         } finally {
             session?.disconnect()
         }
+    }
+
+    fun gcpMelding(filnavn: String): String {
+        return gcpFilBucket.hentInfoOmFil(filnavn)
     }
 }

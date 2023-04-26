@@ -14,6 +14,7 @@ import no.nav.bidrag.regnskap.persistence.entity.Driftsavvik
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.OverføringKontering
 import no.nav.bidrag.regnskap.persistence.entity.Påløp
+import no.nav.bidrag.regnskap.slack.SlackService
 import no.nav.bidrag.regnskap.util.PeriodeUtils.erFørsteDatoSammeSomEllerTidligereEnnAndreDato
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -29,7 +30,8 @@ class PåløpskjøringService(
     private val persistenceService: PersistenceService,
     private val manglendeKonteringerService: ManglendeKonteringerService,
     private val påløpsfilGenerator: PåløpsfilGenerator,
-    private val skattConsumer: SkattConsumer
+    private val skattConsumer: SkattConsumer,
+    private val slackService: SlackService
 ) {
 
     private lateinit var påløpskjøringJob: Job
@@ -38,6 +40,7 @@ class PåløpskjøringService(
     fun hentPåløp() = persistenceService.hentIkkeKjørtePåløp().minByOrNull { it.forPeriode }
 
     fun startPåløpskjøring(påløp: Påløp, schedulertKjøring: Boolean, genererFil: Boolean) {
+        slackService.sendMelding(":open_file_foolder: Påløpskjøring er startet for ${påløp.forPeriode}! Skedulert: $schedulertKjøring, generer fil: $genererFil.")
         validerDriftsavvik(påløp, schedulertKjøring)
         if (genererFil) {
             endreElinVedlikeholdsmodus(
@@ -55,6 +58,7 @@ class PåløpskjøringService(
             )
         }
         avsluttDriftsavvik(påløp)
+        slackService.sendMelding(":file_folder: Påløpskjøring er fullført for ${påløp.forPeriode}.")
     }
 
     fun stoppPågåendePåløpskjøring() {

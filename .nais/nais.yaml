@@ -52,6 +52,7 @@ spec:
     pool: {{ kafka.pool }}
   envFrom:
     - secret: bidrag-regnskap-sftp-private-key
+    - secret: bidrag-bot-slack-oauth-token
     - secret: {{ elin_subscription_key }}
   env:
   {{#each env}}
