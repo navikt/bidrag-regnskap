@@ -15,6 +15,7 @@ import no.nav.bidrag.regnskap.consumer.SkattConsumer
 import no.nav.bidrag.regnskap.dto.enumer.Søknadstype
 import no.nav.bidrag.regnskap.dto.enumer.Type
 import no.nav.bidrag.regnskap.fil.påløp.PåløpsfilGenerator
+import no.nav.bidrag.regnskap.slack.SlackService
 import no.nav.bidrag.regnskap.util.PeriodeUtils.hentAllePerioderMellomDato
 import no.nav.bidrag.regnskap.utils.TestData
 import org.junit.jupiter.api.Test
@@ -28,9 +29,10 @@ class PåløpskjøringServiceTest {
     private val persistenceService = mockk<PersistenceService>(relaxed = true)
     private val påløpsfilGenerator = mockk<PåløpsfilGenerator>(relaxed = true)
     private val skattConsumer = mockk<SkattConsumer>(relaxed = true)
+    private val slackService = mockk<SlackService>(relaxed = true)
 
     private val påløpskjøringService =
-        PåløpskjøringService(persistenceService, ManglendeKonteringerService(), påløpsfilGenerator, skattConsumer)
+        PåløpskjøringService(persistenceService, ManglendeKonteringerService(), påløpsfilGenerator, skattConsumer, slackService)
 
     @Test
     fun `Skal ved påløpskjøring kun starte eldste ikke kjørte påløpsperiode`() {

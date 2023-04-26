@@ -5,6 +5,9 @@ maskinporten:
   clientId: 0f5c38e8-e0bb-4708-96aa-7b30da8bcc3b
   scope: nav:bidrag/v1/bidragskrav
   privateKey: <JWK_MASKINPORTEN>
+
+BIDRAG_BOT_SLACK_OAUTH_TOKEN: <BIDRAG_BOT_SLACK_OAUTH_TOKEN>
+
 spring:
   flyway:
     enabled: true

@@ -44,6 +44,16 @@ class GcpFilBucket(
         return Channels.newInputStream(reader)
     }
 
+    fun hentInfoOmFil(filnavn: String): String {
+        val blob = storage.get(lagBlobinfo(filnavn).blobId)
+
+        return if (blob == null) {
+            "Fil: $filnavn finnes ikke i gcp-bucket!"
+        } else {
+            "Fil: $filnavn ble opprettet i gcp-bucket ${blob.createTimeOffsetDateTime} i bucket med navn: ${blob.bucket}."
+        }
+    }
+
     private fun hentWriteChannel(filnavn: String): WriteChannel {
         return storage.writer(lagBlobinfo(filnavn))
     }

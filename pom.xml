@@ -36,6 +36,7 @@
     <spring-kafka.version>2.9.3</spring-kafka.version>
     <scala.version>2.13.10</scala.version>
     <kotlin-logging-jwv.version>4.0.0-beta-22</kotlin-logging-jwv.version>
+    <slack-api.version>1.29.2</slack-api.version>
   </properties>
 
   <repositories>
@@ -271,6 +272,12 @@
       <artifactId>jsch</artifactId>
       <version>${jsch.version}</version>
     </dependency>
+    <dependency>
+      <groupId>com.slack.api</groupId>
+      <artifactId>slack-api-client</artifactId>
+      <version>${slack-api.version}</version>
+    </dependency>
+
 
     <!--Logging-->
     <dependency>
