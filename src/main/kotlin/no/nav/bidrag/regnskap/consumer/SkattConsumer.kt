@@ -63,7 +63,7 @@ class SkattConsumer(
     }
 
     fun hentStatusPåVedlikeholdsmodus(): ResponseEntity<Any> {
-        LOGGER.info { "Henter status på vedlikeholdsmodus." }
+        LOGGER.debug { "Henter status på vedlikeholdsmodus." }
         return try {
             restTemplate.exchange(
                 opprettSkattUrl(LIVENESS_PATH),
@@ -77,7 +77,7 @@ class SkattConsumer(
     }
 
     fun sjekkBehandlingsstatus(batchUid: String): ResponseEntity<BehandlingsstatusResponse> {
-        LOGGER.info { "Henter behandlingsstatus for batchUid: $batchUid" }
+        LOGGER.debug { "Henter behandlingsstatus for batchUid: $batchUid" }
         return restTemplate.exchange(
             opprettSkattUrl("$KRAV_PATH/$batchUid"),
             HttpMethod.GET,
