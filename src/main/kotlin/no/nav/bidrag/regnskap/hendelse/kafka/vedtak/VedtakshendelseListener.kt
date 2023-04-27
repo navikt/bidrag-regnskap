@@ -33,6 +33,7 @@ class VedtakshendelseListener(
                 "Mapping av hendelse feilet for kafkamelding med offsett: $offset, topic: $topic, recieved_partition: $partition, groupId: $groupId!! " +
                     "\nFeil: $e \n\nHendelse: $hendelse"
             )
+            throw e
         }
     }
 }
