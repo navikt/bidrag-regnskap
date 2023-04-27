@@ -14,7 +14,7 @@ class VedtakshendelseListener(
     private val vedtakshendelseService: VedtakshendelseService
 ) {
 
-    @KafkaListener(groupId = "bidrag-regnskap", topics = ["\${TOPIC_VEDTAK}"])
+    @KafkaListener(groupId = "bidrag-regnskap-v2", topics = ["\${TOPIC_VEDTAK}"])
     fun lesHendelse(
         hendelse: String,
         @Header(KafkaHeaders.OFFSET) offset: Long,
