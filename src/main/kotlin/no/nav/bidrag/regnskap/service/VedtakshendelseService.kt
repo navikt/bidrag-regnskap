@@ -1,5 +1,6 @@
 package no.nav.bidrag.regnskap.service
 
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service
 
 private val LOGGER = LoggerFactory.getLogger(VedtakshendelseService::class.java)
 private val objectMapper = ObjectMapper().registerModule(KotlinModule.Builder().build()).registerModule(JavaTimeModule())
+    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
 @Service
 class VedtakshendelseService(
