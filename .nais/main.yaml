@@ -14,7 +14,7 @@ env:
   SKATT_URL: https://api-preprod.nav.no/bidrag/v1/bidragskrav
   SKATT_HOST: api-preprod.nav.no
   TOPIC_VEDTAK: bidrag.vedtak
-  BUCKET_NAME: bidrag-regnskap
+  BUCKET_NAME: bidrag-regnskap-main
   SFTP_HOST: sftp-q.nav.no
   SFTP_SKAL_OVERFORE_FIL: true
   SAK_URL: https://bidrag-sak.dev-fss-pub.nais.io
