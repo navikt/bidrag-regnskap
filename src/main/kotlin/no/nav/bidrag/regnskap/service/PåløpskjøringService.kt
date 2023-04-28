@@ -135,6 +135,8 @@ class PåløpskjøringService(
         val timestamp = LocalDateTime.now()
         konteringer.forEach {
             it.overføringstidspunkt = timestamp
+            it.sendtIPåløpsfil = true
+            it.behandlingsstatusOkTidspunkt = timestamp
             persistenceService.lagreKontering(it)
             persistenceService.lagreOverføringKontering(
                 OverføringKontering(kontering = it, tidspunkt = timestamp, kanal = "Påløpsfil")

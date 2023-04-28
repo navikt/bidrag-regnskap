@@ -11,7 +11,9 @@ class AvstemmingService(
 ) {
 
     fun startAvstemming(dato: LocalDate) {
-        val konteringer = persistenceService.hentAlleKonteringerForDato(dato)
-        avstemmingsfilGenerator.skrivAvstemmingsfil(konteringer, dato)
+        avstemmingsfilGenerator.skrivAvstemmingsfil(
+            persistenceService.hentAlleKonteringerForDato(dato).filter { it.behandlingsstatusOkTidspunkt != null },
+            dato
+        )
     }
 }
