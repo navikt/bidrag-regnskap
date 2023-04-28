@@ -37,7 +37,7 @@ class SakConsumer(
             )
             hentFødselsnummerTilBmFraSak(responseEntity) ?: DUMMY_NUMMER
         } catch (e: Exception) {
-            LOGGER.error("Noe gikk feil i kommunikasjon med bidrag-sak! Feilmelding: ${e.stackTrace}")
+            LOGGER.error("Noe gikk feil i kommunikasjon med bidrag-sak! Feilmelding: ${e.message}")
             throw e
         }
     }
