@@ -9,6 +9,7 @@ import no.nav.bidrag.regnskap.dto.behandlingsstatus.BehandlingsstatusResponse
 import no.nav.bidrag.regnskap.dto.krav.Kravliste
 import no.nav.bidrag.regnskap.dto.påløp.Vedlikeholdsmodus
 import no.nav.bidrag.regnskap.maskinporten.MaskinportenClient
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -28,7 +29,7 @@ class SkattConsumer(
     @Value("\${SKATT_URL}") private val skattUrl: String,
     @Value("\${maskinporten.scope}") private val scope: String,
     @Value("\${ELIN_SUBSCRIPTION_KEY}") private val subscriptionKey: String,
-    private val restTemplate: RestTemplate,
+    @Qualifier("regnskap") private val restTemplate: RestTemplate,
     private val maskinportenClient: MaskinportenClient
 ) {
 

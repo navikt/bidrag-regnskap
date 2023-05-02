@@ -1,20 +1,22 @@
 package no.nav.bidrag.regnskap.consumer
 
 import io.github.oshai.KotlinLogging
+import no.nav.bidrag.commons.web.client.AbstractRestClient
 import no.nav.bidrag.regnskap.dto.sak.BidragSak
 import no.nav.bidrag.regnskap.dto.sak.enumer.Rolletype
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
-import org.springframework.web.client.RestTemplate
+import org.springframework.web.client.RestOperations
 
 private val LOGGER = KotlinLogging.logger { }
 
 @Service
 class SakConsumer(
     @Value("\${SAK_URL}") private val sakUrl: String,
-    private val restTemplate: RestTemplate
-) {
+    @Qualifier("azure") private val restTemplate: RestOperations
+) : AbstractRestClient(restTemplate, "bidrag-aktoerregister-regnskap") {
 
     companion object {
         const val SAK_PATH = "/bidrag-sak/sak"
