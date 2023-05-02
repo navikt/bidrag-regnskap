@@ -15,7 +15,6 @@ import no.nav.bidrag.regnskap.dto.sak.enumer.Sakskategori
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.springframework.http.HttpMethod
 import org.springframework.http.ResponseEntity
 import org.springframework.test.util.ReflectionTestUtils
 import org.springframework.web.client.RestTemplate
@@ -40,7 +39,7 @@ internal class SakConsumerTest {
 
     @Test
     fun `skal hente ut fødelsnummer fra bm`() {
-        every { restTemplate.exchange(sakUrl + SAK_PATH, HttpMethod.GET, any(), BidragSak::class.java) } returns ResponseEntity.ok(
+        every { restTemplate.getForEntity("$sakUrl$SAK_PATH/123", BidragSak::class.java) } returns ResponseEntity.ok(
             opprettBidragSak(Rolletype.BM)
         )
 
@@ -51,7 +50,7 @@ internal class SakConsumerTest {
 
     @Test
     fun `skal bruke dummynr om det ikke finnes en bm på sak`() {
-        every { restTemplate.exchange(sakUrl + SAK_PATH, HttpMethod.GET, any(), BidragSak::class.java) } returns ResponseEntity.ok(
+        every { restTemplate.getForEntity("$sakUrl$SAK_PATH/123", BidragSak::class.java) } returns ResponseEntity.ok(
             opprettBidragSak(Rolletype.BP)
         )
 
