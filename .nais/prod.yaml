@@ -18,6 +18,6 @@ env:
   SFTP_HOST: sftp.nav.no
   SFTP_SKAL_OVERFORE_FIL: true
   SAK_URL: https://bidrag-sak.prod-fss-pub.nais.io
-  SAK_SCOPE: https://prod-fss.bidrag.bidrag-sak
+  SAK_SCOPE: prod-fss.bidrag.bidrag-sak
   SAK_HOST: bidrag-sak.prod-fss-pub.nais.io
   MASKINPORTEN_SCOPES: "nav:bidrag/v1/bidragskrav"

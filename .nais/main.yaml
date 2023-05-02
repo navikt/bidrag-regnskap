@@ -18,7 +18,7 @@ env:
   SFTP_HOST: sftp-q.nav.no
   SFTP_SKAL_OVERFORE_FIL: true
   SAK_URL: https://bidrag-sak-feature.dev-fss-pub.nais.io
-  SAK_SCOPE: https://dev-fss.bidrag.bidrag-sak-feature
+  SAK_SCOPE: dev-fss.bidrag.bidrag-sak-feature
   SAK_HOST: bidrag-sak-feature.dev-fss-pub.nais.io
   JAVA_OPTS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005
   MASKINPORTEN_SCOPES: "nav:bidrag/v1/bidragskrav"
