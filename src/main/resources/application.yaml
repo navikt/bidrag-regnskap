@@ -40,6 +40,7 @@ no.nav.security.jwt:
   client:
     registration:
       sak:
+        resource-url: ${SAK_URL}
         token-endpoint-url: https://login.microsoftonline.com/${AZURE_APP_TENANT_ID}/oauth2/v2.0/token
         grant-type: urn:ietf:params:oauth:grant-type:jwt-bearer
         scope: api://${SAK_SCOPE}/.default
