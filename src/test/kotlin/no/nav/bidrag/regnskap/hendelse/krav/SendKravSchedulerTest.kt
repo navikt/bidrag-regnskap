@@ -161,5 +161,4 @@ internal class SendKravSchedulerTest {
 
         verify(exactly = 2) { kravService.sendKrav(any()) }
     }
-
 }

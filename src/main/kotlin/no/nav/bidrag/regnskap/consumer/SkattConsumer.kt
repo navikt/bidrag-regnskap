@@ -1,8 +1,6 @@
 package no.nav.bidrag.regnskap.consumer
 
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.github.oshai.KotlinLogging
 import no.nav.bidrag.regnskap.SECURE_LOGGER
 import no.nav.bidrag.regnskap.dto.behandlingsstatus.BehandlingsstatusResponse
@@ -22,7 +20,6 @@ import org.springframework.web.client.RestTemplate
 import java.net.URI
 
 private val LOGGER = KotlinLogging.logger { }
-private val objectMapper = jacksonObjectMapper().registerModule(JavaTimeModule()).configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
 
 @Service
 class SkattConsumer(
@@ -30,7 +27,8 @@ class SkattConsumer(
     @Value("\${maskinporten.scope}") private val scope: String,
     @Value("\${ELIN_SUBSCRIPTION_KEY}") private val subscriptionKey: String,
     @Qualifier("regnskap") private val restTemplate: RestTemplate,
-    private val maskinportenClient: MaskinportenClient
+    private val maskinportenClient: MaskinportenClient,
+    private val objectMapper: ObjectMapper
 ) {
 
     companion object {

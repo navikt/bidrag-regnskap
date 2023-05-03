@@ -811,7 +811,7 @@ internal class VedtakshendelseListenerIT {
     ): VedtakHendelse {
         val vedtakFilString = leggInnGenererteIdenter(hentTestfil(filnavn), kravhaverIdent, mottaker, bm, bp, barn1, barn2)
 
-        kafkaTemplate.usingCompletableFuture().send(topic, vedtakFilString)
+        kafkaTemplate.send(topic, vedtakFilString)
 
         val vedtakHendelse = objectmapper.readValue(vedtakFilString, VedtakHendelse::class.java)
 

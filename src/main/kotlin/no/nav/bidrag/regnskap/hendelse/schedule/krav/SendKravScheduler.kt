@@ -19,9 +19,9 @@ private val LOGGER = KotlinLogging.logger { }
 @EnableScheduling
 @EnableSchedulerLock(defaultLockAtMostFor = "10m")
 class SendKravScheduler(
-        private val persistenceService: PersistenceService,
-        private val kravService: KravService,
-        private val kravSchedulerUtils: KravSchedulerUtils
+    private val persistenceService: PersistenceService,
+    private val kravService: KravService,
+    private val kravSchedulerUtils: KravSchedulerUtils
 ) {
 
     @Scheduled(cron = "\${scheduler.sendkrav.cron}")
@@ -60,9 +60,9 @@ class SendKravScheduler(
 
     private fun hentOppdragMedIkkeOverførteKonteringerHvorKonteringIkkeErUtsatt(): List<Oppdrag> {
         return persistenceService.hentAlleIkkeOverførteKonteringer()
-                .flatMap { listOf(it.oppdragsperiode?.oppdrag) }
-                .filterNot { it?.utsattTilDato?.isAfter(LocalDate.now()) == true }
-                .filterNotNull()
-                .distinct()
+            .flatMap { listOf(it.oppdragsperiode?.oppdrag) }
+            .filterNot { it?.utsattTilDato?.isAfter(LocalDate.now()) == true }
+            .filterNotNull()
+            .distinct()
     }
 }
