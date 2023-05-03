@@ -1,11 +1,12 @@
 package no.nav.bidrag.regnskap.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.boot.context.properties.ConstructorBinding
+import org.springframework.boot.context.properties.bind.ConstructorBinding
 
-@ConstructorBinding
 @ConfigurationProperties("maskinporten")
-data class MaskinportenConfig(
+data class MaskinportenConfig
+@ConstructorBinding
+constructor(
     val tokenUrl: String,
     val audience: String,
     val clientId: String,
