@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.bidrag.regnskap.consumer.SkattConsumer
 import no.nav.bidrag.regnskap.dto.behandlingsstatus.BehandlingsstatusResponse
+import no.nav.bidrag.regnskap.hendelse.schedule.krav.SjekkAvBehandlingsstatusScheduler
 import no.nav.security.token.support.core.api.Protected
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -17,7 +18,8 @@ import org.springframework.web.bind.annotation.RestController
 @Protected
 @Tag(name = "Behandlingsstatus")
 class BehandlingsstatusController(
-    private val skattConsumer: SkattConsumer
+    private val skattConsumer: SkattConsumer,
+    private val sjekkAvBehandlingsstatusScheduler: SjekkAvBehandlingsstatusScheduler
 ) {
 
     @GetMapping("/behandlingsstatus")
@@ -36,5 +38,24 @@ class BehandlingsstatusController(
     )
     fun hentBehandlingsstatus(batchUid: String): ResponseEntity<BehandlingsstatusResponse> {
         return skattConsumer.sjekkBehandlingsstatus(batchUid)
+    }
+
+    @GetMapping("/behandlingsstatusScheduled")
+    @Operation(
+        summary = "Manuelt starter skedulert kjøring av sjekk på behandlingsstatus.",
+        security = [SecurityRequirement(name = "bearer-key")]
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Startet skedulert kjøring av sjekk på behandlingsstatus.",
+                content = [Content()]
+            )
+        ]
+    )
+    fun startSkedulertSjekkAvBehandlingsstatus(): ResponseEntity<Any> {
+        sjekkAvBehandlingsstatusScheduler.skedulertSjekkAvBehandlingsstatus()
+        return ResponseEntity.ok().build()
     }
 }

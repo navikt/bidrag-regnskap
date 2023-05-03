@@ -11,13 +11,13 @@ import java.util.Date
 import kotlin.math.absoluteValue
 
 class MaskinportenTokenGeneratorTest {
-    private val scopes = listOf("skatt:testscope.read", "skatt:testscope.write")
+    private val scope = "skatt:testscope.read"
 
     @Test
     fun `Skal sjekke at maskonporten token er signed med privat key i config`() {
         val config = MaskinportenWireMock.createMaskinportenConfig()
         val generator = MaskinportenTokenGenerator(config)
-        val signedJWT = SignedJWT.parse(generator.genererJwtToken(scopes))
+        val signedJWT = SignedJWT.parse(generator.genererJwtToken(scope))
         val verifier: JWSVerifier = RSASSAVerifier(RSAKey.parse(config.privateKey).toRSAPublicKey())
 
         signedJWT.verify(verifier) shouldBe true
@@ -27,7 +27,7 @@ class MaskinportenTokenGeneratorTest {
     fun `Skal sjekke at benyttet algorytme i header er rsa256`() {
         val config = MaskinportenWireMock.createMaskinportenConfig()
         val generator = MaskinportenTokenGenerator(config)
-        val signedJWT = SignedJWT.parse(generator.genererJwtToken(scopes))
+        val signedJWT = SignedJWT.parse(generator.genererJwtToken(scope))
 
         (signedJWT.header.algorithm as JWSAlgorithm).name shouldBe "RS256"
     }
@@ -36,18 +36,18 @@ class MaskinportenTokenGeneratorTest {
     fun `Skal sjekke at scope claims er lagt til i token body`() {
         val config = MaskinportenWireMock.createMaskinportenConfig()
         val generator = MaskinportenTokenGenerator(config)
-        val signedJWT = SignedJWT.parse(generator.genererJwtToken(scopes))
+        val signedJWT = SignedJWT.parse(generator.genererJwtToken(scope))
 
         signedJWT.jwtClaimsSet.audience[0] shouldBe config.audience
         signedJWT.jwtClaimsSet.issuer shouldBe config.clientId
-        signedJWT.jwtClaimsSet.getStringClaim("scope").split(' ') shouldBe scopes
+        signedJWT.jwtClaimsSet.getStringClaim("scope") shouldBe scope
     }
 
     @Test
     fun `Skal sjekke at timestamps blir satt riktig på token body`() {
         val config = MaskinportenWireMock.createMaskinportenConfig()
         val generator = MaskinportenTokenGenerator(config)
-        val signedJWT = SignedJWT.parse(generator.genererJwtToken(scopes))
+        val signedJWT = SignedJWT.parse(generator.genererJwtToken(scope))
 
         val issuedAt = signedJWT.jwtClaimsSet.issueTime
         val expirationTime = signedJWT.jwtClaimsSet.expirationTime

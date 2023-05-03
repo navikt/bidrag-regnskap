@@ -13,17 +13,17 @@ class MaskinportenTokenGenerator(
     val maskinportenConfig: MaskinportenConfig
 ) {
 
-    internal fun genererJwtToken(scopes: List<String>): String {
-        return SignedJWT(opprettJwsHeader(), generateJWTClaimSet(scopes)).apply {
+    internal fun genererJwtToken(scope: String): String {
+        return SignedJWT(opprettJwsHeader(), generateJWTClaimSet(scope)).apply {
             sign(RSASSASigner(opprettRsaKey()))
         }.serialize()
     }
 
-    private fun generateJWTClaimSet(scopes: List<String>): JWTClaimsSet {
+    private fun generateJWTClaimSet(scope: String): JWTClaimsSet {
         return JWTClaimsSet.Builder().apply {
             audience(maskinportenConfig.audience)
             issuer(maskinportenConfig.clientId)
-            claim("scope", scopes.joinToString(" "))
+            claim("scope", scope)
             issueTime(Date(Date().time))
             expirationTime(Date(Date().time + (maskinportenConfig.validInSeconds * 1000)))
         }.build()
