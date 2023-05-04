@@ -26,7 +26,7 @@ class BehandlingsstatusService(
         konteringerSomIkkeHarFåttGodkjentBehandlingsstatus.forEach { (key, value) ->
             val behandlingsstatusResponse = hentBehandlingsstatus(key)
             val now = LocalDateTime.now()
-            if (behandlingsstatusResponse.bachStatus == Batchstatus.Done) {
+            if (behandlingsstatusResponse.batchStatus == Batchstatus.Done) {
                 value.forEach { it.behandlingsstatusOkTidspunkt = now }
             } else {
                 feilmeldinger[key] = {

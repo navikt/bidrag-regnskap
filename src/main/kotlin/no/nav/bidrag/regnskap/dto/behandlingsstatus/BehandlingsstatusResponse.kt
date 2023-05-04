@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 @Schema(name = "Behandlingstatus response", description = "Response fra kall mot behandlingsstatus med batch-uid.")
 data class BehandlingsstatusResponse(
     val konteringFeil: List<Feilmelding>,
-    val bachStatus: Batchstatus,
+    val batchStatus: Batchstatus,
     val totaltAntall: Int,
     val mislyketAntall: Int,
     val fullfoertAntall: Int
