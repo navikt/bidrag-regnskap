@@ -31,7 +31,7 @@ class ManglendeKonteringerService {
                         transaksjonskode = Transaksjonskode.hentTransaksjonskodeForType(oppdragsperiode.oppdrag!!.stønadType).name,
                         overføringsperiode = periode.toString(),
                         type = vurderType(oppdragsperiode, periode),
-                        søknadType = vurderSøknadType(oppdragsperiode.vedtakType, periodeIndex),
+                        søknadType = vurderSøknadType(oppdragsperiode.vedtakType, oppdragsperiode.oppdrag.stønadType, periodeIndex),
                         oppdragsperiode = oppdragsperiode,
                         sendtIPåløpsfil = true
                     )

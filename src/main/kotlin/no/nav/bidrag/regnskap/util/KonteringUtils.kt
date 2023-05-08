@@ -22,12 +22,12 @@ object KonteringUtils {
         }
     }
 
-    fun vurderSøknadType(vedtakType: String, indexPeriode: Int): String {
+    fun vurderSøknadType(vedtakType: String, stønadType: String, indexPeriode: Int): String {
         return if (vedtakType == VedtakType.INDEKSREGULERING.name && indexPeriode == 0) {
             Søknadstype.IR.name
-        } else if (vedtakType == EngangsbelopType.GEBYR_MOTTAKER.name) {
+        } else if (stønadType == EngangsbelopType.GEBYR_MOTTAKER.name) {
             Søknadstype.FABM.name
-        } else if (vedtakType == EngangsbelopType.GEBYR_SKYLDNER.name) {
+        } else if (stønadType == EngangsbelopType.GEBYR_SKYLDNER.name) {
             Søknadstype.FABP.name
         } else {
             Søknadstype.EN.name
