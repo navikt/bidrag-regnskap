@@ -1,21 +1,17 @@
 package no.nav.bidrag.regnskap.service
 
-import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.verify
 import no.nav.bidrag.regnskap.consumer.SkattConsumer
-import no.nav.bidrag.regnskap.maskinporten.MaskinportenClientException
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.utils.TestData
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.client.HttpClientErrorException
-import org.springframework.web.client.HttpServerErrorException
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -63,50 +59,6 @@ class KravServiceTest {
     }
 
     @Test
-    fun `skal kaste feil om kontering ikke går igjennom validering`() {
-        every { persistenceService.hentOppdrag(oppdragsId) } returns opprettOppdragForPeriode(
-            now,
-            now.plusMonths(1)
-        )
-        every { skattConsumer.sendKrav(any()) } returns ResponseEntity.badRequest().body(
-            """
-          {
-            "message": "Tolkning feilet i Elin."
-        }
-        """
-        )
-        shouldThrow<HttpClientErrorException> {
-            kravService.sendKrav(oppdragId = oppdragsId)
-        }
-    }
-
-    @Test
-    fun `skal kaste feil om tjenesten er slått av`() {
-        every { persistenceService.hentOppdrag(oppdragsId) } returns opprettOppdragForPeriode(
-            now,
-            now.plusMonths(1)
-        )
-        every { skattConsumer.sendKrav(any()) } returns ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(batchUid)
-
-        shouldThrow<HttpServerErrorException> {
-            kravService.sendKrav(oppdragId = oppdragsId)
-        }
-    }
-
-    @Test
-    fun `skal kaste feil om autentisering feiler`() {
-        every { persistenceService.hentOppdrag(oppdragsId) } returns opprettOppdragForPeriode(
-            now,
-            now.plusMonths(1)
-        )
-        every { skattConsumer.sendKrav(any()) } returns ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(batchUid)
-
-        shouldThrow<MaskinportenClientException> {
-            kravService.sendKrav(oppdragId = oppdragsId)
-        }
-    }
-
-    @Test
     fun `skal ikke sende kontering til skatt når kontering allerede er overført`() {
         every { persistenceService.hentOppdrag(oppdragsId) } returns TestData.opprettOppdrag(
             oppdragsperioder = listOf(
@@ -125,7 +77,7 @@ class KravServiceTest {
     fun `skal ikke sende kontering om oppdrag ikke finnes`() {
         every { persistenceService.hentOppdrag(oppdragsId) } returns null
 
-        shouldThrow<IllegalStateException> {
+        shouldNotThrowAny {
             kravService.sendKrav(oppdragId = oppdragsId)
         }
     }

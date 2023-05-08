@@ -1,5 +1,7 @@
 package no.nav.bidrag.regnskap.service
 
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.bidrag.regnskap.SECURE_LOGGER
 import no.nav.bidrag.regnskap.consumer.SkattConsumer
@@ -11,7 +13,6 @@ import no.nav.bidrag.regnskap.dto.krav.KravResponse
 import no.nav.bidrag.regnskap.dto.krav.Kravfeil
 import no.nav.bidrag.regnskap.dto.krav.Kravkontering
 import no.nav.bidrag.regnskap.dto.krav.Kravliste
-import no.nav.bidrag.regnskap.maskinporten.MaskinportenClientException
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
@@ -29,7 +30,8 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 private val LOGGER = LoggerFactory.getLogger(KravService::class.java)
-private val objectMapper = jacksonObjectMapper()
+private val objectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
+    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
 @Service
 class KravService(
@@ -44,7 +46,12 @@ class KravService(
     fun sendKrav(oppdragId: Int) {
         LOGGER.info("Starter overføring av krav til skatt for oppdrag: $oppdragId")
 
-        val oppdrag = persistenceService.hentOppdrag(oppdragId) ?: error("Det finnes ingen oppdrag med angitt oppdragsId: $oppdragId")
+        val oppdrag = persistenceService.hentOppdrag(oppdragId)
+
+        if (oppdrag == null) {
+            LOGGER.error("Det finnes ingen oppdrag med angitt oppdragsId: $oppdragId")
+            return
+        }
 
         if (oppdrag.utsattTilDato?.isAfter(LocalDate.now()) == true) {
             LOGGER.info("Oppdrag $oppdragId skal ikke oversendes før ${oppdrag.utsattTilDato}. Avventer oversending av krav.")
@@ -59,9 +66,13 @@ class KravService(
 
         val alleIkkeOverførteKonteringer = finnAlleIkkeOverførteKonteringer(oppdragsperioderMedIkkeOverførteKonteringer)
 
-        val skattResponse = skattConsumer.sendKrav(opprettSkattKravRequest(alleIkkeOverførteKonteringer))
+        try {
+            val skattResponse = skattConsumer.sendKrav(opprettSkattKravRequest(alleIkkeOverførteKonteringer))
+            lagreOverføringAvKrav(skattResponse, alleIkkeOverførteKonteringer, oppdrag)
+        } catch (e: Exception) {
+            LOGGER.error("Kallet mot skatt feilet på noe uventet! Feil: ${e.message}, stacktrace: ${e.stackTraceToString()}")
+        }
 
-        lagreOverføringAvKrav(skattResponse, alleIkkeOverførteKonteringer, oppdrag)
         LOGGER.info("Overføring til skatt fullført for oppdrag: $oppdragId")
     }
 
@@ -70,46 +81,56 @@ class KravService(
         alleIkkeOverførteKonteringer: List<Kontering>,
         oppdrag: Oppdrag
     ) {
-        when (skattResponse.statusCode) {
-            HttpStatus.ACCEPTED -> {
-                SECURE_LOGGER.info("Mottok svar fra skatt: \n$skattResponse")
-                val kravResponse = objectMapper.readValue(skattResponse.body, KravResponse::class.java)
-                lagreVellykketOverføringAvKrav(alleIkkeOverførteKonteringer, kravResponse, oppdrag)
-            }
+        try {
+            when (skattResponse.statusCode) {
+                HttpStatus.ACCEPTED -> {
+                    SECURE_LOGGER.info("Mottok svar fra skatt: \n$skattResponse")
+                    val kravResponse = objectMapper.readValue(skattResponse.body, KravResponse::class.java)
+                    lagreVellykketOverføringAvKrav(alleIkkeOverførteKonteringer, kravResponse, oppdrag)
+                }
 
-            HttpStatus.BAD_REQUEST -> {
-                LOGGER.error("En eller flere konteringer har ikke gått gjennom validering. Se secure log for mer informasjon.")
-                SECURE_LOGGER.error("En eller flere konteringer har ikke gått gjennom validering, ${skattResponse.body}")
-                val kravfeil = objectMapper.readValue(skattResponse.body, Kravfeil::class.java)
-                lagreFeiletOverføringAvKrav(alleIkkeOverførteKonteringer, kravfeil.toString())
-                throw HttpClientErrorException(skattResponse.statusCode)
-            }
+                HttpStatus.BAD_REQUEST -> {
+                    LOGGER.error("En eller flere konteringer har ikke gått gjennom validering. Se secure log for mer informasjon.")
+                    SECURE_LOGGER.error("En eller flere konteringer har ikke gått gjennom validering, ${skattResponse.body}")
+                    val kravfeil = objectMapper.readValue(skattResponse.body, Kravfeil::class.java)
+                    lagreFeiletOverføringAvKrav(alleIkkeOverførteKonteringer, kravfeil.toString())
+                }
 
-            HttpStatus.SERVICE_UNAVAILABLE -> {
-                LOGGER.error(
-                    "Skatt svarte med uventet statuskode: ${skattResponse.statusCode}. " +
-                        "Tjenesten hos skatt er slått av. Dette kan skje enten ved innlesing av påløpsfil eller ved andre uventede feil. " +
-                        "Feilmelding: ${skattResponse.body}"
-                )
-                lagreFeiletOverføringAvKrav(alleIkkeOverførteKonteringer, skattResponse.statusCode.toString())
-                throw HttpServerErrorException(skattResponse.statusCode)
-            }
+                HttpStatus.SERVICE_UNAVAILABLE -> {
+                    LOGGER.error(
+                        "Skatt svarte med uventet statuskode: ${skattResponse.statusCode}. " +
+                            "Tjenesten hos skatt er slått av. Dette kan skje enten ved innlesing av påløpsfil eller ved andre uventede feil. " +
+                            "Feilmelding: ${skattResponse.body}"
+                    )
+                    lagreFeiletOverføringAvKrav(alleIkkeOverførteKonteringer, skattResponse.statusCode.toString())
+                }
 
-            HttpStatus.UNAUTHORIZED, HttpStatus.FORBIDDEN -> {
-                LOGGER.error(
-                    "Skatt svarte med uventet statuskode: ${skattResponse.statusCode}. " +
-                        "Bidrag-Regnskap er ikke autorisert eller mangler rettigheter for kallet mot skatt. Feilmelding: ${skattResponse.body}"
-                )
-                lagreFeiletOverføringAvKrav(alleIkkeOverførteKonteringer, skattResponse.statusCode.toString())
-                throw MaskinportenClientException("Bidrag-Regnskap er ikke autorisert eller mangler rettigheter for kallet mot skatt. Feilmelding: ${skattResponse.body}")
-            }
+                HttpStatus.UNAUTHORIZED, HttpStatus.FORBIDDEN -> {
+                    LOGGER.error(
+                        "Skatt svarte med uventet statuskode: ${skattResponse.statusCode}. " +
+                            "Bidrag-Regnskap er ikke autorisert eller mangler rettigheter for kallet mot skatt. Feilmelding: ${skattResponse.body}"
+                    )
+                    lagreFeiletOverføringAvKrav(alleIkkeOverførteKonteringer, skattResponse.statusCode.toString())
+                }
 
-            else -> {
-                LOGGER.error("Skatt svarte med uventet statuskode: ${skattResponse.statusCode}. Feilmelding: ${skattResponse.body}")
-                val kravfeil = objectMapper.readValue(skattResponse.body, Kravfeil::class.java)
-                lagreFeiletOverføringAvKrav(alleIkkeOverførteKonteringer, kravfeil.toString())
-                throw HttpServerErrorException(skattResponse.statusCode, "Skatt svarte med uventet statuskode. ${skattResponse.statusCode}. Feilmelding: ${skattResponse.body}")
+                else -> {
+                    LOGGER.error("Skatt svarte med uventet statuskode: ${skattResponse.statusCode}. Feilmelding: ${skattResponse.body}")
+                    lagreFeiletOverføringAvKrav(
+                        alleIkkeOverførteKonteringer,
+                        "Statuskode: ${skattResponse.statusCode}" + ", body: " + (
+                            skattResponse.body
+                                ?: "{}"
+                            )
+                    )
+                }
             }
+        } catch (e: Exception) {
+            LOGGER.error("Tolkningen av svaret fra skatt feilet på noe uventet! Feil: ${e.message}")
+            lagreFeiletOverføringAvKrav(
+                alleIkkeOverførteKonteringer,
+                e.message
+                    ?: "Kallet mot skatt feilet på noe uventet! Stackstrace: ${e.stackTraceToString()}"
+            )
         }
     }
 

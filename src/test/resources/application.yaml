@@ -58,6 +58,7 @@ no.nav.security.jwt:
   client:
     registration:
       skatt:
+        resource-url: ${SKATT_URL}
         token-endpoint-url: http://localhost:${mock-oauth2-server.port:1234}/aad/token
         grant-type: urn:ietf:params:oauth:grant-type:jwt-bearer
         scope: api://123/.default
