@@ -31,7 +31,7 @@ class AvstemmingsfilGenerator(
         if (!gcpFilBucket.finnesFil(avstemmingMappe + avstemmingKonteringFilnavn)) {
             val summeringer = opprettAvstemmingsfilSummeringer()
 
-            val avstemningsfilBuffer = opprettAvstemmingFil(konteringer, summeringer, nowFormattert)
+            val avstemningsfilBuffer = opprettAvstemmingFil(konteringer, summeringer, now)
             gcpFilBucket.lagreFil(avstemmingMappe + avstemmingKonteringFilnavn, avstemningsfilBuffer)
 
             val avstemningSummeringFil = opprettAvstemmingSummeringFil(summeringer)
@@ -47,7 +47,7 @@ class AvstemmingsfilGenerator(
     private fun opprettAvstemmingFil(
         konteringer: List<Kontering>,
         summering: Map<String, AvstemmingsfilSummeringer>,
-        now: String
+        now: LocalDate
     ): ByteArrayOutputStreamTilByteBuffer {
         val avstemningsfilBuffer = ByteArrayOutputStreamTilByteBuffer()
 
@@ -62,7 +62,7 @@ class AvstemmingsfilGenerator(
                         kontering.oppdragsperiode.beløp.toString() + ";" +
                         LocalDate.of(periode.year, periode.month, 1).format(DateTimeFormatter.ofPattern("yyyyMMdd")).toString() + ";" +
                         LocalDate.of(periode.year, periode.month, periode.lengthOfMonth()).format(DateTimeFormatter.ofPattern("yyyyMMdd")).toString() + ";" +
-                        now + ";" +
+                        now.format(DateTimeFormatter.ofPattern("yyyyMMdd")).toString() + ";" +
                         if (Transaksjonskode.valueOf(kontering.transaksjonskode).negativtBeløp) { "F;" } else { "T;" } +
                         kontering.oppdragsperiode.delytelseId.toString() + ";" +
                         kontering.oppdragsperiode.gjelderIdent + ";" +
