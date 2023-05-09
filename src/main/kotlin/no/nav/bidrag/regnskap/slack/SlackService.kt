@@ -4,6 +4,7 @@ import com.slack.api.Slack
 import io.github.oshai.KotlinLogging
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
+import java.util.Base64
 
 @Service
 class SlackService(
@@ -17,7 +18,8 @@ class SlackService(
     }
 
     fun sendMelding(melding: String) {
-        val response = Slack.getInstance().methods(oauthToken).chatPostMessage {
+        val oauthTokenDecoded = Base64.getDecoder().decode(oauthToken)
+        val response = Slack.getInstance().methods(String(oauthTokenDecoded)).chatPostMessage {
             it.channel(CHANNEL)
                 .text("$melding\n\nOpphav for meldingen: $clientId")
         }
