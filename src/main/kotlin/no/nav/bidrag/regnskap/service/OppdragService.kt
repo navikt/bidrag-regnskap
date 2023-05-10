@@ -1,5 +1,6 @@
 package no.nav.bidrag.regnskap.service
 
+import no.nav.bidrag.behandling.felles.enums.EngangsbelopType
 import no.nav.bidrag.regnskap.dto.oppdrag.OppdragResponse
 import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
@@ -32,14 +33,18 @@ class OppdragService(
     }
 
     @Transactional
-    fun lagreHendelse(hendelse: Hendelse): Int {
+    fun lagreHendelse(hendelse: Hendelse): Int? {
         val oppdrag = hentOppdrag(hendelse)
 
         return lagreEllerOppdaterOppdrag(oppdrag, hendelse)
     }
 
-    fun lagreEllerOppdaterOppdrag(hentetOppdrag: Oppdrag?, hendelse: Hendelse): Int {
+    fun lagreEllerOppdaterOppdrag(hentetOppdrag: Oppdrag?, hendelse: Hendelse): Int? {
         val erOppdatering = hentetOppdrag != null
+        if (hentetOppdrag == null && erHendelsestypeGebyr(hendelse) && hendelse.periodeListe.first().beløp == null) {
+            LOGGER.info("Hendelse for vedtak: ${hendelse.vedtakId} har fått fritak for ${hendelse.type}")
+            return null
+        }
         val oppdrag = hentetOppdrag ?: opprettOppdrag(hendelse)
         val sisteOverførtePeriode = persistenceService.finnSisteOverførtePeriode()
 
@@ -65,6 +70,9 @@ class OppdragService(
 
         return oppdragId
     }
+
+    private fun erHendelsestypeGebyr(hendelse: Hendelse) =
+            (hendelse.type == EngangsbelopType.GEBYR_MOTTAKER.name || hendelse.type == EngangsbelopType.GEBYR_SKYLDNER.name)
 
     private fun hentOppdrag(hendelse: Hendelse): Oppdrag? {
         if (hendelse.referanse != null && hendelse.omgjørVedtakId != null) {

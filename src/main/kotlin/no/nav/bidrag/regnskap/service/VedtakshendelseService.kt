@@ -33,7 +33,7 @@ class VedtakshendelseService(
         val vedtakHendelse = mapVedtakHendelse(hendelse)
 
         LOGGER.info("Behandler vedakHendelse for vedtakid: ${vedtakHendelse.id}")
-        SECURE_LOGGER.info("Behandler vedtakHendelse: $vedtakHendelse")
+        SECURE_LOGGER.info("Behandler vedtakHendelse: $vedtakHendelse\nVedtakhendelse som json string: $hendelse")
 
         vedtakHendelse.stonadsendringListe?.forEach {
             opprettOppdragForStonadsending(vedtakHendelse, it)
@@ -75,7 +75,9 @@ class VedtakshendelseService(
             )
             val oppdragId = oppdragService.lagreHendelse(hendelse)
 
-            sendKrav(oppdragId)
+            if (oppdragId != null) {
+                sendKrav(oppdragId)
+            }
         }
     }
 
@@ -129,7 +131,9 @@ class VedtakshendelseService(
             )
             val oppdragId = oppdragService.lagreHendelse(hendelse)
 
-            sendKrav(oppdragId)
+            if (oppdragId != null) {
+                sendKrav(oppdragId)
+            }
         }
     }
 
