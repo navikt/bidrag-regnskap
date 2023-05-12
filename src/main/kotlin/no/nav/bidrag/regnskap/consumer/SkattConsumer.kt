@@ -40,7 +40,7 @@ class SkattConsumer(
     }
 
     fun sendKrav(kravliste: Kravliste): ResponseEntity<String> {
-        SECURE_LOGGER.info("Overfører krav til skatt: ${objectMapper.writeValueAsString(kravliste)}")
+        SECURE_LOGGER.info("Overfører krav til skatt:\n${objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(kravliste)}")
         return try {
             restTemplate.exchange(
                 opprettSkattUrl(KRAV_PATH),

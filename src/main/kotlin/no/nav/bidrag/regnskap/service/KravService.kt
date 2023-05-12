@@ -43,43 +43,45 @@ class KravService(
         noRollbackFor = [HttpClientErrorException::class, HttpServerErrorException::class, JwtTokenUnauthorizedException::class],
         propagation = Propagation.REQUIRES_NEW
     )
-    fun sendKrav(oppdragId: Int) {
-        LOGGER.info("Starter overføring av krav til skatt for oppdrag: $oppdragId")
+    fun sendKrav(oppdragIdListe: List<Int>) {
+        LOGGER.info("Starter overføring av krav til skatt for oppdrag: $oppdragIdListe")
 
-        val oppdrag = persistenceService.hentOppdrag(oppdragId)
+        val oppdragListe = oppdragIdListe.mapNotNull { persistenceService.hentOppdrag(it) }
 
-        if (oppdrag == null) {
-            LOGGER.error("Det finnes ingen oppdrag med angitt oppdragsId: $oppdragId")
+        if (oppdragListe.isEmpty()) {
+            LOGGER.error("Det finnes ingen oppdrag med angitte oppdragsIder: $oppdragIdListe")
             return
         }
 
-        if (oppdrag.utsattTilDato?.isAfter(LocalDate.now()) == true) {
-            LOGGER.info("Oppdrag $oppdragId skal ikke oversendes før ${oppdrag.utsattTilDato}. Avventer oversending av krav.")
-            return
-        }
-        val oppdragsperioderMedIkkeOverførteKonteringer = hentOppdragsperioderMedIkkeOverførteKonteringer(oppdrag)
-
-        if (oppdragsperioderMedIkkeOverførteKonteringer.isEmpty()) {
-            LOGGER.info("Alle konteringer er allerede overført for oppdrag $oppdragId.")
+        // Alle oppdragId i listen skal stamme fra samme vedtak. Disse skal ha samme utsattTilDato.
+        if (oppdragListe.first().utsattTilDato?.isAfter(LocalDate.now()) == true) {
+            LOGGER.info("Oppdrag $oppdragIdListe skal ikke oversendes før ${oppdragListe.first().utsattTilDato}. Avventer oversending av krav.")
             return
         }
 
-        val alleIkkeOverførteKonteringer = finnAlleIkkeOverførteKonteringer(oppdragsperioderMedIkkeOverførteKonteringer)
+        val oppdragsperioderMedIkkeOverførteKonteringerListe = oppdragListe.flatMap { hentOppdragsperioderMedIkkeOverførteKonteringer(it) }
+
+        if (oppdragsperioderMedIkkeOverførteKonteringerListe.isEmpty()) {
+            LOGGER.info("Alle konteringer er allerede overført for alle oppdrag $oppdragIdListe.")
+            return
+        }
+
+        val alleIkkeOverførteKonteringer = finnAlleIkkeOverførteKonteringer(oppdragsperioderMedIkkeOverførteKonteringerListe)
 
         try {
             val skattResponse = skattConsumer.sendKrav(opprettSkattKravRequest(alleIkkeOverførteKonteringer))
-            lagreOverføringAvKrav(skattResponse, alleIkkeOverførteKonteringer, oppdrag)
+            lagreOverføringAvKrav(skattResponse, alleIkkeOverførteKonteringer, oppdragListe)
         } catch (e: Exception) {
             LOGGER.error("Kallet mot skatt feilet på noe uventet! Feil: ${e.message}, stacktrace: ${e.stackTraceToString()}")
         }
 
-        LOGGER.info("Overføring til skatt fullført for oppdrag: $oppdragId")
+        LOGGER.info("Overføring til skatt fullført for oppdrag: $oppdragIdListe")
     }
 
     private fun lagreOverføringAvKrav(
         skattResponse: ResponseEntity<String>,
         alleIkkeOverførteKonteringer: List<Kontering>,
-        oppdrag: Oppdrag
+        oppdrag: List<Oppdrag>
     ) {
         try {
             when (skattResponse.statusCode) {
@@ -141,7 +143,7 @@ class KravService(
     private fun lagreVellykketOverføringAvKrav(
         alleIkkeOverforteKonteringer: List<Kontering>,
         kravResponse: KravResponse,
-        oppdrag: Oppdrag
+        oppdrag: List<Oppdrag>
     ) {
         alleIkkeOverforteKonteringer.forEach { kontering ->
             val now = LocalDateTime.now()
@@ -157,7 +159,7 @@ class KravService(
                 )
             )
         }
-        persistenceService.lagreOppdrag(oppdrag)
+        oppdrag.forEach { persistenceService.lagreOppdrag(it) }
     }
 
     private fun lagreFeiletOverføringAvKrav(

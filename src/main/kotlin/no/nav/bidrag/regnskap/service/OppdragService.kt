@@ -40,11 +40,13 @@ class OppdragService(
     }
 
     fun lagreEllerOppdaterOppdrag(hentetOppdrag: Oppdrag?, hendelse: Hendelse): Int? {
-        val erOppdatering = hentetOppdrag != null
+        // Dette er en edge case hvor vedtak som inneholder gebyrfritak kommer med beløp null og ikke eksisterer fra før av. Disse skal ikke opprettes.
         if (hentetOppdrag == null && erHendelsestypeGebyr(hendelse) && hendelse.periodeListe.first().beløp == null) {
             LOGGER.info("Hendelse for vedtak: ${hendelse.vedtakId} har fått fritak for ${hendelse.type}")
             return null
         }
+
+        val erOppdatering = hentetOppdrag != null
         val oppdrag = hentetOppdrag ?: opprettOppdrag(hendelse)
         val sisteOverførtePeriode = persistenceService.finnSisteOverførtePeriode()
 
@@ -72,7 +74,7 @@ class OppdragService(
     }
 
     private fun erHendelsestypeGebyr(hendelse: Hendelse) =
-            (hendelse.type == EngangsbelopType.GEBYR_MOTTAKER.name || hendelse.type == EngangsbelopType.GEBYR_SKYLDNER.name)
+        (hendelse.type == EngangsbelopType.GEBYR_MOTTAKER.name || hendelse.type == EngangsbelopType.GEBYR_SKYLDNER.name)
 
     private fun hentOppdrag(hendelse: Hendelse): Oppdrag? {
         if (hendelse.referanse != null && hendelse.omgjørVedtakId != null) {

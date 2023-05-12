@@ -46,9 +46,9 @@ class SjekkAvBehandlingsstatusScheduler(
         val feiledeOverføringer: HashMap<String, String> =
             behandlingsstatusService.hentBehandlingsstatusForIkkeGodkjenteKonteringer(konteringerSomIkkeHarFåttGodkjentBehandlingsstatus)
 
-        LOGGER.info { "${konteringerSomIkkeHarFåttGodkjentBehandlingsstatus.size} har nå fått sjekket behandlingsstatus." }
+        LOGGER.info { "${konteringerSomIkkeHarFåttGodkjentBehandlingsstatus.size} batchUider har nå fått sjekket behandlingsstatus. (${konteringerSomIkkeHarFåttGodkjentBehandlingsstatus.entries.joinToString(", ") { it.key }})" }
         if (feiledeOverføringer.isNotEmpty()) {
-            val feilmeldingSammenslått = feiledeOverføringer.entries.joinToString("\n") { "${it.key} : ${it.value}" }
+            val feilmeldingSammenslått = feiledeOverføringer.entries.joinToString("\n") { it.value }
 
             slackService.sendMelding("@channel :ohno: Sjekk av behandlingsstatus feilet for følgende batchUid:\n $feilmeldingSammenslått")
             LOGGER.error { "Det har oppstått feil ved overføring av krav på følgende batchUider med følgende feilmelding:\n $feilmeldingSammenslått" }

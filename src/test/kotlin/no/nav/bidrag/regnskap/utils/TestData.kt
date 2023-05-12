@@ -1,5 +1,6 @@
 package no.nav.bidrag.regnskap.utils
 
+import no.nav.bidrag.behandling.felles.enums.EngangsbelopType
 import no.nav.bidrag.behandling.felles.enums.StonadType
 import no.nav.bidrag.behandling.felles.enums.VedtakType
 import no.nav.bidrag.commons.util.PersonidentGenerator
@@ -24,7 +25,8 @@ object TestData {
 
     fun opprettOppdrag(
         oppdragId: Int = 0,
-        stonadType: StonadType = StonadType.BIDRAG,
+        stonadType: StonadType? = StonadType.BIDRAG,
+        engangsbelopType: EngangsbelopType? = null,
         sakId: String = "123456",
         skyldnerIdent: String = PersonidentGenerator.genererPersonnummer(),
         oppdragsperioder: List<Oppdragsperiode> = listOf(opprettOppdragsperiode()),
@@ -34,7 +36,7 @@ object TestData {
     ): Oppdrag {
         return Oppdrag(
             oppdragId = oppdragId,
-            stønadType = stonadType.toString(),
+            stønadType = stonadType?.toString() ?: engangsbelopType.toString(),
             sakId = sakId,
             skyldnerIdent = skyldnerIdent,
             oppdragsperioder = oppdragsperioder,

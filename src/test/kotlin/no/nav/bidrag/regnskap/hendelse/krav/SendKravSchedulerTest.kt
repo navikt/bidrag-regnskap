@@ -9,6 +9,10 @@ import io.mockk.just
 import io.mockk.mockkStatic
 import io.mockk.verify
 import net.javacrumbs.shedlock.core.LockAssert
+import no.nav.bidrag.behandling.felles.enums.EngangsbelopType
+import no.nav.bidrag.commons.util.PersonidentGenerator
+import no.nav.bidrag.regnskap.dto.enumer.Søknadstype
+import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
 import no.nav.bidrag.regnskap.hendelse.schedule.krav.KravSchedulerUtils
 import no.nav.bidrag.regnskap.hendelse.schedule.krav.SendKravScheduler
 import no.nav.bidrag.regnskap.service.KravService
@@ -121,4 +125,41 @@ internal class SendKravSchedulerTest {
 
         verify(exactly = 1) { kravService.sendKrav(any()) }
     }
+
+    @Test
+    fun `skal sende over flere oppdrag med samme sakId i samme krav`() {
+        val bm = PersonidentGenerator.genererPersonnummer()
+        val bp = PersonidentGenerator.genererPersonnummer()
+        val barn = PersonidentGenerator.genererPersonnummer()
+        val nav = "80000345435"
+
+        val annetOppdrag = TestData.opprettOppdrag(oppdragId = 0, sakId = "654321")
+
+        val bidragOppdrag = TestData.opprettOppdrag(oppdragId = 1, skyldnerIdent = bp, kravhaverIdent = bm, sakId = "123456")
+        val gebyrBpOppdrag = TestData.opprettOppdrag(stonadType = null, engangsbelopType = EngangsbelopType.GEBYR_SKYLDNER, oppdragId = 2, skyldnerIdent = bp, kravhaverIdent = nav, sakId = "123456")
+        val gebyrBmOppdrag = TestData.opprettOppdrag(stonadType = null, engangsbelopType = EngangsbelopType.GEBYR_MOTTAKER, oppdragId = 3, skyldnerIdent = bm, kravhaverIdent = nav, sakId = "123456")
+
+        val annenOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = annetOppdrag, oppdragsperiodeId = 0)
+
+        val bidragOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = bidragOppdrag, oppdragsperiodeId = 1, gjelderIdent = barn, mottakerIdent = bm, periodeTil = null)
+        val gebyrBpOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = gebyrBpOppdrag, oppdragsperiodeId = 2, gjelderIdent = bp, mottakerIdent = nav, periodeFra = LocalDate.now())
+        val gebyrBmOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = gebyrBmOppdrag, oppdragsperiodeId = 3, gjelderIdent = bm, mottakerIdent = nav, periodeFra = LocalDate.now())
+
+        val annenKontering = TestData.opprettKontering(oppdragsperiode = annenOppdragsperiode, konteringId = 0)
+
+        val bidragKontering = TestData.opprettKontering(oppdragsperiode = bidragOppdragsperiode, konteringId = 1, transaksjonskode = Transaksjonskode.B1.name)
+        val gebyrBpKontering = TestData.opprettKontering(oppdragsperiode = gebyrBpOppdragsperiode, konteringId = 2, transaksjonskode = Transaksjonskode.G1.name, søknadstype = Søknadstype.FABP.name)
+        val gebyrBmKontering = TestData.opprettKontering(oppdragsperiode = gebyrBmOppdragsperiode, konteringId = 3, transaksjonskode = Transaksjonskode.G1.name, søknadstype = Søknadstype.FABM.name)
+
+        every { kravSchedulerUtils.harAktivtDriftsavvik() } returns false
+        every { kravSchedulerUtils.erVedlikeholdsmodusPåslått() } returns false
+        every { persistenceService.hentAlleIkkeOverførteKonteringer() } returns listOf(annenKontering, bidragKontering, gebyrBpKontering, gebyrBmKontering)
+
+        every { kravService.sendKrav(any()) } just Runs
+
+        sendKravScheduler.skedulertOverforingAvKrav()
+
+        verify(exactly = 2) { kravService.sendKrav(any()) }
+    }
+
 }

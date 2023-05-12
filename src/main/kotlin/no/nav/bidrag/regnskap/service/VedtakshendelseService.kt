@@ -35,13 +35,21 @@ class VedtakshendelseService(
         LOGGER.info("Behandler vedakHendelse for vedtakid: ${vedtakHendelse.id}")
         SECURE_LOGGER.info("Behandler vedtakHendelse: $vedtakHendelse\nVedtakhendelse som json string: $hendelse")
 
-        vedtakHendelse.stonadsendringListe?.forEach {
-            opprettOppdragForStonadsending(vedtakHendelse, it)
+        val opprettedeOppdrag = mutableListOf<Int>()
+
+        vedtakHendelse.stonadsendringListe?.forEach { stønadsendring ->
+            opprettOppdragForStonadsending(vedtakHendelse, stønadsendring)?.let {
+                opprettedeOppdrag.add(it)
+            }
         }
 
-        vedtakHendelse.engangsbelopListe?.forEach {
-            opprettOppdragForEngangsbelop(vedtakHendelse, it)
+        vedtakHendelse.engangsbelopListe?.forEach { engangsbelop ->
+            opprettOppdragForEngangsbelop(vedtakHendelse, engangsbelop)?.let {
+                opprettedeOppdrag.add(it)
+            }
         }
+
+        sendKrav(opprettedeOppdrag)
 
         LOGGER.info("Ferdig med behandling av vedtakshendelse: ${vedtakHendelse.id}")
     }
@@ -54,7 +62,7 @@ class VedtakshendelseService(
         }
     }
 
-    private fun opprettOppdragForStonadsending(vedtakHendelse: VedtakHendelse, stonadsendring: Stonadsendring) {
+    private fun opprettOppdragForStonadsending(vedtakHendelse: VedtakHendelse, stonadsendring: Stonadsendring): Int? {
         LOGGER.debug("Oppretter oppdrag for stonadendring.")
 
         if (erInnkrevingOgEndring(stonadsendring.innkreving, stonadsendring.endring)) {
@@ -73,12 +81,9 @@ class VedtakshendelseService(
                 omgjørVedtakId = stonadsendring.omgjorVedtakId,
                 periodeListe = mapPeriodelisteTilDomene(stonadsendring.periodeListe)
             )
-            val oppdragId = oppdragService.lagreHendelse(hendelse)
-
-            if (oppdragId != null) {
-                sendKrav(oppdragId)
-            }
+            return oppdragService.lagreHendelse(hendelse)
         }
+        return null
     }
 
     private fun erInnkrevingOgEndring(innkreving: Innkreving, endring: Boolean): Boolean {
@@ -101,7 +106,7 @@ class VedtakshendelseService(
         return perioder
     }
 
-    private fun opprettOppdragForEngangsbelop(vedtakHendelse: VedtakHendelse, engangsbelop: Engangsbelop) {
+    private fun opprettOppdragForEngangsbelop(vedtakHendelse: VedtakHendelse, engangsbelop: Engangsbelop): Int? {
         LOGGER.debug("Oppretter oppdrag for engangsbeløp.")
 
         if (erInnkrevingOgEndring(engangsbelop.innkreving, engangsbelop.endring)) {
@@ -129,23 +134,20 @@ class VedtakshendelseService(
                     )
                 )
             )
-            val oppdragId = oppdragService.lagreHendelse(hendelse)
-
-            if (oppdragId != null) {
-                sendKrav(oppdragId)
-            }
+            return oppdragService.lagreHendelse(hendelse)
         }
+        return null
     }
 
-    private fun sendKrav(oppdragId: Int) {
+    private fun sendKrav(oppdragIdListe: List<Int>) {
         if (harAktiveDriftAvvik()) { // TODO() kan caches cachable 30 sec
-            LOGGER.info("Det finnes aktive driftsavvik. Starter derfor ikke overføring av konteringer for oppdrag: $oppdragId.")
+            LOGGER.info("Det finnes aktive driftsavvik. Starter derfor ikke overføring av konteringer for oppdrag: $oppdragIdListe.")
             return
         } else if (erVedlikeholdsmodusPåslått()) {
-            LOGGER.info("Vedlikeholdsmodus er påslått! Starter derfor ikke overføring av kontering for oppdrag: $oppdragId.")
+            LOGGER.info("Vedlikeholdsmodus er påslått! Starter derfor ikke overføring av kontering for oppdrag: $oppdragIdListe.")
             return
         }
-        kravService.sendKrav(oppdragId)
+        kravService.sendKrav(oppdragIdListe)
     }
 
     private fun erVedlikeholdsmodusPåslått(): Boolean {

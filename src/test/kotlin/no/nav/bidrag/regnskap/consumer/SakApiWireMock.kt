@@ -19,7 +19,7 @@ class SakApiWireMock {
 
     internal fun sakMedGyldigResponse() {
         mock.stubFor(
-            WireMock.get(WireMock.urlEqualTo(SakConsumer.SAK_PATH)).willReturn(
+            WireMock.get(WireMock.anyUrl()).willReturn(
                 WireMock.aResponse().withHeader(HttpHeaders.CONTENT_TYPE, "application/json").withStatus(200).withBody(
                     """
            {

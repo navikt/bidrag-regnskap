@@ -4,6 +4,7 @@ import io.github.oshai.KotlinLogging
 import net.javacrumbs.shedlock.core.LockAssert
 import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
+import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.service.KravService
 import no.nav.bidrag.regnskap.service.PersistenceService
 import org.springframework.context.annotation.Configuration
@@ -18,9 +19,9 @@ private val LOGGER = KotlinLogging.logger { }
 @EnableScheduling
 @EnableSchedulerLock(defaultLockAtMostFor = "10m")
 class SendKravScheduler(
-    private val persistenceService: PersistenceService,
-    private val kravService: KravService,
-    private val kravSchedulerUtils: KravSchedulerUtils
+        private val persistenceService: PersistenceService,
+        private val kravService: KravService,
+        private val kravSchedulerUtils: KravSchedulerUtils
 ) {
 
     @Scheduled(cron = "\${scheduler.sendkrav.cron}")
@@ -37,25 +38,31 @@ class SendKravScheduler(
             return
         }
 
-        val oppdragMedIkkeOverforteKonteringer = hentOppdragMedIkkeOverforteKonteringerHvorKonteringIkkeErUtsatt()
+        val oppdragMedIkkeOverførteKonteringer = hentOppdragMedIkkeOverførteKonteringerHvorKonteringIkkeErUtsatt()
 
-        if (oppdragMedIkkeOverforteKonteringer.isEmpty()) {
+        if (oppdragMedIkkeOverførteKonteringer.isEmpty()) {
             LOGGER.info { "Det finnes ingen oppdrag med unsendte konteringer som ikke skal utsettes." }
             return
         }
 
-        oppdragMedIkkeOverforteKonteringer.forEach {
-            kravService.sendKrav(it)
+        // Samler alle oppdrag for samme sak slik at oversending til ELIN mottar de i samme krav.
+        val sakerMedIkkeOverførteKonteringer = HashMap<String, MutableList<Int>>()
+        oppdragMedIkkeOverførteKonteringer.forEach {
+            sakerMedIkkeOverførteKonteringer.getOrPut(it.sakId) { mutableListOf() }.apply { add(it.oppdragId) }
         }
-        LOGGER.info("Alle oppdrag(antall: ${oppdragMedIkkeOverforteKonteringer.size}) med unsendte konteringer er nå overført til skatt.")
+
+        sakerMedIkkeOverførteKonteringer.forEach {
+            kravService.sendKrav(it.value)
+        }
+
+        LOGGER.info("Alle oppdrag(antall: ${oppdragMedIkkeOverførteKonteringer.size}) med unsendte konteringer er nå overført til skatt.")
     }
 
-    private fun hentOppdragMedIkkeOverforteKonteringerHvorKonteringIkkeErUtsatt(): List<Int> {
+    private fun hentOppdragMedIkkeOverførteKonteringerHvorKonteringIkkeErUtsatt(): List<Oppdrag> {
         return persistenceService.hentAlleIkkeOverførteKonteringer()
-            .flatMap { listOf(it.oppdragsperiode?.oppdrag) }
-            .filterNot { it?.utsattTilDato?.isAfter(LocalDate.now()) == true }
-            .map { it?.oppdragId }
-            .distinct()
-            .filterNotNull()
+                .flatMap { listOf(it.oppdragsperiode?.oppdrag) }
+                .filterNot { it?.utsattTilDato?.isAfter(LocalDate.now()) == true }
+                .filterNotNull()
+                .distinct()
     }
 }
