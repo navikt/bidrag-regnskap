@@ -13,7 +13,6 @@ data class BehandlingsstatusResponse(
 
 @Schema(name = "Behandlingstatus feilmelding", description = "Feilmelding i responsen ved kall mot behandlingsstatus med batch-uid.")
 data class Feilmelding(
-
     val feilmelding: String
 )
 

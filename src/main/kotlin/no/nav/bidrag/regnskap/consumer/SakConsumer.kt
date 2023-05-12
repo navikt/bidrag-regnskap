@@ -29,7 +29,7 @@ class SakConsumer(
 
             hentFødselsnummerTilBmFraSak(responseEntity) ?: DUMMY_NUMMER
         } catch (e: Exception) {
-            LOGGER.error("Noe gikk feil i kommunikasjon med bidrag-sak for sakId: $sakId! \nGjeldende URL mot sak er: ${sakUrl + SAK_PATH} \nFeilmelding: ${e.message}")
+            LOGGER.error("Noe gikk galt i kommunikasjon med bidrag-sak for sakId: $sakId! \nGjeldende URL mot sak er: ${sakUrl + SAK_PATH} \nFeilmelding: ${e.message}")
             throw e
         }
     }

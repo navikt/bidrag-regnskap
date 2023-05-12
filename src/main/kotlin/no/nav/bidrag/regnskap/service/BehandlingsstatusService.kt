@@ -29,7 +29,7 @@ class BehandlingsstatusService(
             if (behandlingsstatusResponse.batchStatus == Batchstatus.Done) {
                 value.forEach { it.behandlingsstatusOkTidspunkt = now }
             } else {
-                feilmeldinger[key] = "Behandling av konteringer for batchuid $key har feilet.\nFeilmedling: $behandlingsstatusResponse"
+                feilmeldinger[key] = "Behandling av konteringer for batchuid $key har feilet: $behandlingsstatusResponse\n"
             }
         }
         return feilmeldinger
