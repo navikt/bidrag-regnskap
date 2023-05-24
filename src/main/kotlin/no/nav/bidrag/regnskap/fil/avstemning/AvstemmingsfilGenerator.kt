@@ -63,7 +63,11 @@ class AvstemmingsfilGenerator(
                         LocalDate.of(periode.year, periode.month, 1).format(DateTimeFormatter.ofPattern("yyyyMMdd")).toString() + ";" +
                         LocalDate.of(periode.year, periode.month, periode.lengthOfMonth()).format(DateTimeFormatter.ofPattern("yyyyMMdd")).toString() + ";" +
                         now.format(DateTimeFormatter.ofPattern("yyyyMMdd")).toString() + ";" +
-                        if (Transaksjonskode.valueOf(kontering.transaksjonskode).negativtBeløp) { "F;" } else { "T;" } +
+                        if (Transaksjonskode.valueOf(kontering.transaksjonskode).negativtBeløp) {
+                            "F;"
+                        } else {
+                            "T;"
+                        } +
                         kontering.oppdragsperiode.delytelseId.toString() + ";" +
                         kontering.oppdragsperiode.gjelderIdent + ";" +
                         kontering.oppdragsperiode.oppdrag!!.kravhaverIdent + ";" +
@@ -112,9 +116,9 @@ class AvstemmingsfilGenerator(
                     if (totalSum >= BigDecimal.ZERO) {
                         "T;"
                     } else {
-                        "F;" +
-                            totalAntall + ";"
-                    }
+                        "F;"
+                    } +
+                    totalAntall + ";"
                 )
                 .toByteArray()
         )
