@@ -12,6 +12,7 @@ import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 private val LOGGER = KotlinLogging.logger { }
 
@@ -23,6 +24,10 @@ class SendKravScheduler(
     private val kravService: KravService,
     private val kravSchedulerUtils: KravSchedulerUtils
 ) {
+
+    companion object {
+        private const val KONTERING_MINIMUM_LEVETID = 30L
+    }
 
     @Scheduled(cron = "\${scheduler.sendkrav.cron}")
     @SchedulerLock(name = "skedulertOverforingAvKrav")
@@ -48,7 +53,9 @@ class SendKravScheduler(
         // Samler alle oppdrag for samme sak slik at oversending til ELIN mottar de i samme krav.
         val sakerMedIkkeOverførteKonteringer = HashMap<String, MutableList<Int>>()
         oppdragMedIkkeOverførteKonteringer.forEach {
-            sakerMedIkkeOverførteKonteringer.getOrPut(it.sakId) { mutableListOf() }.apply { add(it.oppdragId) }
+            if (!oppdragHarNyligOpprettedeKonteringer(it)) {
+                sakerMedIkkeOverførteKonteringer.getOrPut(it.sakId) { mutableListOf() }.apply { add(it.oppdragId) }
+            }
         }
 
         sakerMedIkkeOverførteKonteringer.forEach {
@@ -56,6 +63,14 @@ class SendKravScheduler(
         }
 
         LOGGER.info("Alle oppdrag(antall: ${oppdragMedIkkeOverførteKonteringer.size}) med unsendte konteringer er nå overført til skatt.")
+    }
+
+    private fun oppdragHarNyligOpprettedeKonteringer(oppdrag: Oppdrag): Boolean {
+        return oppdrag.oppdragsperioder.any { oppdragsperiode ->
+            oppdragsperiode.konteringer.any { kontering ->
+                kontering.opprettetTidspunkt.isAfter(LocalDateTime.now().minusSeconds(KONTERING_MINIMUM_LEVETID))
+            }
+        }
     }
 
     private fun hentOppdragMedIkkeOverførteKonteringerHvorKonteringIkkeErUtsatt(): List<Oppdrag> {
