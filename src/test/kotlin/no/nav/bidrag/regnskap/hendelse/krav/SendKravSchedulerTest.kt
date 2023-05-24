@@ -22,6 +22,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.YearMonth
 
 @ExtendWith(MockKExtension::class)
@@ -80,7 +81,10 @@ internal class SendKravSchedulerTest {
     fun `skal sende over kontering`() {
         val oppdrag = TestData.opprettOppdrag(oppdragId = 1)
         val oppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = oppdrag)
-        val kontering = TestData.opprettKontering(oppdragsperiode = oppdragsperiode)
+        val kontering = TestData.opprettKontering(oppdragsperiode = oppdragsperiode, opprettetTidspunkt = LocalDateTime.now().minusMinutes(1))
+
+        oppdragsperiode.konteringer = listOf(kontering)
+        oppdrag.oppdragsperioder = listOf(oppdragsperiode)
 
         every { kravSchedulerUtils.harAktivtDriftsavvik() } returns false
         every { kravSchedulerUtils.erVedlikeholdsmodusPåslått() } returns false
@@ -97,7 +101,10 @@ internal class SendKravSchedulerTest {
     fun `skal filtrere ut oppdrag med fremtidig utsattTilDato`() {
         val oppdrag = TestData.opprettOppdrag(oppdragId = 1, utsattTilDato = LocalDate.now().plusDays(2))
         val oppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = oppdrag)
-        val kontering = TestData.opprettKontering(oppdragsperiode = oppdragsperiode)
+        val kontering = TestData.opprettKontering(oppdragsperiode = oppdragsperiode, opprettetTidspunkt = LocalDateTime.now().minusMinutes(1))
+
+        oppdragsperiode.konteringer = listOf(kontering)
+        oppdrag.oppdragsperioder = listOf(oppdragsperiode)
 
         every { kravSchedulerUtils.harAktivtDriftsavvik() } returns false
         every { kravSchedulerUtils.erVedlikeholdsmodusPåslått() } returns false
@@ -113,7 +120,10 @@ internal class SendKravSchedulerTest {
     fun `skal ikke filtrere ut utsattTilDatoer som er passert`() {
         val oppdrag = TestData.opprettOppdrag(oppdragId = 1, utsattTilDato = LocalDate.now())
         val oppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = oppdrag)
-        val kontering = TestData.opprettKontering(oppdragsperiode = oppdragsperiode)
+        val kontering = TestData.opprettKontering(oppdragsperiode = oppdragsperiode, opprettetTidspunkt = LocalDateTime.now().minusMinutes(1))
+
+        oppdragsperiode.konteringer = listOf(kontering)
+        oppdrag.oppdragsperioder = listOf(oppdragsperiode)
 
         every { kravSchedulerUtils.harAktivtDriftsavvik() } returns false
         every { kravSchedulerUtils.erVedlikeholdsmodusPåslått() } returns false
@@ -145,11 +155,21 @@ internal class SendKravSchedulerTest {
         val gebyrBpOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = gebyrBpOppdrag, oppdragsperiodeId = 2, gjelderIdent = bp, mottakerIdent = nav, periodeFra = LocalDate.now())
         val gebyrBmOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = gebyrBmOppdrag, oppdragsperiodeId = 3, gjelderIdent = bm, mottakerIdent = nav, periodeFra = LocalDate.now())
 
-        val annenKontering = TestData.opprettKontering(oppdragsperiode = annenOppdragsperiode, konteringId = 0)
+        val annenKontering = TestData.opprettKontering(oppdragsperiode = annenOppdragsperiode, konteringId = 0, opprettetTidspunkt = LocalDateTime.now().minusMinutes(1))
 
-        val bidragKontering = TestData.opprettKontering(oppdragsperiode = bidragOppdragsperiode, konteringId = 1, transaksjonskode = Transaksjonskode.B1.name)
-        val gebyrBpKontering = TestData.opprettKontering(oppdragsperiode = gebyrBpOppdragsperiode, konteringId = 2, transaksjonskode = Transaksjonskode.G1.name, søknadstype = Søknadstype.FABP.name)
-        val gebyrBmKontering = TestData.opprettKontering(oppdragsperiode = gebyrBmOppdragsperiode, konteringId = 3, transaksjonskode = Transaksjonskode.G1.name, søknadstype = Søknadstype.FABM.name)
+        val bidragKontering = TestData.opprettKontering(oppdragsperiode = bidragOppdragsperiode, konteringId = 1, transaksjonskode = Transaksjonskode.B1.name, opprettetTidspunkt = LocalDateTime.now().minusMinutes(1))
+        val gebyrBpKontering = TestData.opprettKontering(oppdragsperiode = gebyrBpOppdragsperiode, konteringId = 2, transaksjonskode = Transaksjonskode.G1.name, søknadstype = Søknadstype.FABP.name, opprettetTidspunkt = LocalDateTime.now().minusMinutes(1))
+        val gebyrBmKontering = TestData.opprettKontering(oppdragsperiode = gebyrBmOppdragsperiode, konteringId = 3, transaksjonskode = Transaksjonskode.G1.name, søknadstype = Søknadstype.FABM.name, opprettetTidspunkt = LocalDateTime.now().minusMinutes(1))
+
+        gebyrBmOppdragsperiode.konteringer = listOf(gebyrBmKontering)
+        gebyrBpOppdragsperiode.konteringer = listOf(gebyrBpKontering)
+        bidragOppdragsperiode.konteringer = listOf(bidragKontering)
+        annenOppdragsperiode.konteringer = listOf(annenKontering)
+
+        gebyrBmOppdrag.oppdragsperioder = listOf(gebyrBmOppdragsperiode)
+        gebyrBpOppdrag.oppdragsperioder = listOf(gebyrBpOppdragsperiode)
+        bidragOppdrag.oppdragsperioder = listOf(bidragOppdragsperiode)
+        annetOppdrag.oppdragsperioder = listOf(annenOppdragsperiode)
 
         every { kravSchedulerUtils.harAktivtDriftsavvik() } returns false
         every { kravSchedulerUtils.erVedlikeholdsmodusPåslått() } returns false
@@ -160,5 +180,21 @@ internal class SendKravSchedulerTest {
         sendKravScheduler.skedulertOverforingAvKrav()
 
         verify(exactly = 2) { kravService.sendKrav(any()) }
+    }
+
+    @Test
+    fun `skal ikke sende over krav som er opprettet innen siste 30 sekunder for å unngå dobbel oversending`() {
+        val oppdrag = TestData.opprettOppdrag(oppdragId = 1)
+        val oppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = oppdrag)
+        val kontering = TestData.opprettKontering(oppdragsperiode = oppdragsperiode)
+
+        every { kravSchedulerUtils.harAktivtDriftsavvik() } returns false
+        every { kravSchedulerUtils.erVedlikeholdsmodusPåslått() } returns false
+        every { persistenceService.hentAlleIkkeOverførteKonteringer() } returns listOf(kontering)
+        every { persistenceService.finnSisteOverførtePeriode() } returns YearMonth.now()
+
+        sendKravScheduler.skedulertOverforingAvKrav()
+
+        verify(exactly = 0) { kravService.sendKrav(any()) }
     }
 }

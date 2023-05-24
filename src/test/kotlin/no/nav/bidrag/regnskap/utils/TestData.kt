@@ -142,6 +142,7 @@ object TestData {
         type: String = Type.NY.toString(),
         søknadstype: String = Søknadstype.EN.name,
         sendtIPalopsfil: Boolean = false,
+        opprettetTidspunkt: LocalDateTime = LocalDateTime.now(),
         overføringKontering: List<OverføringKontering>? = listOf(opprettOverføringKontering())
     ): Kontering {
         return Kontering(
@@ -153,6 +154,7 @@ object TestData {
             type = type,
             søknadType = søknadstype,
             sendtIPåløpsfil = sendtIPalopsfil,
+            opprettetTidspunkt = opprettetTidspunkt,
             overføringKontering = overføringKontering
         )
     }
