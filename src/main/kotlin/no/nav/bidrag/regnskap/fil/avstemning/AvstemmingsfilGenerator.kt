@@ -105,7 +105,7 @@ class AvstemmingsfilGenerator(
                         .toByteArray()
                 )
                 totalSum += if (avstemningSummering.transaksjonskode.negativtBeløp) avstemningSummering.sum.negate() else avstemningSummering.sum
-                totalAntall++
+                totalAntall += avstemningSummering.antallKonteringer
             }
         }
 
