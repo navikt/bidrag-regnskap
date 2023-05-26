@@ -46,16 +46,19 @@ class KravService(
     fun sendKrav(oppdragIdListe: List<Int>) {
         LOGGER.info("Starter overføring av krav til skatt for oppdrag: $oppdragIdListe")
 
-        val oppdragListe = oppdragIdListe.mapNotNull { persistenceService.hentOppdrag(it) }
+        val oppdragListe = oppdragIdListe.mapNotNull { persistenceService.hentOppdrag(it) }.toMutableList()
 
-        if (oppdragListe.isEmpty()) {
-            LOGGER.error("Det finnes ingen oppdrag med angitte oppdragsIder: $oppdragIdListe")
-            return
+        //Fjerner alle oppdrag som har utsatt oversending
+        oppdragListe.removeIf { oppdrag ->
+            val skalFjerne = oppdrag.utsattTilDato?.isAfter(LocalDate.now()) == true
+            if (skalFjerne) {
+                LOGGER.info("Oppdrag ${oppdrag.oppdragId} skal ikke oversendes før ${oppdrag.utsattTilDato}. Avventer oversending av krav.")
+            }
+            skalFjerne
         }
 
-        // Alle oppdragId i listen skal stamme fra samme vedtak. Disse skal ha samme utsattTilDato.
-        if (oppdragListe.first().utsattTilDato?.isAfter(LocalDate.now()) == true) {
-            LOGGER.info("Oppdrag $oppdragIdListe skal ikke oversendes før ${oppdragListe.first().utsattTilDato}. Avventer oversending av krav.")
+        if (oppdragListe.isEmpty()) {
+            LOGGER.info("Det finnes ingen oppdrag med angitte oppdragsIder: $oppdragIdListe som skal oversendes.")
             return
         }
 
@@ -66,16 +69,27 @@ class KravService(
             return
         }
 
-        val alleIkkeOverførteKonteringer = finnAlleIkkeOverførteKonteringer(oppdragsperioderMedIkkeOverførteKonteringerListe)
-
         try {
-            val skattResponse = skattConsumer.sendKrav(opprettSkattKravRequest(alleIkkeOverførteKonteringer))
-            lagreOverføringAvKrav(skattResponse, alleIkkeOverførteKonteringer, oppdragListe)
+            val skattResponse = skattConsumer.sendKrav(opprettKravliste(oppdragsperioderMedIkkeOverførteKonteringerListe))
+            lagreOverføringAvKrav(skattResponse, finnAlleIkkeOverførteKonteringer(oppdragsperioderMedIkkeOverførteKonteringerListe), oppdragListe)
         } catch (e: Exception) {
             LOGGER.error("Kallet mot skatt feilet på noe uventet! Feil: ${e.message}, stacktrace: ${e.stackTraceToString()}")
         }
 
         LOGGER.info("Overføring til skatt fullført for oppdrag: $oppdragIdListe")
+    }
+
+    fun opprettKravliste(oppdragsperioderMedIkkeOverførteKonteringerListe: List<Oppdragsperiode>): Kravliste {
+        //Gruperer alle oppdragene på vedtakId for å sende over oppdrag knyttet til en vedtakId om gangen,
+        // sorterer på vedtakId slik at tidligste vedtak kommer først
+        // mapper så til kontering for å opprette en KravKontering per kontering
+        return Kravliste(oppdragsperioderMedIkkeOverførteKonteringerListe
+            .groupBy { it.vedtakId }
+            .mapValues { entry ->
+                entry.value.sortedBy { oppdragsperiode -> oppdragsperiode.vedtakId }
+            }.toSortedMap()
+            .map { finnAlleIkkeOverførteKonteringer(it.value) }
+            .map { opprettKravKonteringListe(it) })
     }
 
     private fun lagreOverføringAvKrav(
@@ -194,7 +208,7 @@ class KravService(
         )
     }
 
-    fun opprettSkattKravRequest(konteringerListe: List<Kontering>): Kravliste {
+    fun opprettKravKonteringListe(konteringerListe: List<Kontering>): Krav {
         val kravKonteringerListe = mutableListOf<Kravkontering>()
         konteringerListe.forEach { kontering ->
             kravKonteringerListe.add(
@@ -219,10 +233,10 @@ class KravService(
                 )
             )
         }
-        return Kravliste(listOf(Krav(kravKonteringerListe)))
+        return Krav(kravKonteringerListe)
     }
 
-    private fun hentOppdragsperioderMedIkkeOverførteKonteringer(
+    fun hentOppdragsperioderMedIkkeOverførteKonteringer(
         oppdrag: Oppdrag
     ): List<Oppdragsperiode> {
         val oppdragsperioder = mutableListOf<Oppdragsperiode>()
@@ -244,7 +258,6 @@ class KravService(
 
     private fun finnAlleIkkeOverførteKonteringer(oppdragsperioder: List<Oppdragsperiode>): List<Kontering> {
         val konteringer = mutableListOf<Kontering>()
-
         oppdragsperioder.forEach { oppdragsperiode ->
             konteringer.addAll(
                 oppdragsperiode.konteringer.filter { kontering ->
