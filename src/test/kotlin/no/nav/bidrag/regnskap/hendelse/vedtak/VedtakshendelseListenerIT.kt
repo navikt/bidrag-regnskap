@@ -862,7 +862,7 @@ internal class VedtakshendelseListenerIT {
     }
 
     private fun skrivTilTestdatafil(konteringer: List<Kontering>, kommentar: String) {
-        val skattKravRequest = kravService.opprettSkattKravRequest(konteringer)
+        val skattKravRequest = kravService.opprettKravKonteringListe(konteringer)
         file.write("\n// $kommentar\n".toByteArray())
         file.write(objectmapper.writerWithDefaultPrettyPrinter().writeValueAsString(skattKravRequest).toByteArray())
     }

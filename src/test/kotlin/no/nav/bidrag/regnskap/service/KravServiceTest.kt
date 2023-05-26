@@ -1,6 +1,8 @@
 package no.nav.bidrag.regnskap.service
 
 import io.kotest.assertions.throwables.shouldNotThrowAny
+import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
@@ -78,6 +80,36 @@ class KravServiceTest {
     }
 
     @Test
+    fun `skal ikke sende konteringer som er utsatt`() {
+        every { persistenceService.hentOppdrag(oppdragsId) } returns TestData.opprettOppdrag(
+            utsattTilDato = LocalDate.now().plusDays(1)
+        )
+
+
+        kravService.sendKrav(listOf(oppdragsId))
+
+
+        verify(exactly = 0) { skattConsumer.sendKrav(any()) }
+    }
+
+    @Test
+    fun `skal sende konteringer hvor utsatt dato er passert`() {
+        val oppdrag = opprettOppdragForPeriode(
+            now.minusMonths(3),
+            now.plusMonths(1)
+        )
+        oppdrag.utsattTilDato = LocalDate.now().minusDays(1)
+
+        every { persistenceService.hentOppdrag(oppdragsId) } returns oppdrag
+        every { skattConsumer.sendKrav(any()) } returns ResponseEntity.accepted().body(batchUid)
+
+        kravService.sendKrav(listOf(oppdragsId))
+
+
+        verify(exactly = 1) { skattConsumer.sendKrav(any()) }
+    }
+
+    @Test
     fun `skal ikke sende kontering om oppdrag ikke finnes`() {
         every { persistenceService.hentOppdrag(oppdragsId) } returns null
 
@@ -121,6 +153,79 @@ class KravServiceTest {
         kravService.sendKrav(listOf(1, 2, 3))
 
         verify(exactly = 1) { skattConsumer.sendKrav(any()) }
+    }
+
+    @Test
+    fun `skal sende samme oppdragId men forskjellig vedtakId i forskjellige Krav i samme kall mot skatt`() {
+        val bm = PersonidentGenerator.genererPersonnummer()
+        val bp = PersonidentGenerator.genererPersonnummer()
+        val barn = PersonidentGenerator.genererPersonnummer()
+        val nav = "80000345435"
+
+        val bidragOppdrag = TestData.opprettOppdrag(oppdragId = 1, skyldnerIdent = bp, kravhaverIdent = bm, sakId = "123456")
+        val gebyrBpOppdrag = TestData.opprettOppdrag(stonadType = null, engangsbelopType = EngangsbelopType.GEBYR_SKYLDNER, oppdragId = 2, skyldnerIdent = bp, kravhaverIdent = nav, sakId = "123456")
+        val gebyrBmOppdrag = TestData.opprettOppdrag(stonadType = null, engangsbelopType = EngangsbelopType.GEBYR_MOTTAKER, oppdragId = 3, skyldnerIdent = bm, kravhaverIdent = nav, sakId = "123456")
+
+        val bidragOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = bidragOppdrag, vedtakId = 123456, oppdragsperiodeId = 1, gjelderIdent = barn, mottakerIdent = bm, periodeTil = null)
+        val gebyrBpOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = gebyrBpOppdrag, oppdragsperiodeId = 2, gjelderIdent = bp, mottakerIdent = nav, periodeFra = LocalDate.now())
+        val gebyrBmOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = gebyrBmOppdrag, oppdragsperiodeId = 3, gjelderIdent = bm, mottakerIdent = nav, periodeFra = LocalDate.now())
+
+        val bidragKontering = TestData.opprettKontering(oppdragsperiode = bidragOppdragsperiode, konteringId = 1, transaksjonskode = Transaksjonskode.B1.name)
+        val gebyrBpKontering = TestData.opprettKontering(oppdragsperiode = gebyrBpOppdragsperiode, konteringId = 2, transaksjonskode = Transaksjonskode.G1.name, søknadstype = Søknadstype.FABP.name)
+        val gebyrBmKontering = TestData.opprettKontering(oppdragsperiode = gebyrBmOppdragsperiode, konteringId = 3, transaksjonskode = Transaksjonskode.G1.name, søknadstype = Søknadstype.FABM.name)
+
+        bidragOppdragsperiode.konteringer = listOf(bidragKontering)
+        gebyrBpOppdragsperiode.konteringer = listOf(gebyrBpKontering)
+        gebyrBmOppdragsperiode.konteringer = listOf(gebyrBmKontering)
+
+        bidragOppdrag.oppdragsperioder = listOf(bidragOppdragsperiode)
+        gebyrBpOppdrag.oppdragsperioder = listOf(gebyrBpOppdragsperiode)
+        gebyrBmOppdrag.oppdragsperioder = listOf(gebyrBmOppdragsperiode)
+
+        every { persistenceService.hentOppdrag(1) } returns bidragOppdrag
+        every { persistenceService.hentOppdrag(2) } returns gebyrBpOppdrag
+        every { persistenceService.hentOppdrag(3) } returns gebyrBmOppdrag
+
+        kravService.sendKrav(listOf(1, 2, 3))
+
+        verify(exactly = 1) { skattConsumer.sendKrav(any()) }
+    }
+
+    @Test
+    fun `skal opprette kravliste sortert med eldste vedtak først`() {
+        val bm = PersonidentGenerator.genererPersonnummer()
+        val bp = PersonidentGenerator.genererPersonnummer()
+        val barn = PersonidentGenerator.genererPersonnummer()
+        val nav = "80000345435"
+
+        val bidragOppdrag = TestData.opprettOppdrag(oppdragId = 1, skyldnerIdent = bp, kravhaverIdent = bm, sakId = "123456")
+        val gebyrBpOppdrag = TestData.opprettOppdrag(stonadType = null, engangsbelopType = EngangsbelopType.GEBYR_SKYLDNER, oppdragId = 2, skyldnerIdent = bp, kravhaverIdent = nav, sakId = "123456")
+        val gebyrBmOppdrag = TestData.opprettOppdrag(stonadType = null, engangsbelopType = EngangsbelopType.GEBYR_MOTTAKER, oppdragId = 3, skyldnerIdent = bm, kravhaverIdent = nav, sakId = "123456")
+
+        val bidragOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = bidragOppdrag, vedtakId = 123456, oppdragsperiodeId = 1, gjelderIdent = barn, mottakerIdent = bm, periodeTil = null)
+        val gebyrBpOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = gebyrBpOppdrag, vedtakId = 12345, oppdragsperiodeId = 2, gjelderIdent = bp, mottakerIdent = nav, periodeFra = LocalDate.now())
+        val gebyrBmOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = gebyrBmOppdrag, vedtakId = 1234, oppdragsperiodeId = 3, gjelderIdent = bm, mottakerIdent = nav, periodeFra = LocalDate.now())
+
+        val bidragKontering = TestData.opprettKontering(oppdragsperiode = bidragOppdragsperiode, konteringId = 1, transaksjonskode = Transaksjonskode.B1.name)
+        val gebyrBpKontering = TestData.opprettKontering(oppdragsperiode = gebyrBpOppdragsperiode, konteringId = 2, transaksjonskode = Transaksjonskode.G1.name, søknadstype = Søknadstype.FABP.name)
+        val gebyrBmKontering = TestData.opprettKontering(oppdragsperiode = gebyrBmOppdragsperiode, konteringId = 3, transaksjonskode = Transaksjonskode.G1.name, søknadstype = Søknadstype.FABM.name)
+
+        bidragOppdragsperiode.konteringer = listOf(bidragKontering)
+        gebyrBpOppdragsperiode.konteringer = listOf(gebyrBpKontering)
+        gebyrBmOppdragsperiode.konteringer = listOf(gebyrBmKontering)
+
+        bidragOppdrag.oppdragsperioder = listOf(bidragOppdragsperiode)
+        gebyrBpOppdrag.oppdragsperioder = listOf(gebyrBpOppdragsperiode)
+        gebyrBmOppdrag.oppdragsperioder = listOf(gebyrBmOppdragsperiode)
+
+        val oppdragsperioderMedIkkeOverførteKonteringerListe = listOf(bidragOppdrag, gebyrBmOppdrag, gebyrBpOppdrag).flatMap { kravService.hentOppdragsperioderMedIkkeOverførteKonteringer(it) }
+
+        val kravliste = kravService.opprettKravliste(oppdragsperioderMedIkkeOverførteKonteringerListe)
+
+        kravliste.krav shouldHaveSize 3
+        kravliste.krav[0].konteringer[0].soknadType shouldBe Søknadstype.FABM
+        kravliste.krav[1].konteringer[0].soknadType shouldBe Søknadstype.FABP
+        kravliste.krav[2].konteringer[0].soknadType shouldBe Søknadstype.EN
     }
 
     private fun opprettOppdragForPeriode(periodeFra: LocalDate, periodeTil: LocalDate): Oppdrag {
