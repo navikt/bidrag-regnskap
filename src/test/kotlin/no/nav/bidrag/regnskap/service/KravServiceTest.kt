@@ -31,6 +31,9 @@ class KravServiceTest {
     @MockK(relaxed = true)
     private lateinit var skattConsumer: SkattConsumer
 
+    @MockK(relaxed = true)
+    private lateinit var behandlingsstatusService: BehandlingsstatusService
+
     @InjectMockKs
     private lateinit var kravService: KravService
 
@@ -85,9 +88,7 @@ class KravServiceTest {
             utsattTilDato = LocalDate.now().plusDays(1)
         )
 
-
         kravService.sendKrav(listOf(oppdragsId))
-
 
         verify(exactly = 0) { skattConsumer.sendKrav(any()) }
     }
@@ -105,8 +106,25 @@ class KravServiceTest {
 
         kravService.sendKrav(listOf(oppdragsId))
 
-
         verify(exactly = 1) { skattConsumer.sendKrav(any()) }
+    }
+
+    @Test
+    fun `skal ikke sende konteringer hvor det finnes ikke godkjente overføringer`() {
+        val oppdrag = opprettOppdragForPeriode(
+            now.minusMonths(3),
+            now.plusMonths(1)
+        )
+        val refernsekode = "test"
+
+        oppdrag.oppdragsperioder.first().konteringer.first().sisteReferansekode = refernsekode
+
+        every { persistenceService.hentOppdrag(oppdragsId) } returns oppdrag
+        every { behandlingsstatusService.hentBehandlingsstatusForIkkeGodkjenteKonteringerForReferansekode(listOf(refernsekode)) } returns hashMapOf(Pair("batchUid", "FEIL"), Pair("batchuid2", "FEIL2"))
+
+        kravService.sendKrav(listOf(oppdragsId))
+
+        verify(exactly = 0) { skattConsumer.sendKrav(any()) }
     }
 
     @Test

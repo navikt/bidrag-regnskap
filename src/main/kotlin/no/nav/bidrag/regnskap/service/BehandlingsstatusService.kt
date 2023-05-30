@@ -13,15 +13,15 @@ class BehandlingsstatusService(
     private val persistenceService: PersistenceService
 ) {
 
-    fun hentKonteringerMedIkkeGodkjentBehandlingsstatus(): HashMap<String, MutableSet<Kontering>> {
+    fun hentKonteringerMedIkkeGodkjentBehandlingsstatus(sisteReferanser: List<String> = emptyList()): HashMap<String, MutableSet<Kontering>> {
         val map = HashMap<String, MutableSet<Kontering>>()
-        persistenceService.hentAlleKonteringerUtenBehandlingsstatusOk().forEach {
+        hentKonteringer(sisteReferanser).forEach {
             map.getOrPut(it.sisteReferansekode!!) { mutableSetOf() }.add(it)
         }
         return map
     }
 
-    fun hentBehandlingsstatusForIkkeGodkjenteKonteringer(konteringerSomIkkeHarFåttGodkjentBehandlingsstatus: java.util.HashMap<String, MutableSet<Kontering>>): HashMap<String, String> {
+    fun hentBehandlingsstatusForIkkeGodkjenteKonteringer(konteringerSomIkkeHarFåttGodkjentBehandlingsstatus: HashMap<String, MutableSet<Kontering>>): HashMap<String, String> {
         val feilmeldinger = hashMapOf<String, String>()
         konteringerSomIkkeHarFåttGodkjentBehandlingsstatus.forEach { (key, value) ->
             val behandlingsstatusResponse = hentBehandlingsstatus(key)
@@ -35,8 +35,25 @@ class BehandlingsstatusService(
         return feilmeldinger
     }
 
+    fun hentBehandlingsstatusForIkkeGodkjenteKonteringerForReferansekode(sisteReferanser: List<String>): HashMap<String, String> {
+        return hentBehandlingsstatusForIkkeGodkjenteKonteringer(hentKonteringerMedIkkeGodkjentBehandlingsstatus(sisteReferanser))
+    }
+
+    private fun hentKonteringer(sisteReferanser: List<String>): List<Kontering> {
+        return if (sisteReferanser.isEmpty()) hentAlleKonteringer() else hentKonteringerForReferanse(sisteReferanser)
+    }
+
+    private fun hentAlleKonteringer(): List<Kontering> {
+        return persistenceService.hentAlleKonteringerUtenBehandlingsstatusOk()
+    }
+
+    private fun hentKonteringerForReferanse(sisteReferanser: List<String>): List<Kontering> {
+        return persistenceService.hentKonteringerUtenBehandlingsstatusOkForReferansekode(sisteReferanser)
+    }
+
     private fun hentBehandlingsstatus(batchUid: String): BehandlingsstatusResponse {
         val behandlingsstatus = skattConsumer.sjekkBehandlingsstatus(batchUid)
-        return behandlingsstatus.body ?: error("Sjekk av behandlingsstatus feilet for batchUid: $batchUid! Feilkode: ${behandlingsstatus.statusCode}")
+        return behandlingsstatus.body
+            ?: error("Sjekk av behandlingsstatus feilet for batchUid: $batchUid! Feilkode: ${behandlingsstatus.statusCode}")
     }
 }

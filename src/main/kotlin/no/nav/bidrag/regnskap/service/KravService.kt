@@ -36,7 +36,8 @@ private val objectMapper = jacksonObjectMapper().registerModule(JavaTimeModule()
 @Service
 class KravService(
     private val skattConsumer: SkattConsumer,
-    private val persistenceService: PersistenceService
+    private val persistenceService: PersistenceService,
+    private val behandlingsstatusService: BehandlingsstatusService
 ) {
 
     @Transactional(
@@ -48,13 +49,26 @@ class KravService(
 
         val oppdragListe = oppdragIdListe.mapNotNull { persistenceService.hentOppdrag(it) }.toMutableList()
 
-        //Fjerner alle oppdrag som har utsatt oversending
+        // Fjerner alle oppdrag som har utsatt oversending
         oppdragListe.removeIf { oppdrag ->
             val skalFjerne = oppdrag.utsattTilDato?.isAfter(LocalDate.now()) == true
             if (skalFjerne) {
                 LOGGER.info("Oppdrag ${oppdrag.oppdragId} skal ikke oversendes før ${oppdrag.utsattTilDato}. Avventer oversending av krav.")
             }
             skalFjerne
+        }
+
+        // Om det finnes ikke godkjente overføringer som er forsøkt overført tidligere så skal det forsøkes å overføres en gang til og om det feiler avbrytes oversending
+        oppdragListe.forEach { oppdrag ->
+            if (harOppdragFeiledeOverføringer(oppdrag)) {
+                val feiledeOverføringer = behandlingsstatusService.hentBehandlingsstatusForIkkeGodkjenteKonteringerForReferansekode(hentSisteReferansekoder(oppdrag))
+
+                if (feiledeOverføringer.isNotEmpty()) {
+                    val feilmeldingSammenslått = feiledeOverføringer.entries.joinToString("\n") { it.value }
+                    LOGGER.error("Det har oppstått feil ved overføring av krav for oppdrag ${oppdrag.oppdragId} på følgende batchUider med følgende feilmelding:\n $feilmeldingSammenslått")
+                    return
+                }
+            }
         }
 
         if (oppdragListe.isEmpty()) {
@@ -79,17 +93,33 @@ class KravService(
         LOGGER.info("Overføring til skatt fullført for oppdrag: $oppdragIdListe")
     }
 
+    private fun hentSisteReferansekoder(oppdrag: Oppdrag) =
+        oppdrag.oppdragsperioder.flatMap { oppdragsperiode ->
+            oppdragsperiode.konteringer.flatMap { kontering ->
+                listOfNotNull(kontering.sisteReferansekode)
+            }
+        }.distinct()
+
+    private fun harOppdragFeiledeOverføringer(oppdrag: Oppdrag) =
+        oppdrag.oppdragsperioder.any { oppdragsperiode ->
+            oppdragsperiode.konteringer.any { kontering ->
+                kontering.behandlingsstatusOkTidspunkt == null && kontering.sisteReferansekode != null
+            }
+        }
+
     fun opprettKravliste(oppdragsperioderMedIkkeOverførteKonteringerListe: List<Oppdragsperiode>): Kravliste {
-        //Gruperer alle oppdragene på vedtakId for å sende over oppdrag knyttet til en vedtakId om gangen,
+        // Gruperer alle oppdragene på vedtakId for å sende over oppdrag knyttet til en vedtakId om gangen,
         // sorterer på vedtakId slik at tidligste vedtak kommer først
         // mapper så til kontering for å opprette en KravKontering per kontering
-        return Kravliste(oppdragsperioderMedIkkeOverførteKonteringerListe
-            .groupBy { it.vedtakId }
-            .mapValues { entry ->
-                entry.value.sortedBy { oppdragsperiode -> oppdragsperiode.vedtakId }
-            }.toSortedMap()
-            .map { finnAlleIkkeOverførteKonteringer(it.value) }
-            .map { opprettKravKonteringListe(it) })
+        return Kravliste(
+            oppdragsperioderMedIkkeOverførteKonteringerListe
+                .groupBy { it.vedtakId }
+                .mapValues { entry ->
+                    entry.value.sortedBy { oppdragsperiode -> oppdragsperiode.vedtakId }
+                }.toSortedMap()
+                .map { finnAlleIkkeOverførteKonteringer(it.value) }
+                .map { opprettKravKonteringListe(it) }
+        )
     }
 
     private fun lagreOverføringAvKrav(

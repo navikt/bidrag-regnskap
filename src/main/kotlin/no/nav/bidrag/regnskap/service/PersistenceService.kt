@@ -116,6 +116,10 @@ class PersistenceService(
         return konteringRepository.findAllByBehandlingsstatusOkTidspunktIsNullAndOverføringstidspunktIsNotNullAndSisteReferansekodeIsNotNull()
     }
 
+    fun hentKonteringerUtenBehandlingsstatusOkForReferansekode(sisteReferansekoder: List<String>): List<Kontering> {
+        return konteringRepository.findAllByBehandlingsstatusOkTidspunktIsNullAndOverføringstidspunktIsNotNullAndSisteReferansekodeIsIn(sisteReferansekoder)
+    }
+
     fun hentAlleKonteringerForDato(dato: LocalDate): List<Kontering> {
         return konteringRepository.hentAlleKonteringerForDato(dato)
     }
