@@ -16,4 +16,6 @@ interface KonteringRepository : JpaRepository<Kontering, Int> {
     fun hentAlleKonteringerForDato(dato: LocalDate): List<Kontering>
 
     fun findAllByBehandlingsstatusOkTidspunktIsNullAndOverføringstidspunktIsNotNullAndSisteReferansekodeIsNotNull(): List<Kontering>
+
+    fun findAllByBehandlingsstatusOkTidspunktIsNullAndOverføringstidspunktIsNotNullAndSisteReferansekodeIsIn(sisteReferansekoder: List<String>): List<Kontering>
 }
