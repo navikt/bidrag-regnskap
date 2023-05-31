@@ -154,6 +154,7 @@ internal class VedtakshendelseListenerIT {
     @BeforeEach
     fun beforeEach() {
         kravApiWireMock.kravMedGyldigResponse()
+        kravApiWireMock.behandlingsstatusMedGyldigResponse()
         sakApiWireMock.sakMedGyldigResponse()
         kravApiWireMock.livenessMedGyldigResponse()
         maskinportenWireMock.kravMedGyldigResponse()
