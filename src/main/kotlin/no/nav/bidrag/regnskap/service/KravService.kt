@@ -112,13 +112,12 @@ class KravService(
         // sorterer på vedtakId slik at tidligste vedtak kommer først
         // mapper så til kontering for å opprette en KravKontering per kontering
         return Kravliste(
-            oppdragsperioderMedIkkeOverførteKonteringerListe
+            finnAlleIkkeOverførteKonteringer(oppdragsperioderMedIkkeOverførteKonteringerListe)
                 .groupBy { it.vedtakId }
                 .mapValues { entry ->
-                    entry.value.sortedBy { oppdragsperiode -> oppdragsperiode.vedtakId }
+                    entry.value.sortedBy { kontering -> kontering.vedtakId }
                 }.toSortedMap()
-                .map { finnAlleIkkeOverførteKonteringer(it.value) }
-                .map { opprettKravKonteringListe(it) }
+                .map { opprettKravKonteringListe(it.value) }
         )
     }
 

@@ -143,6 +143,7 @@ object TestData {
         søknadstype: String = Søknadstype.EN.name,
         sendtIPalopsfil: Boolean = false,
         opprettetTidspunkt: LocalDateTime = LocalDateTime.now(),
+        vedtakId: Int = 654321,
         overføringKontering: List<OverføringKontering>? = listOf(opprettOverføringKontering())
     ): Kontering {
         return Kontering(
@@ -155,6 +156,7 @@ object TestData {
             søknadType = søknadstype,
             sendtIPåløpsfil = sendtIPalopsfil,
             opprettetTidspunkt = opprettetTidspunkt,
+            vedtakId = vedtakId,
             overføringKontering = overføringKontering
         )
     }

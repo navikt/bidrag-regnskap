@@ -114,10 +114,11 @@ class KonteringServiceTest {
                     )
                 )
             )
+            val hendelse = TestData.opprettHendelse()
 
             val sisteOverførtePeriode = YearMonth.of(now.year, now.month).plusMonths(5)
 
-            shouldNotThrowAny { konteringService.opprettKorreksjonskonteringer(oppdrag, nyOppdragsperiode, sisteOverførtePeriode) }
+            shouldNotThrowAny { konteringService.opprettKorreksjonskonteringer(oppdrag, nyOppdragsperiode, sisteOverførtePeriode, hendelse) }
         }
 
         @Test
@@ -143,10 +144,11 @@ class KonteringServiceTest {
                     )
                 )
             )
+            val hendelse = TestData.opprettHendelse()
 
             val sisteOverførtePeriode = YearMonth.of(now.year, now.month).plusMonths(5)
 
-            konteringService.opprettKorreksjonskonteringer(oppdrag, nyOppdragsperiode, sisteOverførtePeriode)
+            konteringService.opprettKorreksjonskonteringer(oppdrag, nyOppdragsperiode, sisteOverførtePeriode, hendelse)
 
             verify(exactly = 0) { persistenceService.lagreKontering(any()) }
         }

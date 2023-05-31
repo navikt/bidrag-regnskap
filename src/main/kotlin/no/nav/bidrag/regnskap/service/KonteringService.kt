@@ -55,24 +55,27 @@ class KonteringService {
                     overføringsperiode = periode.toString(),
                     type = vurderType(oppdragsperiode, periode),
                     søknadType = vurderSøknadType(hendelse, indexPeriode),
-                    oppdragsperiode = oppdragsperiode
+                    oppdragsperiode = oppdragsperiode,
+                    vedtakId = hendelse.vedtakId
                 )
             )
         }
     }
 
-    fun opprettKorreksjonskonteringer(oppdrag: Oppdrag, oppdragsperiode: Oppdragsperiode, sisteOverførtePeriode: YearMonth) {
+    fun opprettKorreksjonskonteringer(oppdrag: Oppdrag, oppdragsperiode: Oppdragsperiode, sisteOverførtePeriode: YearMonth, hendelse: Hendelse) {
         val overførteKonteringerListe = hentAlleKonteringerForOppdrag(oppdrag)
 
         opprettKorreksjonskonteringForAlleredeOversendteKonteringer(
             PeriodeUtils.hentAllePerioderMellomDato(oppdragsperiode.periodeFra, oppdragsperiode.periodeTil, sisteOverførtePeriode),
-            overførteKonteringerListe
+            overførteKonteringerListe,
+            hendelse
         )
     }
 
     private fun opprettKorreksjonskonteringForAlleredeOversendteKonteringer(
         perioderForOppdragsperiode: List<YearMonth>,
-        overførteKonteringerListe: List<Kontering>
+        overførteKonteringerListe: List<Kontering>,
+        hendelse: Hendelse
     ) {
         overførteKonteringerListe.forEach { kontering ->
             val korreksjonskode = Transaksjonskode.valueOf(kontering.transaksjonskode).korreksjonskode
@@ -85,7 +88,8 @@ class KonteringService {
                     overføringsperiode = kontering.overføringsperiode,
                     transaksjonskode = korreksjonskode,
                     type = Type.ENDRING.toString(),
-                    søknadType = kontering.søknadType
+                    søknadType = kontering.søknadType,
+                    vedtakId = hendelse.vedtakId
                 )
 
                 kontering.oppdragsperiode?.konteringer = kontering.oppdragsperiode?.konteringer?.plus(nyKorreksjonskontering)
@@ -134,13 +138,11 @@ class KonteringService {
         kontering: Kontering,
         overførteKonteringerListe: List<Kontering>
     ): Boolean {
-        if (overførteKonteringerListe.any {
-            it.transaksjonskode == Transaksjonskode.valueOf(kontering.transaksjonskode).korreksjonskode && it.oppdragsperiode == kontering.oppdragsperiode && it.overføringsperiode == kontering.overføringsperiode
+        return overførteKonteringerListe.any {
+            it.transaksjonskode == Transaksjonskode.valueOf(kontering.transaksjonskode).korreksjonskode
+                && it.oppdragsperiode == kontering.oppdragsperiode
+                && it.overføringsperiode == kontering.overføringsperiode
         }
-        ) {
-            return true
-        }
-        return false
     }
 
     fun hentAlleKonteringerForOppdrag(oppdrag: Oppdrag): List<Kontering> {
@@ -156,7 +158,8 @@ class KonteringService {
     fun opprettManglendeKonteringerVedOppstartAvOpphørtOppdragsperiode(
         oppdrag: Oppdrag,
         oppdragsperiode: Oppdragsperiode,
-        sisteOverførtePeriode: YearMonth
+        sisteOverførtePeriode: YearMonth,
+        hendelse: Hendelse
     ) {
         oppdrag.oppdragsperioder
             .filter { it.aktivTil == null && it.opphørendeOppdragsperiode }
@@ -175,7 +178,8 @@ class KonteringService {
                             overføringsperiode = periode.toString(),
                             transaksjonskode = kontering.transaksjonskode,
                             type = Type.NY.toString(),
-                            søknadType = kontering.søknadType
+                            søknadType = kontering.søknadType,
+                            vedtakId = hendelse.vedtakId
                         )
                     )
                 }

@@ -53,8 +53,8 @@ class OppdragService(
         hendelse.periodeListe.forEach { periode ->
             val oppdragsperiode = oppdragsperiodeService.opprettNyOppdragsperiode(hendelse, periode, oppdrag)
             if (erOppdatering) {
-                konteringService.opprettKorreksjonskonteringer(oppdrag, oppdragsperiode, sisteOverførtePeriode)
-                konteringService.opprettManglendeKonteringerVedOppstartAvOpphørtOppdragsperiode(oppdrag, oppdragsperiode, sisteOverførtePeriode)
+                konteringService.opprettKorreksjonskonteringer(oppdrag, oppdragsperiode, sisteOverførtePeriode, hendelse)
+                konteringService.opprettManglendeKonteringerVedOppstartAvOpphørtOppdragsperiode(oppdrag, oppdragsperiode, sisteOverførtePeriode, hendelse)
             }
             oppdragsperiodeService.settAktivTilDatoPåEksisterendeOppdragsperioder(oppdrag, oppdragsperiode.periodeFra)
             oppdrag.oppdragsperioder = oppdrag.oppdragsperioder.plus(oppdragsperiode)
