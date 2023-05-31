@@ -51,6 +51,9 @@ data class Kontering(
     @Column(name = "opprettet_tidspunkt")
     val opprettetTidspunkt: LocalDateTime = LocalDateTime.now(),
 
+    @Column(name = "vedtak_id")
+    val vedtakId: Int,
+
     @OneToMany(mappedBy = "kontering", cascade = [CascadeType.ALL])
     @OrderBy("overføringId")
     var overføringKontering: List<OverføringKontering>? = null
@@ -68,6 +71,7 @@ data class Kontering(
             "søknadType = $søknadType , " +
             "sisteReferansekode = $sisteReferansekode , " +
             "opprettetTidspunkt = $opprettetTidspunkt , " +
+            "vetakId = $vedtakId , " +
             "sendtIPåløpsfil = $sendtIPåløpsfil )"
     }
 
@@ -87,6 +91,7 @@ data class Kontering(
         if (søknadType != other.søknadType) return false
         if (sisteReferansekode != other.sisteReferansekode) return false
         if (opprettetTidspunkt != other.opprettetTidspunkt) return false
+        if (vedtakId != other.vedtakId) return false
         if (sendtIPåløpsfil != other.sendtIPåløpsfil) return false
 
         return true
@@ -103,6 +108,7 @@ data class Kontering(
         result = 31 * result + søknadType.hashCode()
         result = 31 * result + (sisteReferansekode?.hashCode() ?: 0)
         result = 31 * result + (opprettetTidspunkt.hashCode())
+        result = 31 * result + (vedtakId.hashCode())
         result = 31 * result + sendtIPåløpsfil.hashCode()
         return result
     }
