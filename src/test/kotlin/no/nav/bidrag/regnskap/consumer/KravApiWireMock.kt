@@ -29,6 +29,24 @@ class KravApiWireMock {
         )
     }
 
+    internal fun behandlingsstatusMedGyldigResponse() {
+        mock.stubFor(
+            WireMock.get(WireMock.urlEqualTo("${SkattConsumer.KRAV_PATH}/STUBBED-BATCHUID")).willReturn(
+                WireMock.aResponse().withHeader("Content-Type", "application/json").withStatus(200).withBody(
+                    """
+                        {
+                          "konteringFeil": [],
+                          "batchStatus": "Done",
+                          "totaltAntall": 1,
+                          "mislyketAntall": 0,
+                          "fullfoertAntall": 1
+                        }
+                        """
+                )
+            )
+        )
+    }
+
     internal fun livenessMedGyldigResponse() {
         mock.stubFor(
             WireMock.get(WireMock.urlEqualTo(SkattConsumer.LIVENESS_PATH)).willReturn(
