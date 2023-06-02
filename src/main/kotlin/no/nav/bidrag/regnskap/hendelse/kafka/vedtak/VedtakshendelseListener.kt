@@ -7,9 +7,11 @@ import org.slf4j.LoggerFactory
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.KafkaHeaders
 import org.springframework.messaging.handler.annotation.Header
+import org.springframework.stereotype.Component
 
 private val LOGGER = LoggerFactory.getLogger(VedtakshendelseListener::class.java)
 
+@Component
 class VedtakshendelseListener(
     private val vedtakshendelseService: VedtakshendelseService
 ) {

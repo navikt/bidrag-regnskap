@@ -61,7 +61,13 @@ class KravService(
         // Om det finnes ikke godkjente overføringer som er forsøkt overført tidligere så skal det forsøkes å overføres en gang til og om det feiler avbrytes oversending
         oppdragListe.forEach { oppdrag ->
             if (harOppdragFeiledeOverføringer(oppdrag)) {
-                val feiledeOverføringer = behandlingsstatusService.hentBehandlingsstatusForIkkeGodkjenteKonteringerForReferansekode(hentSisteReferansekoder(oppdrag))
+                val feiledeOverføringer: HashMap<String, String>
+                try {
+                    feiledeOverføringer = behandlingsstatusService.hentBehandlingsstatusForIkkeGodkjenteKonteringerForReferansekode(hentSisteReferansekoder(oppdrag))
+                } catch (e: Exception) {
+                    LOGGER.error("Noe gikk galt ved kall mot behandlingsstatus! ${e.stackTrace}")
+                    return
+                }
 
                 if (feiledeOverføringer.isNotEmpty()) {
                     val feilmeldingSammenslått = feiledeOverføringer.entries.joinToString("\n") { it.value }
