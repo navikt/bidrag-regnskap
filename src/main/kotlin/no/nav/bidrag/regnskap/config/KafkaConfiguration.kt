@@ -1,8 +1,6 @@
 package no.nav.bidrag.regnskap.config
 
 import no.nav.bidrag.regnskap.SECURE_LOGGER
-import no.nav.bidrag.regnskap.hendelse.kafka.vedtak.VedtakshendelseListener
-import no.nav.bidrag.regnskap.service.VedtakshendelseService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -15,9 +13,6 @@ private val LOGGER = LoggerFactory.getLogger(KafkaConfiguration::class.java)
 
 @Configuration
 class KafkaConfiguration {
-
-    @Bean
-    fun vedtakHendesleListener(vedtakshendelseService: VedtakshendelseService) = VedtakshendelseListener(vedtakshendelseService)
 
     @Bean
     fun defaultErrorHandler(@Value("\${KAFKA_MAX_RETRY:-1}") maxRetry: Int): DefaultErrorHandler {
