@@ -45,8 +45,6 @@ class KravService(
         propagation = Propagation.REQUIRES_NEW
     )
     fun sendKrav(oppdragIdListe: List<Int>) {
-        LOGGER.info("Starter overføring av krav til skatt for oppdrag: $oppdragIdListe")
-
         val oppdragListe = oppdragIdListe.mapNotNull { persistenceService.hentOppdrag(it) }.toMutableList()
 
         // Fjerner alle oppdrag som har utsatt oversending

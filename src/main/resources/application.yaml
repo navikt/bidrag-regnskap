@@ -70,7 +70,7 @@ spring:
       max-poll-records: 10
       enable-auto-commit: false
     listener:
-      ackMode: RECORD
+      ackMode: MANUAL_IMMEDIATE
 
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
