@@ -29,7 +29,7 @@ class VedtakshendelseService(
         const val NAV_TSS_IDENT = "80000345435"
     }
 
-    fun behandleHendelse(hendelse: String) {
+    fun behandleHendelse(hendelse: String): List<Int> {
         val vedtakHendelse = mapVedtakHendelse(hendelse)
 
         LOGGER.info("Behandler vedakHendelse for vedtakid: ${vedtakHendelse.id}")
@@ -49,9 +49,7 @@ class VedtakshendelseService(
             }
         }
 
-        sendKrav(opprettedeOppdrag)
-
-        LOGGER.info("Ferdig med behandling av vedtakshendelse: ${vedtakHendelse.id}")
+        return opprettedeOppdrag
     }
 
     fun mapVedtakHendelse(hendelse: String): VedtakHendelse {
@@ -139,8 +137,8 @@ class VedtakshendelseService(
         return null
     }
 
-    private fun sendKrav(oppdragIdListe: List<Int>) {
-        if (harAktiveDriftAvvik()) { // TODO() kan caches cachable 30 sec
+    fun sendKrav(oppdragIdListe: List<Int>) {
+        if (harAktiveDriftAvvik()) {
             LOGGER.info("Det finnes aktive driftsavvik. Starter derfor ikke overføring av konteringer for oppdrag: $oppdragIdListe.")
             return
         } else if (erVedlikeholdsmodusPåslått()) {

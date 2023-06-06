@@ -46,7 +46,7 @@ spring:
       enableAutoCommit: false
       auto-offset-reset: earliest
     listener:
-      ackMode: RECORD
+      ackMode: MANUAL_IMMEDIATE
 
 sftp:
   username: bruker
