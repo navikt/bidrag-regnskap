@@ -19,5 +19,6 @@ data class Feilmelding(
 enum class Batchstatus {
     Failed,
     Processing,
-    Done
+    Done,
+    DoneWithWarnings
 }
