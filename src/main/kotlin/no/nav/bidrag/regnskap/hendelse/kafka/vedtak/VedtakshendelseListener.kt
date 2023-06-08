@@ -17,6 +17,10 @@ class VedtakshendelseListener(
     private val vedtakshendelseService: VedtakshendelseService
 ) {
 
+    companion object {
+        var hoppOverNesteMelding = false
+    }
+
     @KafkaListener(groupId = "bidrag-regnskap", topics = ["\${TOPIC_VEDTAK}"])
     fun lesHendelse(
         hendelse: String,
@@ -28,6 +32,14 @@ class VedtakshendelseListener(
     ) {
         try {
             LOGGER.info("Starter behandling av vedtakhendelse med offset: $offset")
+
+            if (hoppOverNesteMelding) {
+                LOGGER.info("Hopper over behandling av vedtakhendelse med offset: $offset")
+                acknowledgment.acknowledge() // Acknowledge meldingen for å gå videre til neste offset
+                hoppOverNesteMelding = false // Nullstill variabelen for å unngå hopping på påfølgende meldinger
+                return
+            }
+
             val opprettedeOppdrag = vedtakshendelseService.behandleHendelse(hendelse)
 
             try {
@@ -51,5 +63,9 @@ class VedtakshendelseListener(
             )
             throw e
         }
+    }
+
+    fun hoppOverNesteMelding() {
+        hoppOverNesteMelding = true
     }
 }
