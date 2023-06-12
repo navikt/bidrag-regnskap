@@ -50,7 +50,7 @@ class SjekkAvBehandlingsstatusScheduler(
         if (feiledeOverføringer.isNotEmpty()) {
             val feilmeldingSammenslått = feiledeOverføringer.entries.joinToString("\n") { it.value }
 
-            slackService.sendMelding("@channel :ohno: Sjekk av behandlingsstatus feilet for følgende batchUid:\n $feilmeldingSammenslått")
+            slackService.sendMelding(":ohno: @channel Sjekk av behandlingsstatus feilet for følgende batchUid:\n $feilmeldingSammenslått")
             LOGGER.error { "Det har oppstått feil ved overføring av krav på følgende batchUider med følgende feilmelding:\n $feilmeldingSammenslått" }
         }
     }

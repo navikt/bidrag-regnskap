@@ -49,7 +49,7 @@ class FiloverføringTilElinKlient(
             LOGGER.info("Fil: $filnavn har blitt lastet opp på filsluse!")
         } catch (e: Exception) {
             slackService.sendMelding(
-                "@channel :Warning: Noe gikk galt ved overføring av ${filmappe + filnavn} til ELIN! :Warning:" +
+                ":Warning: @channel Noe gikk galt ved overføring av ${filmappe + filnavn} til ELIN! :Warning:" +
                     "\n\nFeilmelding: ${e.message}" +
                     "\n${gcpMelding(filmappe + filnavn)}"
             )
