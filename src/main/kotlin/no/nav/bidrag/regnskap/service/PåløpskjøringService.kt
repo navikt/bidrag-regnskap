@@ -40,7 +40,7 @@ class PåløpskjøringService(
     fun hentPåløp() = persistenceService.hentIkkeKjørtePåløp().minByOrNull { it.forPeriode }
 
     fun startPåløpskjøring(påløp: Påløp, schedulertKjøring: Boolean, genererFil: Boolean) {
-        slackService.sendMelding(":open_file_foolder: Påløpskjøring er startet for ${påløp.forPeriode}! Skedulert: $schedulertKjøring, generer fil: $genererFil.")
+        slackService.sendMelding(":open_file_folder: @channel Påløpskjøring er startet for ${påløp.forPeriode}! Skedulert: $schedulertKjøring, generer fil: $genererFil.")
         validerDriftsavvik(påløp, schedulertKjøring)
         if (genererFil) {
             endreElinVedlikeholdsmodus(
