@@ -1,7 +1,6 @@
 package no.nav.bidrag.regnskap.service
 
 import no.nav.bidrag.behandling.felles.enums.EngangsbelopType
-import no.nav.bidrag.regnskap.dto.oppdrag.OppdragResponse
 import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import org.slf4j.LoggerFactory
@@ -17,20 +16,6 @@ class OppdragService(
     private val oppdragsperiodeService: OppdragsperiodeService,
     private val konteringService: KonteringService
 ) {
-
-    fun hentOppdrag(oppdragId: Int): OppdragResponse? {
-        val oppdrag = persistenceService.hentOppdrag(oppdragId) ?: return null
-
-        return OppdragResponse(
-            oppdragId = oppdrag.oppdragId,
-            type = oppdrag.stønadType,
-            sakId = oppdrag.sakId,
-            kravhaverIdent = oppdrag.kravhaverIdent,
-            skyldnerIdent = oppdrag.skyldnerIdent,
-            endretTidspunkt = oppdrag.endretTidspunkt.toString(),
-            oppdragsperioder = oppdragsperiodeService.hentOppdragsperioderMedKonteringer(oppdrag)
-        )
-    }
 
     @Transactional
     fun lagreHendelse(hendelse: Hendelse): Int? {

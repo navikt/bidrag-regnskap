@@ -2,7 +2,6 @@ package no.nav.bidrag.regnskap.service
 
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.matchers.collections.shouldHaveSize
-import io.kotest.matchers.shouldBe
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
@@ -25,47 +24,6 @@ class KonteringServiceTest {
 
     @MockK(relaxed = true)
     private lateinit var persistenceService: PersistenceService
-
-    @Nested
-    inner class HentKonteringer {
-        @Test
-        fun `Skal hente alle kontering på et oppdrag`() {
-            val transaksjonskode = Transaksjonskode.B1
-            val overforingsperiode = YearMonth.now()
-
-            val oppdrag = TestData.opprettOppdrag(
-                oppdragsperioder = listOf(
-                    TestData.opprettOppdragsperiode(
-                        konteringer = listOf(
-                            TestData.opprettKontering(
-                                konteringId = 1,
-                                transaksjonskode = transaksjonskode.toString(),
-                                overforingsperiode = overforingsperiode.toString(),
-                                type = Type.NY.toString()
-                            ),
-                            TestData.opprettKontering(
-                                konteringId = 2,
-                                transaksjonskode = transaksjonskode.toString(),
-                                overforingsperiode = overforingsperiode.plusMonths(1).toString(),
-                                type = Type.ENDRING.toString()
-                            )
-                        )
-                    )
-                )
-            )
-
-            val konteringResponseListe = konteringService.hentKonteringer(oppdrag)
-
-            konteringResponseListe[0].konteringId shouldBe 1
-            konteringResponseListe[1].konteringId shouldBe 2
-            konteringResponseListe[0].transaksjonskode shouldBe transaksjonskode
-            konteringResponseListe[1].transaksjonskode shouldBe transaksjonskode
-            konteringResponseListe[0].overforingsperiode shouldBe overforingsperiode.toString()
-            konteringResponseListe[1].overforingsperiode shouldBe overforingsperiode.plusMonths(1).toString()
-            konteringResponseListe[0].type shouldBe Type.NY
-            konteringResponseListe[1].type shouldBe Type.ENDRING
-        }
-    }
 
     @Nested
     inner class OpprettKontering {

@@ -1,7 +1,6 @@
 package no.nav.bidrag.regnskap.service
 
 import no.nav.bidrag.regnskap.consumer.SakConsumer
-import no.nav.bidrag.regnskap.dto.oppdrag.OppdragsperiodeResponse
 import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
 import no.nav.bidrag.regnskap.dto.vedtak.Periode
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
@@ -12,32 +11,8 @@ import java.time.LocalDate
 
 @Service
 class OppdragsperiodeService(
-    val konteringService: KonteringService,
     val sakConsumer: SakConsumer
 ) {
-
-    fun hentOppdragsperioderMedKonteringer(oppdrag: Oppdrag): List<OppdragsperiodeResponse> {
-        return (oppdrag.oppdragsperioder).map {
-            OppdragsperiodeResponse(
-                oppdragsperiodeId = it.oppdragsperiodeId,
-                oppdragId = it.oppdrag?.oppdragId,
-                vedtakId = it.vedtakId,
-                referanse = it.referanse,
-                gjelderIdent = it.gjelderIdent,
-                mottakerIdent = it.mottakerIdent,
-                belop = it.beløp,
-                valuta = it.valuta,
-                periodeFra = it.periodeFra.toString(),
-                periodeTil = it.periodeTil.toString(),
-                vedtaksdato = it.vedtaksdato.toString(),
-                opprettetAv = it.opprettetAv,
-                delytelseId = it.delytelseId.toString(),
-                eksternReferanse = it.eksternReferanse,
-                aktivTil = it.aktivTil.toString(),
-                konteringer = konteringService.hentKonteringer(oppdrag)
-            )
-        }
-    }
 
     fun opprettNyOppdragsperiode(hendelse: Hendelse, periode: Periode, oppdrag: Oppdrag): Oppdragsperiode {
         return Oppdragsperiode(

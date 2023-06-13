@@ -3,7 +3,6 @@ package no.nav.bidrag.regnskap.service
 import no.nav.bidrag.regnskap.dto.enumer.Søknadstype
 import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
 import no.nav.bidrag.regnskap.dto.enumer.Type
-import no.nav.bidrag.regnskap.dto.oppdrag.KonteringResponse
 import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
@@ -17,28 +16,6 @@ import java.time.YearMonth
 
 @Service
 class KonteringService {
-
-    fun hentKonteringer(oppdrag: Oppdrag): List<KonteringResponse> {
-        val konteringResponser = mutableListOf<KonteringResponse>()
-
-        oppdrag.oppdragsperioder.forEach { oppdragsperiode ->
-            oppdragsperiode.konteringer.forEach { kontering ->
-                konteringResponser.add(
-                    KonteringResponse(
-                        konteringId = kontering.konteringId,
-                        oppdragsperiodeId = kontering.oppdragsperiode?.oppdragsperiodeId,
-                        transaksjonskode = Transaksjonskode.valueOf(kontering.transaksjonskode),
-                        overforingsperiode = kontering.overføringsperiode,
-                        overforingstidspunkt = kontering.overføringstidspunkt,
-                        type = Type.valueOf(kontering.type),
-                        soknadType = Søknadstype.valueOf(kontering.søknadType),
-                        sendtIPalopsfil = kontering.sendtIPåløpsfil
-                    )
-                )
-            }
-        }
-        return konteringResponser
-    }
 
     fun opprettNyeKonteringerPåOppdragsperiode(
         oppdragsperiode: Oppdragsperiode,
@@ -139,9 +116,9 @@ class KonteringService {
         overførteKonteringerListe: List<Kontering>
     ): Boolean {
         return overførteKonteringerListe.any {
-            it.transaksjonskode == Transaksjonskode.valueOf(kontering.transaksjonskode).korreksjonskode
-                && it.oppdragsperiode == kontering.oppdragsperiode
-                && it.overføringsperiode == kontering.overføringsperiode
+            it.transaksjonskode == Transaksjonskode.valueOf(kontering.transaksjonskode).korreksjonskode &&
+                it.oppdragsperiode == kontering.oppdragsperiode &&
+                it.overføringsperiode == kontering.overføringsperiode
         }
     }
 
