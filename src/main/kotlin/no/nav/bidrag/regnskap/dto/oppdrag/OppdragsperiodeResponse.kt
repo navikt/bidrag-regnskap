@@ -62,18 +62,18 @@ data class OppdragsperiodeResponse(
     val valuta: String,
 
     @field:Schema(
-        description = "Datoen utbetalingen skal starte fra.",
-        format = "date",
-        example = "2022-01-01"
-    )
-    val periodeFra: String,
-
-    @field:Schema(
         description = "Datoen utbetalingen skal opphøre.",
         format = "date",
         example = "2022-02-01"
     )
     val periodeTil: String,
+
+    @field:Schema(
+        description = "Datoen utbetalingen skal starte fra.",
+        format = "date",
+        example = "2022-01-01"
+    )
+    val periodeFra: String,
 
     @field:Schema(
         description = "Datoen vedtaket ble fattet.",
@@ -89,12 +89,18 @@ data class OppdragsperiodeResponse(
     val opprettetAv: String,
 
     @field:Schema(
+        description = "Sier om oppdragsperioden er opphørende og ikke skal fortsettes.",
+        example = "false"
+    )
+    val opphørendeOppdragsperiode: Boolean,
+
+    @field:Schema(
         description = "Unik referanse til oppdragsperioden i vedtaket angitt som String. " +
             "I bidragssaken kan en oppdragsperiode strekke over flere måneder, og samme referanse blir da benyttet for alle månedene. " +
             "Samme referanse kan ikke benyttes to ganger for samme transaksjonskode i samme måned.",
-        example = "qwerty123456"
+        example = "10000001"
     )
-    val delytelseId: String,
+    val delytelseId: Int?,
 
     @field:Schema(
         description = "Ekstern referanse til gebyr.",

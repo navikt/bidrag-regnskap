@@ -9,7 +9,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.bidrag.regnskap.dto.oppdrag.OppdragResponse
-import no.nav.bidrag.regnskap.service.OppdragService
+import no.nav.bidrag.regnskap.dto.oppdrag.OppslagAvOppdragPåSakIdResponse
+import no.nav.bidrag.regnskap.service.OppslagService
 import no.nav.security.token.support.core.api.Protected
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -19,9 +20,9 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @Protected
-@Tag(name = "Oppdrag")
-class OppdragController(
-    private val oppdragService: OppdragService
+@Tag(name = "Oppslag")
+class OppslagController(
+    private val oppslagService: OppslagService
 ) {
 
     @GetMapping("/oppdrag")
@@ -51,12 +52,48 @@ class OppdragController(
         ]
     )
     fun hentOppdrag(oppdragId: Int): ResponseEntity<*> {
-        val oppdragResponse = oppdragService.hentOppdrag(oppdragId)
+        val oppdragResponse = oppslagService.hentOppdrag(oppdragId)
         return if (oppdragResponse != null) {
-            ResponseEntity.ok(oppdragService.hentOppdrag(oppdragId))
+            ResponseEntity.ok(oppdragResponse)
         } else {
             ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .header(HttpHeaders.WARNING, "Det finnes ingen oppdrag med angitt oppdragsId: $oppdragId")
+                .build<Any>()
+        }
+    }
+
+    @GetMapping("/sak")
+    @Operation(
+        summary = "Hent alle lagrede oppdrag, oppdragsperioder, konteringer og overførte konteringer for en sak",
+        description = "Operasjon for å hente alle lagrede oppdrag med tilhørende oppdragsperioder, konteringer og " +
+            "overførte konteringer for en sak.",
+        security = [SecurityRequirement(name = "bearer-key")]
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Returnerer alt lagret for saken.",
+                content = [
+                    (
+                        Content(
+                            array = (ArraySchema(schema = Schema(implementation = OppslagAvOppdragPåSakIdResponse::class)))
+                        )
+                        )
+                ]
+            ), ApiResponse(
+                responseCode = "204",
+                description = "Fant ingenting lagret på saken."
+            )
+        ]
+    )
+    fun hentSak(sakId: String): ResponseEntity<*> {
+        val sakReponse = oppslagService.hentPåSakId(sakId)
+        return if (sakReponse != null) {
+            ResponseEntity.ok(sakReponse)
+        } else {
+            ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .header(HttpHeaders.WARNING, "Det finnes ingen oppdrag med angitt sakId: $sakId")
                 .build<Any>()
         }
     }

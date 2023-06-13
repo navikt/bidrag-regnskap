@@ -39,6 +39,11 @@ class PersistenceService(
         return oppdragRepository.findByIdOrNull(oppdragId)
     }
 
+    fun hentAlleOppdragPåSakId(sakId: String): List<Oppdrag> {
+        LOGGER.debug("Henter alle oppdrag med sakId: $sakId")
+        return oppdragRepository.findAllBySakIdIs(sakId)
+    }
+
     fun hentOppdragPaUnikeIdentifikatorer(
         stønadType: String,
         kravhaverIdent: String?,

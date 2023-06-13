@@ -1,6 +1,5 @@
 package no.nav.bidrag.regnskap.service
 
-import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
@@ -20,25 +19,10 @@ import java.time.LocalDate
 class OppdragsperiodeServiceTest {
 
     @MockK(relaxed = true)
-    private lateinit var konteringService: KonteringService
-
-    @MockK(relaxed = true)
     private lateinit var sakConsumer: SakConsumer
 
     @InjectMockKs
     private lateinit var oppdragsperiodeService: OppdragsperiodeService
-
-    @Nested
-    inner class HentOppdragsperioder {
-
-        @Test
-        fun `Skal hente oppdragsperiode`() {
-            val oppdrag = TestData.opprettOppdrag()
-            val opprettetOppdragsperiodeListe = oppdragsperiodeService.hentOppdragsperioderMedKonteringer(oppdrag)
-
-            opprettetOppdragsperiodeListe shouldHaveSize oppdrag.oppdragsperioder.size
-        }
-    }
 
     @Nested
     inner class OpprettOppdragsperioder {

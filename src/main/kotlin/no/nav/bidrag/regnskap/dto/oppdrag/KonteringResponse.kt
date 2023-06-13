@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema
 import no.nav.bidrag.regnskap.dto.enumer.Søknadstype
 import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
 import no.nav.bidrag.regnskap.dto.enumer.Type
-import java.time.LocalDateTime
 
 @Schema(
     name = "KonteringResponse",
@@ -53,11 +52,18 @@ data class KonteringResponse(
     val overforingsperiode: String,
 
     @field:Schema(
-        description = "Tidspunktet overføringen ble gjennomført. ",
+        description = "Tidspunktet overføringen ble gjennomført.",
         format = "date-time",
         example = "2022-02-01:00:00:00"
     )
-    val overforingstidspunkt: LocalDateTime?,
+    val overforingstidspunkt: String?,
+
+    @field:Schema(
+        description = "Tidspunktet overføringen ble gjennomført.",
+        format = "date-time",
+        example = "2022-02-01:00:00:00"
+    )
+    val behandlingsstatusOkTidspunkt: String?,
 
     @field:Schema(
         description = "Angir om det er en ny transaksjon eller en endring.",
@@ -78,8 +84,32 @@ data class KonteringResponse(
     ) val soknadType: Søknadstype,
 
     @field:Schema(
+        description = "Siste batch-uid vi har mottatt for overføringer på denne konteringer.",
+        example = "3f1248e9-8d19-4dc3-9584-84055421753d"
+    )
+    val sisteReferansekode: String?,
+
+    @field:Schema(
         description = "Angir om konteringen har blitt overført i generert påløpsfil eller om den er sendt over via REST-endepunktet.",
         example = "false"
     )
-    val sendtIPalopsfil: Boolean
+    val sendtIPalopsfil: Boolean,
+
+    @field:Schema(
+        description = "Tidspunktet overføringen ble opprettet.",
+        format = "date-time",
+        example = "2022-02-01:00:00:00"
+    )
+    val opprettetTidspunkt: String?,
+
+    @field:Schema(
+        description = "VedtakId for konteringen.",
+        example = "101"
+    )
+    val vedtakId: Int,
+
+    @field:Schema(
+        description = "En liste over alle forsøkte oversendinger for denne konteringen."
+    )
+    val overføringKonteringer: List<OverføringKonteringResponse>
 )
