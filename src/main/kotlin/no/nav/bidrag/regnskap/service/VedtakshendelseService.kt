@@ -15,8 +15,9 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 private val LOGGER = LoggerFactory.getLogger(VedtakshendelseService::class.java)
-private val objectMapper = ObjectMapper().registerModule(KotlinModule.Builder().build()).registerModule(JavaTimeModule())
-    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+private val objectMapper =
+    ObjectMapper().registerModule(KotlinModule.Builder().build()).registerModule(JavaTimeModule())
+        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
 @Service
 class VedtakshendelseService(
@@ -89,19 +90,15 @@ class VedtakshendelseService(
     }
 
     private fun mapPeriodelisteTilDomene(periodeListe: List<no.nav.bidrag.behandling.felles.dto.vedtak.Periode>): List<Periode> {
-        val perioder = mutableListOf<Periode>()
-        periodeListe.forEach { periode ->
-            perioder.add(
-                Periode(
-                    beløp = periode.belop,
-                    valutakode = periode.valutakode,
-                    periodeFomDato = periode.fomDato,
-                    periodeTilDato = periode.tilDato,
-                    delytelsesId = periode.delytelseId?.let { Integer.valueOf(it) }
-                )
+        return periodeListe.map { periode ->
+            Periode(
+                beløp = periode.belop,
+                valutakode = periode.valutakode,
+                periodeFomDato = periode.fomDato,
+                periodeTilDato = periode.tilDato,
+                delytelsesId = periode.delytelseId?.let { Integer.valueOf(it) }
             )
         }
-        return perioder
     }
 
     private fun opprettOppdragForEngangsbelop(vedtakHendelse: VedtakHendelse, engangsbelop: Engangsbelop): Int? {

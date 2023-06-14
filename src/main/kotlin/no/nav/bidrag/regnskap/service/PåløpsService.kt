@@ -14,20 +14,14 @@ class PåløpsService(
     fun hentPåløp(): List<PåløpResponse> {
         val påløpListe = persistenceService.hentPåløp()
 
-        val påløpResponseListe = mutableListOf<PåløpResponse>()
-
-        påløpListe.forEach { påløp ->
-            påløpResponseListe.add(
-                PåløpResponse(
-                    påløpId = påløp.påløpId,
-                    kjoredato = påløp.kjøredato.toString(),
-                    fullfortTidspunkt = påløp.fullførtTidspunkt.toString(),
-                    forPeriode = påløp.forPeriode
-                )
+        return påløpListe.map {
+            PåløpResponse(
+                påløpId = it.påløpId,
+                kjoredato = it.kjøredato.toString(),
+                fullfortTidspunkt = it.fullførtTidspunkt.toString(),
+                forPeriode = it.forPeriode
             )
-        }
-
-        return påløpResponseListe.sortedByDescending { YearMonth.parse(it.forPeriode) }
+        }.sortedByDescending { YearMonth.parse(it.forPeriode) }
     }
 
     fun lagrePåløp(påløpRequest: PåløpRequest): Int {

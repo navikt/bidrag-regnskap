@@ -72,6 +72,12 @@ class PersistenceService(
         return lagretOppdrag.oppdragId
     }
 
+    fun lagreOppdrag(oppdrag: List<Oppdrag>): List<Int> {
+        val lagredeOppdrag = oppdragRepository.saveAll(oppdrag)
+        LOGGER.debug("Lagret alle oppdrag med ID: {}", lagredeOppdrag.map { it.oppdragId })
+        return lagredeOppdrag.map { it.oppdragId }
+    }
+
     fun lagreOverføringKontering(overføringKontering: OverføringKontering): Int {
         val lagretOverføringKontering = overføringKonteringRepository.save(overføringKontering)
         LOGGER.debug("Lagret overforingKontering med ID: ${lagretOverføringKontering.overføringId}")
