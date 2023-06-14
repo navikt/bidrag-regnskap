@@ -123,13 +123,7 @@ class KonteringService {
     }
 
     fun hentAlleKonteringerForOppdrag(oppdrag: Oppdrag): List<Kontering> {
-        val periodeListe = mutableListOf<Kontering>()
-        oppdrag.oppdragsperioder.forEach { oppdragsperiode ->
-            oppdragsperiode.konteringer.forEach { kontering ->
-                periodeListe.add(kontering)
-            }
-        }
-        return periodeListe
+        return oppdrag.oppdragsperioder.flatMap { it.konteringer }
     }
 
     fun opprettManglendeKonteringerVedOppstartAvOpphørtOppdragsperiode(

@@ -6,7 +6,6 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import no.nav.bidrag.regnskap.consumer.SakConsumer
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
-import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
 import no.nav.bidrag.regnskap.utils.TestData
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -46,16 +45,8 @@ class OppdragsperiodeServiceTest {
             )
             val oppdrag = TestData.opprettOppdrag()
 
-            val nyeOppdragsperioder = mutableListOf<Oppdragsperiode>()
-
-            hendelse.periodeListe.forEach { periode ->
-                nyeOppdragsperioder.add(
-                    oppdragsperiodeService.opprettNyOppdragsperiode(
-                        hendelse,
-                        periode,
-                        oppdrag
-                    )
-                )
+            val nyeOppdragsperioder = hendelse.periodeListe.map { periode ->
+                oppdragsperiodeService.opprettNyOppdragsperiode(hendelse, periode, oppdrag)
             }
 
             nyeOppdragsperioder[0].mottakerIdent shouldBe hendelse.mottakerIdent
@@ -90,7 +81,10 @@ class OppdragsperiodeServiceTest {
 
         @Test
         fun `Skal sette aktivTil dato til periodeTil om periodeTil er satt og nye oppdragsperiodens periodeFra er etter periodeTil`() {
-            oppdragsperiodeService.settAktivTilDatoPåEksisterendeOppdragsperioder(oppdrag, LocalDate.now().plusMonths(3))
+            oppdragsperiodeService.settAktivTilDatoPåEksisterendeOppdragsperioder(
+                oppdrag,
+                LocalDate.now().plusMonths(3)
+            )
 
             oppdrag.oppdragsperioder.first().aktivTil shouldBe periodeTil
         }
@@ -117,7 +111,10 @@ class OppdragsperiodeServiceTest {
             val now = LocalDate.now()
             oppdrag.oppdragsperioder.first().aktivTil = now
 
-            oppdragsperiodeService.settAktivTilDatoPåEksisterendeOppdragsperioder(oppdrag, LocalDate.now().plusMonths(1))
+            oppdragsperiodeService.settAktivTilDatoPåEksisterendeOppdragsperioder(
+                oppdrag,
+                LocalDate.now().plusMonths(1)
+            )
 
             oppdrag.oppdragsperioder.first().aktivTil shouldBe now
         }
