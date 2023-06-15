@@ -33,7 +33,7 @@ class ManglendeKonteringerService {
                         type = vurderType(oppdragsperiode, periode),
                         søknadType = vurderSøknadType(oppdragsperiode.vedtakType, oppdragsperiode.oppdrag.stønadType, periodeIndex),
                         oppdragsperiode = oppdragsperiode,
-                        sendtIPåløpsfil = true,
+                        sendtIPåløpsperiode = påløpsPeriode.toString(),
                         vedtakId = oppdragsperiode.vedtakId
                     )
                 )

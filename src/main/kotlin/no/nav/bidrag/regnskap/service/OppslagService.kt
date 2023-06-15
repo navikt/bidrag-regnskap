@@ -79,7 +79,7 @@ class OppslagService(
                 behandlingsstatusOkTidspunkt = it.behandlingsstatusOkTidspunkt.toString(),
                 type = Type.valueOf(it.type),
                 soknadType = Søknadstype.valueOf(it.søknadType),
-                sendtIPalopsfil = it.sendtIPåløpsfil,
+                sendtIPalopsperiode = it.sendtIPåløpsperiode,
                 overføringKonteringer = hentOverføringKontering(it),
                 sisteReferansekode = it.sisteReferansekode,
                 opprettetTidspunkt = it.opprettetTidspunkt.toString(),

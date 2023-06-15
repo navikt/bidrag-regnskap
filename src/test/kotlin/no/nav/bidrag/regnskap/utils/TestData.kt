@@ -136,12 +136,12 @@ object TestData {
     fun opprettKontering(
         konteringId: Int = 0,
         oppdragsperiode: Oppdragsperiode? = null,
-        transaksjonskode: String = Transaksjonskode.A1.toString(),
+        transaksjonskode: String = Transaksjonskode.A1.name,
         overforingsperiode: String = YearMonth.now().toString(),
         overforingstidspunkt: LocalDateTime? = null,
-        type: String = Type.NY.toString(),
+        type: String = Type.NY.name,
         søknadstype: String = Søknadstype.EN.name,
-        sendtIPalopsfil: Boolean = false,
+        sendtIPalopsperiode: String? = null,
         opprettetTidspunkt: LocalDateTime = LocalDateTime.now(),
         vedtakId: Int = 654321,
         overføringKontering: List<OverføringKontering>? = listOf(opprettOverføringKontering())
@@ -154,7 +154,7 @@ object TestData {
             overføringstidspunkt = overforingstidspunkt,
             type = type,
             søknadType = søknadstype,
-            sendtIPåløpsfil = sendtIPalopsfil,
+            sendtIPåløpsperiode = sendtIPalopsperiode,
             opprettetTidspunkt = opprettetTidspunkt,
             vedtakId = vedtakId,
             overføringKontering = overføringKontering
