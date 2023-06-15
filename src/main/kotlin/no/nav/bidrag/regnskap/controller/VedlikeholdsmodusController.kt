@@ -11,8 +11,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.bidrag.regnskap.consumer.SkattConsumer
 import no.nav.bidrag.regnskap.dto.enumer.Årsakskode
+import no.nav.bidrag.regnskap.dto.krav.Kravfeil
 import no.nav.bidrag.regnskap.dto.påløp.Vedlikeholdsmodus
-import no.nav.bidrag.regnskap.dto.vedlikeholdsmodus.Feilsituasjon
 import no.nav.security.token.support.core.api.Protected
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -68,7 +68,7 @@ class VedlikeholdsmodusController(
                 content = [
                     Content(
                         mediaType = "application/json",
-                        array = ArraySchema(schema = Schema(implementation = Feilsituasjon::class))
+                        array = ArraySchema(schema = Schema(implementation = Kravfeil::class))
                     )
                 ]
             )
