@@ -19,7 +19,7 @@ class OppdragsperiodeService(
             vedtakId = hendelse.vedtakId,
             referanse = hendelse.referanse,
             vedtakType = hendelse.vedtakType.toString(),
-            gjelderIdent = sakConsumer.hentBmFraSak(hendelse.sakId),
+            gjelderIdent = sakConsumer.hentBmFraSak(hendelse.sakId).verdi,
             mottakerIdent = hendelse.mottakerIdent,
             beløp = periode.beløp ?: BigDecimal.ZERO,
             valuta = periode.valutakode ?: "NOK",
