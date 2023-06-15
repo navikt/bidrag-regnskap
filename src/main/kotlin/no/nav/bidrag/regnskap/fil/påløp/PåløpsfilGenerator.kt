@@ -2,6 +2,7 @@ package no.nav.bidrag.regnskap.fil.påløp
 
 import kotlinx.coroutines.yield
 import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
+import no.nav.bidrag.regnskap.dto.enumer.Type
 import no.nav.bidrag.regnskap.fil.overføring.FiloverføringTilElinKlient
 import no.nav.bidrag.regnskap.persistence.bucket.GcpFilBucket
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
@@ -39,41 +40,40 @@ class PåløpsfilGenerator(
         val påløpsMappe = "påløp/"
         val påløpsfilnavn = "paaloop_D" + now.format(DateTimeFormatter.ofPattern("yyMMdd")).toString() + ".xml"
 
-        if (!gcpFilBucket.finnesFil(påløpsMappe + påløpsfilnavn)) {
-            val dokument = documentBuilder.newDocument()
-            dokument.xmlStandalone = true
+        val dokument = documentBuilder.newDocument()
+        dokument.xmlStandalone = true
 
-            val rootElement = dokument.createElementNS("http://www.trygdeetaten.no/skjema/bidrag-reskonto", "bidrag-reskonto")
-            dokument.appendChild(rootElement)
+        val rootElement =
+            dokument.createElementNS("http://www.trygdeetaten.no/skjema/bidrag-reskonto", "bidrag-reskonto")
+        dokument.appendChild(rootElement)
 
-            opprettStartBatchBr01(dokument, rootElement, påløp, now)
+        opprettStartBatchBr01(dokument, rootElement, påløp, now)
 
-            var index = 0
-            var sum = BigDecimal.ZERO
-            finnAlleOppdragFraKonteringer(konteringer).forEach { (_, konteringerForOppdrag) ->
-                yield()
+        var index = 0
+        var sum = BigDecimal.ZERO
+        finnAlleOppdragFraKonteringer(konteringer).forEach { (_, konteringerForOppdrag) ->
+            yield()
 
-                if (++index % 100 == 0) {
-                    LOGGER.info("Har skrevet $index av ${konteringer.size} konteringer til påløpsfil...")
-                }
-
-                val oppdragElement = dokument.createElement("oppdrag")
-                rootElement.appendChild(oppdragElement)
-
-                konteringerForOppdrag.forEach { kontering ->
-                    yield()
-                    opprettKonteringBr10(dokument, oppdragElement, kontering, now)
-
-                    sum += kontering.oppdragsperiode!!.beløp
-                }
+            if (++index % 100 == 0) {
+                LOGGER.info("Har skrevet $index av ${konteringer.size} konteringer til påløpsfil...")
             }
 
-            LOGGER.info("Påløpskjøring: Har skrevet ${konteringer.size} av ${konteringer.size} konteringer til påløpsfil.")
+            val oppdragElement = dokument.createElement("oppdrag")
+            rootElement.appendChild(oppdragElement)
 
-            opprettStoppBatchBr99(dokument, rootElement, sum, konteringer.size)
+            konteringerForOppdrag.forEach { kontering ->
+                yield()
+                opprettKonteringBr10(dokument, oppdragElement, kontering, now)
 
-            skrivXml(dokument, påløpsMappe + påløpsfilnavn)
+                sum += kontering.oppdragsperiode!!.beløp
+            }
         }
+
+        LOGGER.info("Påløpskjøring: Har skrevet ${konteringer.size} av ${konteringer.size} konteringer til påløpsfil.")
+
+        opprettStoppBatchBr99(dokument, rootElement, sum, konteringer.size)
+        skrivXml(dokument, påløpsMappe + påløpsfilnavn)
+
         filoverføringTilElinKlient.lastOppFilTilFilsluse(påløpsMappe, påløpsfilnavn)
     }
 
@@ -94,7 +94,12 @@ class PåløpsfilGenerator(
         startBatchBr01.appendChild(dato)
     }
 
-    private fun opprettKonteringBr10(dokument: Document, oppdragElement: Element, kontering: Kontering, now: LocalDate) {
+    private fun opprettKonteringBr10(
+        dokument: Document,
+        oppdragElement: Element,
+        kontering: Kontering,
+        now: LocalDate
+    ) {
         val konteringBr10Element = dokument.createElement("kontering-br10")
         oppdragElement.appendChild(konteringBr10Element)
 
@@ -107,7 +112,7 @@ class PåløpsfilGenerator(
         konteringBr10Element.appendChild(transKode)
 
         val endring = dokument.createElement("endring")
-        endring.textContent = kontering.type
+        endring.textContent = if (kontering.type == Type.NY.name) "N" else "J"
         konteringBr10Element.appendChild(endring)
 
         val soknadType = dokument.createElement("soknadType")
@@ -147,7 +152,8 @@ class PåløpsfilGenerator(
         konteringBr10Element.appendChild(belop)
 
         val fradragTillegg = dokument.createElement("fradragTillegg")
-        fradragTillegg.textContent = if (Transaksjonskode.valueOf(kontering.transaksjonskode).korreksjonskode != null) "F" else "T"
+        fradragTillegg.textContent =
+            if (Transaksjonskode.valueOf(kontering.transaksjonskode).korreksjonskode != null) "T" else "F"
         konteringBr10Element.appendChild(fradragTillegg)
 
         val valutaKode = dokument.createElement("valutaKode")

@@ -53,14 +53,14 @@ class KonteringServiceTest {
                     konteringId = 1,
                     transaksjonskode = transaksjonskode.toString(),
                     overforingsperiode = overforingsperiode.toString(),
-                    type = Type.NY.toString(),
+                    type = Type.NY.name,
                     overforingstidspunkt = LocalDateTime.now()
                 ),
                 TestData.opprettKontering(
                     konteringId = 2,
                     transaksjonskode = transaksjonskode.toString(),
                     overforingsperiode = overforingsperiode.plusMonths(1).toString(),
-                    type = Type.ENDRING.toString(),
+                    type = Type.ENDRING.name,
                     overforingstidspunkt = LocalDateTime.now()
                 )
             )
@@ -90,7 +90,7 @@ class KonteringServiceTest {
                     konteringId = 1,
                     transaksjonskode = transaksjonskode.toString(),
                     overforingsperiode = overforingsperiode.toString(),
-                    type = Type.NY.toString()
+                    type = Type.NY.name
                 )
             )
 

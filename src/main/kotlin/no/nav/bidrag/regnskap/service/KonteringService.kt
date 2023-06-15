@@ -64,7 +64,7 @@ class KonteringService {
                     oppdragsperiode = kontering.oppdragsperiode,
                     overføringsperiode = kontering.overføringsperiode,
                     transaksjonskode = korreksjonskode,
-                    type = Type.ENDRING.toString(),
+                    type = Type.ENDRING.name,
                     søknadType = kontering.søknadType,
                     vedtakId = hendelse.vedtakId
                 )
@@ -148,7 +148,7 @@ class KonteringService {
                             oppdragsperiode = kontering.oppdragsperiode,
                             overføringsperiode = periode.toString(),
                             transaksjonskode = kontering.transaksjonskode,
-                            type = Type.NY.toString(),
+                            type = Type.NY.name,
                             søknadType = kontering.søknadType,
                             vedtakId = hendelse.vedtakId
                         )

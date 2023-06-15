@@ -757,7 +757,6 @@ internal class VedtakshendelseListenerIT {
                     kontering.overføringKontering?.size shouldBe 1
                     kontering.transaksjonskode shouldBeIn listOf(forventetTransaksjonskode.name, forventetKorreksjonskode?.name)
                     kontering.søknadType shouldBe forventetSøknadstype.name
-                    kontering.sendtIPåløpsfil shouldBe false
                     kontering.overføringsperiode shouldBeIn månederForKontering
                 }
             }
@@ -857,7 +856,6 @@ internal class VedtakshendelseListenerIT {
             kontering.overføringsperiode shouldBe YearMonth.from(vedtakHendelse.vedtakTidspunkt.toLocalDate()).toString()
             kontering.type shouldBe NY.name
             kontering.søknadType shouldBe søknadstype.name
-            kontering.sendtIPåløpsfil shouldBe false
         }
         return kontering
     }

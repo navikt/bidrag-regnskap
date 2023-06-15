@@ -28,15 +28,13 @@ class AvstemmingsfilGenerator(
         val avstemmingKonteringFilnavn = "avstdet_D$nowFormattert.xml"
         val avstemmingSummeringFilnavn = "avstsum_D$nowFormattert.xml"
 
-        if (!gcpFilBucket.finnesFil(avstemmingMappe + avstemmingKonteringFilnavn)) {
-            val summeringer = opprettAvstemmingsfilSummeringer()
+        val summeringer = opprettAvstemmingsfilSummeringer()
 
-            val avstemningsfilBuffer = opprettAvstemmingFil(konteringer, summeringer, now)
-            gcpFilBucket.lagreFil(avstemmingMappe + avstemmingKonteringFilnavn, avstemningsfilBuffer)
+        val avstemningsfilBuffer = opprettAvstemmingFil(konteringer, summeringer, now)
+        gcpFilBucket.lagreFil(avstemmingMappe + avstemmingKonteringFilnavn, avstemningsfilBuffer)
 
-            val avstemningSummeringFil = opprettAvstemmingSummeringFil(summeringer)
-            gcpFilBucket.lagreFil(avstemmingMappe + avstemmingSummeringFilnavn, avstemningSummeringFil)
-        }
+        val avstemningSummeringFil = opprettAvstemmingSummeringFil(summeringer)
+        gcpFilBucket.lagreFil(avstemmingMappe + avstemmingSummeringFilnavn, avstemningSummeringFil)
 
         LOGGER.info("AvstemmingKontering- og avstemmingSummeringsfil er ferdig skrevet med ${konteringer.size} konteringer.")
 
@@ -57,22 +55,24 @@ class AvstemmingsfilGenerator(
 
             avstemningsfilBuffer.write(
                 (
-                    kontering.transaksjonskode + ";" +
-                        kontering.oppdragsperiode!!.oppdrag!!.sakId + ";" +
-                        kontering.oppdragsperiode.beløp.toString() + ";" +
-                        LocalDate.of(periode.year, periode.month, 1).format(DateTimeFormatter.ofPattern("yyyyMMdd")).toString() + ";" +
-                        LocalDate.of(periode.year, periode.month, periode.lengthOfMonth()).format(DateTimeFormatter.ofPattern("yyyyMMdd")).toString() + ";" +
-                        now.format(DateTimeFormatter.ofPattern("yyyyMMdd")).toString() + ";" +
-                        if (Transaksjonskode.valueOf(kontering.transaksjonskode).negativtBeløp) {
-                            "F;"
-                        } else {
-                            "T;"
-                        } +
-                        kontering.oppdragsperiode.delytelseId.toString() + ";" +
-                        kontering.oppdragsperiode.gjelderIdent + ";" +
-                        kontering.oppdragsperiode.oppdrag!!.kravhaverIdent + ";" +
-                        "\n"
-                    )
+                        kontering.transaksjonskode + ";" +
+                                kontering.oppdragsperiode!!.oppdrag!!.sakId + ";" +
+                                kontering.oppdragsperiode.beløp.toString() + ";" +
+                                LocalDate.of(periode.year, periode.month, 1)
+                                    .format(DateTimeFormatter.ofPattern("yyyyMMdd")).toString() + ";" +
+                                LocalDate.of(periode.year, periode.month, periode.lengthOfMonth())
+                                    .format(DateTimeFormatter.ofPattern("yyyyMMdd")).toString() + ";" +
+                                now.format(DateTimeFormatter.ofPattern("yyyyMMdd")).toString() + ";" +
+                                if (Transaksjonskode.valueOf(kontering.transaksjonskode).negativtBeløp) {
+                                    "F;"
+                                } else {
+                                    "T;"
+                                } +
+                                kontering.oppdragsperiode.delytelseId.toString() + ";" +
+                                kontering.oppdragsperiode.gjelderIdent + ";" +
+                                kontering.oppdragsperiode.oppdrag!!.kravhaverIdent + ";" +
+                                "\n"
+                        )
                     .toByteArray()
             )
 
@@ -96,12 +96,12 @@ class AvstemmingsfilGenerator(
             if (avstemningSummering.antallKonteringer != 0) {
                 avstemningSummeringFil.write(
                     (
-                        name + ";" +
-                            avstemningSummering.sum + ";" +
-                            avstemningSummering.fradragEllerTillegg + ";" +
-                            avstemningSummering.antallKonteringer + ";" +
-                            "\n"
-                        )
+                            name + ";" +
+                                    avstemningSummering.sum + ";" +
+                                    avstemningSummering.fradragEllerTillegg + ";" +
+                                    avstemningSummering.antallKonteringer + ";" +
+                                    "\n"
+                            )
                         .toByteArray()
                 )
                 totalSum += if (avstemningSummering.transaksjonskode.negativtBeløp) avstemningSummering.sum.negate() else avstemningSummering.sum
@@ -111,15 +111,15 @@ class AvstemmingsfilGenerator(
 
         avstemningSummeringFil.write(
             (
-                "Total:;" +
-                    totalSum + ";" +
-                    if (totalSum >= BigDecimal.ZERO) {
-                        "T;"
-                    } else {
-                        "F;"
-                    } +
-                    totalAntall + ";"
-                )
+                    "Total:;" +
+                            totalSum + ";" +
+                            if (totalSum >= BigDecimal.ZERO) {
+                                "T;"
+                            } else {
+                                "F;"
+                            } +
+                            totalAntall + ";"
+                    )
                 .toByteArray()
         )
         return avstemningSummeringFil

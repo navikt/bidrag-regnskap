@@ -28,17 +28,6 @@ class GcpFilBucket(
         LOGGER.info("Fil: $filnavn har blitt lastet opp til GCP-bucket: $bucketNavn!")
     }
 
-    fun finnesFil(filnavn: String): Boolean {
-        if (storage.get(lagBlobinfo(filnavn).blobId) != null) {
-            LOGGER.info(
-                "Fil: $filnavn finnes allerede i GCP-bucket: $bucketNavn! Filen blir derfor ikke lastet opp. " +
-                    "Om det er ønskelig å erstatte eksisterende fil må den manuelt slettes fra GCP-bucket: $bucketNavn."
-            )
-            return true
-        }
-        return false
-    }
-
     fun hentFil(filnavn: String): InputStream {
         val reader = storage.reader(lagBlobinfo(filnavn).blobId)
         return Channels.newInputStream(reader)

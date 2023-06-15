@@ -58,7 +58,6 @@ class AvstemmingsfilGeneratorTest {
 
         avstemmingsfilGenerator.skrivAvstemmingsfil(konteringer + konteringer2, now)
 
-        verify(exactly = 1) { gcpFilBucket.finnesFil("avstemning/avstdet_D$nowFormattert.xml") }
         verify(exactly = 1) { gcpFilBucket.lagreFil("avstemning/avstdet_D$nowFormattert.xml", any()) }
         verify(exactly = 1) { gcpFilBucket.lagreFil("avstemning/avstsum_D$nowFormattert.xml", any()) }
         verify(exactly = 1) { filoverføringTilElinKlient.lastOppFilTilFilsluse("avstemning/", "avstsum_D$nowFormattert.xml") }
@@ -72,7 +71,6 @@ class AvstemmingsfilGeneratorTest {
 
         avstemmingsfilGenerator.skrivAvstemmingsfil(emptyList(), now)
 
-        verify(exactly = 1) { gcpFilBucket.finnesFil("avstemning/avstdet_D$nowFormattert.xml") }
         verify(exactly = 1) { gcpFilBucket.lagreFil("avstemning/avstdet_D$nowFormattert.xml", any()) }
         verify(exactly = 1) { gcpFilBucket.lagreFil("avstemning/avstsum_D$nowFormattert.xml", any()) }
         verify(exactly = 1) { filoverføringTilElinKlient.lastOppFilTilFilsluse("avstemning/", "avstsum_D$nowFormattert.xml") }

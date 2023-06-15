@@ -90,10 +90,10 @@ data class KonteringResponse(
     val sisteReferansekode: String?,
 
     @field:Schema(
-        description = "Angir om konteringen har blitt overført i generert påløpsfil eller om den er sendt over via REST-endepunktet.",
+        description = "Angir hvilken periode konteringen generert i om den er generert via påløpsfil.",
         example = "false"
     )
-    val sendtIPalopsfil: Boolean,
+    val sendtIPalopsperiode: String?,
 
     @field:Schema(
         description = "Tidspunktet overføringen ble opprettet.",

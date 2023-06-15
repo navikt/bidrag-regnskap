@@ -45,8 +45,8 @@ data class Kontering(
     @Column(name = "siste_referansekode")
     var sisteReferansekode: String? = null,
 
-    @Column(name = "sendt_i_palopsfil")
-    var sendtIPåløpsfil: Boolean = false,
+    @Column(name = "sendt_i_palopsperiode")
+    var sendtIPåløpsperiode: String? = null,
 
     @Column(name = "opprettet_tidspunkt")
     val opprettetTidspunkt: LocalDateTime = LocalDateTime.now(),
@@ -72,7 +72,7 @@ data class Kontering(
             "sisteReferansekode = $sisteReferansekode , " +
             "opprettetTidspunkt = $opprettetTidspunkt , " +
             "vetakId = $vedtakId , " +
-            "sendtIPåløpsfil = $sendtIPåløpsfil )"
+            "sendtIPåløpsperiode = $sendtIPåløpsperiode )"
     }
 
     override fun equals(other: Any?): Boolean {
@@ -92,7 +92,7 @@ data class Kontering(
         if (sisteReferansekode != other.sisteReferansekode) return false
         if (opprettetTidspunkt != other.opprettetTidspunkt) return false
         if (vedtakId != other.vedtakId) return false
-        if (sendtIPåløpsfil != other.sendtIPåløpsfil) return false
+        if (sendtIPåløpsperiode != other.sendtIPåløpsperiode) return false
 
         return true
     }
@@ -109,7 +109,7 @@ data class Kontering(
         result = 31 * result + (sisteReferansekode?.hashCode() ?: 0)
         result = 31 * result + (opprettetTidspunkt.hashCode())
         result = 31 * result + (vedtakId.hashCode())
-        result = 31 * result + sendtIPåløpsfil.hashCode()
+        result = 31 * result + (sendtIPåløpsperiode?.hashCode() ?: 0)
         return result
     }
 }

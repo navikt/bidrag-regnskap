@@ -8,7 +8,6 @@ import io.kotest.matchers.types.shouldBeSameInstanceAs
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import no.nav.bidrag.behandling.felles.enums.VedtakType
 import no.nav.bidrag.regnskap.consumer.SkattConsumer
@@ -48,7 +47,6 @@ class PåløpskjøringServiceTest {
     }
 
     @Test
-    @OptIn(ExperimentalCoroutinesApi::class)
     fun `Skal opprette konteringer for alle oppdragsperioder som ikke allerede har fått opprettet alle konteringer for en fastsettelse av et bidrag uten korreksjoner`() =
         runTest {
             val påløp = TestData.opprettPåløp(påløpId = 1, forPeriode = "2023-01")
@@ -83,7 +81,7 @@ class PåløpskjøringServiceTest {
             konteringer.shouldBeUnique()
             konteringer.all { it.type == Type.NY.name } shouldBe true
             konteringer.all { it.søknadType == Søknadstype.EN.name } shouldBe true
-            konteringer.all { it.sendtIPåløpsfil } shouldBe true
+            konteringer.forEach { it.sendtIPåløpsperiode shouldBe "2023-01" }
             konteringer.forEachIndexed { index, kontering ->
                 val periodeForKontering = perioderMellomDato[index]
                 kontering.overføringsperiode shouldBe periodeForKontering.toString()
@@ -91,7 +89,6 @@ class PåløpskjøringServiceTest {
         }
 
     @Test
-    @OptIn(ExperimentalCoroutinesApi::class)
     fun `Skal opprette konteringer for alle oppdragsperioder som ikke allerede har fått opprettet alle konteringer for en fastsettelse av et bidrag med korreksjoner`() =
         runTest {
             val påløp = TestData.opprettPåløp(påløpId = 1, forPeriode = "2023-01")
@@ -135,7 +132,7 @@ class PåløpskjøringServiceTest {
             konteringer.shouldBeUnique()
             konteringer.all { it.type == Type.NY.name } shouldBe true
             konteringer.all { it.søknadType == Søknadstype.EN.name } shouldBe true
-            konteringer.all { it.sendtIPåløpsfil } shouldBe true
+            konteringer.forEach { it.sendtIPåløpsperiode shouldBe "2023-01" }
             konteringer.forEachIndexed { index, kontering ->
                 val periodeForKontering = perioderMellomDato[index]
                 kontering.overføringsperiode shouldBe periodeForKontering.toString()
@@ -147,7 +144,6 @@ class PåløpskjøringServiceTest {
         }
 
     @Test
-    @OptIn(ExperimentalCoroutinesApi::class)
     fun `Skal opprette konteringer for alle oppdragsperioder som ikke allerede har fått opprettet alle konteringer for en indeksregulering`() =
         runTest {
             val påløp = TestData.opprettPåløp(påløpId = 1, forPeriode = "2023-01")
@@ -185,7 +181,7 @@ class PåløpskjøringServiceTest {
             konteringer.subList(1, konteringer.size).none { it.søknadType == Søknadstype.IR.name } shouldBe true
             konteringer.all { it.type == Type.NY.name } shouldBe true
             konteringer.subList(1, konteringer.size).all { it.søknadType == Søknadstype.EN.name } shouldBe true
-            konteringer.all { it.sendtIPåløpsfil } shouldBe true
+            konteringer.forEach { it.sendtIPåløpsperiode shouldBe "2023-01" }
             konteringer.forEachIndexed { index, kontering ->
                 val periodeForKontering = perioderMellomDato[index]
                 kontering.overføringsperiode shouldBe periodeForKontering.toString()
