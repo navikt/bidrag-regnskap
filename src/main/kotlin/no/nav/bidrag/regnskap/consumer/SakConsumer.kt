@@ -2,9 +2,8 @@ package no.nav.bidrag.regnskap.consumer
 
 import io.github.oshai.KotlinLogging
 import no.nav.bidrag.commons.web.client.AbstractRestClient
-import no.nav.bidrag.domain.enums.Rolletype
-import no.nav.bidrag.domain.ident.PersonIdent
-import no.nav.bidrag.transport.sak.BidragssakDto
+import no.nav.bidrag.regnskap.dto.sak.BidragSak
+import no.nav.bidrag.regnskap.dto.sak.enumer.Rolletype
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.ResponseEntity
@@ -24,18 +23,18 @@ class SakConsumer(
         const val DUMMY_NUMMER = "22222222226"
     }
 
-    fun hentBmFraSak(sakId: String): PersonIdent {
+    fun hentBmFraSak(sakId: String): String {
         return try {
-            val responseEntity = restTemplate.getForEntity("$sakUrl$SAK_PATH/$sakId", BidragssakDto::class.java)
+            val responseEntity = restTemplate.getForEntity("$sakUrl$SAK_PATH/$sakId", BidragSak::class.java)
 
-            hentFødselsnummerTilBmFraSak(responseEntity) ?: PersonIdent(DUMMY_NUMMER)
+            hentFødselsnummerTilBmFraSak(responseEntity) ?: DUMMY_NUMMER
         } catch (e: Exception) {
             LOGGER.error("Noe gikk galt i kommunikasjon med bidrag-sak for sakId: $sakId! \nGjeldende URL mot sak er: ${sakUrl + SAK_PATH} \nFeilmelding: ${e.message}")
             throw e
         }
     }
 
-    private fun hentFødselsnummerTilBmFraSak(responseEntity: ResponseEntity<BidragssakDto>): PersonIdent? {
+    private fun hentFødselsnummerTilBmFraSak(responseEntity: ResponseEntity<BidragSak>): String? {
         return responseEntity.body?.roller?.find { it.type == Rolletype.BM }?.fødselsnummer
     }
 }
