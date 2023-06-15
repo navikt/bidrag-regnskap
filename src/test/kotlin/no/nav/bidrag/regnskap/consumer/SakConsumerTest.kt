@@ -64,7 +64,7 @@ internal class SakConsumerTest {
 
         val fødelsnummer = sakConsumer.hentBmFraSak("123")
 
-        fødelsnummer shouldBe DUMMY_NUMMER
+        fødelsnummer shouldBe PersonIdent(DUMMY_NUMMER)
     }
 
     private fun opprettBidragSak(rolletype: Rolletype): BidragssakDto {
