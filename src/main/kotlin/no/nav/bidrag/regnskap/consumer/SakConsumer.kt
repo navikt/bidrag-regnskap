@@ -24,7 +24,7 @@ class SakConsumer(
         const val DUMMY_NUMMER = "22222222226"
     }
 
-    @Cacheable(value = ["bidrag-sak_cache"], key = "sakId")
+    @Cacheable(value = ["bidrag-sak_cache"], key = "#sakId")
     fun hentBmFraSak(sakId: String): String {
         return try {
             val responseEntity = restTemplate.getForEntity("$sakUrl$SAK_PATH/$sakId", BidragSak::class.java)
