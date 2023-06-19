@@ -1,6 +1,5 @@
 package no.nav.bidrag.regnskap.service
 
-import no.nav.bidrag.regnskap.consumer.SakConsumer
 import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
 import no.nav.bidrag.regnskap.dto.vedtak.Periode
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
@@ -10,16 +9,13 @@ import java.math.BigDecimal
 import java.time.LocalDate
 
 @Service
-class OppdragsperiodeService(
-    val sakConsumer: SakConsumer
-) {
+class OppdragsperiodeService {
 
     fun opprettNyOppdragsperiode(hendelse: Hendelse, periode: Periode, oppdrag: Oppdrag): Oppdragsperiode {
         return Oppdragsperiode(
             vedtakId = hendelse.vedtakId,
             referanse = hendelse.referanse,
             vedtakType = hendelse.vedtakType.toString(),
-            gjelderIdent = sakConsumer.hentBmFraSak(hendelse.sakId),
             mottakerIdent = hendelse.mottakerIdent,
             beløp = periode.beløp ?: BigDecimal.ZERO,
             valuta = periode.valutakode ?: "NOK",

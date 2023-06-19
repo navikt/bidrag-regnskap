@@ -240,7 +240,7 @@ class KravService(
                 transaksjonskode = Transaksjonskode.valueOf(kontering.transaksjonskode),
                 type = Type.valueOf(kontering.type),
                 soknadType = Søknadstype.valueOf(kontering.søknadType),
-                gjelderIdent = kontering.oppdragsperiode!!.gjelderIdent,
+                gjelderIdent = kontering.oppdragsperiode!!.oppdrag!!.gjelderIdent,
                 kravhaverIdent = kontering.oppdragsperiode.oppdrag!!.kravhaverIdent,
                 mottakerIdent = kontering.oppdragsperiode.mottakerIdent,
                 skyldnerIdent = kontering.oppdragsperiode.oppdrag.skyldnerIdent,

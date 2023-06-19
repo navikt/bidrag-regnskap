@@ -32,6 +32,9 @@ data class Oppdrag(
     @Column(name = "skyldner_ident")
     val skyldnerIdent: String,
 
+    @Column(name = "gjelder_ident")
+    val gjelderIdent: String,
+
     @Column(name = "utsatt_til_dato")
     var utsattTilDato: LocalDate? = null,
 
@@ -51,6 +54,7 @@ data class Oppdrag(
             "sakId = $sakId , " +
             "kravhaverIdent = $kravhaverIdent , " +
             "skyldnerIdent = $skyldnerIdent , " +
+            "gjelderIdent = $gjelderIdent , " +
             "utsattTilDato = $utsattTilDato , " +
             "endretTidspunkt = $endretTidspunkt )"
     }
@@ -66,6 +70,7 @@ data class Oppdrag(
         if (sakId != other.sakId) return false
         if (kravhaverIdent != other.kravhaverIdent) return false
         if (skyldnerIdent != other.skyldnerIdent) return false
+        if (gjelderIdent != other.gjelderIdent) return false
         if (utsattTilDato != other.utsattTilDato) return false
         if (endretTidspunkt != other.endretTidspunkt) return false
 
@@ -78,6 +83,7 @@ data class Oppdrag(
         result = 31 * result + sakId.hashCode()
         result = 31 * result + (kravhaverIdent?.hashCode() ?: 0)
         result = 31 * result + skyldnerIdent.hashCode()
+        result = 31 * result + gjelderIdent.hashCode()
         result = 31 * result + (utsattTilDato?.hashCode() ?: 0)
         result = 31 * result + (endretTidspunkt?.hashCode() ?: 0)
         return result

@@ -42,6 +42,13 @@ data class OppdragResponse(
     val skyldnerIdent: String,
 
     @field:Schema(
+        description = "Personident (FNR/DNR) til bidragsmottaker i bidragssaken. " +
+                "I saker der bidragsmottaker ikke er satt benyttes et dummynr 22222222226",
+        example = "12345678910"
+    )
+    val gjelderIdent: String,
+
+    @field:Schema(
         description = "Tidspunkt oversending av oppdraget er utsatt til.",
         format = "date-time",
         example = "2022-02-01:00:00:00"

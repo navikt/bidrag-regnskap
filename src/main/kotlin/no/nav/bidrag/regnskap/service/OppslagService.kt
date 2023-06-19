@@ -38,6 +38,7 @@ class OppslagService(
             sakId = oppdrag.sakId,
             kravhaverIdent = oppdrag.kravhaverIdent,
             skyldnerIdent = oppdrag.skyldnerIdent,
+            gjelderIdent = oppdrag.gjelderIdent,
             utsattTilTidspunkt = oppdrag.utsattTilDato.toString(),
             endretTidspunkt = oppdrag.endretTidspunkt.toString(),
             oppdragsperioder = hentOppdragsperioderMedKonteringer(oppdrag)
@@ -51,7 +52,6 @@ class OppslagService(
                 oppdragId = it.oppdrag?.oppdragId,
                 vedtakId = it.vedtakId,
                 referanse = it.referanse,
-                gjelderIdent = it.gjelderIdent,
                 mottakerIdent = it.mottakerIdent,
                 belop = it.beløp,
                 valuta = it.valuta,

@@ -31,6 +31,7 @@ object TestData {
         skyldnerIdent: String = PersonidentGenerator.genererPersonnummer(),
         oppdragsperioder: List<Oppdragsperiode> = listOf(opprettOppdragsperiode()),
         kravhaverIdent: String = PersonidentGenerator.genererPersonnummer(),
+        gjelderIdent: String = PersonidentGenerator.genererPersonnummer(),
         utsattTilDato: LocalDate? = null,
         endretTidspunkt: LocalDateTime? = null
     ): Oppdrag {
@@ -41,6 +42,7 @@ object TestData {
             skyldnerIdent = skyldnerIdent,
             oppdragsperioder = oppdragsperioder,
             kravhaverIdent = kravhaverIdent,
+            gjelderIdent = gjelderIdent,
             utsattTilDato = utsattTilDato,
             endretTidspunkt = endretTidspunkt
         )
@@ -98,7 +100,6 @@ object TestData {
         vedtakId: Int = 654321,
         vedtakType: VedtakType = VedtakType.FASTSETTELSE,
         referanse: String? = null,
-        gjelderIdent: String = PersonidentGenerator.genererPersonnummer(),
         mottakerIdent: String = PersonidentGenerator.genererPersonnummer(),
         belop: BigDecimal = BigDecimal(7500),
         valuta: String = "NOK",
@@ -118,7 +119,6 @@ object TestData {
             vedtakId = vedtakId,
             referanse = referanse,
             vedtakType = vedtakType.toString(),
-            gjelderIdent = gjelderIdent,
             mottakerIdent = mottakerIdent,
             beløp = belop,
             valuta = valuta,

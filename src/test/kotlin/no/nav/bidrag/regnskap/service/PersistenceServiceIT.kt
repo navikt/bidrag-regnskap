@@ -88,9 +88,9 @@ internal class PersistenceServiceIT {
         oppdrag?.oppdragId shouldNotBe null
         oppdrag?.stønadType shouldBe oppdragTestData.stønadType
         oppdrag?.skyldnerIdent shouldBe oppdragTestData.skyldnerIdent
+        oppdrag?.gjelderIdent shouldBe oppdragTestData.gjelderIdent
         oppdrag?.oppdragsperioder?.size shouldBe oppdragTestData.oppdragsperioder.size
         oppdrag?.oppdragsperioder?.first()?.oppdragsperiodeId shouldNotBe null
-        oppdrag?.oppdragsperioder?.first()?.gjelderIdent shouldBe oppdragTestData.oppdragsperioder.first().gjelderIdent
         oppdrag?.oppdragsperioder?.first()?.konteringer?.size shouldBe oppdragTestData.oppdragsperioder.first().konteringer.size
         oppdrag?.oppdragsperioder?.first()?.konteringer?.first()?.konteringId shouldNotBe null
         oppdrag?.oppdragsperioder?.first()?.konteringer?.first()?.transaksjonskode shouldBe oppdragTestData.oppdragsperioder.first().konteringer.first().transaksjonskode
