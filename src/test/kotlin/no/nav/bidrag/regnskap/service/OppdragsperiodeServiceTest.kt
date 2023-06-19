@@ -2,9 +2,7 @@ package no.nav.bidrag.regnskap.service
 
 import io.kotest.matchers.shouldBe
 import io.mockk.impl.annotations.InjectMockKs
-import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
-import no.nav.bidrag.regnskap.consumer.SakConsumer
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.utils.TestData
 import org.junit.jupiter.api.BeforeEach
@@ -16,9 +14,6 @@ import java.time.LocalDate
 
 @ExtendWith(MockKExtension::class)
 class OppdragsperiodeServiceTest {
-
-    @MockK(relaxed = true)
-    private lateinit var sakConsumer: SakConsumer
 
     @InjectMockKs
     private lateinit var oppdragsperiodeService: OppdragsperiodeService

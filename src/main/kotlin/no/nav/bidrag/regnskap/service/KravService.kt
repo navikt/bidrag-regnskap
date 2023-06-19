@@ -157,8 +157,8 @@ class KravService(
                 HttpStatus.SERVICE_UNAVAILABLE -> {
                     LOGGER.error(
                         "Skatt svarte med uventet statuskode: ${skattResponse.statusCode}. " +
-                                "Tjenesten hos skatt er slått av. Dette kan skje enten ved innlesing av påløpsfil eller ved andre uventede feil. " +
-                                "Feilmelding: ${skattResponse.body}"
+                            "Tjenesten hos skatt er slått av. Dette kan skje enten ved innlesing av påløpsfil eller ved andre uventede feil. " +
+                            "Feilmelding: ${skattResponse.body}"
                     )
                     lagreFeiletOverføringAvKrav(alleIkkeOverførteKonteringer, skattResponse.statusCode.toString())
                 }
@@ -166,7 +166,7 @@ class KravService(
                 HttpStatus.UNAUTHORIZED, HttpStatus.FORBIDDEN -> {
                     LOGGER.error(
                         "Skatt svarte med uventet statuskode: ${skattResponse.statusCode}. " +
-                                "Bidrag-Regnskap er ikke autorisert eller mangler rettigheter for kallet mot skatt. Feilmelding: ${skattResponse.body}"
+                            "Bidrag-Regnskap er ikke autorisert eller mangler rettigheter for kallet mot skatt. Feilmelding: ${skattResponse.body}"
                     )
                     lagreFeiletOverføringAvKrav(alleIkkeOverførteKonteringer, skattResponse.statusCode.toString())
                 }
@@ -176,9 +176,9 @@ class KravService(
                     lagreFeiletOverføringAvKrav(
                         alleIkkeOverførteKonteringer,
                         "Statuskode: ${skattResponse.statusCode}" + ", body: " + (
-                                skattResponse.body
-                                    ?: "{}"
-                                )
+                            skattResponse.body
+                                ?: "{}"
+                            )
                     )
                 }
             }
@@ -235,27 +235,29 @@ class KravService(
     }
 
     fun opprettKravKonteringListe(konteringerListe: List<Kontering>): Krav {
-        return Krav(konteringerListe.map { kontering ->
-            Kravkontering(
-                transaksjonskode = Transaksjonskode.valueOf(kontering.transaksjonskode),
-                type = Type.valueOf(kontering.type),
-                soknadType = Søknadstype.valueOf(kontering.søknadType),
-                gjelderIdent = kontering.oppdragsperiode!!.oppdrag!!.gjelderIdent,
-                kravhaverIdent = kontering.oppdragsperiode.oppdrag!!.kravhaverIdent,
-                mottakerIdent = kontering.oppdragsperiode.mottakerIdent,
-                skyldnerIdent = kontering.oppdragsperiode.oppdrag.skyldnerIdent,
-                belop = if (Transaksjonskode.valueOf(kontering.transaksjonskode).negativtBeløp) kontering.oppdragsperiode.beløp.negate() else kontering.oppdragsperiode.beløp,
-                valuta = kontering.oppdragsperiode.valuta,
-                periode = kontering.overføringsperiode,
-                vedtaksdato = kontering.oppdragsperiode.vedtaksdato.toString(),
-                kjoredato = LocalDate.now().toString(),
-                saksbehandlerId = kontering.oppdragsperiode.opprettetAv,
-                attestantId = kontering.oppdragsperiode.opprettetAv,
-                tekst = kontering.oppdragsperiode.eksternReferanse,
-                fagsystemId = kontering.oppdragsperiode.oppdrag.sakId,
-                delytelsesId = kontering.oppdragsperiode.delytelseId.toString()
-            )
-        })
+        return Krav(
+            konteringerListe.map { kontering ->
+                Kravkontering(
+                    transaksjonskode = Transaksjonskode.valueOf(kontering.transaksjonskode),
+                    type = Type.valueOf(kontering.type),
+                    soknadType = Søknadstype.valueOf(kontering.søknadType),
+                    gjelderIdent = kontering.oppdragsperiode!!.oppdrag!!.gjelderIdent,
+                    kravhaverIdent = kontering.oppdragsperiode.oppdrag!!.kravhaverIdent,
+                    mottakerIdent = kontering.oppdragsperiode.mottakerIdent,
+                    skyldnerIdent = kontering.oppdragsperiode.oppdrag.skyldnerIdent,
+                    belop = if (Transaksjonskode.valueOf(kontering.transaksjonskode).negativtBeløp) kontering.oppdragsperiode.beløp.negate() else kontering.oppdragsperiode.beløp,
+                    valuta = kontering.oppdragsperiode.valuta,
+                    periode = kontering.overføringsperiode,
+                    vedtaksdato = kontering.oppdragsperiode.vedtaksdato.toString(),
+                    kjoredato = LocalDate.now().toString(),
+                    saksbehandlerId = kontering.oppdragsperiode.opprettetAv,
+                    attestantId = kontering.oppdragsperiode.opprettetAv,
+                    tekst = kontering.oppdragsperiode.eksternReferanse,
+                    fagsystemId = kontering.oppdragsperiode.oppdrag.sakId,
+                    delytelsesId = kontering.oppdragsperiode.delytelseId.toString()
+                )
+            }
+        )
     }
 
     fun hentOppdragsperioderMedIkkeOverførteKonteringer(
@@ -270,9 +272,9 @@ class KravService(
 
     private fun finnAlleIkkeOverførteKonteringer(oppdragsperioder: List<Oppdragsperiode>): List<Kontering> {
         return oppdragsperioder.flatMap { oppdragsperiode ->
-                oppdragsperiode.konteringer.filter { kontering ->
-                    kontering.overføringstidspunkt == null
-                }
+            oppdragsperiode.konteringer.filter { kontering ->
+                kontering.overføringstidspunkt == null
+            }
         }
     }
 }

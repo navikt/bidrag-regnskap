@@ -142,7 +142,7 @@ class PåløpskjøringService(
         val timestamp = LocalDateTime.now()
         konteringer.forEach {
             it.overføringstidspunkt = timestamp
-            it.sendtIPåløpsperiode= påløp.forPeriode
+            it.sendtIPåløpsperiode = påløp.forPeriode
             it.behandlingsstatusOkTidspunkt = timestamp
             persistenceService.lagreKontering(it)
             persistenceService.lagreOverføringKontering(

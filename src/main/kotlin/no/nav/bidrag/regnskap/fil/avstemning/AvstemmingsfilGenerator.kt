@@ -55,24 +55,24 @@ class AvstemmingsfilGenerator(
 
             avstemningsfilBuffer.write(
                 (
-                        kontering.transaksjonskode + ";" +
-                                kontering.oppdragsperiode!!.oppdrag!!.sakId + ";" +
-                                kontering.oppdragsperiode.beløp.toString() + ";" +
-                                LocalDate.of(periode.year, periode.month, 1)
-                                    .format(DateTimeFormatter.ofPattern("yyyyMMdd")).toString() + ";" +
-                                LocalDate.of(periode.year, periode.month, periode.lengthOfMonth())
-                                    .format(DateTimeFormatter.ofPattern("yyyyMMdd")).toString() + ";" +
-                                now.format(DateTimeFormatter.ofPattern("yyyyMMdd")).toString() + ";" +
-                                if (Transaksjonskode.valueOf(kontering.transaksjonskode).negativtBeløp) {
-                                    "F;"
-                                } else {
-                                    "T;"
-                                } +
-                                kontering.oppdragsperiode.delytelseId.toString() + ";" +
-                                kontering.oppdragsperiode.oppdrag!!.gjelderIdent + ";" +
-                                kontering.oppdragsperiode.oppdrag.kravhaverIdent + ";" +
-                                "\n"
-                        )
+                    kontering.transaksjonskode + ";" +
+                        kontering.oppdragsperiode!!.oppdrag!!.sakId + ";" +
+                        kontering.oppdragsperiode.beløp.toString() + ";" +
+                        LocalDate.of(periode.year, periode.month, 1)
+                            .format(DateTimeFormatter.ofPattern("yyyyMMdd")).toString() + ";" +
+                        LocalDate.of(periode.year, periode.month, periode.lengthOfMonth())
+                            .format(DateTimeFormatter.ofPattern("yyyyMMdd")).toString() + ";" +
+                        now.format(DateTimeFormatter.ofPattern("yyyyMMdd")).toString() + ";" +
+                        if (Transaksjonskode.valueOf(kontering.transaksjonskode).negativtBeløp) {
+                            "F;"
+                        } else {
+                            "T;"
+                        } +
+                        kontering.oppdragsperiode.delytelseId.toString() + ";" +
+                        kontering.oppdragsperiode.oppdrag!!.gjelderIdent + ";" +
+                        kontering.oppdragsperiode.oppdrag.kravhaverIdent + ";" +
+                        "\n"
+                    )
                     .toByteArray()
             )
 
@@ -96,12 +96,12 @@ class AvstemmingsfilGenerator(
             if (avstemningSummering.antallKonteringer != 0) {
                 avstemningSummeringFil.write(
                     (
-                            name + ";" +
-                                    avstemningSummering.sum + ";" +
-                                    avstemningSummering.fradragEllerTillegg + ";" +
-                                    avstemningSummering.antallKonteringer + ";" +
-                                    "\n"
-                            )
+                        name + ";" +
+                            avstemningSummering.sum + ";" +
+                            avstemningSummering.fradragEllerTillegg + ";" +
+                            avstemningSummering.antallKonteringer + ";" +
+                            "\n"
+                        )
                         .toByteArray()
                 )
                 totalSum += if (avstemningSummering.transaksjonskode.negativtBeløp) avstemningSummering.sum.negate() else avstemningSummering.sum
@@ -111,15 +111,15 @@ class AvstemmingsfilGenerator(
 
         avstemningSummeringFil.write(
             (
-                    "Total:;" +
-                            totalSum + ";" +
-                            if (totalSum >= BigDecimal.ZERO) {
-                                "T;"
-                            } else {
-                                "F;"
-                            } +
-                            totalAntall + ";"
-                    )
+                "Total:;" +
+                    totalSum + ";" +
+                    if (totalSum >= BigDecimal.ZERO) {
+                        "T;"
+                    } else {
+                        "F;"
+                    } +
+                    totalAntall + ";"
+                )
                 .toByteArray()
         )
         return avstemningSummeringFil

@@ -151,8 +151,8 @@ internal class SendKravSchedulerTest {
 
         val annenOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = annetOppdrag, oppdragsperiodeId = 0)
 
-        val bidragOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = bidragOppdrag, oppdragsperiodeId = 1,  mottakerIdent = bm, periodeTil = null)
-        val gebyrBpOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = gebyrBpOppdrag, oppdragsperiodeId = 2,  mottakerIdent = nav, periodeFra = LocalDate.now())
+        val bidragOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = bidragOppdrag, oppdragsperiodeId = 1, mottakerIdent = bm, periodeTil = null)
+        val gebyrBpOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = gebyrBpOppdrag, oppdragsperiodeId = 2, mottakerIdent = nav, periodeFra = LocalDate.now())
         val gebyrBmOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = gebyrBmOppdrag, oppdragsperiodeId = 3, mottakerIdent = nav, periodeFra = LocalDate.now())
 
         val annenKontering = TestData.opprettKontering(oppdragsperiode = annenOppdragsperiode, konteringId = 0, opprettetTidspunkt = LocalDateTime.now().minusMinutes(1))
