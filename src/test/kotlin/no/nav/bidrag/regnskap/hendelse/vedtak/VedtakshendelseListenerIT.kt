@@ -59,7 +59,6 @@ import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
@@ -93,7 +92,6 @@ import java.time.YearMonth
 @TestMethodOrder(OrderAnnotation::class)
 @SpringBootTest(classes = [BidragRegnskapLocal::class])
 @EmbeddedKafka(partitions = 1, brokerProperties = ["listeners=PLAINTEXT://localhost:9092", "port=9092"])
-@Disabled
 internal class VedtakshendelseListenerIT {
     companion object {
         private const val HENDELSE_FILMAPPE = "testfiler/hendelse/"
