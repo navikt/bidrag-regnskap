@@ -69,8 +69,8 @@ class AvstemmingsfilGenerator(
                                     "T;"
                                 } +
                                 kontering.oppdragsperiode.delytelseId.toString() + ";" +
-                                kontering.oppdragsperiode.gjelderIdent + ";" +
-                                kontering.oppdragsperiode.oppdrag!!.kravhaverIdent + ";" +
+                                kontering.oppdragsperiode.oppdrag!!.gjelderIdent + ";" +
+                                kontering.oppdragsperiode.oppdrag.kravhaverIdent + ";" +
                                 "\n"
                         )
                     .toByteArray()

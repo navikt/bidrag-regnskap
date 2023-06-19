@@ -1,6 +1,7 @@
 package no.nav.bidrag.regnskap.service
 
 import no.nav.bidrag.behandling.felles.enums.EngangsbelopType
+import no.nav.bidrag.regnskap.consumer.SakConsumer
 import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import org.slf4j.LoggerFactory
@@ -14,7 +15,8 @@ private val LOGGER = LoggerFactory.getLogger(OppdragService::class.java)
 class OppdragService(
     private val persistenceService: PersistenceService,
     private val oppdragsperiodeService: OppdragsperiodeService,
-    private val konteringService: KonteringService
+    private val konteringService: KonteringService,
+    private val sakConsumer: SakConsumer
 ) {
 
     @Transactional
@@ -82,6 +84,7 @@ class OppdragService(
             sakId = hendelse.sakId,
             kravhaverIdent = hendelse.kravhaverIdent,
             skyldnerIdent = hendelse.skyldnerIdent,
+            gjelderIdent = sakConsumer.hentBmFraSak(hendelse.sakId),
             utsattTilDato = hendelse.utsattTilDato
         )
     }
