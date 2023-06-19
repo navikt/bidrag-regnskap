@@ -14,6 +14,7 @@ import no.nav.bidrag.regnskap.persistence.repository.OppdragsperiodeRepository
 import no.nav.bidrag.regnskap.persistence.repository.OverføringKonteringRepository
 import no.nav.bidrag.regnskap.persistence.repository.PåløpRepository
 import org.slf4j.LoggerFactory
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
@@ -153,6 +154,7 @@ class PersistenceService(
         return driftsavvikRepository.save(driftsavvik).driftsavvikId
     }
 
+    @Cacheable(value = ["driftsaavik_cache"], key = "#root.methodName")
     fun harAktivtDriftsavvik(): Boolean {
         return driftsavvikRepository.findAllByTidspunktTilAfterOrTidspunktTilIsNull(LocalDateTime.now()).isNotEmpty()
     }

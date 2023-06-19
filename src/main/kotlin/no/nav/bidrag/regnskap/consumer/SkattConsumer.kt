@@ -9,6 +9,7 @@ import no.nav.bidrag.regnskap.dto.påløp.Vedlikeholdsmodus
 import no.nav.bidrag.regnskap.maskinporten.MaskinportenClient
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -61,6 +62,7 @@ class SkattConsumer(
         )
     }
 
+    @Cacheable(value = ["vedlikeholdsmodus_cache"], key = "#root.methodName")
     fun hentStatusPåVedlikeholdsmodus(): ResponseEntity<Any> {
         LOGGER.debug { "Henter status på vedlikeholdsmodus." }
         return try {
