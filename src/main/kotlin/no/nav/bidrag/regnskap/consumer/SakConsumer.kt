@@ -6,6 +6,7 @@ import no.nav.bidrag.regnskap.dto.sak.BidragSak
 import no.nav.bidrag.regnskap.dto.sak.enumer.Rolletype
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestOperations
@@ -23,6 +24,7 @@ class SakConsumer(
         const val DUMMY_NUMMER = "22222222226"
     }
 
+    @Cacheable(value = ["bidrag-sak_cache"], key= "sakId")
     fun hentBmFraSak(sakId: String): String {
         return try {
             val responseEntity = restTemplate.getForEntity("$sakUrl$SAK_PATH/$sakId", BidragSak::class.java)
