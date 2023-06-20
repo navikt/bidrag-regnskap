@@ -19,6 +19,8 @@ springdoc:
   packages-to-scan: no.nav.bidrag.regnskap.controller
   swagger-ui:
     path: /
+    display-request-duration: true
+    try-it-out-enabled: true
 
 maskinporten:
   tokenUrl: https://test.maskinporten.no/token
