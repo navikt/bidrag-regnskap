@@ -1,7 +1,7 @@
 package no.nav.bidrag.regnskap.dto.enumer
 
-import no.nav.bidrag.behandling.felles.enums.EngangsbelopType
-import no.nav.bidrag.behandling.felles.enums.StonadType
+import no.nav.bidrag.domain.enums.EngangsbelopType
+import no.nav.bidrag.domain.enums.StonadType
 
 enum class Transaksjonskode(val korreksjonskode: String?, val negativtBeløp: Boolean) {
     A1("A3", false), // Bidragsforskudd

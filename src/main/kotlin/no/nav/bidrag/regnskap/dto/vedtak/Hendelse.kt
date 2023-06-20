@@ -1,6 +1,6 @@
 package no.nav.bidrag.regnskap.dto.vedtak
 
-import no.nav.bidrag.behandling.felles.enums.VedtakType
+import no.nav.bidrag.domain.enums.VedtakType
 import java.time.LocalDate
 
 data class Hendelse(

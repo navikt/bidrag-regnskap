@@ -9,8 +9,8 @@ import io.mockk.just
 import io.mockk.mockkStatic
 import io.mockk.verify
 import net.javacrumbs.shedlock.core.LockAssert
-import no.nav.bidrag.behandling.felles.enums.EngangsbelopType
 import no.nav.bidrag.commons.util.PersonidentGenerator
+import no.nav.bidrag.domain.enums.EngangsbelopType
 import no.nav.bidrag.regnskap.dto.enumer.Søknadstype
 import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
 import no.nav.bidrag.regnskap.hendelse.schedule.krav.KravSchedulerUtils

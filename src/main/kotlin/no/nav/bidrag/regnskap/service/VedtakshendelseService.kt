@@ -4,13 +4,13 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import no.nav.bidrag.behandling.felles.dto.vedtak.Engangsbelop
-import no.nav.bidrag.behandling.felles.dto.vedtak.Stonadsendring
-import no.nav.bidrag.behandling.felles.dto.vedtak.VedtakHendelse
-import no.nav.bidrag.behandling.felles.enums.Innkreving
+import no.nav.bidrag.domain.enums.Innkreving
 import no.nav.bidrag.regnskap.SECURE_LOGGER
 import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
 import no.nav.bidrag.regnskap.dto.vedtak.Periode
+import no.nav.bidrag.transport.behandling.vedtak.Engangsbelop
+import no.nav.bidrag.transport.behandling.vedtak.Stonadsendring
+import no.nav.bidrag.transport.behandling.vedtak.VedtakHendelse
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
@@ -89,7 +89,7 @@ class VedtakshendelseService(
         return innkreving == Innkreving.JA && endring
     }
 
-    private fun mapPeriodelisteTilDomene(periodeListe: List<no.nav.bidrag.behandling.felles.dto.vedtak.Periode>): List<Periode> {
+    private fun mapPeriodelisteTilDomene(periodeListe: List<no.nav.bidrag.transport.behandling.vedtak.Periode>): List<Periode> {
         return periodeListe.map { periode ->
             Periode(
                 beløp = periode.belop,

@@ -1,6 +1,6 @@
 package no.nav.bidrag.regnskap.service
 
-import no.nav.bidrag.behandling.felles.enums.EngangsbelopType
+import no.nav.bidrag.domain.enums.EngangsbelopType
 import no.nav.bidrag.regnskap.consumer.SakConsumer
 import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
