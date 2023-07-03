@@ -1,5 +1,6 @@
 package no.nav.bidrag.regnskap.service
 
+import com.google.common.collect.Lists
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
@@ -14,24 +15,29 @@ import no.nav.bidrag.regnskap.persistence.entity.Driftsavvik
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.OverføringKontering
 import no.nav.bidrag.regnskap.persistence.entity.Påløp
-import no.nav.bidrag.regnskap.slack.SlackService
-import no.nav.bidrag.regnskap.util.PeriodeUtils.erFørsteDatoSammeSomEllerTidligereEnnAndreDato
+import no.nav.bidrag.regnskap.persistence.repository.OppdragsperiodeRepository
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.lang.Error
+import java.lang.RuntimeException
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.YearMonth
+import java.util.ArrayList
 
 private val LOGGER = LoggerFactory.getLogger(PåløpskjøringService::class.java)
 
+private const val partisjonStørrelse = 10000
+
 @Service
 class PåløpskjøringService(
+    private val oppdragsperiodeRepo: OppdragsperiodeRepository,
     private val persistenceService: PersistenceService,
     private val manglendeKonteringerService: ManglendeKonteringerService,
     private val påløpsfilGenerator: PåløpsfilGenerator,
     private val skattConsumer: SkattConsumer,
-    private val slackService: SlackService
+    @Autowired(required = false) private val lyttere: List<PåløpskjøringLytter> = emptyList()
 ) {
 
     private lateinit var påløpskjøringJob: Job
@@ -40,25 +46,38 @@ class PåløpskjøringService(
     fun hentPåløp() = persistenceService.hentIkkeKjørtePåløp().minByOrNull { it.forPeriode }
 
     fun startPåløpskjøring(påløp: Påløp, schedulertKjøring: Boolean, genererFil: Boolean) {
-        slackService.sendMelding(":open_file_folder: @channel Påløpskjøring er startet for ${påløp.forPeriode}! Skedulert: $schedulertKjøring, generer fil: $genererFil.")
-        validerDriftsavvik(påløp, schedulertKjøring)
-        if (genererFil) {
-            endreElinVedlikeholdsmodus(
-                Årsakskode.PAALOEP_GENERERES,
-                "Påløp for ${påløp.forPeriode} genereres hos NAV."
-            )
+        if (påløp.startetTidspunkt != null) {
+            return
         }
-        opprettKonteringerForAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer(påløp)
-        genererPåløpsfil(påløp, genererFil)
-        fullførPåløp(påløp)
-        if (genererFil) {
-            endreElinVedlikeholdsmodus(
-                Årsakskode.PAALOEP_LEVERT,
-                "Påløp for ${påløp.forPeriode} er ferdig generert fra NAV."
-            )
+        lyttere.forEach { it.påløpStartet(påløp, schedulertKjøring, genererFil) }
+        try {
+            validerDriftsavvik(påløp, schedulertKjøring)
+            persistenceService.registrerPåløpStartet(påløp.påløpId, LocalDateTime.now())
+
+            if (genererFil) {
+                endreElinVedlikeholdsmodus(
+                    Årsakskode.PAALOEP_GENERERES,
+                    "Påløp for ${påløp.forPeriode} genereres hos NAV."
+                )
+            }
+            opprettKonteringerForAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer(påløp)
+            genererPåløpsfil(påløp, genererFil)
+            fullførPåløp(påløp)
+            if (genererFil) {
+                endreElinVedlikeholdsmodus(
+                    Årsakskode.PAALOEP_LEVERT,
+                    "Påløp for ${påløp.forPeriode} er ferdig generert fra NAV."
+                )
+            }
+            avsluttDriftsavvik(påløp)
+            lyttere.forEach { it.påløpFullført(påløp) }
+        } catch (e: Error) {
+            lyttere.forEach { it.påløpFeilet(påløp, e.toString()) }
+            throw e
+        } catch (e: RuntimeException) {
+            lyttere.forEach { it.påløpFeilet(påløp, e.toString()) }
+            throw e
         }
-        avsluttDriftsavvik(påløp)
-        slackService.sendMelding(":file_folder: Påløpskjøring er fullført for ${påløp.forPeriode}.")
     }
 
     fun stoppPågåendePåløpskjøring() {
@@ -97,35 +116,32 @@ class PåløpskjøringService(
         skattConsumer.oppdaterVedlikeholdsmodus(Vedlikeholdsmodus(true, årsakskode, kommentar))
     }
 
-    @Transactional
     fun opprettKonteringerForAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer(påløp: Påløp) {
         val påløpsPeriode = LocalDate.parse(påløp.forPeriode + "-01")
-        val oppdragsperioderSomIkkeHarOpprettetAlleKonteringer =
-            persistenceService.hentAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer()
+        val oppdragsperioder = ArrayList(oppdragsperiodeRepo.hentAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer())
+        var antallBehandlet = 0
 
-        oppdragsperioderSomIkkeHarOpprettetAlleKonteringer.forEach {
-            if (it.aktivTil == null && erFørsteDatoSammeSomEllerTidligereEnnAndreDato(it.periodeTil, påløpsPeriode)) {
-                it.aktivTil = it.periodeTil
-            }
+        lyttere.forEach { it.rapporterOppdragsperioderBehandlet(påløp, antallBehandlet, oppdragsperioder.size) }
 
-            manglendeKonteringerService.opprettManglendeKonteringerForOppdragsperiode(
-                it,
-                YearMonth.parse(påløp.forPeriode)
-            )
+        Lists.partition(oppdragsperioder, partisjonStørrelse).forEach { oppdragsperiodeIds ->
+            val startTime = System.currentTimeMillis()
+            manglendeKonteringerService.opprettKonteringerForAlleOppdragsperiodePartisjon(påløpsPeriode, oppdragsperiodeIds)
+            LOGGER.info("TIDSBRUK opprettKonteringerForAlleOppdragsperiodePartisjon_ekstern: {}ms, Ledig minne: {}", System.currentTimeMillis() - startTime, Runtime.getRuntime().freeMemory())
 
-            if (erFørsteDatoSammeSomEllerTidligereEnnAndreDato(it.aktivTil, påløpsPeriode)) {
-                it.konteringerFullførtOpprettet = true
-            }
-
-            persistenceService.lagreOppdragsperiode(it)
+            antallBehandlet += oppdragsperiodeIds.size
+            lyttere.forEach { it.rapporterOppdragsperioderBehandlet(påløp, antallBehandlet, oppdragsperioder.size) }
         }
+
+        lyttere.forEach { it.oppdragsperioderBehandletFerdig(påløp, oppdragsperioder.size) }
     }
 
     @Transactional
     fun genererPåløpsfil(påløp: Påløp, genererFil: Boolean) {
         LOGGER.info("Starter generering av påløpsfil...")
         val konteringer = persistenceService.hentAlleIkkeOverførteKonteringer()
-        if (genererFil) runBlocking { skrivPåløpsfilOgLastOppPåFilsluse(konteringer, påløp) }
+        if (genererFil) {
+            runBlocking { skrivPåløpsfilOgLastOppPåFilsluse(konteringer, påløp) }
+        }
         settKonteringTilOverførtOgOpprettOverføringKontering(konteringer, påløp)
         LOGGER.info("Påløpsfil er ferdig skrevet med ${konteringer.size} konteringer og lastet opp til filsluse.")
     }
@@ -165,4 +181,17 @@ class PåløpskjøringService(
         driftsavvik.tidspunktTil = LocalDateTime.now()
         persistenceService.lagreDriftsavvik(driftsavvik)
     }
+}
+
+interface PåløpskjøringLytter {
+    fun påløpStartet(påløp: Påløp, schedulertKjøring: Boolean, genererFil: Boolean)
+    fun rapporterOppdragsperioderBehandlet(påløp: Påløp, antallBehandlet: Int, antallOppdragsperioder: Int)
+
+    fun oppdragsperioderBehandletFerdig(påløp: Påløp, antallOppdragsperioder: Int)
+
+    fun generererFil(påløp: Påløp)
+
+    fun påløpFullført(påløp: Påløp)
+
+    fun påløpFeilet(påløp: Påløp, feilmelding: String)
 }

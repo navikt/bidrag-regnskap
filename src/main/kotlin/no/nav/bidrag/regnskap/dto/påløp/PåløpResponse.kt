@@ -15,7 +15,14 @@ data class PåløpResponse(
     val kjoredato: String,
 
     @field:Schema(
-        description = "Tidspunkt påløpet ble kjørt.",
+        description = "Tidspunkt påløpet ble startet.",
+        type = "datetime",
+        example = "2022-01-01 00:00:00"
+    )
+    var startetTidspunkt: String? = null,
+
+    @field:Schema(
+        description = "Tidspunkt påløpet ble fullført.",
         type = "datetime",
         example = "2022-01-01 00:00:00"
     )

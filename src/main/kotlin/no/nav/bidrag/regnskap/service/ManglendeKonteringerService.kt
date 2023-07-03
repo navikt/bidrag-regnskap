@@ -3,12 +3,14 @@ package no.nav.bidrag.regnskap.service
 import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
+import no.nav.bidrag.regnskap.persistence.repository.OppdragsperiodeRepository
 import no.nav.bidrag.regnskap.util.KonteringUtils.vurderSøknadType
 import no.nav.bidrag.regnskap.util.KonteringUtils.vurderType
 import no.nav.bidrag.regnskap.util.PeriodeUtils.erFørsteDatoSammeSomEllerTidligereEnnAndreDato
 import no.nav.bidrag.regnskap.util.PeriodeUtils.hentAllePerioderMellomDato
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.YearMonth
@@ -16,10 +18,47 @@ import java.time.YearMonth
 private val LOGGER = LoggerFactory.getLogger(ManglendeKonteringerService::class.java)
 
 @Service
-class ManglendeKonteringerService {
+class ManglendeKonteringerService(
+    private val oppdragsperiodeRepo: OppdragsperiodeRepository,
+    private val persistenceService: PersistenceService
+) {
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    fun opprettKonteringerForAlleOppdragsperiodePartisjon(påløpsPeriode: LocalDate, oppdragsperiodeIds: List<Int>) {
+        val startTime = System.currentTimeMillis()
+        LOGGER.info("START-DO opprettKonteringerForAlleOppdragsperiodePartisjon")
+        oppdragsperiodeIds.forEach {
+            opprettKonteringerForOppdragsperiode(påløpsPeriode, it)
+        }
+        LOGGER.info("TIDSBRUK opprettKonteringerForAlleOppdragsperiodePartisjon: {}ms, Ledig minne: {}", System.currentTimeMillis() - startTime, Runtime.getRuntime().freeMemory())
+    }
+
+    @Transactional
+    fun opprettKonteringerForOppdragsperiode(påløpsPeriode: LocalDate, oppdragsperiodeId: Int) {
+        LOGGER.info("Oppretter konteringer for oppdragsperiode {}", oppdragsperiodeId)
+        val startTime = System.currentTimeMillis()
+        val oppdragsperiode = oppdragsperiodeRepo.findById(oppdragsperiodeId).get()
+
+        if (oppdragsperiode.aktivTil == null && erFørsteDatoSammeSomEllerTidligereEnnAndreDato(oppdragsperiode.periodeTil, påløpsPeriode)) {
+            oppdragsperiode.aktivTil = oppdragsperiode.periodeTil
+        }
+
+        opprettManglendeKonteringerForOppdragsperiode(
+            oppdragsperiode,
+            YearMonth.from(påløpsPeriode)
+        )
+
+        if (erFørsteDatoSammeSomEllerTidligereEnnAndreDato(oppdragsperiode.aktivTil, påløpsPeriode)) {
+            oppdragsperiode.konteringerFullførtOpprettet = true
+        }
+
+        persistenceService.lagreOppdragsperiode(oppdragsperiode)
+        LOGGER.info("TIDSBRUK opprettKonteringerForAlleOppdragsperiode: {}ms", System.currentTimeMillis() - startTime)
+    }
 
     @Transactional
     fun opprettManglendeKonteringerForOppdragsperiode(oppdragsperiode: Oppdragsperiode, påløpsPeriode: YearMonth) {
+        val startTime = System.currentTimeMillis()
         val perioderMellomDato = hentAllePerioderMellomDato(oppdragsperiode.periodeFra, oppdragsperiode.periodeTil, påløpsPeriode)
 
         perioderMellomDato.forEachIndexed { periodeIndex, periode ->
@@ -39,6 +78,7 @@ class ManglendeKonteringerService {
                 )
             }
         }
+        LOGGER.info("TIDSBRUK opprettManglendeKonteringerForOppdragsperiode: {}ms", System.currentTimeMillis() - startTime)
     }
 
     private fun harIkkePassertAktivTilDato(oppdragsperiode: Oppdragsperiode, påløpsPeriode: YearMonth) =

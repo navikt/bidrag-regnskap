@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
-import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 private val LOGGER = LoggerFactory.getLogger(PåløpskjøringScheduler::class.java)
@@ -29,7 +28,6 @@ class PåløpskjøringScheduler(
 
     @Scheduled(cron = "\${scheduler.påløpkjøring.cron}")
     @SchedulerLock(name = "skedulertPåløpskjøring")
-    @Transactional
     fun skedulertPåløpskjøring() {
         LockAssert.assertLocked()
 

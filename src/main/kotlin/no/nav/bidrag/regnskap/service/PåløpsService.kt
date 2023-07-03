@@ -18,7 +18,8 @@ class PåløpsService(
             PåløpResponse(
                 påløpId = it.påløpId,
                 kjoredato = it.kjøredato.toString(),
-                fullfortTidspunkt = it.fullførtTidspunkt.toString(),
+                startetTidspunkt = it.startetTidspunkt?.toString(),
+                fullfortTidspunkt = it.fullførtTidspunkt?.toString(),
                 forPeriode = it.forPeriode
             )
         }.sortedByDescending { YearMonth.parse(it.forPeriode) }

@@ -7,6 +7,8 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import no.nav.bidrag.regnskap.persistence.repository.OppdragsperiodeRepository
+import no.nav.bidrag.regnskap.service.ManglendeKonteringerService
 import no.nav.bidrag.regnskap.service.PåløpskjøringService
 import no.nav.bidrag.regnskap.utils.TestData
 import org.junit.jupiter.api.Test
@@ -18,6 +20,12 @@ class PåløpskjøringControllerTest {
 
     @MockK(relaxed = true)
     private lateinit var påløpskjøringService: PåløpskjøringService
+
+    @MockK(relaxed = true)
+    private lateinit var manglendeKonteringerService: ManglendeKonteringerService
+
+    @MockK(relaxed = true)
+    private lateinit var oppdragsperiodeRepo: OppdragsperiodeRepository
 
     @InjectMockKs
     private lateinit var påløpskjøringController: PåløpskjøringController

@@ -4,28 +4,64 @@ import com.slack.api.Slack
 import io.github.oshai.KotlinLogging
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
+import java.time.Instant
 
 @Service
 class SlackService(
-    @Value("\${BIDRAG_BOT_SLACK_OAUTH_TOKEN}") private val oauthToken: String,
-    @Value("\${NAIS_CLIENT_ID}") private val clientId: String
+    @Value("\${BIDRAG_BOT_SLACK_OAUTH_TOKEN}") private val oauthToken: String
 ) {
 
     companion object {
-        const val CHANNEL = "#team-bidrag-regnskap-varsel"
+        const val CHANNEL = "C0556GXJPMF"
         private val LOGGER = KotlinLogging.logger { }
     }
 
-    fun sendMelding(melding: String) {
+    fun sendMelding(melding: String, threadTs: String? = null): SlackMelding {
         val response = Slack.getInstance().methods(oauthToken).chatPostMessage {
             it.channel(CHANNEL)
-                .text("$melding\n\nOpphav for meldingen: $clientId")
+                .threadTs(threadTs)
+                .text(melding)
         }
 
         if (response.isOk) {
             LOGGER.debug("Slack melding sendt: $melding")
         } else {
             LOGGER.error("Feil ved sending av slackmelding: ${response.error}")
+        }
+        return SlackMelding(ts = response.ts, channel = response.channel)
+    }
+
+    inner class SlackMelding(
+        private val opprettetTidspunkt: Instant = Instant.now(),
+        private val ts: String?,
+        private val threadTs: String? = ts,
+        private val channel: String?
+    ) {
+
+        fun oppdaterMelding(melding: String) {
+            if (ts == null) {
+                LOGGER.warn("Ingen melding å oppdatere...")
+                return
+            }
+            val response = Slack.getInstance().methods(oauthToken).chatUpdate {
+                it.channel(channel)
+                    .ts(ts)
+                    .text(melding)
+            }
+            if (response.isOk) {
+                LOGGER.trace("Slack melding oppdatert: $melding")
+                return
+            } else {
+                LOGGER.error("Feil ved oppdatering av slackmelding: ${response.error}")
+            }
+        }
+
+        fun svarITråd(melding: String): SlackMelding {
+            if (ts == null) {
+                LOGGER.trace("Ingen melding å svare på...")
+                return this
+            }
+            return sendMelding(melding = melding, threadTs = threadTs)
         }
     }
 }

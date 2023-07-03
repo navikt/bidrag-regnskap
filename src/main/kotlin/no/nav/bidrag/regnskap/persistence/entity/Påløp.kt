@@ -18,6 +18,9 @@ data class Påløp(
     @Column(name = "kjoredato")
     val kjøredato: LocalDateTime,
 
+    @Column(name = "startet_tidspunkt")
+    var startetTidspunkt: LocalDateTime? = null,
+
     @Column(name = "fullfort_tidspunkt")
     var fullførtTidspunkt: LocalDateTime? = null,
 

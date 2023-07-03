@@ -14,24 +14,25 @@ import no.nav.bidrag.regnskap.consumer.SkattConsumer
 import no.nav.bidrag.regnskap.dto.enumer.Søknadstype
 import no.nav.bidrag.regnskap.dto.enumer.Type
 import no.nav.bidrag.regnskap.fil.påløp.PåløpsfilGenerator
-import no.nav.bidrag.regnskap.slack.SlackService
+import no.nav.bidrag.regnskap.persistence.repository.OppdragsperiodeRepository
 import no.nav.bidrag.regnskap.util.PeriodeUtils.hentAllePerioderMellomDato
 import no.nav.bidrag.regnskap.utils.TestData
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import java.time.LocalDate
 import java.time.YearMonth
+import java.util.Optional
 
 @ExtendWith(MockKExtension::class)
 class PåløpskjøringServiceTest {
 
+    private val oppdragsperiodeRepo = mockk<OppdragsperiodeRepository>(relaxed = true)
     private val persistenceService = mockk<PersistenceService>(relaxed = true)
     private val påløpsfilGenerator = mockk<PåløpsfilGenerator>(relaxed = true)
     private val skattConsumer = mockk<SkattConsumer>(relaxed = true)
-    private val slackService = mockk<SlackService>(relaxed = true)
 
     private val påløpskjøringService =
-        PåløpskjøringService(persistenceService, ManglendeKonteringerService(), påløpsfilGenerator, skattConsumer, slackService)
+        PåløpskjøringService(oppdragsperiodeRepo, persistenceService, ManglendeKonteringerService(oppdragsperiodeRepo, persistenceService), påløpsfilGenerator, skattConsumer)
 
     @Test
     fun `Skal ved påløpskjøring kun starte eldste ikke kjørte påløpsperiode`() {
@@ -62,9 +63,11 @@ class PåløpskjøringServiceTest {
             )
             oppdrag.oppdragsperioder = listOf(oppdragsperiodeMedManglendeKonteringer)
 
-            every { persistenceService.hentAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer() } returns listOf(
-                oppdragsperiodeMedManglendeKonteringer
+            val oppdragsperiodeIder = listOf(
+                oppdragsperiodeMedManglendeKonteringer.oppdragsperiodeId
             )
+            every { oppdragsperiodeRepo.hentAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer() } returns oppdragsperiodeIder
+            every { oppdragsperiodeRepo.findById(oppdragsperiodeMedManglendeKonteringer.oppdragsperiodeId) } returns Optional.of(oppdragsperiodeMedManglendeKonteringer)
 
             påløpskjøringService.startPåløpskjøring(påløp, false, true)
 
@@ -115,7 +118,14 @@ class PåløpskjøringServiceTest {
             val oppdragsperioder = listOf(oppdragsperiodeMedManglendeKonteringer1, oppdragsperiodeMedManglendeKonteringer2)
             oppdrag.oppdragsperioder = oppdragsperioder
 
-            every { persistenceService.hentAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer() } returns oppdragsperioder
+            val oppdragsperiodeIder = listOf(
+                oppdragsperiodeMedManglendeKonteringer1.oppdragsperiodeId,
+                oppdragsperiodeMedManglendeKonteringer2.oppdragsperiodeId
+            )
+            every { oppdragsperiodeRepo.hentAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer() } returns oppdragsperiodeIder
+            oppdragsperioder.forEach {
+                every { oppdragsperiodeRepo.findById(it.oppdragsperiodeId) } returns Optional.of(it)
+            }
 
             påløpskjøringService.startPåløpskjøring(påløp, false, true)
 
@@ -160,9 +170,11 @@ class PåløpskjøringServiceTest {
             )
             oppdrag.oppdragsperioder = listOf(oppdragsperiodeMedManglendeKonteringer)
 
-            every { persistenceService.hentAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer() } returns listOf(
-                oppdragsperiodeMedManglendeKonteringer
+            val oppdragsperiodeIder = listOf(
+                oppdragsperiodeMedManglendeKonteringer.oppdragsperiodeId
             )
+            every { oppdragsperiodeRepo.hentAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer() } returns oppdragsperiodeIder
+            every { oppdragsperiodeRepo.findById(oppdragsperiodeMedManglendeKonteringer.oppdragsperiodeId) } returns Optional.of(oppdragsperiodeMedManglendeKonteringer)
 
             påløpskjøringService.startPåløpskjøring(påløp, false, true)
 

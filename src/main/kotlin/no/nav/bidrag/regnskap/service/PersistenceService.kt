@@ -19,6 +19,8 @@ import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Propagation
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
@@ -97,6 +99,12 @@ class PersistenceService(
         return påløpRepository.findAll()
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    fun registrerPåløpStartet(påløpId: Int, startetTidspunkt: LocalDateTime = LocalDateTime.now()) {
+        val påløp = påløpRepository.findById(påløpId).get()
+        påløp.startetTidspunkt = startetTidspunkt
+    }
+
     fun lagrePåløp(påløp: Påløp): Int {
         val lagretPåløp = påløpRepository.save(påløp)
         LOGGER.info("Lagret påløp med ID: ${lagretPåløp.påløpId}")
@@ -142,12 +150,13 @@ class PersistenceService(
         return lagretKontering.konteringId
     }
 
-    fun hentAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer(): List<Oppdragsperiode> {
-        return oppdragsperiodeRepository.findAllByKonteringerFullførtOpprettetIsFalseAndOpphørendeOppdragsperiodeIsFalseOrderByOppdragAscOppdragsperiodeIdAsc()
-    }
-
     fun lagreOppdragsperiode(oppdragsperiode: Oppdragsperiode): Int {
-        return oppdragsperiodeRepository.save(oppdragsperiode).oppdragsperiodeId
+        val startTime = System.currentTimeMillis()
+        try {
+            return oppdragsperiodeRepository.save(oppdragsperiode).oppdragsperiodeId
+        } finally {
+            LOGGER.info("TIDSBRUK lagreOppdragsperiode: {}ms", System.currentTimeMillis() - startTime)
+        }
     }
 
     fun lagreDriftsavvik(driftsavvik: Driftsavvik): Int {

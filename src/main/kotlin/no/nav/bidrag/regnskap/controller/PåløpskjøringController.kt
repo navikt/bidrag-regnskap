@@ -7,19 +7,25 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import kotlinx.coroutines.runBlocking
+import no.nav.bidrag.regnskap.persistence.repository.OppdragsperiodeRepository
+import no.nav.bidrag.regnskap.service.ManglendeKonteringerService
 import no.nav.bidrag.regnskap.service.PåløpskjøringService
 import no.nav.security.token.support.core.api.Protected
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import java.time.LocalDate
 
 @RestController
 @Protected
 @Tag(name = "Påløpskjøring")
 class PåløpskjøringController(
-    private val påløpskjøringService: PåløpskjøringService
+    private val påløpskjøringService: PåløpskjøringService,
+    private val manglendeKonteringerService: ManglendeKonteringerService,
+    private val oppdragsperiodeRepo: OppdragsperiodeRepository
 ) {
 
     @PostMapping("/palopskjoring")
@@ -64,5 +70,38 @@ class PåløpskjøringController(
     fun stopPågåendePåløpskjøring(): ResponseEntity<Any> {
         påløpskjøringService.stoppPågåendePåløpskjøring()
         return ResponseEntity.ok().build()
+    }
+
+    @PostMapping("/palop_for_oppdragsperiode")
+    @Operation(
+        summary = "Kjører påløp for oppdragsperiode",
+        description = "Operasjon for å starte påløp for en enkelt oppdragsperiode",
+        security = [SecurityRequirement(name = "bearer-key")]
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Påløp er kjørt for oppdragsperioden"
+            )
+        ]
+    )
+    fun kjørPåløpForOppdragsperiode(
+        @RequestParam(required = true) oppdragsperiode: Int,
+        @RequestParam(required = true) tom: String
+    ) {
+        val fom = LocalDate.parse(tom + "-01")
+
+        manglendeKonteringerService.opprettKonteringerForOppdragsperiode(fom, oppdragsperiode)
+    }
+
+    @GetMapping("/palop_oppdragsperioder")
+    @Operation(
+        summary = "Henter oppdragsperioder som mangler konteringer",
+        description = "Operasjon for å hente oppdragsperioder som mangler konteringer",
+        security = [SecurityRequirement(name = "bearer-key")]
+    )
+    fun hentIkkefullførteOppdragsperioder(): List<Int> {
+        return oppdragsperiodeRepo.hentAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer()
     }
 }
