@@ -20,5 +20,5 @@ env:
   SAK_URL: https://bidrag-sak.dev-fss-pub.nais.io
   SAK_HOST: bidrag-sak.dev-fss-pub.nais.io
   SAK_SCOPE: dev-fss.bidrag.bidrag-sak
-  JAVA_OPTS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005
+  JAVA_OPTS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp
   MASKINPORTEN_SCOPES: "nav:bidrag/v1/bidragskravq4"
