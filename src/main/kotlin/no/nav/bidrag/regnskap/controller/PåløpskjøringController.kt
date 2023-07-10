@@ -48,7 +48,7 @@ class PåløpskjøringController(
         ]
     )
     fun startPåløpskjøring(@RequestParam(required = true) genererFil: Boolean): ResponseEntity<Int> {
-        val påløp = påløpskjøringService.hentPåløp() ?: return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
+        val påløp = påløpskjøringService.hentPåløp()?.apply { startetTidspunkt = null } ?: return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
         runBlocking { påløpskjøringService.startPåløpskjøring(påløp, false, genererFil) }
         return ResponseEntity.status(HttpStatus.CREATED).body(påløp.påløpId)
     }

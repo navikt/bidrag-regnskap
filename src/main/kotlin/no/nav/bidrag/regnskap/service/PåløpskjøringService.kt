@@ -28,7 +28,7 @@ import java.util.ArrayList
 
 private val LOGGER = LoggerFactory.getLogger(PåløpskjøringService::class.java)
 
-private const val partisjonStørrelse = 10000
+private const val partisjonStørrelse = 1000
 
 @Service
 class PåløpskjøringService(
