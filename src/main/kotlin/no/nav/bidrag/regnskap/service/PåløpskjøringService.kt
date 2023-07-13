@@ -25,6 +25,7 @@ import java.lang.RuntimeException
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.ArrayList
+import java.util.function.Consumer
 
 private val LOGGER = LoggerFactory.getLogger(PåløpskjøringService::class.java)
 
@@ -49,7 +50,7 @@ class PåløpskjøringService(
         if (påløp.startetTidspunkt != null) {
             return
         }
-        lyttere.forEach { it.påløpStartet(påløp, schedulertKjøring, genererFil) }
+        medLyttere { it.påløpStartet(påløp, schedulertKjøring, genererFil) }
         try {
             validerDriftsavvik(påløp, schedulertKjøring)
             persistenceService.registrerPåløpStartet(påløp.påløpId, LocalDateTime.now())
@@ -70,12 +71,12 @@ class PåløpskjøringService(
                 )
             }
             avsluttDriftsavvik(påløp)
-            lyttere.forEach { it.påløpFullført(påløp) }
+            medLyttere { it.påløpFullført(påløp) }
         } catch (e: Error) {
-            lyttere.forEach { it.påløpFeilet(påløp, e.toString()) }
+            medLyttere { it.påløpFeilet(påløp, e.toString()) }
             throw e
         } catch (e: RuntimeException) {
-            lyttere.forEach { it.påløpFeilet(påløp, e.toString()) }
+            medLyttere { it.påløpFeilet(påløp, e.toString()) }
             throw e
         }
     }
@@ -118,21 +119,23 @@ class PåløpskjøringService(
 
     fun opprettKonteringerForAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer(påløp: Påløp) {
         val påløpsPeriode = LocalDate.parse(påløp.forPeriode + "-01")
-        val oppdragsperioder = ArrayList(oppdragsperiodeRepo.hentAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer())
+        val oppdragsperioder =
+            ArrayList(oppdragsperiodeRepo.hentAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer())
         var antallBehandlet = 0
 
-        lyttere.forEach { it.rapporterOppdragsperioderBehandlet(påløp, antallBehandlet, oppdragsperioder.size) }
+        medLyttere { it.rapporterOppdragsperioderBehandlet(påløp, antallBehandlet, oppdragsperioder.size) }
 
         Lists.partition(oppdragsperioder, partisjonStørrelse).forEach { oppdragsperiodeIds ->
-            val startTime = System.currentTimeMillis()
-            manglendeKonteringerService.opprettKonteringerForAlleOppdragsperiodePartisjon(påløpsPeriode, oppdragsperiodeIds)
-            LOGGER.info("TIDSBRUK opprettKonteringerForAlleOppdragsperiodePartisjon_ekstern: {}ms, Ledig minne: {}", System.currentTimeMillis() - startTime, Runtime.getRuntime().freeMemory())
+            manglendeKonteringerService.opprettKonteringerForAlleOppdragsperiodePartisjon(
+                påløpsPeriode,
+                oppdragsperiodeIds
+            )
 
             antallBehandlet += oppdragsperiodeIds.size
-            lyttere.forEach { it.rapporterOppdragsperioderBehandlet(påløp, antallBehandlet, oppdragsperioder.size) }
+            medLyttere { it.rapporterOppdragsperioderBehandlet(påløp, antallBehandlet, oppdragsperioder.size) }
         }
 
-        lyttere.forEach { it.oppdragsperioderBehandletFerdig(påløp, oppdragsperioder.size) }
+        medLyttere { it.oppdragsperioderBehandletFerdig(påløp, oppdragsperioder.size) }
     }
 
     @Transactional
@@ -166,6 +169,8 @@ class PåløpskjøringService(
             )
         }
     }
+
+    private inline fun medLyttere(lytterConsumer: Consumer<PåløpskjøringLytter>) = lyttere.forEach(lytterConsumer)
 
     @Transactional
     fun fullførPåløp(påløp: Påløp) {

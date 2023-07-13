@@ -26,7 +26,6 @@ class ManglendeKonteringerService(
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun opprettKonteringerForAlleOppdragsperiodePartisjon(påløpsPeriode: LocalDate, oppdragsperiodeIds: List<Int>) {
         val startTime = System.currentTimeMillis()
-        LOGGER.info("START-DO opprettKonteringerForAlleOppdragsperiodePartisjon")
         oppdragsperiodeIds.forEach {
             opprettKonteringerForOppdragsperiode(påløpsPeriode, it)
         }

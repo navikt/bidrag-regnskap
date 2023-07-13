@@ -87,6 +87,7 @@ spring:
   jpa:
     hibernate.connection.provider_class: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
     database: postgresql
+    open-in-view: false
     properties:
       hibernate:
         query:
