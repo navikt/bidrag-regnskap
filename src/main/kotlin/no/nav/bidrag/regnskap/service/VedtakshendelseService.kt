@@ -11,6 +11,7 @@ import no.nav.bidrag.behandling.felles.enums.Innkreving
 import no.nav.bidrag.regnskap.SECURE_LOGGER
 import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
 import no.nav.bidrag.regnskap.dto.vedtak.Periode
+import no.nav.bidrag.regnskap.util.IdentUtils
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
@@ -23,12 +24,9 @@ private val objectMapper =
 class VedtakshendelseService(
     private val oppdragService: OppdragService,
     private val kravService: KravService,
-    private val persistenceService: PersistenceService
+    private val persistenceService: PersistenceService,
+    private val identUtils: IdentUtils
 ) {
-
-    companion object {
-        const val NAV_TSS_IDENT = "80000345435"
-    }
 
     fun behandleHendelse(hendelse: String): List<Int> {
         val vedtakHendelse = mapVedtakHendelse(hendelse)
@@ -68,9 +66,9 @@ class VedtakshendelseService(
             val hendelse = Hendelse(
                 type = stonadsendring.type.name,
                 vedtakType = vedtakHendelse.type,
-                kravhaverIdent = leggTilIdent(stonadsendring.kravhaverId),
-                skyldnerIdent = leggTilIdent(stonadsendring.skyldnerId),
-                mottakerIdent = leggTilIdent(stonadsendring.mottakerId),
+                kravhaverIdent = identUtils.hentNyesteIdent(stonadsendring.kravhaverId),
+                skyldnerIdent = identUtils.hentNyesteIdent(stonadsendring.skyldnerId),
+                mottakerIdent = identUtils.hentNyesteIdent(stonadsendring.mottakerId),
                 sakId = stonadsendring.sakId,
                 vedtakId = vedtakHendelse.id,
                 vedtakDato = vedtakHendelse.vedtakTidspunkt.toLocalDate(),
@@ -108,9 +106,9 @@ class VedtakshendelseService(
             val hendelse = Hendelse(
                 type = engangsbelop.type.name,
                 vedtakType = vedtakHendelse.type,
-                kravhaverIdent = leggTilIdent(engangsbelop.kravhaverId),
-                skyldnerIdent = leggTilIdent(engangsbelop.skyldnerId),
-                mottakerIdent = leggTilIdent(engangsbelop.mottakerId),
+                kravhaverIdent = identUtils.hentNyesteIdent(engangsbelop.kravhaverId),
+                skyldnerIdent = identUtils.hentNyesteIdent(engangsbelop.skyldnerId),
+                mottakerIdent = identUtils.hentNyesteIdent(engangsbelop.mottakerId),
                 sakId = engangsbelop.sakId,
                 vedtakId = vedtakHendelse.id,
                 vedtakDato = vedtakHendelse.vedtakTidspunkt.toLocalDate(),
@@ -151,9 +149,5 @@ class VedtakshendelseService(
 
     private fun harAktiveDriftAvvik(): Boolean {
         return persistenceService.harAktivtDriftsavvik()
-    }
-
-    private fun leggTilIdent(ident: String): String {
-        return if (ident == "NAV") NAV_TSS_IDENT else ident
     }
 }

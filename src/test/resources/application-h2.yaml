@@ -1,0 +1,27 @@
+SKATT_URL: http://localhost:${wiremock.server.port:8097}
+SAK_URL: http://localhost:${wiremock.server.port:8098}
+PERSON_URL: http://localhost:${wiremock.server.port:8099}
+AZURE_OPENID_CONFIG_ISSUER: http://localhost:${mock-oauth2-server.port}/aad
+TOPIC_VEDTAK: bidrag.vedtak-feature-test
+TOPIC_PDL_AKTOR_V2: pdl.aktor-v2-test
+BIDRAG_BOT_SLACK_OAUTH_TOKEN: ikkeGyldigToken
+
+scheduler:
+  sendkrav:
+    cron: "-" #Disabled
+  avstemning:
+    cron: "-" #Disabled
+  påløpkjøring:
+    cron: "-" #Disabled
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+  flyway:
+    enabled: false

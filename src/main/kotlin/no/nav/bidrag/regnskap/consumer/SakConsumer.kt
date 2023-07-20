@@ -17,7 +17,7 @@ private val LOGGER = KotlinLogging.logger { }
 class SakConsumer(
     @Value("\${SAK_URL}") private val sakUrl: String,
     @Qualifier("azure") private val restTemplate: RestOperations
-) : AbstractRestClient(restTemplate, "bidrag-aktoerregister-regnskap") {
+) : AbstractRestClient(restTemplate, "bidrag-regnskap") {
 
     companion object {
         const val SAK_PATH = "/bidrag-sak/sak"
