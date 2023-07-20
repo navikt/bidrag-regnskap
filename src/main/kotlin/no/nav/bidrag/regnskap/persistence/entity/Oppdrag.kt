@@ -27,13 +27,13 @@ data class Oppdrag(
     val sakId: String,
 
     @Column(name = "kravhaver_ident")
-    val kravhaverIdent: String? = null,
+    var kravhaverIdent: String? = null,
 
     @Column(name = "skyldner_ident")
-    val skyldnerIdent: String,
+    var skyldnerIdent: String,
 
     @Column(name = "gjelder_ident")
-    val gjelderIdent: String,
+    var gjelderIdent: String,
 
     @Column(name = "utsatt_til_dato")
     var utsattTilDato: LocalDate? = null,

@@ -12,4 +12,10 @@ interface OppdragRepository : JpaRepository<Oppdrag, Int> {
     ): Oppdrag?
 
     fun findAllBySakIdIs(sakId: String): List<Oppdrag>
+
+    fun findAllByKravhaverIdent(kravhaverIdent: String): List<Oppdrag>
+
+    fun findAllBySkyldnerIdent(skyldnerIdent: String): List<Oppdrag>
+
+    fun findAllByGjelderIdent(gjelderIdent: String): List<Oppdrag>
 }

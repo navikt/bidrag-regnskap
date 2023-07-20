@@ -176,4 +176,20 @@ class PersistenceService(
     fun hentDriftsavvikForPåløp(påløpId: Int): Driftsavvik? {
         return driftsavvikRepository.findByPåløpId(påløpId)
     }
+
+    fun hentAlleMottakereMedIdent(ident: String): List<Oppdragsperiode> {
+        return oppdragsperiodeRepository.findAllByMottakerIdent(ident)
+    }
+
+    fun hentAlleKravhavereMedIdent(ident: String): List<Oppdrag> {
+        return oppdragRepository.findAllByKravhaverIdent(ident)
+    }
+
+    fun hentAlleSkyldnereMedIdent(ident: String): List<Oppdrag> {
+        return oppdragRepository.findAllBySkyldnerIdent(ident)
+    }
+
+    fun hentAlleGjelderMedIdent(ident: String): List<Oppdrag> {
+        return oppdragRepository.findAllByGjelderIdent(ident)
+    }
 }

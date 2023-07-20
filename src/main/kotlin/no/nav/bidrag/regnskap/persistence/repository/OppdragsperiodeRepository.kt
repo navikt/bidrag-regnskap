@@ -18,4 +18,6 @@ interface OppdragsperiodeRepository : JpaRepository<Oppdragsperiode, Int> {
     fun hentAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer(): List<Int>
 
     fun findByReferanseAndVedtakId(referanse: String, vedtakId: Int): List<Oppdragsperiode>
+
+    fun findAllByMottakerIdent(mottakerIdent: String): List<Oppdragsperiode>
 }

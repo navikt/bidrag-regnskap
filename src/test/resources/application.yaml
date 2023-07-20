@@ -10,6 +10,8 @@ AZURE_APP_TENANT_ID: 966ac572-f5b7-4bbe-aa88-c76419c0f851
 server.port: 8999
 NAIS_APP_NAME: bidrag-regnskap
 TOPIC_VEDTAK: bidrag.vedtak-feature
+TOPIC_PDL_AKTOR_V2: pdl.aktor-v2
+AKTOR-V2_GROUP_ID: aktor-v2.bidrag-regnskap-feature
 KAFKA_BOOTSTRAP_SERVERS: localhost:9092
 KAFKA_BROKERS: localhost:9092
 BUCKET_NAME: bidrag-regnskap-dev
