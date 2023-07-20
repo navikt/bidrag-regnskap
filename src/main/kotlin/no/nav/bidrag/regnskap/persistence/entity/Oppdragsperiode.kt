@@ -38,7 +38,7 @@ data class Oppdragsperiode(
     var vedtakType: String,
 
     @Column(name = "mottaker_ident")
-    val mottakerIdent: String,
+    var mottakerIdent: String,
 
     @Column(name = "belop")
     val beløp: BigDecimal,
