@@ -12,6 +12,7 @@ import io.mockk.verify
 import no.nav.bidrag.behandling.felles.enums.EngangsbelopType
 import no.nav.bidrag.behandling.felles.enums.StonadType
 import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
+import no.nav.bidrag.regnskap.util.IdentUtils
 import org.junit.jupiter.api.Assertions.assertDoesNotThrow
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -29,6 +30,9 @@ class VedtakshendelseServiceTest {
 
     @MockK(relaxed = true)
     private lateinit var persistenceService: PersistenceService
+
+    @MockK(relaxed = true)
+    private lateinit var identUtils: IdentUtils
 
     @InjectMockKs
     private lateinit var vedtakshendelseService: VedtakshendelseService
