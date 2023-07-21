@@ -2,9 +2,9 @@ package no.nav.bidrag.regnskap.util
 
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import no.nav.bidrag.commons.util.PersonidentGenerator
 import no.nav.bidrag.regnskap.BidragRegnskapLocal
 import no.nav.bidrag.regnskap.consumer.PersonApiWireMock
-import no.nav.bidrag.commons.util.PersonidentGenerator
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -37,7 +37,6 @@ class SjekkForNyIdentAspectTest {
 
     @Test
     fun `skal bytte begge identer`() {
-
         val nyeIdenter = dummyClassForAnnotasjon.skalTesteBytteAvBeggeIdenter(ident1, ident2)
 
         nyeIdenter[0] shouldBe personApiWireMock.nyIdent

@@ -2,9 +2,10 @@ package no.nav.bidrag.regnskap.hendelse.kafka.pdl
 
 import io.github.oshai.KotlinLogging
 import no.nav.bidrag.regnskap.SECURE_LOGGER
+import no.nav.bidrag.regnskap.pdl.aktor.v2.Aktor
+import no.nav.bidrag.regnskap.pdl.aktor.v2.Type
 import no.nav.bidrag.regnskap.service.AktoerhendelseService
-import no.nav.person.pdl.aktor.v2.Aktor
-import no.nav.person.pdl.aktor.v2.Type
+
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
