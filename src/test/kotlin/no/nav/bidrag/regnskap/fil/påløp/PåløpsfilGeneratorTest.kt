@@ -56,6 +56,6 @@ class PåløpsfilGeneratorTest {
 
         val påløp = TestData.opprettPåløp()
 
-        påløpsfilGenerator.skrivPåløpsfilOgLastOppPåFilsluse(konteringer + konteringer2, påløp)
+        påløpsfilGenerator.skrivPåløpsfilOgLastOppPåFilsluse(konteringer + konteringer2, påløp, emptyList())
     }
 }

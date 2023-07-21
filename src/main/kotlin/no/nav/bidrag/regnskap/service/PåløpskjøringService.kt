@@ -140,19 +140,24 @@ class PåløpskjøringService(
 
     @Transactional
     fun genererPåløpsfil(påløp: Påløp, genererFil: Boolean) {
-        LOGGER.info("Starter generering av påløpsfil...")
         val konteringer = persistenceService.hentAlleIkkeOverførteKonteringer()
         if (genererFil) {
+            LOGGER.info("Starter generering av påløpsfil...")
+            medLyttere { it.generererFil(påløp) }
             runBlocking { skrivPåløpsfilOgLastOppPåFilsluse(konteringer, påløp) }
         }
         settKonteringTilOverførtOgOpprettOverføringKontering(konteringer, påløp)
-        LOGGER.info("Påløpsfil er ferdig skrevet med ${konteringer.size} konteringer og lastet opp til filsluse.")
+        if(genererFil) {
+            LOGGER.info("Påløpsfil er ferdig skrevet for periode ${påløp.forPeriode} med ${konteringer.size} konteringer og lastet opp til filsluse.")
+        } else {
+            LOGGER.info("Påløpskjøring er ferdig uten skriving av fil for periode ${påløp.forPeriode}.")
+        }
     }
 
     private suspend fun skrivPåløpsfilOgLastOppPåFilsluse(konteringer: List<Kontering>, påløp: Påløp) = coroutineScope {
         påløpskjøringJob = launch {
             withContext(Dispatchers.IO) {
-                påløpsfilGenerator.skrivPåløpsfilOgLastOppPåFilsluse(konteringer, påløp)
+                påløpsfilGenerator.skrivPåløpsfilOgLastOppPåFilsluse(konteringer, påløp, lyttere)
             }
         }
     }
@@ -195,6 +200,8 @@ interface PåløpskjøringLytter {
     fun oppdragsperioderBehandletFerdig(påløp: Påløp, antallOppdragsperioder: Int)
 
     fun generererFil(påløp: Påløp)
+
+    fun rapportertKonteringerSkrevetTilFil(påløp: Påløp, antallSkrevetTilFil: Int, antallKonteringerTotalt: Int)
 
     fun påløpFullført(påløp: Påløp)
 

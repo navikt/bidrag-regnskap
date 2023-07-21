@@ -50,6 +50,26 @@ class SlackPåløpVarsler(
         pågåendePåløp?.melding?.svarITråd("Genererer fil...")
     }
 
+    override fun rapportertKonteringerSkrevetTilFil(påløp: Påløp, antallSkrevetTilFil: Int, antallKonteringerTotalt: Int) {
+        val varsel = pågåendePåløp(påløp)
+
+        if (varsel != null) {
+            if (!varsel.skalOppdatereKonteringerMelding()) {
+                return
+            }
+            varsel.registrerObservasjon(antallSkrevetTilFil)
+            val melding = "Skrevet $antallSkrevetTilFil av $antallKonteringerTotalt konteringer til fil" +
+                    "\n${fremdriftsindikator(antallSkrevetTilFil, antallKonteringerTotalt)}" +
+                    "\nTid pr kontering: ${varsel.millisekunderPrPeriode().map{it.toString()}.orElse("?")} ms"
+            if (varsel.påløpsfilMelding == null) {
+                varsel.påløpsfilMelding =
+                    pågåendePåløp?.melding?.svarITråd(melding)
+            } else {
+                varsel.påløpsfilMelding?.oppdaterMelding(melding)
+            }
+        }
+    }
+
     override fun påløpFullført(påløp: Påløp) {
         val varsel = pågåendePåløp(påløp)
 
@@ -79,6 +99,7 @@ class SlackPåløpVarsler(
     ) {
         val oppdateringInterval = Duration.ofSeconds(30)
         var konteringerMelding: SlackService.SlackMelding? = null
+        var påløpsfilMelding: SlackService.SlackMelding? = null
         var nesteOppdateringKonteringerMelding: Instant? = Instant.now()
         var nestSisteObservasjon: PåløpObservasjon = PåløpObservasjon(antallBehandlet = 0)
         var sisteObservasjon: PåløpObservasjon = PåløpObservasjon(antallBehandlet = 0)

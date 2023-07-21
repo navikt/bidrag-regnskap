@@ -7,6 +7,7 @@ import no.nav.bidrag.regnskap.fil.overføring.FiloverføringTilElinKlient
 import no.nav.bidrag.regnskap.persistence.bucket.GcpFilBucket
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.Påløp
+import no.nav.bidrag.regnskap.service.PåløpskjøringLytter
 import no.nav.bidrag.regnskap.util.ByteArrayOutputStreamTilByteBuffer
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
@@ -16,6 +17,7 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
+import java.util.function.Consumer
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerFactory
@@ -33,12 +35,18 @@ class PåløpsfilGenerator(
         const val BATCH_BESKRIVELSE = "Kravtransaksjoner fra Bidrag-Regnskap til Predator"
     }
 
+    private var lyttere: List<PåløpskjøringLytter> = emptyList()
     private val documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
 
-    suspend fun skrivPåløpsfilOgLastOppPåFilsluse(konteringer: List<Kontering>, påløp: Påløp) {
+    suspend fun skrivPåløpsfilOgLastOppPåFilsluse(
+        konteringer: List<Kontering>,
+        påløp: Påløp,
+        lyttere: List<PåløpskjøringLytter>
+    ) {
         val now = LocalDate.now()
         val påløpsMappe = "påløp/"
         val påløpsfilnavn = "paaloop_D" + now.format(DateTimeFormatter.ofPattern("yyMMdd")).toString() + ".xml"
+        this.lyttere = lyttere
 
         val dokument = documentBuilder.newDocument()
         dokument.xmlStandalone = true
@@ -55,7 +63,7 @@ class PåløpsfilGenerator(
             yield()
 
             if (++index % 100 == 0) {
-                LOGGER.info("Har skrevet $index av ${konteringer.size} konteringer til påløpsfil...")
+                medLyttere {it.rapportertKonteringerSkrevetTilFil(påløp, index, konteringer.size)}
             }
 
             val oppdragElement = dokument.createElement("oppdrag")
@@ -245,4 +253,7 @@ class PåløpsfilGenerator(
 //    val result = StreamResult(System.out)
 //    transformer.transform(source, result)
     }
+
+    private inline fun medLyttere(lytterConsumer: Consumer<PåløpskjøringLytter>) = lyttere.forEach(lytterConsumer)
+
 }
