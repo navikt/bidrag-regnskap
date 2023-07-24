@@ -70,6 +70,26 @@ class SlackPåløpVarsler(
         }
     }
 
+    override fun rapporterKonteringerFullført(påløp: Påløp, antallKonteringerFullført: Int, antallKonteringerTotalt: Int) {
+        val varsel = pågåendePåløp(påløp)
+
+        if (varsel != null) {
+            if (!varsel.skalOppdatereKonteringerMelding()) {
+                return
+            }
+            varsel.registrerObservasjon(antallKonteringerFullført)
+            val melding = "Påløpet har fullført $antallKonteringerFullført av $antallKonteringerTotalt konteringer og satt overføringstidspunkt." +
+                    "\n${fremdriftsindikator(antallKonteringerFullført, antallKonteringerTotalt)}" +
+                    "\nTid pr kontering: ${varsel.millisekunderPrPeriode().map{it.toString()}.orElse("?")} ms"
+            if (varsel.konteringerFullførtMelding == null) {
+                varsel.konteringerFullførtMelding =
+                    pågåendePåløp?.melding?.svarITråd(melding)
+            } else {
+                varsel.konteringerFullførtMelding?.oppdaterMelding(melding)
+            }
+        }
+    }
+
     override fun påløpFullført(påløp: Påløp) {
         val varsel = pågåendePåløp(påløp)
 
@@ -100,6 +120,7 @@ class SlackPåløpVarsler(
         val oppdateringInterval = Duration.ofSeconds(30)
         var konteringerMelding: SlackService.SlackMelding? = null
         var påløpsfilMelding: SlackService.SlackMelding? = null
+        var konteringerFullførtMelding: SlackService.SlackMelding? = null
         var nesteOppdateringKonteringerMelding: Instant? = Instant.now()
         var nestSisteObservasjon: PåløpObservasjon = PåløpObservasjon(antallBehandlet = 0)
         var sisteObservasjon: PåløpObservasjon = PåløpObservasjon(antallBehandlet = 0)

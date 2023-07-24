@@ -87,7 +87,6 @@ class PåløpskjøringService(
         }
     }
 
-    @Transactional
     fun validerDriftsavvik(påløp: Påløp, schedulertKjøring: Boolean) {
         val driftsavvikListe = persistenceService.hentAlleAktiveDriftsavvik()
         if (driftsavvikListe.any { it.påløpId != påløp.påløpId }) {
@@ -138,7 +137,6 @@ class PåløpskjøringService(
         medLyttere { it.oppdragsperioderBehandletFerdig(påløp, oppdragsperioder.size) }
     }
 
-    @Transactional
     fun genererPåløpsfil(påløp: Påløp, genererFil: Boolean) {
         val konteringer = persistenceService.hentAlleIkkeOverførteKonteringer()
         if (genererFil) {
@@ -164,26 +162,31 @@ class PåløpskjøringService(
 
     private fun settKonteringTilOverførtOgOpprettOverføringKontering(konteringer: List<Kontering>, påløp: Påløp) {
         val timestamp = LocalDateTime.now()
-        konteringer.forEach {
-            it.overføringstidspunkt = timestamp
-            it.sendtIPåløpsperiode = påløp.forPeriode
-            it.behandlingsstatusOkTidspunkt = timestamp
-            persistenceService.lagreKontering(it)
-            persistenceService.lagreOverføringKontering(
-                OverføringKontering(kontering = it, tidspunkt = timestamp, kanal = "Påløpsfil")
-            )
+        var antallBehandlet = 0
+
+        Lists.partition(konteringer, partisjonStørrelse).forEach { oppdragsperiodeIds ->
+            medLyttere { it.rapporterOppdragsperioderBehandlet(påløp, antallBehandlet, konteringer.size) }
+
+            oppdragsperiodeIds.forEach {
+                it.overføringstidspunkt = timestamp
+                it.sendtIPåløpsperiode = påløp.forPeriode
+                it.behandlingsstatusOkTidspunkt = timestamp
+                persistenceService.lagreKontering(it)
+                persistenceService.lagreOverføringKontering(
+                    OverføringKontering(kontering = it, tidspunkt = timestamp, kanal = "Påløpsfil")
+                )
+            }
+            antallBehandlet += oppdragsperiodeIds.size
         }
     }
 
     private inline fun medLyttere(lytterConsumer: Consumer<PåløpskjøringLytter>) = lyttere.forEach(lytterConsumer)
 
-    @Transactional
     fun fullførPåløp(påløp: Påløp) {
         påløp.fullførtTidspunkt = LocalDateTime.now()
         persistenceService.lagrePåløp(påløp)
     }
 
-    @Transactional
     fun avsluttDriftsavvik(påløp: Påløp) {
         val driftsavvik =
             persistenceService.hentDriftsavvikForPåløp(påløp.påløpId)
@@ -206,4 +209,6 @@ interface PåløpskjøringLytter {
     fun påløpFullført(påløp: Påløp)
 
     fun påløpFeilet(påløp: Påløp, feilmelding: String)
+
+    fun rapporterKonteringerFullført(påløp: Påløp, antallKonteringerFullført: Int, antallKonteringerTotalt: Int)
 }

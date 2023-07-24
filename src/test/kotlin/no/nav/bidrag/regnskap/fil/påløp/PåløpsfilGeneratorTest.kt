@@ -3,7 +3,6 @@ package no.nav.bidrag.regnskap.fil.påløp
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
 import no.nav.bidrag.regnskap.fil.overføring.FiloverføringTilElinKlient
@@ -25,7 +24,6 @@ class PåløpsfilGeneratorTest {
     private lateinit var påløpsfilGenerator: PåløpsfilGenerator
 
     @Test
-    @OptIn(ExperimentalCoroutinesApi::class)
     fun `skal skrive påløpsfil`() = runTest {
         val oppdrag = TestData.opprettOppdrag(oppdragId = 1)
         val oppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = oppdrag)
