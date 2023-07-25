@@ -7,8 +7,6 @@ import no.nav.bidrag.regnskap.dto.oppdrag.KonteringResponse
 import no.nav.bidrag.regnskap.dto.oppdrag.OppdragResponse
 import no.nav.bidrag.regnskap.dto.oppdrag.OppdragsperiodeResponse
 import no.nav.bidrag.regnskap.dto.oppdrag.OppslagAvOppdragPåSakIdResponse
-import no.nav.bidrag.regnskap.dto.oppdrag.OverføringKonteringResponse
-import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
 import org.springframework.stereotype.Service
@@ -80,24 +78,10 @@ class OppslagService(
                 type = Type.valueOf(it.type),
                 soknadType = Søknadstype.valueOf(it.søknadType),
                 sendtIPalopsperiode = it.sendtIPåløpsperiode,
-                overføringKonteringer = hentOverføringKontering(it),
                 sisteReferansekode = it.sisteReferansekode,
                 opprettetTidspunkt = it.opprettetTidspunkt.toString(),
                 vedtakId = it.vedtakId
             )
         }
-    }
-
-    private fun hentOverføringKontering(kontering: Kontering): List<OverføringKonteringResponse> {
-        return kontering.overføringKontering?.map {
-            OverføringKonteringResponse(
-                overføringId = it.overføringId,
-                konteringId = kontering.konteringId,
-                referansekode = it.referansekode,
-                feilmelding = it.feilmelding,
-                tidspunkt = it.tidspunkt,
-                kanal = it.kanal
-            )
-        } ?: emptyList()
     }
 }

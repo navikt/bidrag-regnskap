@@ -13,7 +13,6 @@ import no.nav.bidrag.regnskap.persistence.entity.Driftsavvik
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
-import no.nav.bidrag.regnskap.persistence.entity.OverføringKontering
 import no.nav.bidrag.regnskap.persistence.entity.Påløp
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -143,8 +142,7 @@ object TestData {
         søknadstype: String = Søknadstype.EN.name,
         sendtIPalopsperiode: String? = null,
         opprettetTidspunkt: LocalDateTime = LocalDateTime.now(),
-        vedtakId: Int = 654321,
-        overføringKontering: List<OverføringKontering>? = listOf(opprettOverføringKontering())
+        vedtakId: Int = 654321
     ): Kontering {
         return Kontering(
             konteringId = konteringId,
@@ -156,26 +154,7 @@ object TestData {
             søknadType = søknadstype,
             sendtIPåløpsperiode = sendtIPalopsperiode,
             opprettetTidspunkt = opprettetTidspunkt,
-            vedtakId = vedtakId,
-            overføringKontering = overføringKontering
-        )
-    }
-
-    fun opprettOverføringKontering(
-        overføringId: Int = 0,
-        kontering: Kontering? = null,
-        referansekode: String? = null,
-        feilmelding: String? = null,
-        tidspunkt: LocalDateTime = LocalDateTime.now(),
-        kanal: String = "REST"
-    ): OverføringKontering {
-        return OverføringKontering(
-            overføringId = overføringId,
-            kontering = kontering,
-            referansekode = referansekode,
-            feilmelding = feilmelding,
-            tidspunkt = tidspunkt,
-            kanal = kanal
+            vedtakId = vedtakId
         )
     }
 

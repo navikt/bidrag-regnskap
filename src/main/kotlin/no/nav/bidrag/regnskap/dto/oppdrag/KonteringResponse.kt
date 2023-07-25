@@ -106,10 +106,5 @@ data class KonteringResponse(
         description = "VedtakId for konteringen.",
         example = "101"
     )
-    val vedtakId: Int,
-
-    @field:Schema(
-        description = "En liste over alle forsøkte oversendinger for denne konteringen."
-    )
-    val overføringKonteringer: List<OverføringKonteringResponse>
+    val vedtakId: Int
 )

@@ -16,7 +16,6 @@ import no.nav.bidrag.regnskap.dto.krav.Kravliste
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
-import no.nav.bidrag.regnskap.persistence.entity.OverføringKontering
 import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -151,7 +150,6 @@ class KravService(
                     LOGGER.error("En eller flere konteringer har ikke gått gjennom validering. Se secure log for mer informasjon.")
                     SECURE_LOGGER.error("En eller flere konteringer har ikke gått gjennom validering, ${skattResponse.body}")
                     val kravfeil = objectMapper.readValue(skattResponse.body, Kravfeil::class.java)
-                    lagreFeiletOverføringAvKrav(alleIkkeOverførteKonteringer, kravfeil.toString())
                 }
 
                 HttpStatus.SERVICE_UNAVAILABLE -> {
@@ -160,7 +158,6 @@ class KravService(
                             "Tjenesten hos skatt er slått av. Dette kan skje enten ved innlesing av påløpsfil eller ved andre uventede feil. " +
                             "Feilmelding: ${skattResponse.body}"
                     )
-                    lagreFeiletOverføringAvKrav(alleIkkeOverførteKonteringer, skattResponse.statusCode.toString())
                 }
 
                 HttpStatus.UNAUTHORIZED, HttpStatus.FORBIDDEN -> {
@@ -168,27 +165,14 @@ class KravService(
                         "Skatt svarte med uventet statuskode: ${skattResponse.statusCode}. " +
                             "Bidrag-Regnskap er ikke autorisert eller mangler rettigheter for kallet mot skatt. Feilmelding: ${skattResponse.body}"
                     )
-                    lagreFeiletOverføringAvKrav(alleIkkeOverførteKonteringer, skattResponse.statusCode.toString())
                 }
 
                 else -> {
                     LOGGER.error("Skatt svarte med uventet statuskode: ${skattResponse.statusCode}. Feilmelding: ${skattResponse.body}")
-                    lagreFeiletOverføringAvKrav(
-                        alleIkkeOverførteKonteringer,
-                        "Statuskode: ${skattResponse.statusCode}" + ", body: " + (
-                            skattResponse.body
-                                ?: "{}"
-                            )
-                    )
                 }
             }
         } catch (e: Exception) {
             LOGGER.error("Tolkningen av svaret fra skatt feilet på noe uventet! Feil: ${e.message}")
-            lagreFeiletOverføringAvKrav(
-                alleIkkeOverførteKonteringer,
-                e.message
-                    ?: "Kallet mot skatt feilet på noe uventet! Stackstrace: ${e.stackTraceToString()}"
-            )
         }
     }
 
@@ -205,33 +189,8 @@ class KravService(
             val now = LocalDateTime.now()
             kontering.overføringstidspunkt = now
             kontering.sisteReferansekode = kravResponse.batchUid
-
-            persistenceService.lagreOverføringKontering(
-                OverføringKontering(
-                    kontering = kontering,
-                    referansekode = kravResponse.batchUid,
-                    tidspunkt = now,
-                    kanal = "REST"
-                )
-            )
         }
         persistenceService.lagreOppdrag(oppdrag)
-    }
-
-    private fun lagreFeiletOverføringAvKrav(
-        alleIkkeOverforteKonteringer: List<Kontering>,
-        skattFeiletKravResponse: String
-    ) {
-        alleIkkeOverforteKonteringer.forEach { kontering ->
-            persistenceService.lagreOverføringKontering(
-                OverføringKontering(
-                    kontering = kontering,
-                    tidspunkt = LocalDateTime.now(),
-                    feilmelding = skattFeiletKravResponse,
-                    kanal = "REST"
-                )
-            )
-        }
     }
 
     fun opprettKravKonteringListe(konteringerListe: List<Kontering>): Krav {

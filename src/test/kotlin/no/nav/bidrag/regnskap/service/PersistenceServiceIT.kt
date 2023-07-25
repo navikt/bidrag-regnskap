@@ -2,7 +2,6 @@ package no.nav.bidrag.regnskap.service
 
 import io.kotest.inspectors.forOne
 import io.kotest.matchers.collections.shouldContainAll
-import io.kotest.matchers.ints.shouldBeGreaterThanOrEqual
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import no.nav.bidrag.regnskap.BidragRegnskapLocal
@@ -57,7 +56,7 @@ internal class PersistenceServiceIT {
     fun setup() {
         oppdragTestData = TestData.opprettOppdrag(oppdragsperioder = emptyList())
         val oppdragsperiode = TestData.opprettOppdragsperiode(konteringer = emptyList(), oppdrag = oppdragTestData, delytelseId = null)
-        val konteringer = TestData.opprettKontering(oppdragsperiode = oppdragsperiode, overføringKontering = null)
+        val konteringer = TestData.opprettKontering(oppdragsperiode = oppdragsperiode)
         oppdragsperiode.konteringer = listOf(konteringer)
         oppdragTestData.oppdragsperioder = listOf(oppdragsperiode)
     }
@@ -123,20 +122,6 @@ internal class PersistenceServiceIT {
     }
 
     @Test
-    fun `skal opprette overføringKontering`() {
-        val overføringKonteringId = persistenceService.lagreOverføringKontering(TestData.opprettOverføringKontering())
-        val overføringKonteringMedFeilId =
-            persistenceService.lagreOverføringKontering(TestData.opprettOverføringKontering(feilmelding = "TestFeil"))
-        val overføringKonteringerListe = persistenceService.hentOverføringKontering(Pageable.ofSize(10))
-        val overføringKonteringerMedFeilListe = persistenceService.hentOverføringKonteringMedFeil(Pageable.ofSize(10))
-
-        overføringKonteringId shouldNotBe null
-        overføringKonteringMedFeilId shouldNotBe null
-        overføringKonteringerListe.size shouldBeGreaterThanOrEqual 2
-        overføringKonteringerMedFeilListe.size shouldBeGreaterThanOrEqual 1
-    }
-
-    @Test
     fun `skal lagre nytt påløp`() {
         val påløpJan = TestData.opprettPåløp(forPeriode = "2022-01")
         val påløpFeb = TestData.opprettPåløp(forPeriode = "2022-02")
@@ -154,8 +139,8 @@ internal class PersistenceServiceIT {
 
     @Test
     fun lagreKontering() {
-        val oversendtKontering = TestData.opprettKontering(overføringKontering = null, overforingstidspunkt = LocalDateTime.now())
-        val kontering = TestData.opprettKontering(overføringKontering = null, overforingstidspunkt = null)
+        val oversendtKontering = TestData.opprettKontering(overforingstidspunkt = LocalDateTime.now())
+        val kontering = TestData.opprettKontering(overforingstidspunkt = null)
 
         val konteringId = persistenceService.lagreKontering(kontering)
         val oversendtKonteringId = persistenceService.lagreKontering(oversendtKontering)

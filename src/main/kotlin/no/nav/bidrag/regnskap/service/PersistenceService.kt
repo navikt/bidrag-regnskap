@@ -5,13 +5,11 @@ import no.nav.bidrag.regnskap.persistence.entity.Driftsavvik
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
-import no.nav.bidrag.regnskap.persistence.entity.OverføringKontering
 import no.nav.bidrag.regnskap.persistence.entity.Påløp
 import no.nav.bidrag.regnskap.persistence.repository.DriftsavvikRepository
 import no.nav.bidrag.regnskap.persistence.repository.KonteringRepository
 import no.nav.bidrag.regnskap.persistence.repository.OppdragRepository
 import no.nav.bidrag.regnskap.persistence.repository.OppdragsperiodeRepository
-import no.nav.bidrag.regnskap.persistence.repository.OverføringKonteringRepository
 import no.nav.bidrag.regnskap.persistence.repository.PåløpRepository
 import org.slf4j.LoggerFactory
 import org.springframework.cache.annotation.Cacheable
@@ -32,7 +30,6 @@ private val LOGGER = LoggerFactory.getLogger(PersistenceService::class.java)
 @Service
 class PersistenceService(
     val oppdragRepository: OppdragRepository,
-    val overføringKonteringRepository: OverføringKonteringRepository,
     val konteringRepository: KonteringRepository,
     val påløpRepository: PåløpRepository,
     val oppdragsperiodeRepository: OppdragsperiodeRepository,
@@ -81,20 +78,6 @@ class PersistenceService(
         val lagredeOppdrag = oppdragRepository.saveAll(oppdrag)
         LOGGER.debug("Lagret alle oppdrag med ID: {}", lagredeOppdrag.map { it.oppdragId })
         return lagredeOppdrag.map { it.oppdragId }
-    }
-
-    fun lagreOverføringKontering(overføringKontering: OverføringKontering): Int {
-        val lagretOverføringKontering = overføringKonteringRepository.save(overføringKontering)
-        LOGGER.debug("Lagret overforingKontering med ID: ${lagretOverføringKontering.overføringId}")
-        return lagretOverføringKontering.overføringId
-    }
-
-    fun hentOverføringKontering(pageable: Pageable): List<OverføringKontering> {
-        return overføringKonteringRepository.findAll(pageable).toList()
-    }
-
-    fun hentOverføringKonteringMedFeil(pageable: Pageable): List<OverføringKontering> {
-        return overføringKonteringRepository.findByFeilmeldingIsNotNull(pageable).toList()
     }
 
     fun hentPåløp(): List<Påløp> {

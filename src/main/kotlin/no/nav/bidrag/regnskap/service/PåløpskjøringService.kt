@@ -13,7 +13,6 @@ import no.nav.bidrag.regnskap.dto.påløp.Vedlikeholdsmodus
 import no.nav.bidrag.regnskap.fil.påløp.PåløpsfilGenerator
 import no.nav.bidrag.regnskap.persistence.entity.Driftsavvik
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
-import no.nav.bidrag.regnskap.persistence.entity.OverføringKontering
 import no.nav.bidrag.regnskap.persistence.entity.Påløp
 import no.nav.bidrag.regnskap.persistence.repository.OppdragsperiodeRepository
 import org.slf4j.LoggerFactory
@@ -180,9 +179,6 @@ class PåløpskjøringService(
             it.sendtIPåløpsperiode = påløp.forPeriode
             it.behandlingsstatusOkTidspunkt = timestamp
             persistenceService.lagreKontering(it)
-            persistenceService.lagreOverføringKontering(
-                OverføringKontering(kontering = it, tidspunkt = timestamp, kanal = "Påløpsfil")
-            )
         }
     }
 
