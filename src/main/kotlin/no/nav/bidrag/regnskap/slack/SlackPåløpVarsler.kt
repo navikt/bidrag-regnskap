@@ -70,16 +70,16 @@ class SlackPåløpVarsler(
         }
     }
 
-    override fun rapporterKonteringerFullført(påløp: Påløp, antallKonteringerFullført: Int, antallKonteringerTotalt: Int) {
+    override fun rapporterKonteringerFullført(påløp: Påløp, antallSiderFullført: Int, totaltAntallSider: Int, antallPerSide: Int) {
         val varsel = pågåendePåløp(påløp)
 
         if (varsel != null) {
             if (!varsel.skalOppdatereKonteringerMelding()) {
                 return
             }
-            varsel.registrerObservasjon(antallKonteringerFullført)
-            val melding = "Påløpet har fullført $antallKonteringerFullført av $antallKonteringerTotalt konteringer og satt overføringstidspunkt." +
-                    "\n${fremdriftsindikator(antallKonteringerFullført, antallKonteringerTotalt)}" +
+            varsel.registrerObservasjon(antallSiderFullført)
+            val melding = "Påløpet har fullført $antallSiderFullført av $totaltAntallSider sider med konteringer og satt overføringstidspunkt. $antallPerSide konteringer per side." +
+                    "\n${fremdriftsindikator(antallSiderFullført, totaltAntallSider)}" +
                     "\nTid pr kontering: ${varsel.millisekunderPrPeriode().map{it.toString()}.orElse("?")} ms"
             if (varsel.konteringerFullførtMelding == null) {
                 varsel.konteringerFullførtMelding =

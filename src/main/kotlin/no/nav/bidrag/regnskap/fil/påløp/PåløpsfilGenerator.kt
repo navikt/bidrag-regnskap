@@ -7,6 +7,7 @@ import no.nav.bidrag.regnskap.fil.overføring.FiloverføringTilElinKlient
 import no.nav.bidrag.regnskap.persistence.bucket.GcpFilBucket
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.Påløp
+import no.nav.bidrag.regnskap.service.PersistenceService
 import no.nav.bidrag.regnskap.service.PåløpskjøringLytter
 import no.nav.bidrag.regnskap.util.ByteArrayOutputStreamTilByteBuffer
 import org.slf4j.LoggerFactory
@@ -27,7 +28,8 @@ import javax.xml.transform.stream.StreamResult
 @Component
 class PåløpsfilGenerator(
     private val gcpFilBucket: GcpFilBucket,
-    private val filoverføringTilElinKlient: FiloverføringTilElinKlient
+    private val filoverføringTilElinKlient: FiloverføringTilElinKlient,
+    private val persistenceService: PersistenceService
 ) {
 
     companion object {
@@ -39,7 +41,6 @@ class PåløpsfilGenerator(
     private val documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
 
     suspend fun skrivPåløpsfilOgLastOppPåFilsluse(
-        konteringer: List<Kontering>,
         påløp: Påløp,
         lyttere: List<PåløpskjøringLytter>
     ) {
@@ -47,6 +48,7 @@ class PåløpsfilGenerator(
         val påløpsMappe = "påløp/"
         val påløpsfilnavn = "paaloop_D" + now.format(DateTimeFormatter.ofPattern("yyMMdd")).toString() + ".xml"
         this.lyttere = lyttere
+        val konteringer = persistenceService.hentAlleIkkeOverførteKonteringer()
 
         val dokument = documentBuilder.newDocument()
         dokument.xmlStandalone = true

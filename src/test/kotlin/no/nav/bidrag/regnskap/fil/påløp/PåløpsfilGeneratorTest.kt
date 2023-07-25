@@ -1,5 +1,6 @@
 package no.nav.bidrag.regnskap.fil.påløp
 
+import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
@@ -7,6 +8,7 @@ import kotlinx.coroutines.test.runTest
 import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
 import no.nav.bidrag.regnskap.fil.overføring.FiloverføringTilElinKlient
 import no.nav.bidrag.regnskap.persistence.bucket.GcpFilBucket
+import no.nav.bidrag.regnskap.service.PersistenceService
 import no.nav.bidrag.regnskap.utils.TestData
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -16,6 +18,9 @@ class PåløpsfilGeneratorTest {
 
     @MockK(relaxed = true)
     private lateinit var gcpFilBucket: GcpFilBucket
+
+    @MockK(relaxed = true)
+    private lateinit var persistenceService: PersistenceService
 
     @MockK(relaxed = true)
     private lateinit var filoverføringTilElinKlient: FiloverføringTilElinKlient
@@ -54,6 +59,8 @@ class PåløpsfilGeneratorTest {
 
         val påløp = TestData.opprettPåløp()
 
-        påløpsfilGenerator.skrivPåløpsfilOgLastOppPåFilsluse(konteringer + konteringer2, påløp, emptyList())
+        every { persistenceService.hentAlleIkkeOverførteKonteringer() } returns konteringer + konteringer2
+
+        påløpsfilGenerator.skrivPåløpsfilOgLastOppPåFilsluse(påløp, emptyList())
     }
 }

@@ -18,13 +18,11 @@ import no.nav.bidrag.regnskap.persistence.entity.Påløp
 import no.nav.bidrag.regnskap.persistence.repository.OppdragsperiodeRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Page
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.lang.Error
-import java.lang.RuntimeException
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.ArrayList
 import java.util.function.Consumer
 
 private val LOGGER = LoggerFactory.getLogger(PåløpskjøringService::class.java)
@@ -62,7 +60,10 @@ class PåløpskjøringService(
                 )
             }
             opprettKonteringerForAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer(påløp)
-            genererPåløpsfil(påløp, genererFil)
+            if (genererFil) {
+                genererPåløpsfil(påløp)
+            }
+            settOverføringstidspunktPåKonteringer(påløp)
             fullførPåløp(påløp)
             if (genererFil) {
                 endreElinVedlikeholdsmodus(
@@ -137,46 +138,48 @@ class PåløpskjøringService(
         medLyttere { it.oppdragsperioderBehandletFerdig(påløp, oppdragsperioder.size) }
     }
 
-    fun genererPåløpsfil(påløp: Påløp, genererFil: Boolean) {
-        val konteringer = persistenceService.hentAlleIkkeOverførteKonteringer()
-        if (genererFil) {
-            LOGGER.info("Starter generering av påløpsfil...")
-            medLyttere { it.generererFil(påløp) }
-            runBlocking { skrivPåløpsfilOgLastOppPåFilsluse(konteringer, påløp) }
-        }
-        settKonteringTilOverførtOgOpprettOverføringKontering(konteringer, påløp)
-        if(genererFil) {
-            LOGGER.info("Påløpsfil er ferdig skrevet for periode ${påløp.forPeriode} med ${konteringer.size} konteringer og lastet opp til filsluse.")
-        } else {
-            LOGGER.info("Påløpskjøring er ferdig uten skriving av fil for periode ${påløp.forPeriode}.")
-        }
+    fun genererPåløpsfil(påløp: Påløp) {
+        LOGGER.info("Starter generering av påløpsfil...")
+        medLyttere { it.generererFil(påløp) }
+        runBlocking { skrivPåløpsfilOgLastOppPåFilsluse(påløp) }
+        LOGGER.info("Påløpsfil er ferdig skrevet for periode ${påløp.forPeriode} og lastet opp til filsluse.")
     }
 
-    private suspend fun skrivPåløpsfilOgLastOppPåFilsluse(konteringer: List<Kontering>, påløp: Påløp) = coroutineScope {
+    private fun settOverføringstidspunktPåKonteringer(påløp: Påløp) {
+        val timestamp = LocalDateTime.now()
+        var pageNumber = 0
+        val pageSize = 10000
+        var konteringerPage: Page<Kontering>
+
+        do {
+            konteringerPage = persistenceService.hentAlleIkkeOverførteKonteringer(pageNumber, pageSize)
+            settKonteringTilOverførtOgOpprettOverføringKontering(konteringerPage, påløp, timestamp)
+            pageNumber++
+            medLyttere { it.rapporterKonteringerFullført(påløp, pageNumber, konteringerPage.totalPages, pageSize) }
+        } while (konteringerPage.hasNext())
+    }
+
+    private suspend fun skrivPåløpsfilOgLastOppPåFilsluse(påløp: Påløp) = coroutineScope {
         påløpskjøringJob = launch {
             withContext(Dispatchers.IO) {
-                påløpsfilGenerator.skrivPåløpsfilOgLastOppPåFilsluse(konteringer, påløp, lyttere)
+                påløpsfilGenerator.skrivPåløpsfilOgLastOppPåFilsluse(påløp, lyttere)
             }
         }
     }
 
-    private fun settKonteringTilOverførtOgOpprettOverføringKontering(konteringer: List<Kontering>, påløp: Påløp) {
-        val timestamp = LocalDateTime.now()
-        var antallBehandlet = 0
-
-        Lists.partition(konteringer, partisjonStørrelse).forEach { oppdragsperiodeIds ->
-            medLyttere { it.rapporterOppdragsperioderBehandlet(påløp, antallBehandlet, konteringer.size) }
-
-            oppdragsperiodeIds.forEach {
-                it.overføringstidspunkt = timestamp
-                it.sendtIPåløpsperiode = påløp.forPeriode
-                it.behandlingsstatusOkTidspunkt = timestamp
-                persistenceService.lagreKontering(it)
-                persistenceService.lagreOverføringKontering(
-                    OverføringKontering(kontering = it, tidspunkt = timestamp, kanal = "Påløpsfil")
-                )
-            }
-            antallBehandlet += oppdragsperiodeIds.size
+    private fun settKonteringTilOverførtOgOpprettOverføringKontering(
+        konteringer: Page<Kontering>,
+        påløp: Påløp,
+        timestamp: LocalDateTime
+    ) {
+        konteringer.content.forEach {
+            it.overføringstidspunkt = timestamp
+            it.sendtIPåløpsperiode = påløp.forPeriode
+            it.behandlingsstatusOkTidspunkt = timestamp
+            persistenceService.lagreKontering(it)
+            persistenceService.lagreOverføringKontering(
+                OverføringKontering(kontering = it, tidspunkt = timestamp, kanal = "Påløpsfil")
+            )
         }
     }
 
@@ -210,5 +213,5 @@ interface PåløpskjøringLytter {
 
     fun påløpFeilet(påløp: Påløp, feilmelding: String)
 
-    fun rapporterKonteringerFullført(påløp: Påløp, antallKonteringerFullført: Int, antallKonteringerTotalt: Int)
+    fun rapporterKonteringerFullført(påløp: Påløp, antallSiderFullført: Int, totaltAntallSider: Int, antallPerSide: Int)
 }

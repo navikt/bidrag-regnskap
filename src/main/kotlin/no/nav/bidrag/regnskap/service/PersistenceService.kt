@@ -16,6 +16,8 @@ import no.nav.bidrag.regnskap.persistence.repository.PåløpRepository
 import org.slf4j.LoggerFactory
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.dao.EmptyResultDataAccessException
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -130,6 +132,10 @@ class PersistenceService(
 
     fun hentAlleIkkeOverførteKonteringer(): List<Kontering> {
         return konteringRepository.findAllByOverføringstidspunktIsNull()
+    }
+
+    fun hentAlleIkkeOverførteKonteringer(pageNumber: Int, pageSize: Int): Page<Kontering> {
+        return konteringRepository.findAllByOverføringstidspunktIsNullOrderByKonteringId(PageRequest.of(pageNumber, pageSize))
     }
 
     fun hentAlleKonteringerUtenBehandlingsstatusOk(): List<Kontering> {
