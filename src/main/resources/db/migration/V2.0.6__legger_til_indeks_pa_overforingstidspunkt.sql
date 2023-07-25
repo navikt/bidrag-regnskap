@@ -1,0 +1,1 @@
+CREATE INDEX overforingstidspunkt_index ON konteringer (overforingstidspunkt);
