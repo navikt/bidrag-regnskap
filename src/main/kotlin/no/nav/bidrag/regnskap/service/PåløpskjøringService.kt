@@ -151,12 +151,15 @@ class PåløpskjøringService(
         val pageSize = 10000
         var konteringerPage: Page<Kontering>
 
+        LOGGER.info("Starter å sette overføringstidspunkt konteringer.")
         do {
             konteringerPage = persistenceService.hentAlleIkkeOverførteKonteringer(pageNumber, pageSize)
             settKonteringTilOverførtOgOpprettOverføringKontering(konteringerPage, påløp, timestamp)
             pageNumber++
             medLyttere { it.rapporterKonteringerFullført(påløp, pageNumber, konteringerPage.totalPages, pageSize) }
         } while (konteringerPage.hasNext())
+
+        LOGGER.info("Fullført setting av overføringstidspunkt for konteringer.")
     }
 
     private suspend fun skrivPåløpsfilOgLastOppPåFilsluse(påløp: Påløp) = coroutineScope {
