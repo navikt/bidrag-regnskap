@@ -151,14 +151,18 @@ class PåløpskjøringService(
         var konteringerPage: Page<Kontering>
 
         LOGGER.info("Starter å sette overføringstidspunkt konteringer.")
-        do {
-            konteringerPage = persistenceService.hentAlleIkkeOverførteKonteringer(pageNumber, pageSize)
-            settKonteringTilOverførtOgOpprettOverføringKontering(konteringerPage, påløp, timestamp)
-            pageNumber++
-            medLyttere { it.rapporterKonteringerFullført(påløp, pageNumber, konteringerPage.totalPages, pageSize) }
-        } while (konteringerPage.hasNext())
+        medLyttere { it.rapporterOverføringstidspunkt(påløp, "Starter oppdatering av overføringstidspunkt, behandlingsstatusOkTidspunkt og påløpsperiode på alle konteringer. Timestamp: $timestamp")}
+//        do {
+//            konteringerPage = persistenceService.hentAlleIkkeOverførteKonteringer(pageNumber, pageSize)
+//            settKonteringTilOverførtOgOpprettOverføringKontering(konteringerPage, påløp, timestamp)
+//            pageNumber++
+//            medLyttere { it.rapporterKonteringerFullført(påløp, pageNumber, konteringerPage.totalPages, pageSize) }
+//        } while (konteringerPage.hasNext())
+
+        persistenceService.oppdaterAlleKonteringerMedOverføringstidspunktBehandlingsstatusOkTidspunktOgPåløpsperiode(timestamp, påløp.forPeriode)
 
         LOGGER.info("Fullført setting av overføringstidspunkt for konteringer.")
+        medLyttere { it.rapporterOverføringstidspunkt(påløp, "Oppdatering av overføringstidspunkt, behandlingsstatusOkTidspunkt og påløpsperiode fullført på alle konteringer. Timestamp: ${LocalDateTime.now()}")}
     }
 
     private suspend fun skrivPåløpsfilOgLastOppPåFilsluse(påløp: Påløp) = coroutineScope {
@@ -213,4 +217,6 @@ interface PåløpskjøringLytter {
     fun påløpFeilet(påløp: Påløp, feilmelding: String)
 
     fun rapporterKonteringerFullført(påløp: Påløp, antallSiderFullført: Int, totaltAntallSider: Int, antallPerSide: Int)
+
+    fun rapporterOverføringstidspunkt(påløp: Påløp, melding: String)
 }

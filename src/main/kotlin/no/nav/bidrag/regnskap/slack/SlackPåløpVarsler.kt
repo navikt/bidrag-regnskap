@@ -90,6 +90,19 @@ class SlackPåløpVarsler(
         }
     }
 
+    override fun rapporterOverføringstidspunkt(påløp: Påløp, melding: String) {
+        val varsel = pågåendePåløp(påløp)
+
+        if (varsel != null) {
+            if (varsel.overføringstidspunktMelding == null) {
+                varsel.overføringstidspunktMelding =
+                    pågåendePåløp?.melding?.svarITråd(melding)
+            } else {
+                varsel.overføringstidspunktMelding?.oppdaterMelding(melding)
+            }
+        }
+    }
+
     override fun påløpFullført(påløp: Påløp) {
         val varsel = pågåendePåløp(påløp)
 
@@ -121,6 +134,7 @@ class SlackPåløpVarsler(
         var konteringerMelding: SlackService.SlackMelding? = null
         var påløpsfilMelding: SlackService.SlackMelding? = null
         var konteringerFullførtMelding: SlackService.SlackMelding? = null
+        var overføringstidspunktMelding: SlackService.SlackMelding? = null
         var nesteOppdateringKonteringerMelding: Instant? = Instant.now()
         var nestSisteObservasjon: PåløpObservasjon = PåløpObservasjon(antallBehandlet = 0)
         var sisteObservasjon: PåløpObservasjon = PåløpObservasjon(antallBehandlet = 0)

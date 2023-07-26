@@ -121,6 +121,10 @@ class PersistenceService(
         return konteringRepository.findAllByOverføringstidspunktIsNullOrderByKonteringId(PageRequest.of(pageNumber, pageSize))
     }
 
+    fun oppdaterAlleKonteringerMedOverføringstidspunktBehandlingsstatusOkTidspunktOgPåløpsperiode(overføringstidspunkt: LocalDateTime, påløpsperiode: String) {
+        konteringRepository.oppdaterAlleKonteringerMedOverføringstidspunktPeriodeOgBehandlingsstatusOk(overføringstidspunkt, påløpsperiode)
+    }
+
     fun hentAlleKonteringerUtenBehandlingsstatusOk(): List<Kontering> {
         return konteringRepository.findAllByBehandlingsstatusOkTidspunktIsNullAndOverføringstidspunktIsNotNullAndSisteReferansekodeIsNotNull()
     }
