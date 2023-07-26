@@ -6,7 +6,6 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
-import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -22,7 +21,6 @@ interface KonteringRepository : JpaRepository<Kontering, Int> {
         value = "UPDATE konteringer SET overforingstidspunkt = ?1, behandlingsstatus_ok_tidspunkt = ?1, sendt_i_palopsperiode = ?2 WHERE overforingstidspunkt IS NULL",
         nativeQuery = true
     )
-    @Transactional
     fun oppdaterAlleKonteringerMedOverføringstidspunktPeriodeOgBehandlingsstatusOk(overføringsperiode: LocalDateTime, påløpsperiode: String)
 
     @Query(
