@@ -1,6 +1,5 @@
 package no.nav.bidrag.regnskap.fil.påløp
 
-import kotlinx.coroutines.yield
 import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
 import no.nav.bidrag.regnskap.dto.enumer.Type
 import no.nav.bidrag.regnskap.fil.overføring.FiloverføringTilElinKlient
@@ -40,7 +39,7 @@ class PåløpsfilGenerator(
     private var lyttere: List<PåløpskjøringLytter> = emptyList()
     private val documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
 
-    suspend fun skrivPåløpsfilOgLastOppPåFilsluse(
+    fun skrivPåløpsfilOgLastOppPåFilsluse(
         påløp: Påløp,
         lyttere: List<PåløpskjøringLytter>
     ) {
@@ -62,9 +61,7 @@ class PåløpsfilGenerator(
         var index = 0
         var sum = BigDecimal.ZERO
         finnAlleOppdragFraKonteringer(konteringer).forEach { (_, konteringerForOppdrag) ->
-            yield()
-
-            if (++index % 100 == 0) {
+            if (++index % 10000 == 0) {
                 medLyttere {it.rapportertKonteringerSkrevetTilFil(påløp, index, konteringer.size)}
             }
 
@@ -72,19 +69,23 @@ class PåløpsfilGenerator(
             rootElement.appendChild(oppdragElement)
 
             konteringerForOppdrag.forEach { kontering ->
-                yield()
                 opprettKonteringBr10(dokument, oppdragElement, kontering, now)
-
                 sum += kontering.oppdragsperiode!!.beløp
             }
         }
 
+        medLyttere { it.konteringerSkrevetTilFilFerdig(påløp, konteringer.size) }
         LOGGER.info("Påløpskjøring: Har skrevet ${konteringer.size} av ${konteringer.size} konteringer til påløpsfil.")
 
         opprettStoppBatchBr99(dokument, rootElement, sum, konteringer.size)
-        skrivXml(dokument, påløpsMappe + påløpsfilnavn)
 
+        medLyttere { it.lastOppFilTilGcpBucket(påløp, "Starter opplasting til GCP bucket..") }
+        skrivXml(dokument, påløpsMappe + påløpsfilnavn)
+        medLyttere { it.lastOppFilTilGcpBucket(påløp, "Fil lastet opp til GCP bucket!") }
+
+        medLyttere { it.lastOppFilTilFilsluse(påløp, "Starter opplasting til filsluse..") }
         filoverføringTilElinKlient.lastOppFilTilFilsluse(påløpsMappe, påløpsfilnavn)
+        medLyttere { it.lastOppFilTilFilsluse(påløp, "Fil lastet opp til filsluse!") }
     }
 
     private fun opprettStartBatchBr01(dokument: Document, rootElement: Element, påløp: Påløp, now: LocalDate) {

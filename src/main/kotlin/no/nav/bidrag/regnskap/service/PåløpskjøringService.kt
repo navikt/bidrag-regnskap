@@ -1,12 +1,7 @@
 package no.nav.bidrag.regnskap.service
 
 import com.google.common.collect.Lists
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import no.nav.bidrag.regnskap.consumer.SkattConsumer
 import no.nav.bidrag.regnskap.dto.enumer.Årsakskode
 import no.nav.bidrag.regnskap.dto.påløp.Vedlikeholdsmodus
@@ -140,7 +135,7 @@ class PåløpskjøringService(
     fun genererPåløpsfil(påløp: Påløp) {
         LOGGER.info("Starter generering av påløpsfil...")
         medLyttere { it.generererFil(påløp) }
-        runBlocking { skrivPåløpsfilOgLastOppPåFilsluse(påløp) }
+        skrivPåløpsfilOgLastOppPåFilsluse(påløp)
         LOGGER.info("Påløpsfil er ferdig skrevet for periode ${påløp.forPeriode} og lastet opp til filsluse.")
     }
 
@@ -158,15 +153,12 @@ class PåløpskjøringService(
             medLyttere { it.rapporterKonteringerFullført(påløp, pageNumber, konteringerPage.totalPages, pageSize) }
         } while (konteringerPage.hasNext())
 
+        medLyttere { it.konteringerFullførtFerdig(påløp, konteringerPage.totalPages, pageSize) }
         LOGGER.info("Fullført setting av overføringstidspunkt for konteringer.")
     }
 
-    private suspend fun skrivPåløpsfilOgLastOppPåFilsluse(påløp: Påløp) = coroutineScope {
-        påløpskjøringJob = launch {
-            withContext(Dispatchers.IO) {
-                påløpsfilGenerator.skrivPåløpsfilOgLastOppPåFilsluse(påløp, lyttere)
-            }
-        }
+    private fun skrivPåløpsfilOgLastOppPåFilsluse(påløp: Påløp)  {
+        påløpsfilGenerator.skrivPåløpsfilOgLastOppPåFilsluse(påløp, lyttere)
     }
 
     private fun settKonteringTilOverførtOgOpprettOverføringKontering(
@@ -206,9 +198,17 @@ interface PåløpskjøringLytter {
 
     fun rapportertKonteringerSkrevetTilFil(påløp: Påløp, antallSkrevetTilFil: Int, antallKonteringerTotalt: Int)
 
+    fun konteringerSkrevetTilFilFerdig(påløp: Påløp, antallKonteringerTotalt: Int)
+
     fun påløpFullført(påløp: Påløp)
 
     fun påløpFeilet(påløp: Påløp, feilmelding: String)
 
     fun rapporterKonteringerFullført(påløp: Påløp, antallSiderFullført: Int, totaltAntallSider: Int, antallPerSide: Int)
+
+    fun konteringerFullførtFerdig(påløp: Påløp, totaltAntallSider: Int, antallPerSide: Int)
+
+    fun lastOppFilTilGcpBucket(påløp: Påløp, melding: String)
+
+    fun lastOppFilTilFilsluse(påløp: Påløp, melding: String)
 }

@@ -1,6 +1,5 @@
 package no.nav.bidrag.regnskap.hendelse.schedule.påløp
 
-import kotlinx.coroutines.runBlocking
 import net.javacrumbs.shedlock.core.LockAssert
 import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
@@ -35,9 +34,7 @@ class PåløpskjøringScheduler(
         persistenceService.hentIkkeKjørtePåløp().minByOrNull { it.forPeriode }.let {
             if (it != null) {
                 if (it.kjøredato.isBefore(LocalDateTime.now())) {
-                    runBlocking {
-                        påløpskjøringService.startPåløpskjøring(it, true, true)
-                    }
+                    påløpskjøringService.startPåløpskjøring(it, true, true)
                 } else {
                     LOGGER.info("Fant ingen påløp som skulle kjøres på dette tidspunkt. Neste påløpskjøring er for periode: ${it.forPeriode} som kjøres: ${it.kjøredato}")
                 }

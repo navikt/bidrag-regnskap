@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
-import kotlinx.coroutines.runBlocking
 import no.nav.bidrag.regnskap.persistence.repository.OppdragsperiodeRepository
 import no.nav.bidrag.regnskap.service.ManglendeKonteringerService
 import no.nav.bidrag.regnskap.service.PåløpskjøringService
@@ -49,7 +48,7 @@ class PåløpskjøringController(
     )
     fun startPåløpskjøring(@RequestParam(required = true) genererFil: Boolean): ResponseEntity<Int> {
         val påløp = påløpskjøringService.hentPåløp()?.apply { startetTidspunkt = null } ?: return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
-        runBlocking { påløpskjøringService.startPåløpskjøring(påløp, false, genererFil) }
+        påløpskjøringService.startPåløpskjøring(påløp, false, genererFil)
         return ResponseEntity.status(HttpStatus.CREATED).body(påløp.påløpId)
     }
 

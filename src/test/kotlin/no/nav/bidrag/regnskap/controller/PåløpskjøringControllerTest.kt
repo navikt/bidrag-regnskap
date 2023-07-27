@@ -5,7 +5,6 @@ import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import no.nav.bidrag.regnskap.persistence.repository.OppdragsperiodeRepository
 import no.nav.bidrag.regnskap.service.ManglendeKonteringerService
@@ -31,7 +30,6 @@ class PåløpskjøringControllerTest {
     private lateinit var påløpskjøringController: PåløpskjøringController
 
     @Test
-    @OptIn(ExperimentalCoroutinesApi::class)
     fun `skal ved påløpskjøring returnere 201`() = runTest {
         val påløp = TestData.opprettPåløp(påløpId = 1, fullførtTidspunkt = null, forPeriode = "2022-01")
 
@@ -43,7 +41,6 @@ class PåløpskjøringControllerTest {
     }
 
     @Test
-    @OptIn(ExperimentalCoroutinesApi::class)
     fun `skal om det ikke finnes ikke kjørte påløpsperioder returnere 204`() = runTest {
         every { påløpskjøringService.hentPåløp() } returns null
 

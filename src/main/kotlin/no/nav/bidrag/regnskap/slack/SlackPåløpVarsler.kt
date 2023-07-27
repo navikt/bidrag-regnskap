@@ -42,8 +42,7 @@ class SlackPåløpVarsler(
     }
 
     override fun oppdragsperioderBehandletFerdig(påløp: Påløp, antallOppdragsperioder: Int) {
-        val varsel = pågåendePåløp(påløp)
-        varsel?.konteringerMelding?.oppdaterMelding("Opprettet konteringer for $antallOppdragsperioder oppdragsperioder")
+        pågåendePåløp(påløp)?.konteringerMelding?.oppdaterMelding("Opprettet konteringer for $antallOppdragsperioder oppdragsperioder")
     }
 
     override fun generererFil(påløp: Påløp) {
@@ -54,9 +53,6 @@ class SlackPåløpVarsler(
         val varsel = pågåendePåløp(påløp)
 
         if (varsel != null) {
-            if (!varsel.skalOppdatereKonteringerMelding()) {
-                return
-            }
             varsel.registrerObservasjon(antallSkrevetTilFil)
             val melding = "Skrevet $antallSkrevetTilFil av $antallKonteringerTotalt konteringer til fil" +
                     "\n${fremdriftsindikator(antallSkrevetTilFil, antallKonteringerTotalt)}" +
@@ -68,6 +64,10 @@ class SlackPåløpVarsler(
                 varsel.påløpsfilMelding?.oppdaterMelding(melding)
             }
         }
+    }
+
+    override fun konteringerSkrevetTilFilFerdig(påløp: Påløp, antallKonteringerTotalt: Int) {
+        pågåendePåløp(påløp)?.påløpsfilMelding?.oppdaterMelding("Påløpet har skrevet ferdig fil med $antallKonteringerTotalt konteringer!")
     }
 
     override fun rapporterKonteringerFullført(påløp: Påløp, antallSiderFullført: Int, totaltAntallSider: Int, antallPerSide: Int) {
@@ -90,16 +90,43 @@ class SlackPåløpVarsler(
         }
     }
 
+    override fun konteringerFullførtFerdig(påløp: Påløp, totaltAntallSider: Int, antallPerSide: Int) {
+        pågåendePåløp(påløp)?.konteringerFullførtMelding?.oppdaterMelding("Påløpet har satt overføringstidspunkt for alle konteringer. Antall siden med konteringer: $totaltAntallSider med $antallPerSide konteringer per side.")
+    }
+
     override fun påløpFullført(påløp: Påløp) {
         val varsel = pågåendePåløp(påløp)
 
-        varsel?.melding?.svarITråd("Påløp er fullført")
+        varsel?.melding?.svarITråd("Påløp er fullført!")
         varsel?.melding?.oppdaterMelding(":file_folder: Påløpskjøring er fullført for ${påløp.forPeriode}!\nSkedulert: ${varsel.schedulertKjøring}\nGenerer fil: ${varsel.genererFil}\nMiljø: $clientId")
     }
 
     override fun påløpFeilet(påløp: Påløp, feilmelding: String) {
         pågåendePåløp?.melding?.svarITråd("Påløp feilet: $feilmelding")
     }
+
+    override fun lastOppFilTilFilsluse(påløp: Påløp, melding: String) {
+        val varsel = pågåendePåløp(påløp)
+        if (varsel != null) {
+            if (varsel.lastOppFilTilGcpMelding == null) {
+                varsel.lastOppFilTilGcpMelding =
+                    pågåendePåløp?.melding?.svarITråd(melding)
+            } else {
+                varsel.lastOppFilTilGcpMelding?.oppdaterMelding(melding)
+            }
+        }
+    }
+
+    override fun lastOppFilTilGcpBucket(påløp: Påløp, melding: String) {
+        val varsel = pågåendePåløp(påløp)
+        if (varsel != null) {
+            if (varsel.lastOppFilTilFilsluseMelding == null) {
+                varsel.lastOppFilTilFilsluseMelding =
+                    pågåendePåløp?.melding?.svarITråd(melding)
+            } else {
+                varsel.lastOppFilTilFilsluseMelding?.oppdaterMelding(melding)
+            }
+        }       }
 
     private fun pågåendePåløp(påløp: Påløp) = if (påløp.equals(pågåendePåløp?.påløp)) pågåendePåløp else null
 
@@ -114,13 +141,14 @@ class SlackPåløpVarsler(
         val påløp: Påløp,
         val schedulertKjøring: Boolean,
         val genererFil: Boolean,
-        val startTid: Instant = Instant.now(),
         val melding: SlackService.SlackMelding
     ) {
         val oppdateringInterval = Duration.ofSeconds(30)
         var konteringerMelding: SlackService.SlackMelding? = null
         var påløpsfilMelding: SlackService.SlackMelding? = null
         var konteringerFullførtMelding: SlackService.SlackMelding? = null
+        var lastOppFilTilGcpMelding: SlackService.SlackMelding? = null
+        var lastOppFilTilFilsluseMelding: SlackService.SlackMelding? = null
         var nesteOppdateringKonteringerMelding: Instant? = Instant.now()
         var nestSisteObservasjon: PåløpObservasjon = PåløpObservasjon(antallBehandlet = 0)
         var sisteObservasjon: PåløpObservasjon = PåløpObservasjon(antallBehandlet = 0)
