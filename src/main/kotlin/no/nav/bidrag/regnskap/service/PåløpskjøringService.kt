@@ -153,7 +153,7 @@ class PåløpskjøringService(
         LOGGER.info("Starter å sette overføringstidspunkt konteringer.")
         do {
             konteringerPage = persistenceService.hentAlleIkkeOverførteKonteringer(pageNumber, pageSize)
-            settKonteringTilOverførtOgOpprettOverføringKontering(konteringerPage, påløp, timestamp)
+            settKonteringTilOverførtOgOpprettOverføringKontering(konteringerPage, timestamp)
             pageNumber++
             medLyttere { it.rapporterKonteringerFullført(påløp, pageNumber, konteringerPage.totalPages, pageSize) }
         } while (konteringerPage.hasNext())
@@ -171,12 +171,10 @@ class PåløpskjøringService(
 
     private fun settKonteringTilOverførtOgOpprettOverføringKontering(
         konteringer: Page<Kontering>,
-        påløp: Påløp,
         timestamp: LocalDateTime
     ) {
         konteringer.content.forEach {
             it.overføringstidspunkt = timestamp
-            it.sendtIPåløpsperiode = påløp.forPeriode
             it.behandlingsstatusOkTidspunkt = timestamp
             persistenceService.lagreKontering(it)
         }
