@@ -199,4 +199,28 @@ class PåløpskjøringServiceTest {
                 kontering.overføringsperiode shouldBe periodeForKontering.toString()
             }
         }
+
+    @Test
+    fun skalHindreAtKonteringerSkalOpprettesFremITidSelvOmPeriodeTilErSattFremITid() {
+        val påløp = TestData.opprettPåløp(påløpId = 1, forPeriode = "2023-01")
+
+        val oppdrag = TestData.opprettOppdrag(oppdragsperioder = emptyList())
+        val oppdragsperiodeMedManglendeKonteringer = TestData.opprettOppdragsperiode(
+            periodeFra = LocalDate.of(2022, 1, 1),
+            periodeTil = LocalDate.of(2024, 1, 1),
+            konteringer = emptyList(),
+            vedtakType = VedtakType.INDEKSREGULERING,
+            aktivTil = null,
+            konteringerFullførtOpprettet = false,
+            oppdrag = oppdrag
+        )
+
+        val perioderMellomDato = hentAllePerioderMellomDato(
+            oppdragsperiodeMedManglendeKonteringer.periodeFra,
+            oppdragsperiodeMedManglendeKonteringer.periodeTil,
+            YearMonth.parse(påløp.forPeriode)
+        )
+
+        perioderMellomDato shouldHaveSize 13
+    }
 }

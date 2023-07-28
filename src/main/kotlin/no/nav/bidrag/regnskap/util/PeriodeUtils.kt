@@ -18,8 +18,17 @@ object PeriodeUtils {
         periodeTilForOppdragsperiode: LocalDate?,
         sisteOverførtePeriode: YearMonth
     ): List<YearMonth> {
+        val sisteOverførtePeriodeDato =
+            LocalDate.of(sisteOverførtePeriode.year, sisteOverførtePeriode.month, 1).plusMonths(1)
+
+        // Om perioden til på oppdragsperioden er satt til en dato etter siste påløp skal vi kun finne perioder frem til siste påløpsperiode.
+        // Dette er for å unngå at konteringer for fremtidige mnder blir opprettet.
         val periodeTil =
-            periodeTilForOppdragsperiode ?: LocalDate.of(sisteOverførtePeriode.year, sisteOverførtePeriode.month, 1).plusMonths(1)
+            if (periodeTilForOppdragsperiode != null && sisteOverførtePeriodeDato.isAfter(periodeTilForOppdragsperiode))
+                periodeTilForOppdragsperiode
+            else {
+                sisteOverførtePeriodeDato
+            }
 
         if (periodeTil.isBefore(periodeFraForOppdragsperiode)) {
             return emptyList()
@@ -32,7 +41,8 @@ object PeriodeUtils {
                 periodeFraForOppdragsperiode,
                 periodeTil
             )
-        ).map { it.format(DateTimeFormatter.ofPattern("yyyy-MM")) }.map { YearMonth.parse(it) }.collect(Collectors.toList())
+        ).map { it.format(DateTimeFormatter.ofPattern("yyyy-MM")) }.map { YearMonth.parse(it) }
+            .collect(Collectors.toList())
     }
 
     fun erFørsteDatoSammeSomEllerTidligereEnnAndreDato(
