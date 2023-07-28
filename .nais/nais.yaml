@@ -36,7 +36,11 @@ spec:
       memory: 4096Mi
     requests:
       cpu: 500m
-      memory: 1024Mi
+      memory: 2048Mi
+  replicas:
+    disableAutoScaling: true
+    max: 2
+    min: 2
   maskinporten:
     enabled: true
     scopes:
