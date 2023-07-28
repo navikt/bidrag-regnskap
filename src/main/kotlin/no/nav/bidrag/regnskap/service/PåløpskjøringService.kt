@@ -7,12 +7,10 @@ import no.nav.bidrag.regnskap.dto.enumer.Årsakskode
 import no.nav.bidrag.regnskap.dto.påløp.Vedlikeholdsmodus
 import no.nav.bidrag.regnskap.fil.påløp.PåløpsfilGenerator
 import no.nav.bidrag.regnskap.persistence.entity.Driftsavvik
-import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.Påløp
 import no.nav.bidrag.regnskap.persistence.repository.OppdragsperiodeRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.domain.Page
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -141,35 +139,27 @@ class PåløpskjøringService(
 
     private fun settOverføringstidspunktPåKonteringer(påløp: Påløp) {
         val timestamp = LocalDateTime.now()
-        var pageNumber = 0
-        val pageSize = 10000
-        var konteringerPage: Page<Kontering>
+        var antallBehandlet = 0
 
         LOGGER.info("Starter å sette overføringstidspunkt konteringer.")
-        do {
-            konteringerPage = persistenceService.hentAlleIkkeOverførteKonteringer(pageNumber, pageSize)
-            settKonteringTilOverførtOgOpprettOverføringKontering(konteringerPage, timestamp)
-            pageNumber++
-            medLyttere { it.rapporterKonteringerFullført(påløp, pageNumber, konteringerPage.totalPages, pageSize) }
-        } while (konteringerPage.hasNext())
+        val konteringer = ArrayList(persistenceService.hentAlleIkkeOverførteKonteringer())
+        Lists.partition(konteringer, partisjonStørrelse).forEach { konteringerPartition ->
+            konteringerPartition.forEach {
+                it.overføringstidspunkt = timestamp
+                it.behandlingsstatusOkTidspunkt = timestamp
+            }
+            persistenceService.lagreKonteringer(konteringerPartition)
+            antallBehandlet += konteringerPartition.size
 
-        medLyttere { it.konteringerFullførtFerdig(påløp, konteringerPage.totalPages, pageSize) }
+            medLyttere { it.rapporterKonteringerFullført(påløp, antallBehandlet, konteringer.size) }
+        }
+
+        medLyttere { it.konteringerFullførtFerdig(påløp, konteringer.size) }
         LOGGER.info("Fullført setting av overføringstidspunkt for konteringer.")
     }
 
     private fun skrivPåløpsfilOgLastOppPåFilsluse(påløp: Påløp)  {
         påløpsfilGenerator.skrivPåløpsfilOgLastOppPåFilsluse(påløp, lyttere)
-    }
-
-    private fun settKonteringTilOverførtOgOpprettOverføringKontering(
-        konteringer: Page<Kontering>,
-        timestamp: LocalDateTime
-    ) {
-        konteringer.content.forEach {
-            it.overføringstidspunkt = timestamp
-            it.behandlingsstatusOkTidspunkt = timestamp
-            persistenceService.lagreKontering(it)
-        }
     }
 
     private inline fun medLyttere(lytterConsumer: Consumer<PåløpskjøringLytter>) = lyttere.forEach(lytterConsumer)
@@ -204,9 +194,9 @@ interface PåløpskjøringLytter {
 
     fun påløpFeilet(påløp: Påløp, feilmelding: String)
 
-    fun rapporterKonteringerFullført(påløp: Påløp, antallSiderFullført: Int, totaltAntallSider: Int, antallPerSide: Int)
+    fun rapporterKonteringerFullført(påløp: Påløp, antallFullført: Int, totaltAntall: Int)
 
-    fun konteringerFullførtFerdig(påløp: Påløp, totaltAntallSider: Int, antallPerSide: Int)
+    fun konteringerFullførtFerdig(påløp: Påløp, totaltAntall: Int)
 
     fun lastOppFilTilGcpBucket(påløp: Påløp, melding: String)
 

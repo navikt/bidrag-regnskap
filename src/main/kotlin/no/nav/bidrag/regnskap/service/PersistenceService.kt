@@ -139,6 +139,10 @@ class PersistenceService(
         return lagretKontering.konteringId
     }
 
+    fun lagreKonteringer(konteringer: List<Kontering>) {
+        konteringRepository.saveAll(konteringer)
+    }
+
     fun lagreOppdragsperiode(oppdragsperiode: Oppdragsperiode): Int {
         val startTime = System.currentTimeMillis()
         try {

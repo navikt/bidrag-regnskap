@@ -70,16 +70,16 @@ class SlackPåløpVarsler(
         pågåendePåløp(påløp)?.påløpsfilMelding?.oppdaterMelding("Påløpet har skrevet ferdig fil med $antallKonteringerTotalt konteringer!")
     }
 
-    override fun rapporterKonteringerFullført(påløp: Påløp, antallSiderFullført: Int, totaltAntallSider: Int, antallPerSide: Int) {
+    override fun rapporterKonteringerFullført(påløp: Påløp, antallFullført: Int, totaltAntall: Int) {
         val varsel = pågåendePåløp(påløp)
 
         if (varsel != null) {
             if (!varsel.skalOppdatereKonteringerMelding()) {
                 return
             }
-            varsel.registrerObservasjon(antallSiderFullført)
-            val melding = "Påløpet har fullført $antallSiderFullført av $totaltAntallSider sider med konteringer og satt overføringstidspunkt. $antallPerSide konteringer per side." +
-                    "\n${fremdriftsindikator(antallSiderFullført, totaltAntallSider)}" +
+            varsel.registrerObservasjon(antallFullført)
+            val melding = "Påløpet har fullført $antallFullført av $totaltAntall konteringer og satt overføringstidspunkt." +
+                    "\n${fremdriftsindikator(antallFullført, totaltAntall)}" +
                     "\nTid pr kontering: ${varsel.millisekunderPrPeriode().map{it.toString()}.orElse("?")} ms"
             if (varsel.konteringerFullførtMelding == null) {
                 varsel.konteringerFullførtMelding =
@@ -90,8 +90,8 @@ class SlackPåløpVarsler(
         }
     }
 
-    override fun konteringerFullførtFerdig(påløp: Påløp, totaltAntallSider: Int, antallPerSide: Int) {
-        pågåendePåløp(påløp)?.konteringerFullførtMelding?.oppdaterMelding("Påløpet har satt overføringstidspunkt for alle konteringer. Antall siden med konteringer: $totaltAntallSider med $antallPerSide konteringer per side.")
+    override fun konteringerFullførtFerdig(påløp: Påløp, totaltAntall: Int) {
+        pågåendePåløp(påløp)?.konteringerFullførtMelding?.oppdaterMelding("Påløpet har satt overføringstidspunkt for $totaltAntall konteringer.")
     }
 
     override fun påløpFullført(påløp: Påløp) {
