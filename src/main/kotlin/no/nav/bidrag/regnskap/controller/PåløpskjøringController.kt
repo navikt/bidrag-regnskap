@@ -52,25 +52,6 @@ class PåløpskjøringController(
         return ResponseEntity.status(HttpStatus.CREATED).body(påløp.påløpId)
     }
 
-    @PostMapping("/stop_palopskjoring")
-    @Operation(
-        summary = "Stopper pågående generering av påløpsfil",
-        description = "Operasjon for å stoppe påløpskjøring.",
-        security = [SecurityRequirement(name = "bearer-key")]
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(
-                responseCode = "200",
-                description = "Påløpskjøringen er stoppet."
-            )
-        ]
-    )
-    fun stopPågåendePåløpskjøring(): ResponseEntity<Any> {
-        påløpskjøringService.stoppPågåendePåløpskjøring()
-        return ResponseEntity.ok().build()
-    }
-
     @PostMapping("/palop_for_oppdragsperiode")
     @Operation(
         summary = "Kjører påløp for oppdragsperiode",

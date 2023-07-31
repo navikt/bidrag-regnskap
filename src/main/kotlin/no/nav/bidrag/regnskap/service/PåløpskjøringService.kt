@@ -1,7 +1,6 @@
 package no.nav.bidrag.regnskap.service
 
 import com.google.common.collect.Lists
-import kotlinx.coroutines.Job
 import no.nav.bidrag.regnskap.consumer.SkattConsumer
 import no.nav.bidrag.regnskap.dto.enumer.Årsakskode
 import no.nav.bidrag.regnskap.dto.påløp.Vedlikeholdsmodus
@@ -33,8 +32,6 @@ class PåløpskjøringService(
     private val skattConsumer: SkattConsumer,
     @Autowired(required = false) private val lyttere: List<PåløpskjøringLytter> = emptyList()
 ) {
-
-    private lateinit var påløpskjøringJob: Job
 
     @Transactional
     fun hentPåløp() = persistenceService.hentIkkeKjørtePåløp().minByOrNull { it.forPeriode }
@@ -74,12 +71,6 @@ class PåløpskjøringService(
         } catch (e: RuntimeException) {
             medLyttere { it.påløpFeilet(påløp, e.toString()) }
             throw e
-        }
-    }
-
-    fun stoppPågåendePåløpskjøring() {
-        if (this::påløpskjøringJob.isInitialized) {
-            påløpskjøringJob.cancel()
         }
     }
 
