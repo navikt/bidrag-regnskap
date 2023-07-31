@@ -10,7 +10,6 @@ import no.nav.bidrag.regnskap.service.PersistenceService
 import no.nav.bidrag.regnskap.service.PåløpskjøringLytter
 import no.nav.bidrag.regnskap.util.ByteArrayOutputStreamTilByteBuffer
 import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Component
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 import java.math.BigDecimal
@@ -24,7 +23,6 @@ import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 
-@Component
 class PåløpsfilGenerator(
     private val gcpFilBucket: GcpFilBucket,
     private val filoverføringTilElinKlient: FiloverføringTilElinKlient,

@@ -13,7 +13,8 @@ import no.nav.bidrag.behandling.felles.enums.VedtakType
 import no.nav.bidrag.regnskap.consumer.SkattConsumer
 import no.nav.bidrag.regnskap.dto.enumer.Søknadstype
 import no.nav.bidrag.regnskap.dto.enumer.Type
-import no.nav.bidrag.regnskap.fil.påløp.PåløpsfilGenerator
+import no.nav.bidrag.regnskap.fil.overføring.FiloverføringTilElinKlient
+import no.nav.bidrag.regnskap.persistence.bucket.GcpFilBucket
 import no.nav.bidrag.regnskap.persistence.repository.OppdragsperiodeRepository
 import no.nav.bidrag.regnskap.util.PeriodeUtils.hentAllePerioderMellomDato
 import no.nav.bidrag.regnskap.utils.TestData
@@ -28,11 +29,12 @@ class PåløpskjøringServiceTest {
 
     private val oppdragsperiodeRepo = mockk<OppdragsperiodeRepository>(relaxed = true)
     private val persistenceService = mockk<PersistenceService>(relaxed = true)
-    private val påløpsfilGenerator = mockk<PåløpsfilGenerator>(relaxed = true)
+    private val gcpFilBucket = mockk<GcpFilBucket>(relaxed = true)
+    private val filoverføringTilElinKlient = mockk<FiloverføringTilElinKlient>(relaxed = true)
     private val skattConsumer = mockk<SkattConsumer>(relaxed = true)
 
     private val påløpskjøringService =
-        PåløpskjøringService(oppdragsperiodeRepo, persistenceService, ManglendeKonteringerService(oppdragsperiodeRepo, persistenceService), påløpsfilGenerator, skattConsumer)
+        PåløpskjøringService(oppdragsperiodeRepo, persistenceService, ManglendeKonteringerService(oppdragsperiodeRepo, persistenceService), gcpFilBucket, filoverføringTilElinKlient, skattConsumer)
 
     @Test
     fun `Skal ved påløpskjøring kun starte eldste ikke kjørte påløpsperiode`() {

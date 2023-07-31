@@ -5,7 +5,9 @@ import kotlinx.coroutines.Job
 import no.nav.bidrag.regnskap.consumer.SkattConsumer
 import no.nav.bidrag.regnskap.dto.enumer.Årsakskode
 import no.nav.bidrag.regnskap.dto.påløp.Vedlikeholdsmodus
+import no.nav.bidrag.regnskap.fil.overføring.FiloverføringTilElinKlient
 import no.nav.bidrag.regnskap.fil.påløp.PåløpsfilGenerator
+import no.nav.bidrag.regnskap.persistence.bucket.GcpFilBucket
 import no.nav.bidrag.regnskap.persistence.entity.Driftsavvik
 import no.nav.bidrag.regnskap.persistence.entity.Påløp
 import no.nav.bidrag.regnskap.persistence.repository.OppdragsperiodeRepository
@@ -26,7 +28,8 @@ class PåløpskjøringService(
     private val oppdragsperiodeRepo: OppdragsperiodeRepository,
     private val persistenceService: PersistenceService,
     private val manglendeKonteringerService: ManglendeKonteringerService,
-    private val påløpsfilGenerator: PåløpsfilGenerator,
+    private val gcpFilBucket: GcpFilBucket,
+    private val filoverføringTilElinKlient: FiloverføringTilElinKlient,
     private val skattConsumer: SkattConsumer,
     @Autowired(required = false) private val lyttere: List<PåløpskjøringLytter> = emptyList()
 ) {
@@ -159,6 +162,7 @@ class PåløpskjøringService(
     }
 
     private fun skrivPåløpsfilOgLastOppPåFilsluse(påløp: Påløp)  {
+        val påløpsfilGenerator = PåløpsfilGenerator(gcpFilBucket, filoverføringTilElinKlient, persistenceService)
         påløpsfilGenerator.skrivPåløpsfilOgLastOppPåFilsluse(påløp, lyttere)
     }
 
