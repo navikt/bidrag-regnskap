@@ -15,7 +15,7 @@ env:
   SKATT_HOST: bidrag-stubs.dev.intern.nav.no #TODO()
   TOPIC_VEDTAK: bidrag.vedtak
   TOPIC_PDL_AKTOR_V2: pdl.aktor-v2
-  AKTOR-V2_GROUP_ID: aktor-v2.bidrag-regnskap
+  AKTOR_V2_GROUP_ID: aktor-v2.bidrag-regnskap
   BUCKET_NAME: bidrag-regnskap-prod
   SFTP_HOST: sftp.nav.no
   SFTP_SKAL_OVERFORE_FIL: true
