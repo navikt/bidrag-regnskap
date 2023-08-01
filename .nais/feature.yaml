@@ -15,7 +15,7 @@ env:
   SKATT_HOST: api-preprod.nav.no
   TOPIC_VEDTAK: bidrag.vedtak-feature
   TOPIC_PDL_AKTOR_V2: pdl.aktor-v2
-  AKTOR-V2_GROUP_ID: aktor-v2.bidrag-regnskap-feature
+  AKTOR_V2_GROUP_ID: aktor-v2.bidrag-regnskap-feature
   BUCKET_NAME: bidrag-regnskap-feature
   SFTP_HOST: sftp-q.nav.no
   SFTP_SKAL_OVERFORE_FIL: false

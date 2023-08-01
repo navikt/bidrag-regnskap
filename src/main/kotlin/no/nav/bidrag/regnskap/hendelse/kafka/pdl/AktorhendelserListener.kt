@@ -21,11 +21,7 @@ class AktorhendelserListener(
         private val LOGGER = LoggerFactory.getLogger(AktorhendelserListener::class.java)
     }
 
-    @KafkaListener(
-        groupId = "\${AKTOR-V2_GROUP_ID}",
-        topics = ["\${TOPIC_PDL_AKTOR_V2}"],
-        properties = ["auto.offset.reset:latest"],
-    )
+    @KafkaListener(groupId = "\${AKTOR_V2_GROUP_ID}", topics = ["\${TOPIC_PDL_AKTOR_V2}"], properties = ["auto.offset.reset:latest"])
     fun lesHendelse(
         consumerRecord: ConsumerRecord<String, Aktor?>,
         @Header(KafkaHeaders.OFFSET) offset: Long,
