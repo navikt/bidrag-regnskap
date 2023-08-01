@@ -55,8 +55,8 @@ class SlackPåløpVarsler(
         if (varsel != null) {
             varsel.registrerObservasjon(antallSkrevetTilFil)
             val melding = "Skrevet $antallSkrevetTilFil av $antallKonteringerTotalt konteringer til fil" +
-                    "\n${fremdriftsindikator(antallSkrevetTilFil, antallKonteringerTotalt)}" +
-                    "\nTid pr kontering: ${varsel.millisekunderPrPeriode().map{it.toString()}.orElse("?")} ms"
+                "\n${fremdriftsindikator(antallSkrevetTilFil, antallKonteringerTotalt)}" +
+                "\nTid pr kontering: ${varsel.millisekunderPrPeriode().map{it.toString()}.orElse("?")} ms"
             if (varsel.påløpsfilMelding == null) {
                 varsel.påløpsfilMelding =
                     pågåendePåløp?.melding?.svarITråd(melding)
@@ -79,8 +79,8 @@ class SlackPåløpVarsler(
             }
             varsel.registrerObservasjon(antallFullført)
             val melding = "Påløpet har fullført $antallFullført av $totaltAntall konteringer og satt overføringstidspunkt." +
-                    "\n${fremdriftsindikator(antallFullført, totaltAntall)}" +
-                    "\nTid pr kontering: ${varsel.millisekunderPrPeriode().map{it.toString()}.orElse("?")} ms"
+                "\n${fremdriftsindikator(antallFullført, totaltAntall)}" +
+                "\nTid pr kontering: ${varsel.millisekunderPrPeriode().map{it.toString()}.orElse("?")} ms"
             if (varsel.konteringerFullførtMelding == null) {
                 varsel.konteringerFullførtMelding =
                     pågåendePåløp?.melding?.svarITråd(melding)
@@ -126,7 +126,8 @@ class SlackPåløpVarsler(
             } else {
                 varsel.lastOppFilTilFilsluseMelding?.oppdaterMelding(melding)
             }
-        }       }
+        }
+    }
 
     private fun pågåendePåløp(påløp: Påløp) = if (påløp.equals(pågåendePåløp?.påløp)) pågåendePåløp else null
 

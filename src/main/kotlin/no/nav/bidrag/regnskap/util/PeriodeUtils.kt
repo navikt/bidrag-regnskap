@@ -24,9 +24,9 @@ object PeriodeUtils {
         // Om perioden til på oppdragsperioden er satt til en dato etter siste påløp skal vi kun finne perioder frem til siste påløpsperiode.
         // Dette er for å unngå at konteringer for fremtidige mnder blir opprettet.
         val periodeTil =
-            if (periodeTilForOppdragsperiode != null && sisteOverførtePeriodeDato.isAfter(periodeTilForOppdragsperiode))
+            if (periodeTilForOppdragsperiode != null && sisteOverførtePeriodeDato.isAfter(periodeTilForOppdragsperiode)) {
                 periodeTilForOppdragsperiode
-            else {
+            } else {
                 sisteOverførtePeriodeDato
             }
 
