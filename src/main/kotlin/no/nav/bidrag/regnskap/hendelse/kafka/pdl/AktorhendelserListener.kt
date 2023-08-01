@@ -31,10 +31,10 @@ class AktorhendelserListener(
         acknowledgment: Acknowledgment
     ) {
         try {
-            val aktør = consumerRecord.value()
-
             LOGGER.info("Behandler aktorhendelse med offset: $offset i consumergroup: $groupId for topic: $topic")
             SECURE_LOGGER.info("Behandler aktorhendelse: $consumerRecord")
+
+            val aktør = consumerRecord.value()
 
             aktør?.identifikatorer?.singleOrNull { ident ->
                 ident.type == Type.FOLKEREGISTERIDENT && ident.gjeldende
