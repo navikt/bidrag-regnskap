@@ -92,7 +92,7 @@ import java.time.YearMonth
 @TestMethodOrder(OrderAnnotation::class)
 @SpringBootTest(classes = [BidragRegnskapLocal::class])
 @EmbeddedKafka(partitions = 1, brokerProperties = ["listeners=PLAINTEXT://localhost:9092", "port=9092"])
-@Disabled //TODO() Må fikses med opphenting på sakId for hver sak etter at overføringKontering ble fjernet.
+@Disabled // TODO() Må fikses med opphenting på sakId for hver sak etter at overføringKontering ble fjernet.
 internal class VedtakshendelseListenerIT {
     companion object {
         private const val HENDELSE_FILMAPPE = "testfiler/hendelse/"

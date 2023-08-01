@@ -60,7 +60,7 @@ class PåløpsfilGenerator(
         var sum = BigDecimal.ZERO
         finnAlleOppdragFraKonteringer(konteringer).forEach { (_, konteringerForOppdrag) ->
             if (++index % 10000 == 0) {
-                medLyttere {it.rapportertKonteringerSkrevetTilFil(påløp, index, konteringer.size)}
+                medLyttere { it.rapportertKonteringerSkrevetTilFil(påløp, index, konteringer.size) }
             }
 
             val oppdragElement = dokument.createElement("oppdrag")
@@ -255,6 +255,5 @@ class PåløpsfilGenerator(
 //    transformer.transform(source, result)
     }
 
-    private inline fun medLyttere(lytterConsumer: Consumer<PåløpskjøringLytter>) = lyttere.forEach(lytterConsumer)
-
+    private fun medLyttere(lytterConsumer: Consumer<PåløpskjøringLytter>) = lyttere.forEach(lytterConsumer)
 }

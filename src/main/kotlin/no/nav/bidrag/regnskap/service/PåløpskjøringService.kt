@@ -152,12 +152,12 @@ class PåløpskjøringService(
         LOGGER.info("Fullført setting av overføringstidspunkt for konteringer.")
     }
 
-    private fun skrivPåløpsfilOgLastOppPåFilsluse(påløp: Påløp)  {
+    private fun skrivPåløpsfilOgLastOppPåFilsluse(påløp: Påløp) {
         val påløpsfilGenerator = PåløpsfilGenerator(gcpFilBucket, filoverføringTilElinKlient, persistenceService)
         påløpsfilGenerator.skrivPåløpsfilOgLastOppPåFilsluse(påløp, lyttere)
     }
 
-    private inline fun medLyttere(lytterConsumer: Consumer<PåløpskjøringLytter>) = lyttere.forEach(lytterConsumer)
+    private fun medLyttere(lytterConsumer: Consumer<PåløpskjøringLytter>) = lyttere.forEach(lytterConsumer)
 
     fun fullførPåløp(påløp: Påløp) {
         påløp.fullførtTidspunkt = LocalDateTime.now()
