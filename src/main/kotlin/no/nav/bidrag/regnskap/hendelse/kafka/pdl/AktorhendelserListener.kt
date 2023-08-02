@@ -38,13 +38,18 @@ class AktorhendelserListener(
         try {
             LOGGER.info("Behandler aktorhendelse med offset: $offset i consumergroup: $groupId for topic: $topic")
 
-            val aktor = GenericData.Record(Aktor.getClassSchema())["identifikatorer"] as List<GenericData.Record>
+            val genericRecord = GenericData.Record(Aktor.getClassSchema())
+            val identifikatorerField = genericRecord.get("identifikatorer")
 
-            for (identifikator in aktor) {
-                if (identifikator.get("gjeldende") as Boolean && identifikator.get("type") as Type == Type.FOLKEREGISTERIDENT) {
-                    val ident = identifikator.get("idnummer") as String
-                    aktorhendelseService.behandleAktoerHendelse(ident)
-                    SECURE_LOGGER.info("Oppdatert ident: $ident")
+            if (identifikatorerField is List<*>) {
+                val aktor = identifikatorerField.filterIsInstance<GenericData.Record>()
+
+                for (identifikator in aktor) {
+                    if (identifikator.get("gjeldende") as Boolean && identifikator.get("type") as Type == Type.FOLKEREGISTERIDENT) {
+                        val ident = identifikator.get("idnummer") as String
+                        aktorhendelseService.behandleAktoerHendelse(ident)
+                        SECURE_LOGGER.info("Oppdatert ident: $ident")
+                    }
                 }
             }
             acknowledgment.acknowledge()
