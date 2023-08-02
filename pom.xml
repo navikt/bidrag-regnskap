@@ -39,7 +39,8 @@
     <scala.version>2.13.11-M1</scala.version>
     <kotlin-logging-jwv.version>4.0.0-beta-28</kotlin-logging-jwv.version>
     <slack-api.version>1.29.2</slack-api.version>
-    <avro.version>1.11.1</avro.version>
+    <avro.version>1.11.2</avro.version>
+    <avro-serializer.version>7.4.0</avro-serializer.version>
   </properties>
 
   <repositories>
@@ -297,6 +298,11 @@
       <groupId>org.apache.avro</groupId>
       <artifactId>avro</artifactId>
       <version>${avro.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.confluent</groupId>
+      <artifactId>kafka-avro-serializer</artifactId>
+      <version>${avro-serializer.version}</version>
     </dependency>
 
     <!--Logging-->
