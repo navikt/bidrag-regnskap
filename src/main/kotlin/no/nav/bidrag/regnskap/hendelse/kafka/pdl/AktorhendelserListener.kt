@@ -23,7 +23,7 @@ class AktorhendelserListener(
 
     @KafkaListener(groupId = "\${AKTOR_V2_GROUP_ID}", topics = ["\${TOPIC_PDL_AKTOR_V2}"], properties = ["auto.offset.reset:latest"])
     fun lesHendelse(
-        consumerRecord: ConsumerRecord<String, Aktor?>,
+        hendelse: String,
         @Header(KafkaHeaders.OFFSET) offset: Long,
         @Header(KafkaHeaders.RECEIVED_TOPIC) topic: String,
         @Header(KafkaHeaders.RECEIVED_PARTITION) partition: Int,
@@ -32,15 +32,17 @@ class AktorhendelserListener(
     ) {
         try {
             LOGGER.info("Behandler aktorhendelse med offset: $offset i consumergroup: $groupId for topic: $topic")
-            SECURE_LOGGER.info("Behandler aktorhendelse: $consumerRecord")
+            SECURE_LOGGER.info("Behandler aktorhendelse: $hendelse")
 
-            val aktør = consumerRecord.value()
+//            val aktør = consumerRecord.value()
 
-            aktør?.identifikatorer?.singleOrNull { ident ->
-                ident.type == Type.FOLKEREGISTERIDENT && ident.gjeldende
-            }?.also { folkeregisterident ->
-                aktorhendelseService.behandleAktoerHendelse(folkeregisterident.idnummer.toString())
-            }
+//            aktør?.identifikatorer?.singleOrNull { ident ->
+//                ident.type == Type.FOLKEREGISTERIDENT && ident.gjeldende
+//            }?.also { folkeregisterident ->
+//                aktorhendelseService.behandleAktoerHendelse(folkeregisterident.idnummer.toString())
+//            }
+            LOGGER.info("Behandlet hendelse med offset: $offset")
+            SECURE_LOGGER.info("Behandlet aktorhendelse for: $hendelse")
             acknowledgment.acknowledge()
         } catch (e: RuntimeException) {
             LOGGER.warn(
@@ -49,7 +51,7 @@ class AktorhendelserListener(
             )
             SECURE_LOGGER.warn(
                 "Feil i prosessering av ident-hendelser med offsett: $offset, topic: $topic, recieved_partition: $partition, groupId: $groupId." +
-                        "\n$consumerRecord", e
+                        "\n$hendelse", e
             )
             throw RuntimeException("Feil i prosessering av ident-hendelser")
         }
