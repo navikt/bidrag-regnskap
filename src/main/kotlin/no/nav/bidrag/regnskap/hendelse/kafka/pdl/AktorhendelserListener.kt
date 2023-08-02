@@ -4,6 +4,7 @@ import no.nav.bidrag.regnskap.SECURE_LOGGER
 import no.nav.bidrag.regnskap.pdl.aktor.v2.Aktor
 import no.nav.bidrag.regnskap.pdl.aktor.v2.Type
 import no.nav.bidrag.regnskap.service.AktorhendelseService
+import org.apache.avro.generic.GenericData
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.LoggerFactory
 import org.springframework.kafka.annotation.KafkaListener
@@ -21,9 +22,13 @@ class AktorhendelserListener(
         private val LOGGER = LoggerFactory.getLogger(AktorhendelserListener::class.java)
     }
 
-    @KafkaListener(groupId = "\${AKTOR_V2_GROUP_ID}", topics = ["\${TOPIC_PDL_AKTOR_V2}"], properties = ["auto.offset.reset:latest"])
+    @KafkaListener(
+        groupId = "\${AKTOR_V2_GROUP_ID}",
+        topics = ["\${TOPIC_PDL_AKTOR_V2}"],
+        properties = ["auto.offset.reset:latest"]
+    )
     fun lesHendelse(
-        hendelse: String,
+        consumerRecord: ConsumerRecord<String, GenericData.Record?>,
         @Header(KafkaHeaders.OFFSET) offset: Long,
         @Header(KafkaHeaders.RECEIVED_TOPIC) topic: String,
         @Header(KafkaHeaders.RECEIVED_PARTITION) partition: Int,
@@ -32,18 +37,18 @@ class AktorhendelserListener(
     ) {
         try {
             LOGGER.info("Behandler aktorhendelse med offset: $offset i consumergroup: $groupId for topic: $topic")
-            SECURE_LOGGER.info("Behandler aktorhendelse: $hendelse")
 
-//            val aktør = consumerRecord.value()
+            val aktor = GenericData.Record(Aktor.getClassSchema())["identifikatorer"] as List<GenericData.Record>
 
-//            aktør?.identifikatorer?.singleOrNull { ident ->
-//                ident.type == Type.FOLKEREGISTERIDENT && ident.gjeldende
-//            }?.also { folkeregisterident ->
-//                aktorhendelseService.behandleAktoerHendelse(folkeregisterident.idnummer.toString())
-//            }
-            LOGGER.info("Behandlet hendelse med offset: $offset")
-            SECURE_LOGGER.info("Behandlet aktorhendelse for: $hendelse")
+            for (identifikator in aktor) {
+                if (identifikator.get("gjeldende") as Boolean && identifikator.get("type") as Type == Type.FOLKEREGISTERIDENT) {
+                    val ident = identifikator.get("idnummer") as String
+                    aktorhendelseService.behandleAktoerHendelse(ident)
+                    SECURE_LOGGER.info("Oppdatert ident: $ident")
+                }
+            }
             acknowledgment.acknowledge()
+            LOGGER.info("Behandlet hendelse med offset: $offset")
         } catch (e: RuntimeException) {
             LOGGER.warn(
                 "Feil i prosessering av ident-hendelser med offsett: $offset, topic: $topic, recieved_partition: $partition, groupId: $groupId",
@@ -51,7 +56,7 @@ class AktorhendelserListener(
             )
             SECURE_LOGGER.warn(
                 "Feil i prosessering av ident-hendelser med offsett: $offset, topic: $topic, recieved_partition: $partition, groupId: $groupId." +
-                        "\n$hendelse", e
+                        "\n$consumerRecord", e
             )
             throw RuntimeException("Feil i prosessering av ident-hendelser")
         }
