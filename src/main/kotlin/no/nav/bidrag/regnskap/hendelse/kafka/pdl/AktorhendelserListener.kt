@@ -42,10 +42,15 @@ class AktorhendelserListener(
             val identifikatorerField = genericRecord.get("identifikatorer")
 
             if (identifikatorerField is List<*>) {
-                val aktor = identifikatorerField.filterIsInstance<GenericData.Record>()
 
+                LOGGER.info("Aktorhendelse: identifikatorliste: $identifikatorerField")
+                val aktor = identifikatorerField.filterIsInstance<GenericData.Record>()
+                LOGGER.info("Aktorhendelse: Aktor: $aktor")
                 for (identifikator in aktor) {
-                    if (identifikator.get("gjeldende") as Boolean && identifikator.get("type") as Type == Type.FOLKEREGISTERIDENT) {
+                    val gjeldende = identifikator.get("gjeldende") as Boolean
+                    val type = identifikator.get("type") as Type
+                    LOGGER.info("Aktorhendelse: type: $type, gjeldende: $gjeldende")
+                    if (gjeldende && type == Type.FOLKEREGISTERIDENT) {
                         val ident = identifikator.get("idnummer") as String
                         aktorhendelseService.behandleAktoerHendelse(ident)
                         SECURE_LOGGER.info("Oppdatert ident: $ident")
