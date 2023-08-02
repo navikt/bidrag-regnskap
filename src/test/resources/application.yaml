@@ -12,9 +12,6 @@ NAIS_APP_NAME: bidrag-regnskap
 TOPIC_VEDTAK: bidrag.vedtak-feature
 TOPIC_PDL_AKTOR_V2: pdl.aktor-v2
 AKTOR_V2_GROUP_ID: aktor-v2.bidrag-regnskap-feature
-KAFKA_BOOTSTRAP_SERVERS: localhost:9092
-KAFKA_BROKERS: localhost:9092
-KAFKA_SCHEMA_REGISTRY: localhost:9093
 BUCKET_NAME: bidrag-regnskap-dev
 ELIN_SUBSCRIPTION_KEY: ingenSubKeyLokaltKunForApiPortalen
 NAIS_CLIENT_ID: "localhost:bidrag:bidrag-regnskap"
