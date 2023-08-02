@@ -4,7 +4,6 @@ import no.nav.bidrag.regnskap.SECURE_LOGGER
 import no.nav.bidrag.regnskap.pdl.aktor.v2.Aktor
 import no.nav.bidrag.regnskap.pdl.aktor.v2.Type
 import no.nav.bidrag.regnskap.service.AktorhendelseService
-import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.LoggerFactory
 import org.springframework.kafka.annotation.KafkaListener
@@ -25,12 +24,7 @@ class AktorhendelserListener(
     @KafkaListener(
         groupId = "\${AKTOR_V2_GROUP_ID}",
         topics = ["\${TOPIC_PDL_AKTOR_V2}"],
-        properties = [
-            "auto.offset.reset:latest",
-            ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG + "=io.confluent.kafka.serializers.KafkaAvroDeserializer",
-            ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG + "=org.apache.kafka.common.serialization.StringDeserializer",
-            "schema.registry.url=\${KAFKA_SCHEMA_REGISTRY}",
-        ]
+        containerFactory = "kafkaAktorV2HendelseContainerFactory"
     )
     fun lesHendelse(
         consumerRecord: ConsumerRecord<String, Aktor?>,
