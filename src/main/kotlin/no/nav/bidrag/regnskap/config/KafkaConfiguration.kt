@@ -54,6 +54,7 @@ class KafkaConfiguration(val environment: Environment) {
         val factory = ConcurrentKafkaListenerContainerFactory<String, String>()
         factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
         factory.consumerFactory = DefaultKafkaConsumerFactory(consumerConfigsLatestAvro())
+        factory.setCommonErrorHandler(DefaultErrorHandler())
         return factory
     }
 
