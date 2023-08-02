@@ -57,7 +57,8 @@ class AktorhendelserListener(
             )
             SECURE_LOGGER.warn(
                 "Feil i prosessering av ident-hendelser med offsett: $offset, topic: $topic, recieved_partition: $partition, groupId: $groupId." +
-                        "\n$consumerRecord", e
+                    "\n$consumerRecord",
+                e
             )
             throw RuntimeException("Feil i prosessering av ident-hendelser")
         }
