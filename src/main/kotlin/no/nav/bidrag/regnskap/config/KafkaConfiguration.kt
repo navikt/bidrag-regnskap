@@ -17,6 +17,7 @@ import org.springframework.kafka.listener.ContainerProperties
 import org.springframework.kafka.listener.DefaultErrorHandler
 import org.springframework.kafka.support.ExponentialBackOffWithMaxRetries
 import org.springframework.util.backoff.ExponentialBackOff
+import java.time.Duration
 
 private val LOGGER = LoggerFactory.getLogger(KafkaConfiguration::class.java)
 
@@ -50,11 +51,12 @@ class KafkaConfiguration(val environment: Environment) {
     }
 
     @Bean
-    fun kafkaAktorV2HendelseContainerFactory(): ConcurrentKafkaListenerContainerFactory<String, String> {
+    fun kafkaAktorV2HendelseContainerFactory(defaultErrorHandler: DefaultErrorHandler): ConcurrentKafkaListenerContainerFactory<String, String> {
         val factory = ConcurrentKafkaListenerContainerFactory<String, String>()
         factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
         factory.consumerFactory = DefaultKafkaConsumerFactory(consumerConfigsLatestAvro())
-        factory.setCommonErrorHandler(DefaultErrorHandler())
+        factory.setContainerCustomizer {  it.containerProperties.setAuthExceptionRetryInterval(Duration.ofSeconds(10)) }
+        factory.setCommonErrorHandler(defaultErrorHandler)
         return factory
     }
 
