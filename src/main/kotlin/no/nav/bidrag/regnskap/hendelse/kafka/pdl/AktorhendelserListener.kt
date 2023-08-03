@@ -1,9 +1,9 @@
 package no.nav.bidrag.regnskap.hendelse.kafka.pdl
 
 import no.nav.bidrag.regnskap.SECURE_LOGGER
-import no.nav.bidrag.regnskap.pdl.aktor.v2.Aktor
-import no.nav.bidrag.regnskap.pdl.aktor.v2.Type
 import no.nav.bidrag.regnskap.service.AktorhendelseService
+import no.nav.person.pdl.aktor.v2.Aktor
+import no.nav.person.pdl.aktor.v2.Type
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.LoggerFactory
 import org.springframework.kafka.annotation.KafkaListener
