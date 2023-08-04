@@ -2,7 +2,9 @@ package no.nav.bidrag.regnskap.util
 
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import no.nav.bidrag.commons.util.SjekkForNyIdent
 import no.nav.bidrag.commons.util.PersonidentGenerator
+import no.nav.bidrag.domain.ident.Ident
 import no.nav.bidrag.regnskap.BidragRegnskapLocal
 import no.nav.bidrag.regnskap.consumer.PersonApiWireMock
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
@@ -22,8 +24,8 @@ import org.springframework.test.context.ActiveProfiles
 @SpringBootTest(classes = [BidragRegnskapLocal::class])
 class SjekkForNyIdentAspectTest {
 
-    private val ident1: String = PersonidentGenerator.genererPersonnummer()
-    private val ident2 = PersonidentGenerator.genererPersonnummer()
+    private val ident1: String = PersonidentGenerator.genererFødselsnummer()
+    private val ident2 = PersonidentGenerator.genererFødselsnummer()
 
     @Autowired
     private lateinit var dummyClassForAnnotasjon: DummyClassForAnnotasjon
@@ -75,6 +77,38 @@ class SjekkForNyIdentAspectTest {
         nyeIdenter[0] shouldBe personApiWireMock.nyIdent
         nyeIdenter[1] shouldBe personApiWireMock.nyIdent
     }
+
+    @Test
+    fun `skal bytte ident med Ident som objekt`() {
+        val nyeIdenter = dummyClassForAnnotasjon.skalTesteBytteAvIdentMedIdentObjekt(Ident(ident1), ident2)
+
+        nyeIdenter[0] shouldBe personApiWireMock.nyIdent
+        nyeIdenter[1] shouldNotBe personApiWireMock.nyIdent
+    }
+
+    @Test
+    fun `skal bytte ident på parameter med Ident som objekt`() {
+        val nyeIdenter = dummyClassForAnnotasjon.skalTesteBytteAvIdentPåParameterMedIdentObjekt(Ident(ident1), ident2)
+
+        nyeIdenter[0] shouldBe personApiWireMock.nyIdent
+        nyeIdenter[1] shouldNotBe personApiWireMock.nyIdent
+    }
+
+    @Test
+    fun `skal ha feil input objekt`() {
+        val nyeIdenter = dummyClassForAnnotasjon.skalTesteFeilInput(ident1.toLong(), ident2)
+
+        nyeIdenter[0] shouldNotBe personApiWireMock.nyIdent
+        nyeIdenter[1] shouldNotBe personApiWireMock.nyIdent
+    }
+
+    @Test
+    fun `skal ha feil input objekt på parameter`() {
+        val nyeIdenter = dummyClassForAnnotasjon.skalTesteFeilInputPåParameter(ident1.toLong(), ident2)
+
+        nyeIdenter[0] shouldNotBe personApiWireMock.nyIdent
+        nyeIdenter[1] shouldNotBe personApiWireMock.nyIdent
+    }
 }
 
 @Component
@@ -100,5 +134,22 @@ private class DummyClassForAnnotasjon {
 
     fun skalTesteBytteAvIdentPåBeggeParameter(@SjekkForNyIdent ident1: String, @SjekkForNyIdent ident2: String): List<String> {
         return listOf(ident1, ident2)
+    }
+
+    @SjekkForNyIdent("ident1")
+    fun skalTesteBytteAvIdentMedIdentObjekt(ident1: Ident, ident2: String): List<String> {
+        return listOf(ident1.verdi, ident2)
+    }
+
+    fun skalTesteBytteAvIdentPåParameterMedIdentObjekt(@SjekkForNyIdent ident1: Ident, ident2: String): List<String> {
+        return listOf(ident1.verdi, ident2)
+    }
+
+    fun skalTesteFeilInputPåParameter(@SjekkForNyIdent ident1: Long, ident2: String): List<String> {
+        return listOf(ident1.toString(), ident2)
+    }
+    @SjekkForNyIdent("ident1")
+    fun skalTesteFeilInput(ident1: Long, ident2: String): List<String> {
+        return listOf(ident1.toString(), ident2)
     }
 }

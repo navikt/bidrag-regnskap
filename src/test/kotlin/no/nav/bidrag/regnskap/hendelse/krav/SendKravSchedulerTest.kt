@@ -138,9 +138,9 @@ internal class SendKravSchedulerTest {
 
     @Test
     fun `skal sende over flere oppdrag med samme sakId i samme krav`() {
-        val bm = PersonidentGenerator.genererPersonnummer()
-        val bp = PersonidentGenerator.genererPersonnummer()
-        val barn = PersonidentGenerator.genererPersonnummer()
+        val bm = PersonidentGenerator.genererFødselsnummer()
+        val bp = PersonidentGenerator.genererFødselsnummer()
+        val barn = PersonidentGenerator.genererFødselsnummer()
         val nav = "80000345435"
 
         val annetOppdrag = TestData.opprettOppdrag(oppdragId = 0, sakId = "654321")

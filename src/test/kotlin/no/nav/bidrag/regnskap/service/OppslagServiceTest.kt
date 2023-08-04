@@ -31,7 +31,7 @@ class OppslagServiceTest {
         @Test
         fun `skal hente eksisterende oppdrag`() {
             val stonadType = StonadType.BIDRAG
-            val skyldnerIdent = PersonidentGenerator.genererPersonnummer()
+            val skyldnerIdent = PersonidentGenerator.genererFødselsnummer()
 
             every { persistenceService.hentOppdrag(any()) } returns TestData.opprettOppdrag(
                 stonadType = stonadType,
