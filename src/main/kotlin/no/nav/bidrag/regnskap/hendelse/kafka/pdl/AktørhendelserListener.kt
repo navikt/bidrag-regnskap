@@ -1,9 +1,8 @@
 package no.nav.bidrag.regnskap.hendelse.kafka.pdl
 
 import no.nav.bidrag.regnskap.SECURE_LOGGER
-import no.nav.bidrag.regnskap.service.AktorhendelseService
+import no.nav.bidrag.regnskap.service.AktørhendelseService
 import no.nav.person.pdl.aktor.v2.Aktor
-import no.nav.person.pdl.aktor.v2.Type
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.LoggerFactory
 import org.springframework.kafka.annotation.KafkaListener
@@ -13,12 +12,12 @@ import org.springframework.messaging.handler.annotation.Header
 import org.springframework.stereotype.Component
 
 @Component
-class AktorhendelserListener(
-    private val aktorhendelseService: AktorhendelseService
+class AktørhendelserListener(
+    private val aktørhendelseService: AktørhendelseService
 ) {
 
     companion object {
-        private val LOGGER = LoggerFactory.getLogger(AktorhendelserListener::class.java)
+        private val LOGGER = LoggerFactory.getLogger(AktørhendelserListener::class.java)
     }
 
     @KafkaListener(
@@ -39,13 +38,7 @@ class AktorhendelserListener(
             SECURE_LOGGER.info("Behandler aktorhendelse: $consumerRecord")
 
             val aktør = consumerRecord.value()
-
-            aktør?.identifikatorer?.singleOrNull { ident ->
-                ident.type == Type.FOLKEREGISTERIDENT && ident.gjeldende
-            }?.also { folkeregisterident ->
-                aktorhendelseService.behandleAktoerHendelse(folkeregisterident.idnummer.toString())
-                LOGGER.info("Oppdatert indent aktorhendelse med offset: $offset")
-            }
+            aktørhendelseService.behandleAktoerHendelse(aktør)
 
             acknowledgment.acknowledge()
             LOGGER.info("Behandlet aktorhendelse med offset: $offset")
