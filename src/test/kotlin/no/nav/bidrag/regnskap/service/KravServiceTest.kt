@@ -139,9 +139,9 @@ class KravServiceTest {
 
     @Test
     fun `skal støtte å sende over flere oppdrag i samme krav`() {
-        val bm = PersonidentGenerator.genererPersonnummer()
-        val bp = PersonidentGenerator.genererPersonnummer()
-        val barn = PersonidentGenerator.genererPersonnummer()
+        val bm = PersonidentGenerator.genererFødselsnummer()
+        val bp = PersonidentGenerator.genererFødselsnummer()
+        val barn = PersonidentGenerator.genererFødselsnummer()
         val nav = "80000345435"
 
         val bidragOppdrag = TestData.opprettOppdrag(oppdragId = 1, skyldnerIdent = bp, kravhaverIdent = bm, gjelderIdent = barn, sakId = "123456")
@@ -175,9 +175,9 @@ class KravServiceTest {
 
     @Test
     fun `skal sende samme oppdragId men forskjellig vedtakId i forskjellige Krav i samme kall mot skatt`() {
-        val bm = PersonidentGenerator.genererPersonnummer()
-        val bp = PersonidentGenerator.genererPersonnummer()
-        val barn = PersonidentGenerator.genererPersonnummer()
+        val bm = PersonidentGenerator.genererFødselsnummer()
+        val bp = PersonidentGenerator.genererFødselsnummer()
+        val barn = PersonidentGenerator.genererFødselsnummer()
         val nav = "80000345435"
 
         val bidragOppdrag = TestData.opprettOppdrag(oppdragId = 1, skyldnerIdent = bp, kravhaverIdent = bm, gjelderIdent = barn, sakId = "123456")
@@ -211,9 +211,9 @@ class KravServiceTest {
 
     @Test
     fun `skal opprette kravliste sortert med eldste vedtak først`() {
-        val bm = PersonidentGenerator.genererPersonnummer()
-        val bp = PersonidentGenerator.genererPersonnummer()
-        val barn = PersonidentGenerator.genererPersonnummer()
+        val bm = PersonidentGenerator.genererFødselsnummer()
+        val bp = PersonidentGenerator.genererFødselsnummer()
+        val barn = PersonidentGenerator.genererFødselsnummer()
         val nav = "80000345435"
 
         val bidragOppdrag = TestData.opprettOppdrag(oppdragId = 1, skyldnerIdent = bp, kravhaverIdent = bm, gjelderIdent = barn, sakId = "123456")

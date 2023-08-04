@@ -29,7 +29,7 @@ class SakApiWireMock {
              "kategori": "N",
              "roller": [
                {
-                 "fodselsnummer": "${PersonidentGenerator.genererPersonnummer()}",
+                 "fodselsnummer": "${PersonidentGenerator.genererFødselsnummer()}",
                  "type": "BA"
                }
              ]

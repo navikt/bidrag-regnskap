@@ -361,8 +361,8 @@ internal class VedtakshendelseListenerIT {
         skrivTilTestdatafil(listOf(kontering), "Ettergivelse tilbakekreving")
     }
 
-    val skyldnerIdent = PersonidentGenerator.genererPersonnummer()
-    val kravhaverIdent = PersonidentGenerator.genererPersonnummer()
+    val skyldnerIdent = PersonidentGenerator.genererFødselsnummer()
+    val kravhaverIdent = PersonidentGenerator.genererFødselsnummer()
 
     @Test
     @Order(12)
@@ -412,10 +412,10 @@ internal class VedtakshendelseListenerIT {
         skrivTilTestdatafil(konteringer, "Oppdaterer bidragsforskudds med 50 øre og endrer til å slutte 2 mnd tidligere.")
     }
 
-    val bmBidrag = PersonidentGenerator.genererPersonnummer()
-    val bpBidrag = PersonidentGenerator.genererPersonnummer()
-    val barn1Bidrag = PersonidentGenerator.genererPersonnummer()
-    val barn2Bidrag = PersonidentGenerator.genererPersonnummer()
+    val bmBidrag = PersonidentGenerator.genererFødselsnummer()
+    val bpBidrag = PersonidentGenerator.genererFødselsnummer()
+    val barn1Bidrag = PersonidentGenerator.genererFødselsnummer()
+    val barn2Bidrag = PersonidentGenerator.genererFødselsnummer()
 
     @Test
     @Order(14)
@@ -506,9 +506,9 @@ internal class VedtakshendelseListenerIT {
         )
     }
 
-    val bpOppfostring = PersonidentGenerator.genererPersonnummer()
-    val barn1Oppfostring = PersonidentGenerator.genererPersonnummer()
-    val barn2Oppfostring = PersonidentGenerator.genererPersonnummer()
+    val bpOppfostring = PersonidentGenerator.genererFødselsnummer()
+    val barn1Oppfostring = PersonidentGenerator.genererFødselsnummer()
+    val barn2Oppfostring = PersonidentGenerator.genererFødselsnummer()
 
     @Test
     @Order(16)
@@ -637,8 +637,8 @@ internal class VedtakshendelseListenerIT {
         )
     }
 
-    val skyldnerIdEktefelleBidrag = PersonidentGenerator.genererPersonnummer()
-    val kravhaverIdEktefellebidrag = PersonidentGenerator.genererPersonnummer()
+    val skyldnerIdEktefelleBidrag = PersonidentGenerator.genererFødselsnummer()
+    val kravhaverIdEktefellebidrag = PersonidentGenerator.genererFødselsnummer()
 
     @Test
     @Order(20)
@@ -802,12 +802,12 @@ internal class VedtakshendelseListenerIT {
     private fun hentFilOgSendPåKafka(
         filnavn: String,
         antallOverføringerSåLangt: Int,
-        kravhaverIdent: String = PersonidentGenerator.genererPersonnummer(),
-        mottaker: String = PersonidentGenerator.genererPersonnummer(),
-        bm: String = PersonidentGenerator.genererPersonnummer(),
-        bp: String = PersonidentGenerator.genererPersonnummer(),
-        barn1: String = PersonidentGenerator.genererPersonnummer(),
-        barn2: String = PersonidentGenerator.genererPersonnummer()
+        kravhaverIdent: String = PersonidentGenerator.genererFødselsnummer(),
+        mottaker: String = PersonidentGenerator.genererFødselsnummer(),
+        bm: String = PersonidentGenerator.genererFødselsnummer(),
+        bp: String = PersonidentGenerator.genererFødselsnummer(),
+        barn1: String = PersonidentGenerator.genererFødselsnummer(),
+        barn2: String = PersonidentGenerator.genererFødselsnummer()
     ): VedtakHendelse {
         val vedtakFilString = leggInnGenererteIdenter(hentTestfil(filnavn), kravhaverIdent, mottaker, bm, bp, barn1, barn2)
 
@@ -875,7 +875,7 @@ internal class VedtakshendelseListenerIT {
         barn1: String,
         barn2: String
     ): String {
-        return vedtakFil.replace("\"skyldnerId\": \"\"", "\"skyldnerId\" : \"${PersonidentGenerator.genererPersonnummer()}\"")
+        return vedtakFil.replace("\"skyldnerId\": \"\"", "\"skyldnerId\" : \"${PersonidentGenerator.genererFødselsnummer()}\"")
             .replace("\"kravhaverId\": \"\"", "\"kravhaverId\" : \"$kravhaverIdent\"")
             .replace("\"mottakerId\": \"\"", "\"mottakerId\" : \"$mottaker\"")
             .replace("\"skyldnerId\": \"BP\"", "\"skyldnerId\" : \"$bp\"")

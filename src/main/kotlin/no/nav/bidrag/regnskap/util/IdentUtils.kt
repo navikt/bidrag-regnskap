@@ -1,5 +1,6 @@
 package no.nav.bidrag.regnskap.util
 
+import no.nav.bidrag.commons.util.SjekkForNyIdent
 import org.springframework.stereotype.Component
 
 @Component

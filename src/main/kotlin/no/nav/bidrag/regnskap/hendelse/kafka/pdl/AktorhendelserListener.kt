@@ -44,11 +44,11 @@ class AktorhendelserListener(
                 ident.type == Type.FOLKEREGISTERIDENT && ident.gjeldende
             }?.also { folkeregisterident ->
                 aktorhendelseService.behandleAktoerHendelse(folkeregisterident.idnummer.toString())
-                LOGGER.info("Oppdatert indent ved hendelse for AktørV2 for offset: $offset")
+                LOGGER.info("Oppdatert indent aktorhendelse med offset: $offset")
             }
 
             acknowledgment.acknowledge()
-            LOGGER.info("Behandlet hendelse med offset: $offset")
+            LOGGER.info("Behandlet aktorhendelse med offset: $offset")
             SECURE_LOGGER.info("Behandlet aktorhendelse for: $aktør")
         } catch (e: RuntimeException) {
             LOGGER.warn(

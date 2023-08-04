@@ -67,7 +67,7 @@ internal class SakConsumerTest {
             Sakskategori.N,
             roller = listOf(
                 RolleDto(
-                    PersonidentGenerator.genererPersonnummer(),
+                    PersonidentGenerator.genererFødselsnummer(),
                     rolletype
                 )
             )
