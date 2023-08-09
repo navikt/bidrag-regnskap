@@ -9,19 +9,13 @@ import no.nav.bidrag.regnskap.persistence.entity.Påløp
 import no.nav.bidrag.regnskap.service.PersistenceService
 import no.nav.bidrag.regnskap.service.PåløpskjøringLytter
 import no.nav.bidrag.regnskap.util.ByteArrayOutputStreamTilByteBuffer
-import org.slf4j.LoggerFactory
-import org.w3c.dom.Document
-import org.w3c.dom.Element
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.util.function.Consumer
-import javax.xml.parsers.DocumentBuilderFactory
-import javax.xml.transform.OutputKeys
-import javax.xml.transform.TransformerFactory
-import javax.xml.transform.dom.DOMSource
-import javax.xml.transform.stream.StreamResult
+import javax.xml.stream.XMLOutputFactory
+import javax.xml.stream.XMLStreamWriter
 
 class PåløpsfilGenerator(
     private val gcpFilBucket: GcpFilBucket,
@@ -29,32 +23,21 @@ class PåløpsfilGenerator(
     private val persistenceService: PersistenceService
 ) {
 
-    companion object {
-        private val LOGGER = LoggerFactory.getLogger(PåløpsfilGenerator::class.java)
-        const val BATCH_BESKRIVELSE = "Kravtransaksjoner fra Bidrag-Regnskap til Predator"
-    }
-
     private var lyttere: List<PåløpskjøringLytter> = emptyList()
-    private val documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
 
     fun skrivPåløpsfilOgLastOppPåFilsluse(
         påløp: Påløp,
         lyttere: List<PåløpskjøringLytter>
     ) {
-        val now = LocalDate.now()
-        val påløpsMappe = "påløp/"
-        val påløpsfilnavn = "paaloop_D" + now.format(DateTimeFormatter.ofPattern("yyMMdd")).toString() + ".xml"
         this.lyttere = lyttere
+        val now = LocalDate.now()
         val konteringer = persistenceService.hentAlleIkkeOverførteKonteringer()
 
-        val dokument = documentBuilder.newDocument()
-        dokument.xmlStandalone = true
+        val byteArrayOutputStream = ByteArrayOutputStreamTilByteBuffer()
+        val writer = XMLOutputFactory.newInstance().createXMLStreamWriter(byteArrayOutputStream, "ISO-8859-1")
 
-        val rootElement =
-            dokument.createElementNS("http://www.trygdeetaten.no/skjema/bidrag-reskonto", "bidrag-reskonto")
-        dokument.appendChild(rootElement)
-
-        opprettStartBatchBr01(dokument, rootElement, påløp, now)
+        skrivHeader(writer)
+        skrivStartBatchBr01(writer, påløp, now)
 
         var index = 0
         var sum = BigDecimal.ZERO
@@ -63,171 +46,200 @@ class PåløpsfilGenerator(
                 medLyttere { it.rapportertKonteringerSkrevetTilFil(påløp, index, konteringer.size) }
             }
 
-            val oppdragElement = dokument.createElement("oppdrag")
-            rootElement.appendChild(oppdragElement)
+            writer.writeCharacters("\n")
+            writer.writeStartElement("oppdrag")
 
             konteringerForOppdrag.forEach { kontering ->
-                opprettKonteringBr10(dokument, oppdragElement, kontering, now)
+                skrivKonteringBr10(writer, kontering, now)
                 sum += kontering.oppdragsperiode!!.beløp
             }
+
+            writer.writeEndElement()
         }
 
         medLyttere { it.konteringerSkrevetTilFilFerdig(påløp, konteringer.size) }
-        LOGGER.info("Påløpskjøring: Har skrevet ${konteringer.size} av ${konteringer.size} konteringer til påløpsfil.")
 
-        opprettStoppBatchBr99(dokument, rootElement, sum, konteringer.size)
+        skrivStoppBatchBr99(writer, sum, konteringer.size)
+
+        skrivHeaderSlutt(writer)
+
+        writer.close()
+        byteArrayOutputStream.close()
+
+        val påløpsMappe = "påløp/"
+        val påløpsfilnavn = "paaloop_D" + now.format(DateTimeFormatter.ofPattern("yyMMdd")).toString() + ".xml"
 
         medLyttere { it.lastOppFilTilGcpBucket(påløp, "Starter opplasting til GCP bucket..") }
-        skrivXml(dokument, påløpsMappe + påløpsfilnavn)
+        gcpFilBucket.lagreFil(påløpsMappe + påløpsfilnavn, byteArrayOutputStream)
         medLyttere { it.lastOppFilTilGcpBucket(påløp, "Fil lastet opp til GCP bucket!") }
 
         medLyttere { it.lastOppFilTilFilsluse(påløp, "Starter opplasting til filsluse..") }
         filoverføringTilElinKlient.lastOppFilTilFilsluse(påløpsMappe, påløpsfilnavn)
         medLyttere { it.lastOppFilTilFilsluse(påløp, "Fil lastet opp til filsluse!") }
+
+// For lokal testing av filgenerering
+//        val xmlString = byteArrayOutputStream.toString()
+//        println("Generert XML:\n$xmlString")
     }
 
-    private fun opprettStartBatchBr01(dokument: Document, rootElement: Element, påløp: Påløp, now: LocalDate) {
-        val startBatchBr01 = dokument.createElement("start-batch-br01")
-        rootElement.appendChild(startBatchBr01)
-
-        val beskrivelse = dokument.createElement("beskrivelse")
-        beskrivelse.textContent = BATCH_BESKRIVELSE
-        startBatchBr01.appendChild(beskrivelse)
-
-        val kjorenr = dokument.createElement("kjorenr")
-        kjorenr.textContent = påløp.påløpId.toString()
-        startBatchBr01.appendChild(kjorenr)
-
-        val dato = dokument.createElement("dato")
-        dato.textContent = now.toString()
-        startBatchBr01.appendChild(dato)
+    private fun skrivHeader(writer: XMLStreamWriter) {
+        writer.writeStartDocument("ISO-8859-1", "1.0")
+        writer.writeCharacters("\n")
+        writer.writeStartElement("bidrag-reskonto")
+        writer.writeDefaultNamespace("http://www.trygdeetaten.no/skjema/bidrag-reskonto")
     }
 
-    private fun opprettKonteringBr10(
-        dokument: Document,
-        oppdragElement: Element,
-        kontering: Kontering,
+    private fun skrivHeaderSlutt(writer: XMLStreamWriter) {
+        writer.writeCharacters("\n")
+        writer.writeEndElement(); //bidrag-reskonto
+        writer.writeEndDocument()
+    }
+
+    private fun skrivStartBatchBr01(
+        writer: XMLStreamWriter,
+        påløp: Påløp,
         now: LocalDate
     ) {
-        val konteringBr10Element = dokument.createElement("kontering-br10")
-        oppdragElement.appendChild(konteringBr10Element)
+        writer.writeCharacters("\n")
+        writer.writeStartElement("start-batch-br01")
+
+        writer.writeStartElement("beskrivelse")
+        writer.writeCharacters("Kravtransaksjoner fra Bidrag-Regnskap til Predator")
+        writer.writeEndElement()
+
+        writer.writeStartElement("kjorenr")
+        writer.writeCharacters(påløp.påløpId.toString())
+        writer.writeEndElement()
+
+        writer.writeStartElement("dato")
+        writer.writeCharacters(now.toString())
+        writer.writeEndElement()
+        writer.writeEndElement(); // start-batch-br01
+    }
+
+    private fun skrivKonteringBr10(writer: XMLStreamWriter, kontering: Kontering, now: LocalDate) {
+        writer.writeStartElement("kontering-br10")
 
         // Ikke i bruk, genereres tom
-        val kodeFagomraade = dokument.createElement("kodeFagomraade")
-        konteringBr10Element.appendChild(kodeFagomraade)
+        writer.writeStartElement("kodeFagomraade")
+        writer.writeEndElement()
 
-        val transKode = dokument.createElement("transKode")
-        transKode.textContent = kontering.transaksjonskode
-        konteringBr10Element.appendChild(transKode)
+        writer.writeStartElement("transKode")
+        writer.writeCharacters(kontering.transaksjonskode)
+        writer.writeEndElement()
 
-        val endring = dokument.createElement("endring")
-        endring.textContent = if (kontering.type == Type.NY.name) "N" else "J"
-        konteringBr10Element.appendChild(endring)
+        writer.writeStartElement("endring")
+        writer.writeCharacters(if (kontering.type == Type.NY.name) "N" else "J")
+        writer.writeEndElement()
 
-        val soknadType = dokument.createElement("soknadType")
-        soknadType.textContent = kontering.søknadType
-        konteringBr10Element.appendChild(soknadType)
-
-        // Ikke i bruk, genereres tom
-        val eierEnhet = dokument.createElement("eierEnhet")
-        konteringBr10Element.appendChild(eierEnhet)
+        writer.writeStartElement("soknadType")
+        writer.writeCharacters(kontering.søknadType)
+        writer.writeEndElement()
 
         // Ikke i bruk, genereres tom
-        val behandlEnhet = dokument.createElement("behandlEnhet")
-        konteringBr10Element.appendChild(behandlEnhet)
+        writer.writeStartElement("eierEnhet")
+        writer.writeEndElement()
 
-        val fagsystemId = dokument.createElement("fagsystemId")
-        fagsystemId.textContent = kontering.oppdragsperiode?.oppdrag?.sakId
-        konteringBr10Element.appendChild(fagsystemId)
+        // Ikke i bruk, genereres tom
+        writer.writeStartElement("behandlEnhet")
+        writer.writeEndElement()
 
-        val oppdragGjelderId = dokument.createElement("oppdragGjelderId")
-        oppdragGjelderId.textContent = kontering.oppdragsperiode?.oppdrag?.gjelderIdent
-        konteringBr10Element.appendChild(oppdragGjelderId)
+        writer.writeStartElement("fagsystemId")
+        writer.writeCharacters(kontering.oppdragsperiode?.oppdrag?.sakId)
+        writer.writeEndElement()
 
-        val skyldnerId = dokument.createElement("skyldnerId")
-        skyldnerId.textContent = kontering.oppdragsperiode?.oppdrag?.skyldnerIdent
-        konteringBr10Element.appendChild(skyldnerId)
+        writer.writeStartElement("oppdragGjelderId")
+        writer.writeCharacters(kontering.oppdragsperiode?.oppdrag?.gjelderIdent)
+        writer.writeEndElement()
 
-        val kravhaverId = dokument.createElement("kravhaverId")
-        kravhaverId.textContent = kontering.oppdragsperiode?.oppdrag?.kravhaverIdent
-        konteringBr10Element.appendChild(kravhaverId)
+        writer.writeStartElement("skyldnerId")
+        writer.writeCharacters(kontering.oppdragsperiode?.oppdrag?.skyldnerIdent)
+        writer.writeEndElement()
 
-        val utbetalesTilId = dokument.createElement("utbetalesTilId")
-        utbetalesTilId.textContent = kontering.oppdragsperiode?.mottakerIdent
-        konteringBr10Element.appendChild(utbetalesTilId)
+        writer.writeStartElement("kravhaverId")
+        writer.writeCharacters(kontering.oppdragsperiode?.oppdrag?.kravhaverIdent)
+        writer.writeEndElement()
 
-        val belop = dokument.createElement("belop")
-        belop.textContent = kontering.oppdragsperiode?.beløp.toString()
-        konteringBr10Element.appendChild(belop)
+        writer.writeStartElement("utbetalesTilId")
+        writer.writeCharacters(kontering.oppdragsperiode?.mottakerIdent)
+        writer.writeEndElement()
 
-        val fradragTillegg = dokument.createElement("fradragTillegg")
-        fradragTillegg.textContent =
-            if (Transaksjonskode.valueOf(kontering.transaksjonskode).korreksjonskode != null) "T" else "F"
-        konteringBr10Element.appendChild(fradragTillegg)
+        writer.writeStartElement("belop")
+        writer.writeCharacters(kontering.oppdragsperiode?.beløp.toString())
+        writer.writeEndElement()
 
-        val valutaKode = dokument.createElement("valutaKode")
-        valutaKode.textContent = kontering.oppdragsperiode?.valuta
-        konteringBr10Element.appendChild(valutaKode)
+        writer.writeStartElement("fradragTillegg")
+        writer.writeCharacters(if (Transaksjonskode.valueOf(kontering.transaksjonskode).korreksjonskode != null) "T" else "F")
+        writer.writeEndElement()
+
+        writer.writeStartElement("valutaKode")
+        writer.writeCharacters(kontering.oppdragsperiode?.valuta)
+        writer.writeEndElement()
 
         val yearMonth = YearMonth.parse(kontering.overføringsperiode)
 
-        val datoBeregnFom = dokument.createElement("datoBeregnFom")
-        datoBeregnFom.textContent = LocalDate.of(yearMonth.year, yearMonth.month, 1).toString()
-        konteringBr10Element.appendChild(datoBeregnFom)
+        writer.writeStartElement("datoBeregnFom")
+        writer.writeCharacters(LocalDate.of(yearMonth.year, yearMonth.month, 1).toString())
+        writer.writeEndElement()
 
-        val datoBeregnTom = dokument.createElement("datoBeregnTom")
-        datoBeregnTom.textContent = LocalDate.of(yearMonth.year, yearMonth.month, yearMonth.lengthOfMonth()).toString()
-        konteringBr10Element.appendChild(datoBeregnTom)
+        writer.writeStartElement("datoBeregnTom")
+        writer.writeCharacters(LocalDate.of(yearMonth.year, yearMonth.month, yearMonth.lengthOfMonth()).toString())
+        writer.writeEndElement()
 
-        val datoVedtak = dokument.createElement("datoVedtak")
-        datoVedtak.textContent = kontering.oppdragsperiode?.vedtaksdato.toString()
-        konteringBr10Element.appendChild(datoVedtak)
+        writer.writeStartElement("datoVedtak")
+        writer.writeCharacters(kontering.oppdragsperiode?.vedtaksdato.toString())
+        writer.writeEndElement()
 
-        val datoKjores = dokument.createElement("datoKjores")
-        datoKjores.textContent = now.toString()
-        konteringBr10Element.appendChild(datoKjores)
+        writer.writeStartElement("datoKjores")
+        writer.writeCharacters(now.toString())
+        writer.writeEndElement()
 
-        val saksbehId = dokument.createElement("saksbehId")
-        saksbehId.textContent = kontering.oppdragsperiode?.opprettetAv
-        konteringBr10Element.appendChild(saksbehId)
+        writer.writeStartElement("saksbehId")
+        writer.writeCharacters(kontering.oppdragsperiode?.opprettetAv)
+        writer.writeEndElement()
 
-        val attestantId = dokument.createElement("attestantId")
-        attestantId.textContent = kontering.oppdragsperiode?.opprettetAv
-        konteringBr10Element.appendChild(attestantId)
+        writer.writeStartElement("attestantId")
+        writer.writeCharacters(kontering.oppdragsperiode?.opprettetAv)
+        writer.writeEndElement()
 
-        val tekst = dokument.createElement("tekst")
-        tekst.textContent = kontering.oppdragsperiode?.eksternReferanse
-        konteringBr10Element.appendChild(tekst)
+        writer.writeStartElement("tekst")
+        writer.writeCharacters(kontering.oppdragsperiode?.eksternReferanse)
+        writer.writeEndElement()
 
-        val refFagsystemId = dokument.createElement("refFagsystemId")
-        refFagsystemId.textContent = kontering.oppdragsperiode?.oppdrag?.sakId
-        konteringBr10Element.appendChild(refFagsystemId)
+        writer.writeStartElement("refFagsystemId")
+        writer.writeCharacters(kontering.oppdragsperiode?.oppdrag?.sakId)
+        writer.writeEndElement()
 
-        val delytelseId = dokument.createElement("delytelseId")
-        delytelseId.textContent = kontering.oppdragsperiode?.delytelseId.toString()
-        konteringBr10Element.appendChild(delytelseId)
+        writer.writeStartElement("delytelseId")
+        writer.writeCharacters(kontering.oppdragsperiode?.delytelseId.toString())
+        writer.writeEndElement()
 
-        val refDelytelseId = dokument.createElement("refDelytelseId")
-        refDelytelseId.textContent = kontering.oppdragsperiode?.delytelseId.toString()
-        konteringBr10Element.appendChild(refDelytelseId)
+        writer.writeStartElement("refDelytelseId")
+        writer.writeCharacters(kontering.oppdragsperiode?.delytelseId.toString())
+        writer.writeEndElement()
+
+        writer.writeEndElement() // kontering-br10
     }
 
-    private fun opprettStoppBatchBr99(dokument: Document, rootElement: Element, sum: BigDecimal, antall: Int) {
-        val stopBatchBr99 = dokument.createElement("stopp-batch-br99")
-        rootElement.appendChild(stopBatchBr99)
+    private fun skrivStoppBatchBr99(writer: XMLStreamWriter, sum: BigDecimal, antall: Int) {
+        writer.writeCharacters("\n")
+        writer.writeStartElement("stopp-batch-br99")
 
-        val sumBelop = dokument.createElement("sumBelop")
-        sumBelop.textContent = sum.toString()
-        stopBatchBr99.appendChild(sumBelop)
+        writer.writeStartElement("sumBelop")
+        writer.writeCharacters(sum.toString())
+        writer.writeEndElement()
 
-        val antallRecords = dokument.createElement("antallRecords")
-        antallRecords.textContent = antall.toString()
-        stopBatchBr99.appendChild(antallRecords)
+        writer.writeStartElement("antallRecords")
+        writer.writeCharacters(antall.toString())
+        writer.writeEndElement()
+
+        writer.writeEndElement() // stopp-batch-br99
     }
 
     private fun finnAlleOppdragFraKonteringer(konteringer: List<Kontering>): HashMap<Int, ArrayList<Kontering>> {
         val oppdragsMap = HashMap<Int, ArrayList<Kontering>>()
 
+        // Går igjennom alle konteringer, oppretter en liste for hvert oppdrag om det ikke allerede finnes og legger til konteringen i listen tilhørende tilknyttet oppdrag.
         konteringer.forEach { kontering ->
             val oppdrag = kontering.oppdragsperiode?.oppdrag?.oppdragId!!
             var current = oppdragsMap[oppdrag]
@@ -238,21 +250,6 @@ class PåløpsfilGenerator(
             current.add(kontering)
         }
         return oppdragsMap
-    }
-
-    private fun skrivXml(dokument: Document, påløpsfilnavn: String) {
-        val transformer = TransformerFactory.newInstance().newTransformer()
-        transformer.setOutputProperty(OutputKeys.ENCODING, "ISO-8859-1")
-
-        val source = DOMSource(dokument)
-        val byteArrayStream = ByteArrayOutputStreamTilByteBuffer()
-        transformer.transform(source, StreamResult(byteArrayStream))
-
-        gcpFilBucket.lagreFil(påløpsfilnavn, byteArrayStream)
-
-        // Output til console for testing
-//    val result = StreamResult(System.out)
-//    transformer.transform(source, result)
     }
 
     private fun medLyttere(lytterConsumer: Consumer<PåløpskjøringLytter>) = lyttere.forEach(lytterConsumer)
