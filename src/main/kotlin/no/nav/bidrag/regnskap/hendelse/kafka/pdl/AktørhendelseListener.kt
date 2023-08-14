@@ -12,12 +12,12 @@ import org.springframework.messaging.handler.annotation.Header
 import org.springframework.stereotype.Component
 
 @Component
-class AktørhendelserListener(
+class AktørhendelseListener(
     private val aktørhendelseService: AktørhendelseService
 ) {
 
     companion object {
-        private val LOGGER = LoggerFactory.getLogger(AktørhendelserListener::class.java)
+        private val LOGGER = LoggerFactory.getLogger(AktørhendelseListener::class.java)
     }
 
     @KafkaListener(

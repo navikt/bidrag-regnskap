@@ -10,22 +10,30 @@ i form av gebyrer.
 ### Oppdrag
 
 Bidrag-regnskap lytter på hendelser fra Bidrag-vedtak og lagrer hendelsene som et oppdrag.
-Et oppdrag er definert unikt av stønadstype, kravhaverIdent, skyldnerIdent og ekstern referanse.
+
+Oppdrag kan deles i to hovedgrupper, engangsbeløp og stønader. 
+Engangsbeløp består av særtilskudd, gebyr mottaker, gebyr skyldner, tilbakekreving, ettergivelse, direkte oppgjør og ettergivelse tilbakekreving.
+Disse har en periode på kun 1 mnd. 
+
+Stønader består av forskudd, bidrag, oppfostringsbidrag, 18 års bidrag, ektefellebidrag og motregning.
+Disse er ofte løpende over flere mnd, og kan eksistere med en satt sluttdato eller uten kjent sluttdato.
+
+
+Et oppdrag er definert unikt av stønadstype, kravhaverIdent, skyldnerIdent og sakId.
 Oppdraget består av alle verdier som er felles for alle perioder oppdraget inneholder.
 Disse perioden er definert som oppdragsperioder. Et oppdrag kan ha mange oppdragsperioder.
-</br>Oppdrag består av følgende felter:
 
-| Navn                  | Navn i databasen        | Beskrivelse                                                                                                                                                                                                                                                                                                              |
-|-----------------------|-------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| OppdragId             | oppdrag_id              | Primærnøkkel. ID for oppdraget. Autogeneres av postgres ved lagring av oppdraget.                                                                                                                                                                                                                                        |
-| Stønadtype            | stonad_type             | Hva slags type oppdrag dette er. Er en av følgende fra enum: [StonadType.kt](https://github.com/navikt/bidrag-behandling-felles/blob/main/src/main/kotlin/no/nav/bidrag/behandling/felles/enums/StonadType.kt)                                                                                                           |
-| VedtakType            | vedtak_type             | Viser til om vedtaket er opprettet manuelt eller automatisk. Er en av følgende fra enum: [EngangsbelopType.kt](https://github.com/navikt/bidrag-behandling-felles/blob/main/src/main/kotlin/no/nav/bidrag/behandling/felles/enums/EngangsbelopType.kt)                                                                   |
-| KravhaverIdent        | kravhaver_ident         | Ident på kravhaver av oppdraget. I de fleste tilfeller er dette barnet.                                                                                                                                                                                                                                                  |
-| SkyldnerIdent         | skyldner_ident          | Ident på skyldner av oppdraget. Dette er ofte BP i saken.                                                                                                                                                                                                                                                                |
-| EksternReferanse      | ekstern_referanse       | Fritekst felt som ofte benyttes i utenlandssaker.                                                                                                                                                                                                                                                                        |
-| UtsattTilDato         | utsatt_til_dato         | Saksbehandler kan ved opprettelse av en sak sette en dato som betalingen skal utsettes til. Dette kan kun gjøres ved nye vedtak. Dette vil forhindre at konteringer oversendes før utsattTil datoen er passert.                                                                                                          |
-| EndretTidspunkt       | endret_tidspunkt        | Timestamp for når oppdraget sist var endret. Timestampet settes og brukes av schedlock for å identifisere om det har vært endringer på oppdraget mens locken var aktiv.                                                                                                                                                  |
-| Oppdragsperioder      | -                       | OneToMany mapping til alle oppdragsperiodene knyttet til oppdraget.                                                                                                                                                                                                                                                      |
+Et oppdrag inneholder følgende nevneverdige felter:
+
+| Navn               | Beskrivelse                                                                                                                                                                                                                                                                                                                                                                                                |
+|--------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Stønadtype         | Hva slags type oppdrag dette er. Er fra en av følgende enumer: [StonadType.kt](https://github.com/navikt/bidrag-domain/blob/28a5a86914ad8bdaad0eeaf884813dedeb1647a8/src/main/kotlin/no/nav/bidrag/domain/enums/StonadType.kt) [EngangsbelopType.kt](https://github.com/navikt/bidrag-domain/blob/28a5a86914ad8bdaad0eeaf884813dedeb1647a8/src/main/kotlin/no/nav/bidrag/domain/enums/EngangsbelopType.kt) |
+| VedtakType         | Viser til om det var fastsettelse, krage, indeksregulering e.g som førte til vedtaket. Er en av følgende fra enum: [VedtakType.kt](https://github.com/navikt/bidrag-domain/blob/28a5a86914ad8bdaad0eeaf884813dedeb1647a8/src/main/kotlin/no/nav/bidrag/domain/enums/VedtakType.kt)                                                                                                                         |
+| SakId             | Iden til saken oppdraget er knyttet til.                                                                                                                                                                                                                                                                                                                                                                   |
+| KravhaverIdent     | Ident på kravhaver av oppdraget. I de fleste tilfeller er dette barnet.                                                                                                                                                                                                                                                                                                                                    |
+| SkyldnerIdent      | Ident på skyldner av oppdraget. Dette er ofte BP i saken.                                                                                                                                                                                                                                                                                                                                                  |
+| GjelderIdent      | Identen til den oppdragsperioden gjelder. Det gjøres et oppslag mot bidrag-sak på saksId for å sjekke om det finnes en BM på saken. Om det finnes settes gjelderIdent til BM, ellers settes gjelderIdent til dummynummer: `22222222226` |
+| UtsattTilDato      | Saksbehandler kan ved opprettelse av en sak sette en dato som betalingen skal utsettes til. Dette kan kun gjøres ved nye vedtak. Dette vil forhindre at konteringer oversendes før utsattTil datoen er passert.                                                                                                                                                                                            |
 
 ### Oppdragsperiode
 
@@ -37,83 +45,66 @@ Engangsbeløp som i utgangspunktet ikke er periodisert vil her bli opprettet med
 varer i 1 måned.
 Dette er gjort for tilfredsstille ELINs krav om periode for alle beløp som overføres.
 Oppdragsperioden kan kun være knyttet til et oppdrag.
-</br>Oppdragsperiode består av følgende felter:
 
-| Navn              | Navn i databasen   | Beskrivelse                                                                                                                                                                                                                                      |
-|-------------------|--------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| OppdragsperiodeId | oppdragsperiode_id | Primærnøkkel. ID for oppdragsperioder. Autogeneres av postgres ved lagring av oppdragsperioden.                                                                                                                                                  |
-| Oppdrag           | oppdrag            | Referanse til oppdraget oppdragsperioden tilhører.                                                                                                                                                                                               |
-| SakId             | sak_id             | Iden til saken oppdragsperioden er knyttet til.                                                                                                                                                                                                  |
-| VedtakId          | vedtak_id          | Iden til vedtaket oppdragsperioden er knyttet til.                                                                                                                                                                                               |
-| Referanse         | referanse          | Referanse til vedtaket som ble fattet for et engangsbeløp. Vil ikke eksistere for løpende oppdragsperioder.                                                                                                                                      |
-| GjelderIdent      | gjelder_ident      | Identen til den oppdragsperioden gjelder. Det gjøres et oppslag mot bidrag-sak på saksId for å sjekke om det finnes en BM på saken. Om det finnes settes gjelderIdent til BM, ellers settes gjelderIdent til dummynummer: `22222222226`          |
-| MottakerIdent     | mottaker_ident     | Identen til mottaker av beløpet. Dette vil tilsvare RM. I enkelte tilfeller, slik som ved gebyr, så vil mottakerIdent settes til NAVs aktørnummer `80000345435`.                                                                                 |
-| Beløp             | belop              | Beløpet oppdragsperioden har. Tallet er et desimaltall.                                                                                                                                                                                          |
-| Valuta            | valuta             | Valutakode på tre bokstaver, eks `NOK`.                                                                                                                                                                                                          |
-| PeriodeFra        | periode_fra        | Dato for starten på perioden. Datoen skal alltid være 1. dag i måned og er inklusiv i perioden, dvs fra og med periodeFra datoen.                                                                                                                |
-| PeriodeTil        | periode_til        | Dato for slutten av perioden. Datoen skal alltid være 1. dag i måned om den er satt. Datoen kan også være null og da løper perioden helt til den blir stoppet. Datoen er ekslusiv i perioden, dvs til og _IKKE_ med periodeTil datoen.           |
-| Vedtaksdato       | vedtaksdato        | Dato vedtaket ble fattet. For engangsbeløp er det denne datoen som definerer hvilken måned beløpet gjelder for.                                                                                                                                  |
-| OpprettetAv       | opprettet_av       | Iden til saksbehandler som opprettet vedtaket.                                                                                                                                                                                                   |
-| DelytelsesId      | delytelses_id      | Unik kode som representerer et løpende kontinuerlig oppdrag                                                                                                                                                                                      |
-| AktivTil          | aktiv_til          | Feltet får satt en periode, e.g. `2023-01-01`, som representerer hvilken måned oppdragsperioden er aktiv til og ikke med. Dette kan bli satt til en annen dato enn aktivTil ved oppdateringer som går tilbake i tid tidligere enn aktivTil dato. |
-| Konteringer       | -                  | OneToMany mapping til alle konteringer knyttet til oppdragsperiode.                                                                                                                                                                              |
+Et oppdrag inneholder følgende nevneverdige felter:
+
+| Navn              | Beskrivelse                                                                                                                                                                                                                       |
+|-------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| VedtakId          | Iden til vedtaket oppdragsperioden er knyttet til.                                                                                                                                                                                |
+| Referanse         | Referanse til vedtaket som ble fattet for et engangsbeløp. Vil ikke eksistere for løpende oppdragsperioder.                                                                                                                       |
+| MottakerIdent     | Identen til mottaker av beløpet. Dette vil tilsvare RM. I enkelte tilfeller, slik som ved gebyr, så vil mottakerIdent settes til NAVs aktørnummer `80000345435`.                                                                  |
+| Beløp             | Beløpet oppdragsperioden har. Tallet er et desimaltall.                                                                                                                                                                           |
+| Valuta            | Valutakode på tre bokstaver, eks `NOK`.                                                                                                                                                                                           |
+| PeriodeFra        | Dato for starten på perioden. Datoen skal alltid være 1. dag i måned og er inklusiv i perioden, dvs fra og med periodeFra datoen.                                                                                                 |
+| PeriodeTil        | Dato for slutten av perioden. Datoen skal alltid være 1. dag i måned om den er satt. Datoen kan også være null og da løper perioden helt til den blir stoppet. Datoen er ekslusiv i perioden, dvs til og _IKKE_ med periodeTil datoen. |
+| Vedtaksdato       | Dato vedtaket ble fattet. For engangsbeløp er det denne datoen som definerer hvilken måned beløpet gjelder for.                                                                                                                   |
+| OpprettetAv       | Iden til saksbehandler som opprettet vedtaket.                                                                                                                                                                                    |
+| DelytelsesId      | Unik kode som representerer et løpende kontinuerlig oppdrag                                                                                                                                                                       |
+| AktivTil          | Feltet får satt en periode, e.g. `2023-01-01`, som representerer hvilken måned oppdragsperioden er aktiv til og ikke med. Dette kan bli satt til en annen dato enn aktivTil ved oppdateringer som går tilbake i tid tidligere enn aktivTil dato. |
 
 ### Kontering
 En kontering er en representasjon av en måned i en oppdragsperiode. Konteringen er knyttet til en overføringsperiode som sier hvilken måned konteringen gjelder for.
-</br>Kontering består av følgende felter:
+Et oppdrag inneholder følgende nevneverdige felter:
 
-| Navn                 | Navn i databasen     | Beskrivelse                                                                                                                                                                                                                                                                                                                  |
-|----------------------|----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| KonteringId          | kontering_id         | Primærnøkkel. ID for kontering. Autogeneres av postgres ved lagring av konteringen.                                                                                                                                                                                                                                          |
-| Oppdragsperiode      | oppdragsperiode_id   | Referanse til oppdragsperioden konteringen tilhører.                                                                                                                                                                                                                                                                         |
-| Transaksjonskode     | transaksjonskode     | Transaksjonskoden er ELINs "oversetting" av de forskjellige stønadstypene. Til forskjell fra stønadstype så kan transaksjonskoder også være korrigerende. Se [Transaksjonskode](src/main/kotlin/no/nav/bidrag/regnskap/dto/enumer/Transaksjonskode.kt) for oversikt over transaksjonskoder og tilhørende korrigerende koder. |
-| Overføringsperiode   | overforingsperiode   | Måneden konteringen gjelder for. Representert som YearMonth e.g. `2023-01`                                                                                                                                                                                                                                                   |
-| Overføringstidspunkt | overforingstidspunkt | Tidspunktet konteringen ble overført til Skatteetaten. Denne er null frem til konteringen er overført.                                                                                                                                                                                                                       |
-| Type                 | type                 | Feltet er (dårlig) navngitt for samsvare med slik Skatt ønsket KravAPIet. Type definerer om det er en NY eller en ENDRING av oppdraget. Det er kun førte kontering i første oppdragsperiode som skal være NY, resterende skal være ENDRING.                                                                                  |
-| SøknadType           | soknad_type          | Settes til `IN` om vedtaket er `AUTOMATISK_INDEKSREGULERING`, `FABM` om vedtaket er `GEBYR_MOTTAKER`, `FABP` om vedtaket er `GEBYR_SKYLDNER`. Om ingen av disse svarer til vedtaktypen benyttes `EN`                                                                                                                         |
-| SendtIPåløpsfil      | sendt_i_palopsfil    | Boolean verdi på om konteringen er sendt i påløpsfil eller ikke. Se [Skedulerte kjøringer](#skedulerte-kjøringer) for med informasjon.                                                                                                                                                                                           |
-| OverføringKontering  | -                    | OneToMany mapping til alle overførte konteringer knyttet til denne konteringer.                                                                                                                                                                                                                                              |
+| Navn                         | Beskrivelse                                                                                                                                                                                                                                                                                                                  |
+|------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Transaksjonskode             | Transaksjonskoden er ELINs "oversetting" av de forskjellige stønadstypene. Til forskjell fra stønadstype så kan transaksjonskoder også være korrigerende. Se [Transaksjonskode](src/main/kotlin/no/nav/bidrag/regnskap/dto/enumer/Transaksjonskode.kt) for oversikt over transaksjonskoder og tilhørende korrigerende koder. |
+| Overføringsperiode           | Måneden konteringen gjelder for. Representert som YearMonth e.g. `2023-01`                                                                                                                                                                                                                                                   |
+| Overføringstidspunkt         | Tidspunktet konteringen ble overført til Skatteetaten. Denne er null frem til konteringen er overført.                                                                                                                                                                                                                       |
+| BehandlingsstatusOkTidspunkt | Tidspunktet vi fikk en godkjenning fra ELIN om at konteringen var vellykket lest inn. Denne er null frem til konteringen er bekreftet godkjent. Dette feltet hindrer videre oversendinger av konteringer for samme oppdrag frem til bekreftet ok.                                                                            |
+| Type                         | Feltet er navngitt for samsvare med KravAPIet. Type definerer om det er en NY eller en ENDRING av oppdraget. Det er kun førte kontering i første oppdragsperiode som skal være NY, resterende skal være ENDRING.                                                                                                             |
+| SøknadType                   | Settes til `IN` om vedtaket er `AUTOMATISK_INDEKSREGULERING`, `FABM` om vedtaket er `GEBYR_MOTTAKER`, `FABP` om vedtaket er `GEBYR_SKYLDNER`. Om ingen av disse svarer til vedtaktypen benyttes `EN`                                                                                                                         |
+| SendtIPåløpsfil              | Boolean verdi på om konteringen er sendt i påløpsfil eller ikke. Se [Skedulerte kjøringer](#skedulerte-kjøringer) for med informasjon.                                                                                                                                                                                       |
  
-
-### Overføring konteringer
-Overføring kontering er en oversikt over alle overføringen gjort for en kontering til Skatteetaten. 
-I de fleste tilfeller vil en kontering ha en overføring kontering. Om overføringen av en kontering feiler vil det derimot opprettes en overføring kontering som inneholder informasjon om feilmeldingen på hvorfor overføringen feilet.
-</br>Overføring konteringer består av følgende felter:
-
-| Navn          | Navn i databasen | Beskrivelse                                                                                                                                                                                                                                                                                                                      |
-|---------------|------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| OverføringId  | overforing_id    | Primærnøkkel. ID for overføring kontering. Autogeneres av postgres ved lagring av overføringen.                                                                                                                                                                                                                                  |
-| Kontering     | kontering_id     | Referanse til konteringen overføring konteringen tilhører.                                                                                                                                                                                                                                                                       |
-| Referansekode | referansekode    | Ved en vellykket overføring vil det returneres en UUID. Denne lagres som referansekode og kan brukes til å slå opp i ELIN for å hente ut informasjon om prosesseringen av konteringen. Denne vil være unik for hver oversending, så ikke nødvendigvis unik for hver kontering da en oversending kan inneholde flere konteringer. |                                                                                                 |
-| Feilmelding   | feilmelding      | Om overføringen feiler vil feilmeldingen lagres her.                                                                                                                                                                                                                                                                             |
-| Tidspunkt     | tidspunkt        | Tidspunktet overføringen ble gjennomført.                                                                                                                                                                                                                                                                                        |
-| Kanal         | kanal            | Hvordan konteringen ble overført. Per nå kan dette kun være via REST-endepunkt eller Påløpsfil. Se [Skedulerte kjøringer](#skedulerte-kjøringer) eller [Integrasjoner](#integrasjoner).                                                                                                                                              |
 
 ### Påløptabell
 Påløpstabellen inneholder informasjon om planlagte og gjennomført generering og overføring av påløpsfil til ELIN. Se [Skedulerte kjøringer](#skedulerte-kjøringer) for mer informasjon.
-</br>Påløp består av følgende felter:
 
-| Navn              | Navn i databasen   | Beskrivelse                                                                            |
-|-------------------|--------------------|----------------------------------------------------------------------------------------|
-| PåløpId           | palop_id           | Primærnøkkel. ID for overføring påløp. Autogeneres av postgres ved lagring av påløpet. |
-| Kjøredato         | kjoredato          | Datoen påløpet skal kjøre på.                                                          |
-| FullførtTidspunkt | fullfort_tidspunkt | Tidspunktet påløpet var ferdig overført på.                                            |
-| ForPeriode        | for_periode        | Perioden påløpet er for. Representert som en YearMonth e.g. `2022-01`                  |
+Påløp består av følgende felter:
+
+| Navn              | Beskrivelse                                                                                                                                                                    |
+|-------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Kjøredato         | Datoen påløpet skal kjøre på.                                                                                                                                                  |
+| StartetTidspunkt  | Tidspunktet påløpet ble startet. Dette eksisterer for å ikke starte påbegynte påløp på nytt i tilfeller hvor påløp tar lenger tid enn intervallet mellom skedulerte kjøringer. |
+| FullførtTidspunkt | Tidspunktet påløpet var ferdig overført på.                                                                                                                                    |
+| ForPeriode        | Perioden påløpet er for. Representert som en YearMonth e.g. `2022-01`                                                                                                          |
 
 ### Driftsavviktabell
 Driftsavvik er en hendelse bidrag-regnskap selv oppretter for å hindre uønsket overføring av konteringer. 
 Dette gir også bidrag-regnskap muligheten til å manuelt stoppe alle overføringer.
 Se [Skedulerte kjøringer](#skedulerte-kjøringer) for mer informasjon.
-</br>Driftsavvik består av følgende felter:
 
-| Navn          | Navn i databasen | Beskrivelse                                                                                        |
-|---------------|------------------|----------------------------------------------------------------------------------------------------|
-| driftsavvikId | driftsavvik_id   | Primærnøkkel. ID for overføring driftsavvik. Autogeneres av postgres ved lagring av driftsavviket. |
-| PåløpId       | palop_id         | Referanse til påløpet driftsavviket er knyttet til.                                                |
-| TidspunktFra  | tidspunkt_fra    | Tidspunktet driftsavviket ble opprettet.                                                           |
-| TidspunktTil  | tidspunkt_til    | Tidspunktet driftsavviket gjelder til.                                                             |
-| OpprettetAv   | opprettet_av     | Hvem/Hva som opprettet driftsavviket. Dette er ofte den Automatiske påløpskjøringen.               |
-| Årsak         | arsak            | Grunnen til at driftsavviket ble opprettet.                                                        |
+Driftsavvik består av følgende felter:
+
+| Navn          |  Beskrivelse                                                                                        |
+|---------------|-----------------------------------------------------------------------------------------------------|
+| PåløpId       |  Referanse til påløpet driftsavviket er knyttet til.                                                |
+| TidspunktFra  |  Tidspunktet driftsavviket ble opprettet.                                                           |
+| TidspunktTil  |  Tidspunktet driftsavviket gjelder til.                                                             |
+| OpprettetAv   |  Hvem/Hva som opprettet driftsavviket. Dette er ofte den Automatiske påløpskjøringen.               |
+| Årsak         |  Grunnen til at driftsavviket ble opprettet.                                                        |
+
+
 
 ## Skedulerte kjøringer
 Bidrag-regnskap har flere skedulerte kjøringer. Tidspunktet disse kjører på finnes som cron-uttrykk i [application.yaml](src/main/resources/application.yaml).
@@ -160,6 +151,12 @@ Bidrag-regnskap kaller ELINs KravAPI for å sende over konteringer og endre stat
 
 ### Bidrag-sak
 Bidrag-regnskap har en integrasjon mot bidrag-sak for å hente ut ident til BM i saken. Se [SakConsumer.kt](src/main/kotlin/no/nav/bidrag/regnskap/consumer/SakConsumer.kt).
+
+### Bidrag-person
+Bidrag-regnskap benytter seg av @SjekkForNyIdent annotasjon for å søke etter nye identer på vedtak som mottas fra bidrag-vedtak. Se: [IdentUtils.kt](src/main/kotlin/no/nav/bidrag/regnskap/util/IdentUtils.kt) for bruk.
+
+### PDL
+Bidrag-regnskap lytter på AktorV2 topic fra PDL for å lese inn endringer på identer. Se [AktørhendelseListener](src/main/kotlin/no/nav/bidrag/regnskap/hendelse/kafka/pdl/AktørhendelseListener.kt)
 
 ## Lokal utvikling
 
