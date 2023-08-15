@@ -18,7 +18,6 @@ class AktørhendelseService(
         }
 
         if (tidligereIdenter?.isNotEmpty() == true) {
-
             val gjeldendeIdent = aktor.identifikatorer?.singleOrNull { ident ->
                 ident.type == Type.FOLKEREGISTERIDENT && ident.gjeldende
             }?.idnummer.toString()
@@ -33,7 +32,6 @@ class AktørhendelseService(
                 persistenceService.hentAlleKravhavereMedIdent(tidligereIdent?.idnummer.toString()).forEach {
                     it.kravhaverIdent = gjeldendeIdent
                     SECURE_LOGGER.info("Aktorhendelse: $tidligereIdent oppdatert til $gjeldendeIdent for oppdragId: ${it.oppdragId}")
-
                 }
 
                 persistenceService.hentAlleSkyldnereMedIdent(tidligereIdent?.idnummer.toString()).forEach {
