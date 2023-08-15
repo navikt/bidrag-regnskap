@@ -9,6 +9,7 @@ import no.nav.bidrag.regnskap.util.KonteringUtils.vurderType
 import no.nav.bidrag.regnskap.util.PeriodeUtils.erFørsteDatoSammeSomEllerTidligereEnnAndreDato
 import no.nav.bidrag.regnskap.util.PeriodeUtils.hentAllePerioderMellomDato
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
@@ -19,8 +20,9 @@ private val LOGGER = LoggerFactory.getLogger(ManglendeKonteringerService::class.
 
 @Service
 class ManglendeKonteringerService(
-    private val oppdragsperiodeRepo: OppdragsperiodeRepository,
-    private val persistenceService: PersistenceService
+        private val oppdragsperiodeRepo: OppdragsperiodeRepository,
+        private val persistenceService: PersistenceService,
+        @Value("\${KONTERINGER_FORELDET_DATO}") private val konteringerForeldetDato: String
 ) {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -43,8 +45,8 @@ class ManglendeKonteringerService(
         }
 
         opprettManglendeKonteringerForOppdragsperiode(
-            oppdragsperiode,
-            YearMonth.from(påløpsPeriode)
+                oppdragsperiode,
+                YearMonth.from(påløpsPeriode)
         )
 
         if (erFørsteDatoSammeSomEllerTidligereEnnAndreDato(oppdragsperiode.aktivTil, påløpsPeriode)) {
@@ -60,26 +62,29 @@ class ManglendeKonteringerService(
         val startTime = System.currentTimeMillis()
         val perioderMellomDato = hentAllePerioderMellomDato(oppdragsperiode.periodeFra, oppdragsperiode.periodeTil, påløpsPeriode)
 
-        perioderMellomDato.forEachIndexed { periodeIndex, periode ->
-            if (oppdragsperiode.konteringer.any { it.overføringsperiode == periode.toString() }) {
-                LOGGER.debug("Kontering for periode: $periode i oppdragsperiode: ${oppdragsperiode.oppdragsperiodeId} er allerede opprettet.")
-            } else if (harIkkePassertAktivTilDato(oppdragsperiode, periode)) {
-                oppdragsperiode.konteringer = oppdragsperiode.konteringer.plus(
-                    Kontering(
-                        transaksjonskode = Transaksjonskode.hentTransaksjonskodeForType(oppdragsperiode.oppdrag!!.stønadType).name,
-                        overføringsperiode = periode.toString(),
-                        type = vurderType(oppdragsperiode, periode),
-                        søknadType = vurderSøknadType(oppdragsperiode.vedtakType, oppdragsperiode.oppdrag.stønadType, periodeIndex),
-                        oppdragsperiode = oppdragsperiode,
-                        sendtIPåløpsperiode = påløpsPeriode.toString(),
-                        vedtakId = oppdragsperiode.vedtakId
-                    )
-                )
-            }
-        }
+
+        perioderMellomDato
+                .filterNot { it.isBefore(YearMonth.parse(konteringerForeldetDato)) }
+                .forEachIndexed { periodeIndex, periode ->
+                    if (oppdragsperiode.konteringer.any { it.overføringsperiode == periode.toString() }) {
+                        LOGGER.debug("Kontering for periode: $periode i oppdragsperiode: ${oppdragsperiode.oppdragsperiodeId} er allerede opprettet.")
+                    } else if (harIkkePassertAktivTilDato(oppdragsperiode, periode)) {
+                        oppdragsperiode.konteringer = oppdragsperiode.konteringer.plus(
+                                Kontering(
+                                        transaksjonskode = Transaksjonskode.hentTransaksjonskodeForType(oppdragsperiode.oppdrag!!.stønadType).name,
+                                        overføringsperiode = periode.toString(),
+                                        type = vurderType(oppdragsperiode, periode),
+                                        søknadType = vurderSøknadType(oppdragsperiode.vedtakType, oppdragsperiode.oppdrag.stønadType, periodeIndex),
+                                        oppdragsperiode = oppdragsperiode,
+                                        sendtIPåløpsperiode = påløpsPeriode.toString(),
+                                        vedtakId = oppdragsperiode.vedtakId
+                                )
+                        )
+                    }
+                }
         LOGGER.info("TIDSBRUK opprettManglendeKonteringerForOppdragsperiode: {}ms", System.currentTimeMillis() - startTime)
     }
 
-    private fun harIkkePassertAktivTilDato(oppdragsperiode: Oppdragsperiode, påløpsPeriode: YearMonth) =
-        !erFørsteDatoSammeSomEllerTidligereEnnAndreDato(oppdragsperiode.aktivTil, LocalDate.of(påløpsPeriode.year, påløpsPeriode.month, 1))
+    private fun harIkkePassertAktivTilDato(oppdragsperiode: Oppdragsperiode, periode: YearMonth) =
+            !erFørsteDatoSammeSomEllerTidligereEnnAndreDato(oppdragsperiode.aktivTil, LocalDate.of(periode.year, periode.month, 1))
 }

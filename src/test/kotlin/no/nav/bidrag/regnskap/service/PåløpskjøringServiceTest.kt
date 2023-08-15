@@ -34,7 +34,7 @@ class PåløpskjøringServiceTest {
     private val skattConsumer = mockk<SkattConsumer>(relaxed = true)
 
     private val påløpskjøringService =
-        PåløpskjøringService(oppdragsperiodeRepo, persistenceService, ManglendeKonteringerService(oppdragsperiodeRepo, persistenceService), gcpFilBucket, filoverføringTilElinKlient, skattConsumer)
+        PåløpskjøringService(oppdragsperiodeRepo, persistenceService, ManglendeKonteringerService(oppdragsperiodeRepo, persistenceService, "2006-04"), gcpFilBucket, filoverføringTilElinKlient, skattConsumer)
 
     @Test
     fun `Skal ved påløpskjøring kun starte eldste ikke kjørte påløpsperiode`() {
