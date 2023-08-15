@@ -91,7 +91,7 @@ class PåløpsfilGenerator(
 
     private fun skrivHeaderSlutt(writer: XMLStreamWriter) {
         writer.writeCharacters("\n")
-        writer.writeEndElement(); //bidrag-reskonto
+        writer.writeEndElement() // bidrag-reskonto
         writer.writeEndDocument()
     }
 
@@ -114,7 +114,7 @@ class PåløpsfilGenerator(
         writer.writeStartElement("dato")
         writer.writeCharacters(now.toString())
         writer.writeEndElement()
-        writer.writeEndElement(); // start-batch-br01
+        writer.writeEndElement() // start-batch-br01
     }
 
     private fun skrivKonteringBr10(writer: XMLStreamWriter, kontering: Kontering, now: LocalDate) {

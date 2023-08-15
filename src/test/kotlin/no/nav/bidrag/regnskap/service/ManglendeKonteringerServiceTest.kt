@@ -7,7 +7,6 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import no.nav.bidrag.regnskap.persistence.repository.OppdragsperiodeRepository
 import no.nav.bidrag.regnskap.utils.TestData
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -40,13 +39,13 @@ class ManglendeKonteringerServiceTest {
         val periodeTil = LocalDate.of(2010, 1, 1)
         val periodeFra = LocalDate.of(2006, 1, 1)
         val oppdragsperiode = TestData.opprettOppdragsperiode(
-                oppdrag = oppdrag,
-                periodeFra = periodeFra,
-                periodeTil = periodeTil,
-                konteringer = emptyList())
+            oppdrag = oppdrag,
+            periodeFra = periodeFra,
+            periodeTil = periodeTil,
+            konteringer = emptyList()
+        )
         oppdrag.oppdragsperioder = listOf(oppdragsperiode)
         val påløpsperiode = YearMonth.parse("2011-01")
-
 
         manglendeKonteringerService.opprettManglendeKonteringerForOppdragsperiode(oppdragsperiode, påløpsperiode)
 
@@ -54,5 +53,4 @@ class ManglendeKonteringerServiceTest {
         oppdragsperiode.konteringer.first().overføringsperiode shouldBe konteringerForeldetDato
         oppdragsperiode.konteringer.last().overføringsperiode shouldBe YearMonth.from(periodeTil.minusMonths(1)).toString()
     }
-
 }

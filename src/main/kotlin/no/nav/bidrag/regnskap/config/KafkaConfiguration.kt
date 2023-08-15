@@ -55,7 +55,7 @@ class KafkaConfiguration(val environment: Environment) {
         val factory = ConcurrentKafkaListenerContainerFactory<String, String>()
         factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
         factory.consumerFactory = DefaultKafkaConsumerFactory(consumerConfigsLatestAvro())
-        factory.setContainerCustomizer {  it.containerProperties.setAuthExceptionRetryInterval(Duration.ofSeconds(10)) }
+        factory.setContainerCustomizer { it.containerProperties.setAuthExceptionRetryInterval(Duration.ofSeconds(10)) }
         factory.setCommonErrorHandler(defaultErrorHandler)
         return factory
     }
