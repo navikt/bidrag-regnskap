@@ -27,3 +27,4 @@ env:
   PERSON_HOST: bidrag-person-feature.dev-fss-pub.nais.io
   JAVA_OPTS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -XX:MaxRAMPercentage=80.0
   MASKINPORTEN_SCOPES: "nav:bidrag/v1/bidragskrav"
+  KONTERINGER_FORELDET_DATO: 2006-04

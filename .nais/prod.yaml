@@ -27,3 +27,4 @@ env:
   PERSON_HOST: bidrag-person.prod-fss-pub.nais.io
   MASKINPORTEN_SCOPES: "nav:bidrag/v1/bidragskrav"
   JAVA_OPTS: -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -XX:MaxRAMPercentage=80.0
+  KONTERINGER_FORELDET_DATO: 2006-04

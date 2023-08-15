@@ -16,6 +16,7 @@ BUCKET_NAME: bidrag-regnskap-dev
 ELIN_SUBSCRIPTION_KEY: ingenSubKeyLokaltKunForApiPortalen
 NAIS_CLIENT_ID: "localhost:bidrag:bidrag-regnskap"
 NAIS_CLUSTER_NAME: localhost
+KONTERINGER_FORELDET_DATO: 2006-04
 
 springdoc:
   packages-to-scan: no.nav.bidrag.regnskap.controller
