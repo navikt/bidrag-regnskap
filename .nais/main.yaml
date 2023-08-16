@@ -22,7 +22,7 @@ env:
   SAK_URL: https://bidrag-sak-feature.dev-fss-pub.nais.io
   SAK_SCOPE: dev-fss.bidrag.bidrag-sak-feature
   SAK_HOST: bidrag-sak-feature.dev-fss-pub.nais.io
-  PERSON_URL: https://bidrag-person-feature.dev-fss-pub.nais.io
+  PERSON_URL: https://bidrag-person-feature.dev-fss-pub.nais.io/bidrag-person
   PERSON_SCOPE: dev-fss.bidrag.bidrag-person-feature
   PERSON_HOST: bidrag-person-feature.dev-fss-pub.nais.io
   JAVA_OPTS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -XX:MaxRAMPercentage=80.0

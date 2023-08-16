@@ -22,7 +22,7 @@ env:
   SAK_URL: https://bidrag-sak.prod-fss-pub.nais.io
   SAK_SCOPE: prod-fss.bidrag.bidrag-sak
   SAK_HOST: bidrag-sak.prod-fss-pub.nais.io
-  PERSON_URL: https://bidrag-person.prod-fss-pub.nais.io
+  PERSON_URL: https://bidrag-person.prod-fss-pub.nais.io/bidrag-person
   PERSON_SCOPE: prod-fss.bidrag.bidrag-person
   PERSON_HOST: bidrag-person.prod-fss-pub.nais.io
   MASKINPORTEN_SCOPES: "nav:bidrag/v1/bidragskrav"
