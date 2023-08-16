@@ -33,7 +33,7 @@ class VedtakshendelseListener(
         try {
             LOGGER.info("Starter behandling av vedtakhendelse med offset: $offset")
 
-            if (true) {
+            if (hoppOverNesteMelding) {
                 LOGGER.info("Hopper over behandling av vedtakhendelse med offset: $offset")
                 acknowledgment.acknowledge() // Acknowledge meldingen for å gå videre til neste offset
                 hoppOverNesteMelding = false // Nullstill variabelen for å unngå hopping på påfølgende meldinger
