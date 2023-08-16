@@ -1,0 +1,2 @@
+ALTER TABLE konteringer
+    ADD CONSTRAINT oppdragsperiodeId_transaksjonskode_overforingsperiode_unique UNIQUE(oppdragsperiode_id, transaksjonskode, overforingsperiode)
