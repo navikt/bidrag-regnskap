@@ -17,7 +17,7 @@
     <java.version>17</java.version>
     <kotlin.version>1.8.21</kotlin.version>
     <kotlin-coroutines.version>1.7.1</kotlin-coroutines.version>
-    <bidrag-commons.version>20230816093943_2f4e731</bidrag-commons.version>
+    <bidrag-commons.version>20230816111838_f404b39</bidrag-commons.version>
     <bidrag-behandling-felles-dto.version>0.0.88</bidrag-behandling-felles-dto.version>
     <bidrag-behandling-felles.version>0.0.82</bidrag-behandling-felles.version>
     <bidrag-transport.version>20230705081501_68e71c7</bidrag-transport.version>
