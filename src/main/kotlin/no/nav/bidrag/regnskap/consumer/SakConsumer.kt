@@ -2,8 +2,8 @@ package no.nav.bidrag.regnskap.consumer
 
 import io.github.oshai.KotlinLogging
 import no.nav.bidrag.commons.web.client.AbstractRestClient
-import no.nav.bidrag.regnskap.dto.sak.BidragSak
-import no.nav.bidrag.regnskap.dto.sak.enumer.Rolletype
+import no.nav.bidrag.domain.enums.Rolletype
+import no.nav.bidrag.transport.sak.BidragssakDto
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cache.annotation.Cacheable
@@ -27,7 +27,7 @@ class SakConsumer(
     @Cacheable(value = ["bidrag-sak_cache"], key = "#sakId")
     fun hentBmFraSak(sakId: String): String {
         return try {
-            val responseEntity = restTemplate.getForEntity("$sakUrl$SAK_PATH/$sakId", BidragSak::class.java)
+            val responseEntity = restTemplate.getForEntity("$sakUrl$SAK_PATH/$sakId", BidragssakDto::class.java)
 
             hentFødselsnummerTilBmFraSak(responseEntity) ?: DUMMY_NUMMER
         } catch (e: Exception) {
@@ -36,7 +36,7 @@ class SakConsumer(
         }
     }
 
-    private fun hentFødselsnummerTilBmFraSak(responseEntity: ResponseEntity<BidragSak>): String? {
-        return responseEntity.body?.roller?.find { it.type == Rolletype.BM }?.fødselsnummer
+    private fun hentFødselsnummerTilBmFraSak(responseEntity: ResponseEntity<BidragssakDto>): String? {
+        return responseEntity.body?.roller?.find { it.type == Rolletype.BM }?.fødselsnummer?.verdi
     }
 }

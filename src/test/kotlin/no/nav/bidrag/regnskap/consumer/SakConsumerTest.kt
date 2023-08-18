@@ -7,17 +7,26 @@ import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import no.nav.bidrag.commons.util.PersonidentGenerator
-import no.nav.bidrag.regnskap.dto.sak.BidragSak
-import no.nav.bidrag.regnskap.dto.sak.RolleDto
-import no.nav.bidrag.regnskap.dto.sak.enumer.Bidragssakstatus
-import no.nav.bidrag.regnskap.dto.sak.enumer.Rolletype
-import no.nav.bidrag.regnskap.dto.sak.enumer.Sakskategori
+import no.nav.bidrag.domain.bool.BegrensetTilgang
+import no.nav.bidrag.domain.bool.LevdeAdskilt
+import no.nav.bidrag.domain.bool.Paragraf19
+import no.nav.bidrag.domain.bool.UkjentPart
+import no.nav.bidrag.domain.enums.Bidragssakstatus
+import no.nav.bidrag.domain.enums.Rolletype
+import no.nav.bidrag.domain.enums.Sakskategori
+import no.nav.bidrag.domain.ident.PersonIdent
+import no.nav.bidrag.domain.string.Enhetsnummer
+import no.nav.bidrag.domain.string.Saksnummer
+import no.nav.bidrag.domain.tid.OpprettetDato
+import no.nav.bidrag.transport.sak.BidragssakDto
+import no.nav.bidrag.transport.sak.RolleDto
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.http.ResponseEntity
 import org.springframework.test.util.ReflectionTestUtils
 import org.springframework.web.client.RestTemplate
+import java.time.LocalDate
 
 @ExtendWith(MockKExtension::class)
 internal class SakConsumerTest {
@@ -39,8 +48,8 @@ internal class SakConsumerTest {
 
     @Test
     fun `skal hente ut fødelsnummer fra bm`() {
-        every { restTemplate.getForEntity("$sakUrl$SAK_PATH/123", BidragSak::class.java) } returns ResponseEntity.ok(
-            opprettBidragSak(Rolletype.BM)
+        every { restTemplate.getForEntity("$sakUrl$SAK_PATH/123", BidragssakDto::class.java) } returns ResponseEntity.ok(
+                opprettBidragSak(Rolletype.BM)
         )
 
         val fødelsnummer = sakConsumer.hentBmFraSak("123")
@@ -50,8 +59,8 @@ internal class SakConsumerTest {
 
     @Test
     fun `skal bruke dummynr om det ikke finnes en bm på sak`() {
-        every { restTemplate.getForEntity("$sakUrl$SAK_PATH/123", BidragSak::class.java) } returns ResponseEntity.ok(
-            opprettBidragSak(Rolletype.BP)
+        every { restTemplate.getForEntity("$sakUrl$SAK_PATH/123", BidragssakDto::class.java) } returns ResponseEntity.ok(
+                opprettBidragSak(Rolletype.BP)
         )
 
         val fødelsnummer = sakConsumer.hentBmFraSak("123")
@@ -59,18 +68,23 @@ internal class SakConsumerTest {
         fødelsnummer shouldBe DUMMY_NUMMER
     }
 
-    private fun opprettBidragSak(rolletype: Rolletype): BidragSak {
-        return BidragSak(
-            "eierfogd",
-            "123",
-            Bidragssakstatus.NY,
-            Sakskategori.N,
-            roller = listOf(
-                RolleDto(
-                    PersonidentGenerator.genererFødselsnummer(),
-                    rolletype
+    private fun opprettBidragSak(rolletype: Rolletype): BidragssakDto {
+        return BidragssakDto(
+                Enhetsnummer("eierfogd"),
+                Saksnummer("123"),
+                Bidragssakstatus.NY,
+                Sakskategori.N,
+                Paragraf19(false),
+                BegrensetTilgang(false),
+                OpprettetDato(LocalDate.now()),
+                LevdeAdskilt(false),
+                UkjentPart(false),
+                roller = listOf(
+                        RolleDto(
+                                PersonIdent(PersonidentGenerator.genererFødselsnummer()),
+                                rolletype
+                        )
                 )
-            )
         )
     }
 }
