@@ -133,6 +133,10 @@ class PersistenceService(
         return konteringRepository.hentAlleKonteringerForDato(dato)
     }
 
+    fun hentAlleKonteringerForDato(dato: LocalDate, fomTidspunkt: LocalDateTime, tomTidspunkt: LocalDateTime): List<Kontering> {
+        return konteringRepository.hentAlleKonteringerForDato(dato, fomTidspunkt, tomTidspunkt)
+    }
+
     fun lagreKontering(kontering: Kontering): Int {
         val lagretKontering = konteringRepository.save(kontering)
         LOGGER.debug("Lagret kontering med ID: ${lagretKontering.konteringId}")

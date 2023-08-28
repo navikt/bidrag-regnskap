@@ -10,7 +10,7 @@ scheduler:
   behandlingsstatus:
     cron: "0 0 22 * * *" #Hver dag kl 22:00
   avstemning:
-    cron: "0 0 1 * * *" #Hver dag kl 01:00
+    cron: "0 15 0 * * *" #Hver dag kl 00:15
   påløpkjøring:
     cron: "0 5 * * * *" #Hver time 5 minutter over hel
 

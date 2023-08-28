@@ -1,6 +1,8 @@
 package no.nav.bidrag.regnskap.controller
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.Parameters
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
@@ -11,8 +13,10 @@ import no.nav.security.token.support.core.api.Protected
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @RestController
 @Protected
@@ -41,14 +45,32 @@ class AvstemmingController(
             )
         ]
     )
+    @Parameters(
+        value = [
+            Parameter(name = "dato", example = "2022-01-01"),
+            Parameter(name = "fomTidspunkt", example = "2022-01-01T10:00:00"),
+            Parameter(name = "tomTidspunkt", example = "2022-01-01T11:00:00")
+        ]
+    )
     fun startAvstemmingsgenerering(
+        @RequestParam(required = true)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-        dato: LocalDate
+        dato: LocalDate,
+        @RequestParam(required = false)
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+        fomTidspunkt: LocalDateTime?,
+        @RequestParam(required = false)
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+        tomTidspunkt: LocalDateTime?
     ): ResponseEntity<Any> {
         if (dato.isAfter(LocalDate.now())) {
             return ResponseEntity.badRequest().build()
         }
-        avstemmingService.startAvstemming(dato)
+        if (fomTidspunkt != null && tomTidspunkt != null) {
+            avstemmingService.startAvstemming(dato, fomTidspunkt, tomTidspunkt)
+        } else {
+            avstemmingService.startAvstemming(dato)
+        }
         return ResponseEntity.ok().build()
     }
 }

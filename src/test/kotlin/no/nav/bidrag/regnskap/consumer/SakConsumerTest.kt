@@ -49,7 +49,7 @@ internal class SakConsumerTest {
     @Test
     fun `skal hente ut fødelsnummer fra bm`() {
         every { restTemplate.getForEntity("$sakUrl$SAK_PATH/123", BidragssakDto::class.java) } returns ResponseEntity.ok(
-                opprettBidragSak(Rolletype.BM)
+            opprettBidragSak(Rolletype.BM)
         )
 
         val fødelsnummer = sakConsumer.hentBmFraSak("123")
@@ -60,7 +60,7 @@ internal class SakConsumerTest {
     @Test
     fun `skal bruke dummynr om det ikke finnes en bm på sak`() {
         every { restTemplate.getForEntity("$sakUrl$SAK_PATH/123", BidragssakDto::class.java) } returns ResponseEntity.ok(
-                opprettBidragSak(Rolletype.BP)
+            opprettBidragSak(Rolletype.BP)
         )
 
         val fødelsnummer = sakConsumer.hentBmFraSak("123")
@@ -70,21 +70,21 @@ internal class SakConsumerTest {
 
     private fun opprettBidragSak(rolletype: Rolletype): BidragssakDto {
         return BidragssakDto(
-                Enhetsnummer("eierfogd"),
-                Saksnummer("123"),
-                Bidragssakstatus.NY,
-                Sakskategori.N,
-                Paragraf19(false),
-                BegrensetTilgang(false),
-                OpprettetDato(LocalDate.now()),
-                LevdeAdskilt(false),
-                UkjentPart(false),
-                roller = listOf(
-                        RolleDto(
-                                PersonIdent(PersonidentGenerator.genererFødselsnummer()),
-                                rolletype
-                        )
+            Enhetsnummer("eierfogd"),
+            Saksnummer("123"),
+            Bidragssakstatus.NY,
+            Sakskategori.N,
+            Paragraf19(false),
+            BegrensetTilgang(false),
+            OpprettetDato(LocalDate.now()),
+            LevdeAdskilt(false),
+            UkjentPart(false),
+            roller = listOf(
+                RolleDto(
+                    PersonIdent(PersonidentGenerator.genererFødselsnummer()),
+                    rolletype
                 )
+            )
         )
     }
 }
