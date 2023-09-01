@@ -147,6 +147,9 @@ internal class VedtakshendelseListenerIT {
 
     @BeforeAll
     fun beforeAll() {
+        persistenceService.konteringRepository.deleteAll()
+        persistenceService.oppdragsperiodeRepository.deleteAll()
+        persistenceService.oppdragRepository.deleteAll()
         file = FileOutputStream(TESTDATA_OUTPUT_NAVN)
         persistenceService.lagrePåløp(påløp)
     }
