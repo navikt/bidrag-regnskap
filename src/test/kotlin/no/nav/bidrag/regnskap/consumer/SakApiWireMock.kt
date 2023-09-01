@@ -27,6 +27,9 @@ class SakApiWireMock {
              "saksnummer": "123",
              "saksstatus": "AK",
              "kategori": "N",
+             "opprettetDato": "2023-01-01",
+             "levdeAdskilt": "false",
+             "ukjentPart": "false",
              "roller": [
                {
                  "fodselsnummer": "${PersonidentGenerator.genererFødselsnummer()}",

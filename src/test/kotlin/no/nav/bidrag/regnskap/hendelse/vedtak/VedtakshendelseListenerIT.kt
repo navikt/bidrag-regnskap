@@ -59,7 +59,6 @@ import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
@@ -92,8 +91,8 @@ import java.time.YearMonth
 @TestMethodOrder(OrderAnnotation::class)
 @SpringBootTest(classes = [BidragRegnskapLocal::class])
 @EmbeddedKafka(partitions = 1, brokerProperties = ["listeners=PLAINTEXT://localhost:9092", "port=9092"])
-@Disabled // TODO() Må fikses med opphenting på sakId for hver sak etter at overføringKontering ble fjernet.
 internal class VedtakshendelseListenerIT {
+
     companion object {
         private const val HENDELSE_FILMAPPE = "testfiler/hendelse/"
         private const val TESTDATA_OUTPUT_NAVN = "kravTestData.json"
@@ -186,10 +185,6 @@ internal class VedtakshendelseListenerIT {
     @Test
     @Order(2)
     fun `skal oppdatere gebyr for skyldner`() {
-        await().atMost(TEN_SECONDS).until {
-            return@until persistenceService.hentOppdrag(1) != null
-        }
-
         hentFilOgSendPåKafka("gebyrSkyldnerOppdatering.json", 3)
 
         val konteringer = assertVedOppdateringAvEngangsbeløpOgReturnerKonteringer(
@@ -422,7 +417,7 @@ internal class VedtakshendelseListenerIT {
     fun `skal opprette bidrag for to barn med gebyr til begge parter`() {
         val vedtakHendelse = hentFilOgSendPåKafka(
             filnavn = "barnebidrag.json",
-            antallOverføringerSåLangt = 55,
+            antallKonteringerTotalt = 55,
             bm = bmBidrag,
             bp = bpBidrag,
             barn1 = barn1Bidrag,
@@ -480,7 +475,7 @@ internal class VedtakshendelseListenerIT {
     fun `skal oppdatere bidrag`() {
         val vedtakHendelse = hentFilOgSendPåKafka(
             filnavn = "barnebidragOppdatering.json",
-            antallOverføringerSåLangt = 59,
+            antallKonteringerTotalt = 71,
             bm = bmBidrag,
             bp = bpBidrag,
             barn1 = barn1Bidrag,
@@ -558,7 +553,7 @@ internal class VedtakshendelseListenerIT {
     fun `skal oppdatere oppfostringsbidrag`() {
         val vedtakHendelse = hentFilOgSendPåKafka(
             filnavn = "oppfostringsbidragOppdatering.json",
-            antallOverføringerSåLangt = 119,
+            antallKonteringerTotalt = 119,
             bp = bpOppfostring,
             barn1 = barn1Oppfostring,
             barn2 = barn2Oppfostring
@@ -615,7 +610,7 @@ internal class VedtakshendelseListenerIT {
     fun `skal oppdatere 18 års bidrag`() {
         val vedtakHendelse = hentFilOgSendPåKafka(
             filnavn = "18årsbidragOppdatering.json",
-            antallOverføringerSåLangt = 130,
+            antallKonteringerTotalt = 135,
             bp = skyldnerIdEktefelleBidrag,
             kravhaverIdent = kravhaverIdEktefellebidrag
         )
@@ -645,7 +640,7 @@ internal class VedtakshendelseListenerIT {
     fun `skal opprette ektefellebidrag`() {
         val vedtakHendelse = hentFilOgSendPåKafka(
             "ektefellebidrag.json",
-            151,
+            156,
             bp = skyldnerIdEktefelleBidrag,
             kravhaverIdent = kravhaverIdEktefellebidrag
         )
@@ -672,7 +667,7 @@ internal class VedtakshendelseListenerIT {
     fun `skal oppdatere ektefellebidrag`() {
         val vedtakHendelse = hentFilOgSendPåKafka(
             filnavn = "ektefellebidragOppdatering.json",
-            antallOverføringerSåLangt = 161,
+            antallKonteringerTotalt = 166,
             bp = skyldnerIdEktefelleBidrag,
             kravhaverIdent = kravhaverIdEktefellebidrag
         )
@@ -699,7 +694,7 @@ internal class VedtakshendelseListenerIT {
     fun `skal opprette motregning`() {
         val vedtakHendelse = hentFilOgSendPåKafka(
             "motregning.json",
-            172
+            177
         )
 
         await().atMost(TEN_SECONDS).until {
@@ -801,7 +796,7 @@ internal class VedtakshendelseListenerIT {
 
     private fun hentFilOgSendPåKafka(
         filnavn: String,
-        antallOverføringerSåLangt: Int,
+        antallKonteringerTotalt: Int,
         kravhaverIdent: String = PersonidentGenerator.genererFødselsnummer(),
         mottaker: String = PersonidentGenerator.genererFødselsnummer(),
         bm: String = PersonidentGenerator.genererFødselsnummer(),
@@ -813,12 +808,10 @@ internal class VedtakshendelseListenerIT {
 
         kafkaTemplate.send(topic, vedtakFilString)
 
-        val vedtakHendelse = objectmapper.readValue(vedtakFilString, VedtakHendelse::class.java)
-
-//        await().atMost(TEN_SECONDS).until { //TODO() Dette må erstattes
-//            return@until persistenceService.hentOverføringKontering(Pageable.ofSize(1000)).size >= antallOverføringerSåLangt
-//        }
-        return vedtakHendelse
+        await().atMost(TEN_SECONDS).until {
+            return@until persistenceService.konteringRepository.findAll().size == antallKonteringerTotalt
+        }
+        return objectmapper.readValue(vedtakFilString, VedtakHendelse::class.java)
     }
 
     private fun assertVedOpprettelseAvEngangsbeløp(
