@@ -70,7 +70,6 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.test.context.EmbeddedKafka
-import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
@@ -139,10 +138,14 @@ internal class VedtakshendelseListenerIT {
     private lateinit var file: FileOutputStream
 
     private val påløp =
-        TestData.opprettPåløp(forPeriode = YearMonth.from(PÅLØPSDATO).toString(), fullførtTidspunkt = LocalDateTime.now())
+        TestData.opprettPåløp(
+            forPeriode = YearMonth.from(PÅLØPSDATO).toString(),
+            fullførtTidspunkt = LocalDateTime.now()
+        )
 
-    private val objectmapper = jacksonObjectMapper().registerModule(KotlinModule.Builder().build()).registerModule(JavaTimeModule())
-        .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+    private val objectmapper =
+        jacksonObjectMapper().registerModule(KotlinModule.Builder().build()).registerModule(JavaTimeModule())
+            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
 
     @BeforeAll
     fun beforeAll() {
@@ -403,7 +406,10 @@ internal class VedtakshendelseListenerIT {
         )
 
         val konteringer = hentAlleOppdaterteOgNyeKonteringerForOppdragVedOppdatering(oppdrag)
-        skrivTilTestdatafil(konteringer, "Oppdaterer bidragsforskudds med 50 øre og endrer til å slutte 2 mnd tidligere.")
+        skrivTilTestdatafil(
+            konteringer,
+            "Oppdaterer bidragsforskudds med 50 øre og endrer til å slutte 2 mnd tidligere."
+        )
     }
 
     val bmBidrag = PersonidentGenerator.genererFødselsnummer()
@@ -724,7 +730,8 @@ internal class VedtakshendelseListenerIT {
         forventetKorreksjonskode: Transaksjonskode? = null,
         stonadsendringIndex: Int = 0
     ): Oppdrag {
-        val oppdrag = persistenceService.hentOppdrag(oppdragId) ?: error("Det finnes ingen oppdrag med angitt oppdragsId: $oppdragId")
+        val oppdrag = persistenceService.hentOppdrag(oppdragId)
+            ?: error("Det finnes ingen oppdrag med angitt oppdragsId: $oppdragId")
 
         oppdrag.stønadType shouldBe stønadstype.name
         oppdrag.oppdragsperioder.size shouldBe antallOppdragsperioder
@@ -749,7 +756,10 @@ internal class VedtakshendelseListenerIT {
 
                 oppdragsperiode.konteringer.size shouldBe månederForKontering.size
                 oppdragsperiode.konteringer.forEach { kontering ->
-                    kontering.transaksjonskode shouldBeIn listOf(forventetTransaksjonskode.name, forventetKorreksjonskode?.name)
+                    kontering.transaksjonskode shouldBeIn listOf(
+                        forventetTransaksjonskode.name,
+                        forventetKorreksjonskode?.name
+                    )
                     kontering.søknadType shouldBe forventetSøknadstype.name
                     kontering.overføringsperiode shouldBeIn månederForKontering
                 }
@@ -774,7 +784,8 @@ internal class VedtakshendelseListenerIT {
         forventetKorreksjonskode: Transaksjonskode,
         forventetDelytelsesId: Int
     ): List<Kontering> {
-        val oppdrag = persistenceService.hentOppdrag(oppdragId) ?: error("Det finnes ingen oppdrag med angitt oppdragsId: $oppdragId")
+        val oppdrag = persistenceService.hentOppdrag(oppdragId)
+            ?: error("Det finnes ingen oppdrag med angitt oppdragsId: $oppdragId")
 
         oppdrag.oppdragsperioder shouldHaveSize 2
         oppdrag.oppdragsperioder[0].beløp shouldNotBe oppdrag.oppdragsperioder[1].beløp
@@ -803,7 +814,8 @@ internal class VedtakshendelseListenerIT {
         barn1: String = PersonidentGenerator.genererFødselsnummer(),
         barn2: String = PersonidentGenerator.genererFødselsnummer()
     ): VedtakHendelse {
-        val vedtakFilString = leggInnGenererteIdenter(hentTestfil(filnavn), kravhaverIdent, mottaker, bm, bp, barn1, barn2)
+        val vedtakFilString =
+            leggInnGenererteIdenter(hentTestfil(filnavn), kravhaverIdent, mottaker, bm, bp, barn1, barn2)
 
         kafkaTemplate.send(topic, vedtakFilString)
 
@@ -822,7 +834,8 @@ internal class VedtakshendelseListenerIT {
         søknadstype: Søknadstype,
         engangsbeløpIndex: Int = 0
     ): Kontering {
-        val oppdrag = persistenceService.hentOppdrag(oppdragId) ?: error("Det finnes ingen oppdrag med angitt oppdragsId: $oppdragId")
+        val oppdrag = persistenceService.hentOppdrag(oppdragId)
+            ?: error("Det finnes ingen oppdrag med angitt oppdragsId: $oppdragId")
         assertSoftly {
             oppdrag.stønadType shouldBe forventetEngangsbeløpType.name
             oppdrag.sakId shouldBe vedtakHendelse.engangsbelopListe!![engangsbeløpIndex].sakId
@@ -837,7 +850,8 @@ internal class VedtakshendelseListenerIT {
             oppdragsperiode.valuta shouldBe vedtakHendelse.engangsbelopListe!![engangsbeløpIndex].valutakode
             oppdragsperiode.vedtaksdato shouldBe vedtakHendelse.vedtakTidspunkt.toLocalDate()
             oppdragsperiode.periodeFra shouldBe vedtakHendelse.vedtakTidspunkt.toLocalDate().withDayOfMonth(1)
-            oppdragsperiode.periodeTil shouldBe vedtakHendelse.vedtakTidspunkt.toLocalDate().plusMonths(1).withDayOfMonth(1)
+            oppdragsperiode.periodeTil shouldBe vedtakHendelse.vedtakTidspunkt.toLocalDate().plusMonths(1)
+                .withDayOfMonth(1)
             oppdragsperiode.opprettetAv shouldBe vedtakHendelse.opprettetAv
             oppdragsperiode.delytelseId shouldBe forventetDelytelsesId
         }
@@ -845,7 +859,8 @@ internal class VedtakshendelseListenerIT {
         val kontering = hentAlleKonteringerForOppdrag(oppdrag).first()
         assertSoftly {
             kontering.transaksjonskode shouldBe forventetTransaksjonskode.name
-            kontering.overføringsperiode shouldBe YearMonth.from(vedtakHendelse.vedtakTidspunkt.toLocalDate()).toString()
+            kontering.overføringsperiode shouldBe YearMonth.from(vedtakHendelse.vedtakTidspunkt.toLocalDate())
+                .toString()
             kontering.type shouldBe NY.name
             kontering.søknadType shouldBe søknadstype.name
         }
@@ -867,7 +882,10 @@ internal class VedtakshendelseListenerIT {
         barn1: String,
         barn2: String
     ): String {
-        return vedtakFil.replace("\"skyldnerId\": \"\"", "\"skyldnerId\" : \"${PersonidentGenerator.genererFødselsnummer()}\"")
+        return vedtakFil.replace(
+            "\"skyldnerId\": \"\"",
+            "\"skyldnerId\" : \"${PersonidentGenerator.genererFødselsnummer()}\""
+        )
             .replace("\"kravhaverId\": \"\"", "\"kravhaverId\" : \"$kravhaverIdent\"")
             .replace("\"mottakerId\": \"\"", "\"mottakerId\" : \"$mottaker\"")
             .replace("\"skyldnerId\": \"BP\"", "\"skyldnerId\" : \"$bp\"")
