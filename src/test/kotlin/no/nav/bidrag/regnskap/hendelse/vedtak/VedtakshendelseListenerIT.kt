@@ -84,7 +84,6 @@ import java.time.LocalDateTime
 import java.time.YearMonth
 
 @Transactional
-@DirtiesContext
 @ActiveProfiles("test")
 @EnableMockOAuth2Server
 @TestInstance(PER_CLASS)
@@ -147,9 +146,6 @@ internal class VedtakshendelseListenerIT {
 
     @BeforeAll
     fun beforeAll() {
-        persistenceService.konteringRepository.deleteAll()
-        persistenceService.oppdragsperiodeRepository.deleteAll()
-        persistenceService.oppdragRepository.deleteAll()
         file = FileOutputStream(TESTDATA_OUTPUT_NAVN)
         persistenceService.lagrePåløp(påløp)
     }
