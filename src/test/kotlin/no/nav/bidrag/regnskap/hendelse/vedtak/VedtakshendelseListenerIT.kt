@@ -819,6 +819,8 @@ internal class VedtakshendelseListenerIT {
 
         kafkaTemplate.send(topic, vedtakFilString)
 
+        println("$filnavn blir nå behandlet. Antall opprettede konteringer totalt i db så langt: ${persistenceService.konteringRepository.findAll().size}")
+
         await().atMost(TEN_SECONDS).until {
             return@until persistenceService.konteringRepository.findAll().size == antallKonteringerTotalt
         }
