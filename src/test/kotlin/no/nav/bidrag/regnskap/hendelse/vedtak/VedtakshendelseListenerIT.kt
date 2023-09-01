@@ -22,6 +22,7 @@ import no.nav.bidrag.behandling.felles.enums.StonadType.OPPFOSTRINGSBIDRAG
 import no.nav.bidrag.commons.util.PersonidentGenerator
 import no.nav.bidrag.regnskap.BidragRegnskapLocal
 import no.nav.bidrag.regnskap.consumer.KravApiWireMock
+import no.nav.bidrag.regnskap.consumer.PersonApiWireMock
 import no.nav.bidrag.regnskap.consumer.SakApiWireMock
 import no.nav.bidrag.regnskap.dto.enumer.Søknadstype
 import no.nav.bidrag.regnskap.dto.enumer.Søknadstype.EN
@@ -99,6 +100,7 @@ internal class VedtakshendelseListenerIT {
         private var kravApiWireMock: KravApiWireMock = KravApiWireMock()
         private var sakApiWireMock: SakApiWireMock = SakApiWireMock()
         private var maskinportenWireMock: MaskinportenWireMock = MaskinportenWireMock()
+        private var personApiWireMock: PersonApiWireMock = PersonApiWireMock()
 
         private val maskinportenConfig = MaskinportenWireMock.createMaskinportenConfig()
 
@@ -160,6 +162,7 @@ internal class VedtakshendelseListenerIT {
         sakApiWireMock.sakMedGyldigResponse()
         kravApiWireMock.livenessMedGyldigResponse()
         maskinportenWireMock.kravMedGyldigResponse()
+        personApiWireMock.personidentMedNoBody()
     }
 
     @AfterAll
