@@ -3,10 +3,10 @@ package no.nav.bidrag.regnskap.consumer
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.github.oshai.KotlinLogging
 import no.nav.bidrag.regnskap.SECURE_LOGGER
-import no.nav.bidrag.regnskap.dto.behandlingsstatus.BehandlingsstatusResponse
-import no.nav.bidrag.regnskap.dto.krav.Kravliste
-import no.nav.bidrag.regnskap.dto.påløp.Vedlikeholdsmodus
 import no.nav.bidrag.regnskap.maskinporten.MaskinportenClient
+import no.nav.bidrag.transport.regnskap.behandlingsstatus.BehandlingsstatusResponse
+import no.nav.bidrag.transport.regnskap.krav.Kravliste
+import no.nav.bidrag.transport.regnskap.vedlikeholdsmodus.Vedlikeholdsmodus
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cache.annotation.Cacheable

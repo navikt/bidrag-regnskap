@@ -1,15 +1,15 @@
 package no.nav.bidrag.regnskap.service
 
 import com.google.common.collect.Lists
+import no.nav.bidrag.domain.enums.regnskap.Årsakskode
 import no.nav.bidrag.regnskap.consumer.SkattConsumer
-import no.nav.bidrag.regnskap.dto.enumer.Årsakskode
-import no.nav.bidrag.regnskap.dto.påløp.Vedlikeholdsmodus
 import no.nav.bidrag.regnskap.fil.overføring.FiloverføringTilElinKlient
 import no.nav.bidrag.regnskap.fil.påløp.PåløpsfilGenerator
 import no.nav.bidrag.regnskap.persistence.bucket.GcpFilBucket
 import no.nav.bidrag.regnskap.persistence.entity.Driftsavvik
 import no.nav.bidrag.regnskap.persistence.entity.Påløp
 import no.nav.bidrag.regnskap.persistence.repository.OppdragsperiodeRepository
+import no.nav.bidrag.transport.regnskap.vedlikeholdsmodus.Vedlikeholdsmodus
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -160,16 +160,14 @@ class PåløpskjøringService(
     private fun medLyttere(lytterConsumer: Consumer<PåløpskjøringLytter>) = lyttere.forEach(lytterConsumer)
 
     fun fullførPåløp(påløp: Påløp) {
-        påløp.fullførtTidspunkt = LocalDateTime.now()
-        persistenceService.lagrePåløp(påløp)
+        persistenceService.lagrePåløp(påløp.copy(fullførtTidspunkt = LocalDateTime.now()))
     }
 
     fun avsluttDriftsavvik(påløp: Påløp) {
         val driftsavvik =
             persistenceService.hentDriftsavvikForPåløp(påløp.påløpId)
                 ?: error("Fant ikke driftsavvik på ID: ${påløp.påløpId}")
-        driftsavvik.tidspunktTil = LocalDateTime.now()
-        persistenceService.lagreDriftsavvik(driftsavvik)
+        persistenceService.lagreDriftsavvik(driftsavvik.copy(tidspunktTil = LocalDateTime.now()))
     }
 }
 

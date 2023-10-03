@@ -10,9 +10,9 @@ import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import no.nav.bidrag.domain.enums.VedtakType
+import no.nav.bidrag.domain.enums.regnskap.Søknadstype
+import no.nav.bidrag.domain.enums.regnskap.Type
 import no.nav.bidrag.regnskap.consumer.SkattConsumer
-import no.nav.bidrag.regnskap.dto.enumer.Søknadstype
-import no.nav.bidrag.regnskap.dto.enumer.Type
 import no.nav.bidrag.regnskap.fil.overføring.FiloverføringTilElinKlient
 import no.nav.bidrag.regnskap.persistence.bucket.GcpFilBucket
 import no.nav.bidrag.regnskap.persistence.repository.OppdragsperiodeRepository

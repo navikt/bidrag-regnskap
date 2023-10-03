@@ -1,6 +1,6 @@
 package no.nav.bidrag.regnskap.service
 
-import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
+import no.nav.bidrag.domain.enums.regnskap.Transaksjonskode
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
 import no.nav.bidrag.regnskap.persistence.repository.OppdragsperiodeRepository

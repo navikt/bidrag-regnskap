@@ -28,9 +28,6 @@ class DriftsavvikService(
     @Transactional
     fun endreDriftsavvik(driftsavvikId: Int, tidspunktTil: LocalDateTime?): Int? {
         val driftsavvik = persistenceService.hentDriftsavvik(driftsavvikId) ?: return null
-
-        driftsavvik.tidspunktTil = tidspunktTil
-
-        return persistenceService.lagreDriftsavvik(driftsavvik)
+        return persistenceService.lagreDriftsavvik(driftsavvik.copy(tidspunktTil = tidspunktTil))
     }
 }

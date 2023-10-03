@@ -10,9 +10,9 @@ import io.mockk.junit5.MockKExtension
 import io.mockk.verify
 import no.nav.bidrag.commons.util.PersonidentGenerator
 import no.nav.bidrag.domain.enums.EngangsbelopType
+import no.nav.bidrag.domain.enums.regnskap.Søknadstype
+import no.nav.bidrag.domain.enums.regnskap.Transaksjonskode
 import no.nav.bidrag.regnskap.consumer.SkattConsumer
-import no.nav.bidrag.regnskap.dto.enumer.Søknadstype
-import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.utils.TestData
 import org.junit.jupiter.api.Test

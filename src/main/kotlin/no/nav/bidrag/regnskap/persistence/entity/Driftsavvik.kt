@@ -22,7 +22,7 @@ data class Driftsavvik(
     val tidspunktFra: LocalDateTime,
 
     @Column(name = "tidspunkt_til")
-    var tidspunktTil: LocalDateTime? = null,
+    val tidspunktTil: LocalDateTime? = null,
 
     @Column(name = "opprettet_av")
     val opprettetAv: String? = null,
