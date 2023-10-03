@@ -6,8 +6,8 @@ import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
-import no.nav.bidrag.behandling.felles.enums.StonadType
 import no.nav.bidrag.commons.util.PersonidentGenerator
+import no.nav.bidrag.domain.enums.StonadType
 import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
 import no.nav.bidrag.regnskap.dto.enumer.Type
 import no.nav.bidrag.regnskap.utils.TestData

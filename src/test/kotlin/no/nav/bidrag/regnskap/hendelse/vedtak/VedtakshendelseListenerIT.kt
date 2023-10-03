@@ -10,16 +10,9 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.types.shouldBeSameInstanceAs
-import no.nav.bidrag.behandling.felles.dto.vedtak.VedtakHendelse
-import no.nav.bidrag.behandling.felles.enums.EngangsbelopType
-import no.nav.bidrag.behandling.felles.enums.StonadType
-import no.nav.bidrag.behandling.felles.enums.StonadType.BIDRAG
-import no.nav.bidrag.behandling.felles.enums.StonadType.BIDRAG18AAR
-import no.nav.bidrag.behandling.felles.enums.StonadType.EKTEFELLEBIDRAG
-import no.nav.bidrag.behandling.felles.enums.StonadType.FORSKUDD
-import no.nav.bidrag.behandling.felles.enums.StonadType.MOTREGNING
-import no.nav.bidrag.behandling.felles.enums.StonadType.OPPFOSTRINGSBIDRAG
 import no.nav.bidrag.commons.util.PersonidentGenerator
+import no.nav.bidrag.domain.enums.EngangsbelopType
+import no.nav.bidrag.domain.enums.StonadType
 import no.nav.bidrag.regnskap.BidragRegnskapLocal
 import no.nav.bidrag.regnskap.consumer.KravApiWireMock
 import no.nav.bidrag.regnskap.consumer.PersonApiWireMock
@@ -56,6 +49,7 @@ import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
 import no.nav.bidrag.regnskap.service.KravService
 import no.nav.bidrag.regnskap.service.PersistenceService
 import no.nav.bidrag.regnskap.utils.TestData
+import no.nav.bidrag.transport.behandling.vedtak.VedtakHendelse
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -372,7 +366,7 @@ internal class VedtakshendelseListenerIT {
         val oppdrag = assertStønader(
             9,
             vedtakHendelse,
-            FORSKUDD,
+            StonadType.FORSKUDD,
             3,
             3,
             A1,
@@ -400,7 +394,7 @@ internal class VedtakshendelseListenerIT {
         val oppdrag = assertStønader(
             9,
             vedtakHendelse,
-            FORSKUDD,
+            StonadType.FORSKUDD,
             4,
             1,
             A1,
@@ -435,7 +429,7 @@ internal class VedtakshendelseListenerIT {
         val oppdrag1 = assertStønader(
             10,
             vedtakHendelse,
-            BIDRAG,
+            StonadType.BIDRAG,
             2,
             2,
             B1,
@@ -445,7 +439,7 @@ internal class VedtakshendelseListenerIT {
         val oppdrag2 = assertStønader(
             11,
             vedtakHendelse,
-            BIDRAG,
+            StonadType.BIDRAG,
             2,
             2,
             B1,
@@ -491,7 +485,7 @@ internal class VedtakshendelseListenerIT {
         )
 
         val oppdrag1 = assertStønader(
-            10, vedtakHendelse, BIDRAG, 3, 1, B1, EN, B3, 0
+            10, vedtakHendelse, StonadType.BIDRAG, 3, 1, B1, EN, B3, 0
         )
 
         skrivTilTestdatafil(
@@ -500,7 +494,7 @@ internal class VedtakshendelseListenerIT {
         )
 
         val oppdrag2 = assertStønader(
-            11, vedtakHendelse, BIDRAG, 3, 1, B1, EN, B3, 1
+            11, vedtakHendelse, StonadType.BIDRAG, 3, 1, B1, EN, B3, 1
         )
 
         skrivTilTestdatafil(
@@ -531,7 +525,7 @@ internal class VedtakshendelseListenerIT {
         val oppdrag1 = assertStønader(
             14,
             vedtakHendelse,
-            OPPFOSTRINGSBIDRAG,
+            StonadType.OPPFOSTRINGSBIDRAG,
             1,
             1,
             B1,
@@ -545,7 +539,7 @@ internal class VedtakshendelseListenerIT {
         val oppdrag2 = assertStønader(
             15,
             vedtakHendelse,
-            OPPFOSTRINGSBIDRAG,
+            StonadType.OPPFOSTRINGSBIDRAG,
             1,
             1,
             B1,
@@ -568,7 +562,7 @@ internal class VedtakshendelseListenerIT {
         )
 
         val oppdrag1 = assertStønader(
-            14, vedtakHendelse, OPPFOSTRINGSBIDRAG, 2, 1, B1, EN, B3, 0
+            14, vedtakHendelse, StonadType.OPPFOSTRINGSBIDRAG, 2, 1, B1, EN, B3, 0
         )
 
         skrivTilTestdatafil(
@@ -577,7 +571,7 @@ internal class VedtakshendelseListenerIT {
         )
 
         val oppdrag2 = assertStønader(
-            15, vedtakHendelse, OPPFOSTRINGSBIDRAG, 2, 1, B1, EN, B3, 1
+            15, vedtakHendelse, StonadType.OPPFOSTRINGSBIDRAG, 2, 1, B1, EN, B3, 1
         )
 
         skrivTilTestdatafil(
@@ -603,7 +597,7 @@ internal class VedtakshendelseListenerIT {
         val oppdrag = assertStønader(
             16,
             vedtakHendelse,
-            BIDRAG18AAR,
+            StonadType.BIDRAG18AAR,
             3,
             3,
             D1,
@@ -626,7 +620,7 @@ internal class VedtakshendelseListenerIT {
         val oppdrag = assertStønader(
             16,
             vedtakHendelse,
-            BIDRAG18AAR,
+            StonadType.BIDRAG18AAR,
             4,
             1,
             D1,
@@ -660,7 +654,7 @@ internal class VedtakshendelseListenerIT {
         val oppdrag = assertStønader(
             17,
             vedtakHendelse,
-            EKTEFELLEBIDRAG,
+            StonadType.EKTEFELLEBIDRAG,
             2,
             2,
             F1,
@@ -683,7 +677,7 @@ internal class VedtakshendelseListenerIT {
         val oppdrag = assertStønader(
             17,
             vedtakHendelse,
-            EKTEFELLEBIDRAG,
+            StonadType.EKTEFELLEBIDRAG,
             3,
             1,
             F1,
@@ -712,7 +706,7 @@ internal class VedtakshendelseListenerIT {
         val oppdrag = assertStønader(
             18,
             vedtakHendelse,
-            MOTREGNING,
+            StonadType.MOTREGNING,
             1,
             1,
             I1,
