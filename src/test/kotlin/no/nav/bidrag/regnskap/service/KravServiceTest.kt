@@ -8,8 +8,8 @@ import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.verify
-import no.nav.bidrag.behandling.felles.enums.EngangsbelopType
 import no.nav.bidrag.commons.util.PersonidentGenerator
+import no.nav.bidrag.domain.enums.EngangsbelopType
 import no.nav.bidrag.regnskap.consumer.SkattConsumer
 import no.nav.bidrag.regnskap.dto.enumer.Søknadstype
 import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode

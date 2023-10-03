@@ -10,7 +10,6 @@ import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
 import no.nav.bidrag.regnskap.dto.enumer.Type
 import no.nav.bidrag.regnskap.dto.krav.Krav
 import no.nav.bidrag.regnskap.dto.krav.KravResponse
-import no.nav.bidrag.regnskap.dto.krav.Kravfeil
 import no.nav.bidrag.regnskap.dto.krav.Kravkontering
 import no.nav.bidrag.regnskap.dto.krav.Kravliste
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
@@ -149,7 +148,6 @@ class KravService(
                 HttpStatus.BAD_REQUEST -> {
                     LOGGER.error("En eller flere konteringer har ikke gått gjennom validering. Se secure log for mer informasjon.")
                     SECURE_LOGGER.error("En eller flere konteringer har ikke gått gjennom validering, ${skattResponse.body}")
-                    val kravfeil = objectMapper.readValue(skattResponse.body, Kravfeil::class.java)
                 }
 
                 HttpStatus.SERVICE_UNAVAILABLE -> {
