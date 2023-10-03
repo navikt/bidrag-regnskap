@@ -1,7 +1,7 @@
 package no.nav.bidrag.regnskap.fil.påløp
 
-import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
-import no.nav.bidrag.regnskap.dto.enumer.Type
+import no.nav.bidrag.domain.enums.regnskap.Transaksjonskode
+import no.nav.bidrag.domain.enums.regnskap.Type
 import no.nav.bidrag.regnskap.fil.overføring.FiloverføringTilElinKlient
 import no.nav.bidrag.regnskap.persistence.bucket.GcpFilBucket
 import no.nav.bidrag.regnskap.persistence.entity.Kontering

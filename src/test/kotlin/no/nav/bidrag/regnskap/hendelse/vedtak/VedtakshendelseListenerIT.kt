@@ -13,35 +13,13 @@ import io.kotest.matchers.types.shouldBeSameInstanceAs
 import no.nav.bidrag.commons.util.PersonidentGenerator
 import no.nav.bidrag.domain.enums.EngangsbelopType
 import no.nav.bidrag.domain.enums.StonadType
+import no.nav.bidrag.domain.enums.regnskap.Søknadstype
+import no.nav.bidrag.domain.enums.regnskap.Transaksjonskode
+import no.nav.bidrag.domain.enums.regnskap.Type
 import no.nav.bidrag.regnskap.BidragRegnskapLocal
 import no.nav.bidrag.regnskap.consumer.KravApiWireMock
 import no.nav.bidrag.regnskap.consumer.PersonApiWireMock
 import no.nav.bidrag.regnskap.consumer.SakApiWireMock
-import no.nav.bidrag.regnskap.dto.enumer.Søknadstype
-import no.nav.bidrag.regnskap.dto.enumer.Søknadstype.EN
-import no.nav.bidrag.regnskap.dto.enumer.Søknadstype.FABM
-import no.nav.bidrag.regnskap.dto.enumer.Søknadstype.FABP
-import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
-import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode.A1
-import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode.A3
-import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode.B1
-import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode.B3
-import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode.D1
-import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode.D3
-import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode.E1
-import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode.E3
-import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode.F1
-import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode.F3
-import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode.G1
-import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode.G3
-import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode.H1
-import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode.H3
-import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode.I1
-import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode.K1
-import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode.K2
-import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode.K3
-import no.nav.bidrag.regnskap.dto.enumer.Type.ENDRING
-import no.nav.bidrag.regnskap.dto.enumer.Type.NY
 import no.nav.bidrag.regnskap.maskinporten.MaskinportenWireMock
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
@@ -173,9 +151,9 @@ internal class VedtakshendelseListenerIT {
             1,
             vedtakHendelse,
             EngangsbelopType.GEBYR_SKYLDNER,
-            G1,
+            Transaksjonskode.G1,
             Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].delytelseId),
-            FABP
+            Søknadstype.FABP
         )
 
         skrivTilTestdatafil(listOf(kontering), "Gebyr for skyldner")
@@ -188,8 +166,8 @@ internal class VedtakshendelseListenerIT {
 
         val konteringer = assertVedOppdateringAvEngangsbeløpOgReturnerKonteringer(
             1,
-            G1,
-            G3,
+            Transaksjonskode.G1,
+            Transaksjonskode.G3,
             100000000
         )
 
@@ -205,9 +183,9 @@ internal class VedtakshendelseListenerIT {
             2,
             vedtakHendelse,
             EngangsbelopType.GEBYR_MOTTAKER,
-            G1,
+            Transaksjonskode.G1,
             Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].delytelseId),
-            FABM
+            Søknadstype.FABM
         )
 
         skrivTilTestdatafil(listOf(kontering), "Gebyr for mottaker")
@@ -224,8 +202,8 @@ internal class VedtakshendelseListenerIT {
 
         val konteringer = assertVedOppdateringAvEngangsbeløpOgReturnerKonteringer(
             2,
-            G1,
-            G3,
+            Transaksjonskode.G1,
+            Transaksjonskode.G3,
             100000001
         )
 
@@ -241,9 +219,9 @@ internal class VedtakshendelseListenerIT {
             3,
             vedtakHendelse,
             EngangsbelopType.SAERTILSKUDD,
-            E1,
+            Transaksjonskode.E1,
             100000002,
-            EN
+            Søknadstype.EN
         )
 
         skrivTilTestdatafil(listOf(kontering), "Særtilskudd")
@@ -260,8 +238,8 @@ internal class VedtakshendelseListenerIT {
 
         val konteringer = assertVedOppdateringAvEngangsbeløpOgReturnerKonteringer(
             3,
-            E1,
-            E3,
+            Transaksjonskode.E1,
+            Transaksjonskode.E3,
             100000003
         )
 
@@ -277,9 +255,9 @@ internal class VedtakshendelseListenerIT {
             4,
             vedtakHendelse,
             EngangsbelopType.TILBAKEKREVING,
-            H1,
+            Transaksjonskode.H1,
             Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].delytelseId),
-            EN
+            Søknadstype.EN
         )
 
         skrivTilTestdatafil(listOf(kontering), "Tilbakekreving")
@@ -296,8 +274,8 @@ internal class VedtakshendelseListenerIT {
 
         val konteringer = assertVedOppdateringAvEngangsbeløpOgReturnerKonteringer(
             4,
-            H1,
-            H3,
+            Transaksjonskode.H1,
+            Transaksjonskode.H3,
             100000004
         )
 
@@ -313,9 +291,9 @@ internal class VedtakshendelseListenerIT {
             5,
             vedtakHendelse,
             EngangsbelopType.ETTERGIVELSE,
-            K1,
+            Transaksjonskode.K1,
             Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].delytelseId),
-            EN
+            Søknadstype.EN
         )
 
         skrivTilTestdatafil(listOf(kontering), "Ettergivelse")
@@ -330,9 +308,9 @@ internal class VedtakshendelseListenerIT {
             7,
             vedtakHendelse,
             EngangsbelopType.DIREKTE_OPPGJOR,
-            K2,
+            Transaksjonskode.K2,
             Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].delytelseId),
-            EN
+            Søknadstype.EN
         )
 
         skrivTilTestdatafil(listOf(kontering), "Direkte oppgjør")
@@ -347,9 +325,9 @@ internal class VedtakshendelseListenerIT {
             8,
             vedtakHendelse,
             EngangsbelopType.ETTERGIVELSE_TILBAKEKREVING,
-            K3,
+            Transaksjonskode.K3,
             Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].delytelseId),
-            EN
+            Søknadstype.EN
         )
 
         skrivTilTestdatafil(listOf(kontering), "Ettergivelse tilbakekreving")
@@ -369,8 +347,8 @@ internal class VedtakshendelseListenerIT {
             StonadType.FORSKUDD,
             3,
             3,
-            A1,
-            EN
+            Transaksjonskode.A1,
+            Søknadstype.EN
         )
 
         val konteringer = hentAlleKonteringerForOppdrag(oppdrag)
@@ -397,9 +375,9 @@ internal class VedtakshendelseListenerIT {
             StonadType.FORSKUDD,
             4,
             1,
-            A1,
-            EN,
-            A3
+            Transaksjonskode.A1,
+            Søknadstype.EN,
+            Transaksjonskode.A3
         )
 
         val konteringer = hentAlleOppdaterteOgNyeKonteringerForOppdragVedOppdatering(oppdrag)
@@ -432,8 +410,8 @@ internal class VedtakshendelseListenerIT {
             StonadType.BIDRAG,
             2,
             2,
-            B1,
-            EN
+            Transaksjonskode.B1,
+            Søknadstype.EN
         )
 
         val oppdrag2 = assertStønader(
@@ -442,8 +420,8 @@ internal class VedtakshendelseListenerIT {
             StonadType.BIDRAG,
             2,
             2,
-            B1,
-            EN,
+            Transaksjonskode.B1,
+            Søknadstype.EN,
             stonadsendringIndex = 1
         )
 
@@ -451,18 +429,18 @@ internal class VedtakshendelseListenerIT {
             12,
             vedtakHendelse,
             EngangsbelopType.GEBYR_SKYLDNER,
-            G1,
+            Transaksjonskode.G1,
             Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].delytelseId),
-            FABP
+            Søknadstype.FABP
         )
 
         val gebyrBm = assertVedOpprettelseAvEngangsbeløp(
             13,
             vedtakHendelse,
             EngangsbelopType.GEBYR_MOTTAKER,
-            G1,
+            Transaksjonskode.G1,
             Integer.valueOf(vedtakHendelse.engangsbelopListe!![1].delytelseId),
-            FABM,
+            Søknadstype.FABM,
             engangsbeløpIndex = 1
         )
 
@@ -485,7 +463,14 @@ internal class VedtakshendelseListenerIT {
         )
 
         val oppdrag1 = assertStønader(
-            10, vedtakHendelse, StonadType.BIDRAG, 3, 1, B1, EN, B3, 0
+            10,
+            vedtakHendelse,
+            StonadType.BIDRAG,
+            3,
+            1,
+            Transaksjonskode.B1,
+            Søknadstype.EN,
+            Transaksjonskode.B3, 0
         )
 
         skrivTilTestdatafil(
@@ -494,7 +479,15 @@ internal class VedtakshendelseListenerIT {
         )
 
         val oppdrag2 = assertStønader(
-            11, vedtakHendelse, StonadType.BIDRAG, 3, 1, B1, EN, B3, 1
+            11,
+            vedtakHendelse,
+            StonadType.BIDRAG,
+            3,
+            1,
+            Transaksjonskode.B1,
+            Søknadstype.EN,
+            Transaksjonskode.B3,
+            1
         )
 
         skrivTilTestdatafil(
@@ -528,8 +521,8 @@ internal class VedtakshendelseListenerIT {
             StonadType.OPPFOSTRINGSBIDRAG,
             1,
             1,
-            B1,
-            EN
+            Transaksjonskode.B1,
+            Søknadstype.EN
         )
 
         await().atMost(TEN_SECONDS).until {
@@ -542,8 +535,8 @@ internal class VedtakshendelseListenerIT {
             StonadType.OPPFOSTRINGSBIDRAG,
             1,
             1,
-            B1,
-            EN
+            Transaksjonskode.B1,
+            Søknadstype.EN
         )
 
         skrivTilTestdatafil(hentAlleKonteringerForOppdrag(oppdrag1), "Oppfostringsbidrag for barn 1")
@@ -562,7 +555,15 @@ internal class VedtakshendelseListenerIT {
         )
 
         val oppdrag1 = assertStønader(
-            14, vedtakHendelse, StonadType.OPPFOSTRINGSBIDRAG, 2, 1, B1, EN, B3, 0
+            14,
+            vedtakHendelse,
+            StonadType.OPPFOSTRINGSBIDRAG,
+            2,
+            1,
+            Transaksjonskode.B1,
+            Søknadstype.EN,
+            Transaksjonskode.B3,
+            0
         )
 
         skrivTilTestdatafil(
@@ -571,7 +572,15 @@ internal class VedtakshendelseListenerIT {
         )
 
         val oppdrag2 = assertStønader(
-            15, vedtakHendelse, StonadType.OPPFOSTRINGSBIDRAG, 2, 1, B1, EN, B3, 1
+            15,
+            vedtakHendelse,
+            StonadType.OPPFOSTRINGSBIDRAG,
+            2,
+            1,
+            Transaksjonskode.B1,
+            Søknadstype.EN,
+            Transaksjonskode.B3,
+            1
         )
 
         skrivTilTestdatafil(
@@ -600,8 +609,8 @@ internal class VedtakshendelseListenerIT {
             StonadType.BIDRAG18AAR,
             3,
             3,
-            D1,
-            EN
+            Transaksjonskode.D1,
+            Søknadstype.EN
         )
 
         skrivTilTestdatafil(hentAlleKonteringerForOppdrag(oppdrag), "18 års bidrag")
@@ -623,9 +632,9 @@ internal class VedtakshendelseListenerIT {
             StonadType.BIDRAG18AAR,
             4,
             1,
-            D1,
-            EN,
-            D3
+            Transaksjonskode.D1,
+            Søknadstype.EN,
+            Transaksjonskode.D3
         )
 
         skrivTilTestdatafil(
@@ -657,8 +666,8 @@ internal class VedtakshendelseListenerIT {
             StonadType.EKTEFELLEBIDRAG,
             2,
             2,
-            F1,
-            EN
+            Transaksjonskode.F1,
+            Søknadstype.EN
         )
 
         skrivTilTestdatafil(hentAlleKonteringerForOppdrag(oppdrag), "Ektefellebidrag")
@@ -680,9 +689,9 @@ internal class VedtakshendelseListenerIT {
             StonadType.EKTEFELLEBIDRAG,
             3,
             1,
-            F1,
-            EN,
-            F3
+            Transaksjonskode.F1,
+            Søknadstype.EN,
+            Transaksjonskode.F3
         )
 
         skrivTilTestdatafil(
@@ -709,8 +718,8 @@ internal class VedtakshendelseListenerIT {
             StonadType.MOTREGNING,
             1,
             1,
-            I1,
-            EN
+            Transaksjonskode.I1,
+            Søknadstype.EN
         )
 
         skrivTilTestdatafil(hentAlleKonteringerForOppdrag(oppdrag), "Motregning")
@@ -789,12 +798,12 @@ internal class VedtakshendelseListenerIT {
 
         oppdrag.oppdragsperioder[0].konteringer shouldHaveSize 2
         oppdrag.oppdragsperioder[0].konteringer[0].transaksjonskode shouldBe forventetTransaksjonskode.name
-        oppdrag.oppdragsperioder[0].konteringer[0].type shouldBe NY.name
+        oppdrag.oppdragsperioder[0].konteringer[0].type shouldBe Type.NY.name
         oppdrag.oppdragsperioder[0].konteringer[1].transaksjonskode shouldBe forventetKorreksjonskode.name
-        oppdrag.oppdragsperioder[0].konteringer[1].type shouldBe ENDRING.name
+        oppdrag.oppdragsperioder[0].konteringer[1].type shouldBe Type.ENDRING.name
         oppdrag.oppdragsperioder[1].konteringer shouldHaveSize 1
         oppdrag.oppdragsperioder[1].konteringer[0].transaksjonskode shouldBe forventetTransaksjonskode.name
-        oppdrag.oppdragsperioder[1].konteringer[0].type shouldBe ENDRING.name
+        oppdrag.oppdragsperioder[1].konteringer[0].type shouldBe Type.ENDRING.name
         oppdrag.oppdragsperioder[1].delytelseId shouldBe forventetDelytelsesId
 
         val konteringer = hentAlleKonteringerForOppdrag(oppdrag)
@@ -860,7 +869,7 @@ internal class VedtakshendelseListenerIT {
             kontering.transaksjonskode shouldBe forventetTransaksjonskode.name
             kontering.overføringsperiode shouldBe YearMonth.from(vedtakHendelse.vedtakTidspunkt.toLocalDate())
                 .toString()
-            kontering.type shouldBe NY.name
+            kontering.type shouldBe Type.NY.name
             kontering.søknadType shouldBe søknadstype.name
         }
         return kontering

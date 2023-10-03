@@ -37,6 +37,6 @@ class SakConsumer(
     }
 
     private fun hentFødselsnummerTilBmFraSak(responseEntity: ResponseEntity<BidragssakDto>): String? {
-        return responseEntity.body?.roller?.find { it.type == Rolletype.BM }?.fødselsnummer?.verdi
+        return responseEntity.body?.roller?.find { it.type == Rolletype.BIDRAGSMOTTAKER }?.fødselsnummer?.verdi
     }
 }

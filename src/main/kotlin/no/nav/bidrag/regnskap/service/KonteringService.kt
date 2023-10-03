@@ -1,8 +1,8 @@
 package no.nav.bidrag.regnskap.service
 
-import no.nav.bidrag.regnskap.dto.enumer.Søknadstype
-import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
-import no.nav.bidrag.regnskap.dto.enumer.Type
+import no.nav.bidrag.domain.enums.regnskap.Søknadstype
+import no.nav.bidrag.domain.enums.regnskap.Transaksjonskode
+import no.nav.bidrag.domain.enums.regnskap.Type
 import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag

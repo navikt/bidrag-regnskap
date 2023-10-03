@@ -2,8 +2,8 @@ package no.nav.bidrag.regnskap.util
 
 import no.nav.bidrag.domain.enums.EngangsbelopType
 import no.nav.bidrag.domain.enums.VedtakType
-import no.nav.bidrag.regnskap.dto.enumer.Søknadstype
-import no.nav.bidrag.regnskap.dto.enumer.Type
+import no.nav.bidrag.domain.enums.regnskap.Søknadstype
+import no.nav.bidrag.domain.enums.regnskap.Type
 import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
 import java.time.YearMonth

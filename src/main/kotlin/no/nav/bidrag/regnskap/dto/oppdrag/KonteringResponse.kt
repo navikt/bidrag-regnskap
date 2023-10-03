@@ -1,9 +1,9 @@
 package no.nav.bidrag.regnskap.dto.oppdrag
 
 import io.swagger.v3.oas.annotations.media.Schema
-import no.nav.bidrag.regnskap.dto.enumer.Søknadstype
-import no.nav.bidrag.regnskap.dto.enumer.Transaksjonskode
-import no.nav.bidrag.regnskap.dto.enumer.Type
+import no.nav.bidrag.domain.enums.regnskap.Søknadstype
+import no.nav.bidrag.domain.enums.regnskap.Transaksjonskode
+import no.nav.bidrag.domain.enums.regnskap.Type
 
 @Schema(
     name = "KonteringResponse",

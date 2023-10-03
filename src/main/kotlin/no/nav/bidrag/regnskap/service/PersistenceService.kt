@@ -87,7 +87,7 @@ class PersistenceService(
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun registrerPåløpStartet(påløpId: Int, startetTidspunkt: LocalDateTime = LocalDateTime.now()) {
         val påløp = påløpRepository.findById(påløpId).get()
-        påløp.startetTidspunkt = startetTidspunkt
+        påløpRepository.save(påløp.copy(startetTidspunkt = startetTidspunkt))
     }
 
     fun lagrePåløp(påløp: Påløp): Int {

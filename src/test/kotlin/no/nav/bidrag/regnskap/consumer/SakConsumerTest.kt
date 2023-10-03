@@ -49,7 +49,7 @@ internal class SakConsumerTest {
     @Test
     fun `skal hente ut fødelsnummer fra bm`() {
         every { restTemplate.getForEntity("$sakUrl$SAK_PATH/123", BidragssakDto::class.java) } returns ResponseEntity.ok(
-            opprettBidragSak(Rolletype.BM)
+            opprettBidragSak(Rolletype.BIDRAGSMOTTAKER)
         )
 
         val fødelsnummer = sakConsumer.hentBmFraSak("123")
@@ -60,7 +60,7 @@ internal class SakConsumerTest {
     @Test
     fun `skal bruke dummynr om det ikke finnes en bm på sak`() {
         every { restTemplate.getForEntity("$sakUrl$SAK_PATH/123", BidragssakDto::class.java) } returns ResponseEntity.ok(
-            opprettBidragSak(Rolletype.BP)
+            opprettBidragSak(Rolletype.BIDRAGSPLIKTIG)
         )
 
         val fødelsnummer = sakConsumer.hentBmFraSak("123")
