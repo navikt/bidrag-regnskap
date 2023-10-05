@@ -1,6 +1,7 @@
 package no.nav.bidrag.regnskap.hendelse.kafka.vedtak
 
 import com.fasterxml.jackson.core.JacksonException
+import io.micrometer.core.instrument.MeterRegistry
 import no.nav.bidrag.regnskap.SECURE_LOGGER
 import no.nav.bidrag.regnskap.service.VedtakshendelseService
 import org.slf4j.LoggerFactory
@@ -14,7 +15,8 @@ private val LOGGER = LoggerFactory.getLogger(VedtakshendelseListener::class.java
 
 @Component
 class VedtakshendelseListener(
-    private val vedtakshendelseService: VedtakshendelseService
+    private val vedtakshendelseService: VedtakshendelseService,
+    private val meterRegistry: MeterRegistry
 ) {
 
     companion object {
@@ -63,6 +65,7 @@ class VedtakshendelseListener(
             )
             throw e
         }
+        meterRegistry.counter("vedtak-antall-lest").increment()
     }
 
     fun hoppOverNesteMelding() {

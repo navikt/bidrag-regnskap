@@ -1,6 +1,7 @@
 package no.nav.bidrag.regnskap.hendelse.schedule.krav
 
 import io.github.oshai.KotlinLogging
+import io.micrometer.core.instrument.MeterRegistry
 import net.javacrumbs.shedlock.core.LockAssert
 import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
@@ -19,7 +20,8 @@ private val LOGGER = KotlinLogging.logger { }
 class SjekkAvBehandlingsstatusScheduler(
     private val behandlingsstatusService: BehandlingsstatusService,
     private val kravSchedulerUtils: KravSchedulerUtils,
-    private val slackService: SlackService
+    private val slackService: SlackService,
+    private val meterRegistry: MeterRegistry
 ) {
 
     @Scheduled(cron = "\${scheduler.behandlingsstatus.cron}")
@@ -40,6 +42,7 @@ class SjekkAvBehandlingsstatusScheduler(
 
         if (konteringerSomIkkeHarFåttGodkjentBehandlingsstatus.isEmpty()) {
             LOGGER.info { "Det finnes ingen konteringer som ikke har sjekket behandlingsstatus." }
+            meterRegistry.gauge("behandlingsstatus-feilet-for-antall", 0)
             return
         }
 
@@ -52,6 +55,10 @@ class SjekkAvBehandlingsstatusScheduler(
 
             slackService.sendMelding(":ohno: @channel Sjekk av behandlingsstatus feilet for følgende batchUid:\n $feilmeldingSammenslått")
             LOGGER.error { "Det har oppstått feil ved overføring av krav på følgende batchUider med følgende feilmelding:\n $feilmeldingSammenslått" }
+
+            meterRegistry.gauge("behandlingsstatus-feilet-for-antall", feiledeOverføringer.size)
+        } else {
+            meterRegistry.gauge("behandlingsstatus-feilet-for-antall", 0)
         }
     }
 }

@@ -41,7 +41,13 @@ scheduler:
   avstemning:
     cron: "0 0 1 * * *" #Hver dag kl 01:00
   påløpkjøring:
-    cron: "0 5 * * * *" #Hver time 5 minutter over hel
+    cron: "0 */10 * * * *" #Hvert 10. minutt
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "prometheus,health"
 
 spring:
   kafka:

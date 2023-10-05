@@ -1,6 +1,8 @@
 package no.nav.bidrag.regnskap.service
 
 import com.google.common.collect.Lists
+import io.micrometer.core.instrument.LongTaskTimer
+import io.micrometer.core.instrument.MeterRegistry
 import no.nav.bidrag.domain.enums.regnskap.Årsakskode
 import no.nav.bidrag.regnskap.consumer.SkattConsumer
 import no.nav.bidrag.regnskap.fil.overføring.FiloverføringTilElinKlient
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.util.function.Consumer
 
 private val LOGGER = LoggerFactory.getLogger(PåløpskjøringService::class.java)
@@ -30,6 +33,7 @@ class PåløpskjøringService(
     private val gcpFilBucket: GcpFilBucket,
     private val filoverføringTilElinKlient: FiloverføringTilElinKlient,
     private val skattConsumer: SkattConsumer,
+    private val meterRegistry: MeterRegistry,
     @Autowired(required = false) private val lyttere: List<PåløpskjøringLytter> = emptyList()
 ) {
 
@@ -43,6 +47,7 @@ class PåløpskjøringService(
         medLyttere { it.påløpStartet(påløp, schedulertKjøring, genererFil) }
         try {
             validerDriftsavvik(påløp, schedulertKjøring)
+            val longTaskTimer = LongTaskTimer.builder("palop-kjoretid").register(meterRegistry).start()
             persistenceService.registrerPåløpStartet(påløp.påløpId, LocalDateTime.now())
 
             if (genererFil) {
@@ -65,6 +70,8 @@ class PåløpskjøringService(
             }
             avsluttDriftsavvik(påløp)
             medLyttere { it.påløpFullført(påløp) }
+            longTaskTimer.stop()
+            meterRegistry.gauge("palop-siste-palopskjoring-dato", påløp.kjøredato.toEpochSecond(ZoneOffset.UTC))
         } catch (e: Error) {
             medLyttere { it.påløpFeilet(påløp, e.toString()) }
             throw e
