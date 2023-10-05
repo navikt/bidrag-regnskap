@@ -5,6 +5,7 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.types.shouldBeSameInstanceAs
+import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
@@ -32,9 +33,10 @@ class PåløpskjøringServiceTest {
     private val gcpFilBucket = mockk<GcpFilBucket>(relaxed = true)
     private val filoverføringTilElinKlient = mockk<FiloverføringTilElinKlient>(relaxed = true)
     private val skattConsumer = mockk<SkattConsumer>(relaxed = true)
+    private val meterRegistry = mockk<MeterRegistry>(relaxed = true)
 
     private val påløpskjøringService =
-        PåløpskjøringService(oppdragsperiodeRepo, persistenceService, ManglendeKonteringerService(oppdragsperiodeRepo, persistenceService, "2006-04"), gcpFilBucket, filoverføringTilElinKlient, skattConsumer)
+        PåløpskjøringService(oppdragsperiodeRepo, persistenceService, ManglendeKonteringerService(oppdragsperiodeRepo, persistenceService, "2006-04"), gcpFilBucket, filoverføringTilElinKlient, skattConsumer, meterRegistry)
 
     @Test
     fun `Skal ved påløpskjøring kun starte eldste ikke kjørte påløpsperiode`() {

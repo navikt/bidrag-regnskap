@@ -32,7 +32,7 @@ spec:
     path: /actuator/prometheus
   resources:
     limits:
-      cpu: 1000m
+      cpu: 1500m
       memory: 4096Mi
     requests:
       cpu: 500m

@@ -2,6 +2,7 @@ package no.nav.bidrag.regnskap.consumer
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.github.oshai.KotlinLogging
+import io.micrometer.core.instrument.MeterRegistry
 import no.nav.bidrag.regnskap.SECURE_LOGGER
 import no.nav.bidrag.regnskap.maskinporten.MaskinportenClient
 import no.nav.bidrag.transport.regnskap.behandlingsstatus.BehandlingsstatusResponse
@@ -29,7 +30,8 @@ class SkattConsumer(
     @Value("\${ELIN_SUBSCRIPTION_KEY}") private val subscriptionKey: String,
     @Qualifier("regnskap") private val restTemplate: RestTemplate,
     private val maskinportenClient: MaskinportenClient,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
+    private val meterRegistry: MeterRegistry
 ) {
 
     companion object {
@@ -40,6 +42,7 @@ class SkattConsumer(
 
     fun sendKrav(kravliste: Kravliste): ResponseEntity<String> {
         SECURE_LOGGER.info("Overfører krav til skatt:\n${objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(kravliste)}")
+        metrikkerForAntallOversendteKonteringer(kravliste)
         return try {
             restTemplate.exchange(
                 opprettSkattUrl(KRAV_PATH),
@@ -50,6 +53,13 @@ class SkattConsumer(
         } catch (e: HttpStatusCodeException) {
             ResponseEntity.status(e.statusCode).body(e.responseBodyAsString)
         }
+    }
+
+    private fun metrikkerForAntallOversendteKonteringer(kravliste: Kravliste) {
+        kravliste.krav.forEach { krav ->
+            krav.konteringer.forEach { kontering ->
+                meterRegistry.counter("krav-antall-overfort-grensesnitt", "transaksjonskode", kontering.transaksjonskode.name).increment()
+            } }
     }
 
     fun oppdaterVedlikeholdsmodus(vedlikeholdsmodus: Vedlikeholdsmodus): ResponseEntity<Any> {
