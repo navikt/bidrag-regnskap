@@ -24,6 +24,10 @@ class SjekkAvBehandlingsstatusScheduler(
     private val meterRegistry: MeterRegistry
 ) {
 
+    companion object {
+        var behandlingsstatusAntallFeilet: Number = 0
+    }
+
     @Scheduled(cron = "\${scheduler.behandlingsstatus.cron}")
     @SchedulerLock(name = "skedulertSjekkAvBehandlingsstatus")
     @Transactional
@@ -42,7 +46,8 @@ class SjekkAvBehandlingsstatusScheduler(
 
         if (konteringerSomIkkeHarFåttGodkjentBehandlingsstatus.isEmpty()) {
             LOGGER.info { "Det finnes ingen konteringer som ikke har sjekket behandlingsstatus." }
-            meterRegistry.gauge("behandlingsstatus-feilet-for-antall", 0)
+            behandlingsstatusAntallFeilet = 0
+            meterRegistry.gauge("behandlingsstatus-feilet-for-antall", behandlingsstatusAntallFeilet)
             return
         }
 
@@ -55,10 +60,11 @@ class SjekkAvBehandlingsstatusScheduler(
 
             slackService.sendMelding(":ohno: @channel Sjekk av behandlingsstatus feilet for følgende batchUid:\n $feilmeldingSammenslått")
             LOGGER.error { "Det har oppstått feil ved overføring av krav på følgende batchUider med følgende feilmelding:\n $feilmeldingSammenslått" }
-
-            meterRegistry.gauge("behandlingsstatus-feilet-for-antall", feiledeOverføringer.size)
+            behandlingsstatusAntallFeilet = feiledeOverføringer.size
+            meterRegistry.gauge("behandlingsstatus-feilet-for-antall", behandlingsstatusAntallFeilet)
         } else {
-            meterRegistry.gauge("behandlingsstatus-feilet-for-antall", 0)
+            behandlingsstatusAntallFeilet = 0
+            meterRegistry.gauge("behandlingsstatus-feilet-for-antall", behandlingsstatusAntallFeilet)
         }
     }
 }

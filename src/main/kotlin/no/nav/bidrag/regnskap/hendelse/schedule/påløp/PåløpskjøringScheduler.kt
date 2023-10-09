@@ -28,6 +28,11 @@ class PåløpskjøringScheduler(
     @Value("\${NAIS_CLUSTER_NAME}") private val clusterName: String
 ) {
 
+    companion object {
+        var nestePåløpskjøring: Number = -1
+        var sistePåløpskjøringsdato: Number = -1
+    }
+
     @Scheduled(cron = "\${scheduler.påløpkjøring.cron}")
     @SchedulerLock(name = "skedulertPåløpskjøring")
     fun skedulertPåløpskjøring() {
@@ -40,15 +45,22 @@ class PåløpskjøringScheduler(
                     påløpskjøringService.startPåløpskjøring(it, true, true)
                 } else {
                     LOGGER.info("Fant ingen påløp som skulle kjøres på dette tidspunkt. Neste påløpskjøring er for periode: ${it.forPeriode} som kjøres: ${it.kjøredato}")
-                    meterRegistry.gauge("palop-neste-palopskjoring-dato", it.kjøredato.toEpochSecond(ZoneOffset.UTC))
+                    nestePåløpskjøring = it.kjøredato.toEpochSecond(ZoneOffset.UTC)
+                    meterRegistry.gauge("palop-neste-palopskjoring-dato", nestePåløpskjøring)
                 }
             } else {
                 if (clusterName == "prod-gcp") {
                     slackService.sendMelding("Det finnes ingen fremtidige planlagte påløp! Påløpsfil kommer ikke til å generes før dette legges inn!")
                 }
                 LOGGER.error("Det finnes ingen fremtidige planlagte påløp! Påløpsfil kommer ikke til å generes før dette legges inn!")
-                meterRegistry.gauge("palop-neste-palopskjoring-dato", -1)
+                nestePåløpskjøring = -1
+                meterRegistry.gauge("palop-neste-palopskjoring-dato", nestePåløpskjøring)
             }
         }
+
+        persistenceService.hentPåløp().filter { it.fullførtTidspunkt != null }.minByOrNull { it.kjøredato }?.also {
+            sistePåløpskjøringsdato = it.kjøredato.toEpochSecond(ZoneOffset.UTC)
+            meterRegistry.gauge("palop-siste-palopskjoring-dato", sistePåløpskjøringsdato)
+        } ?: meterRegistry.gauge("palop-siste-palopskjoring-dato", sistePåløpskjøringsdato)
     }
 }

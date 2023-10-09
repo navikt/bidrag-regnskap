@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.ZoneOffset
 import java.util.function.Consumer
 
 private val LOGGER = LoggerFactory.getLogger(PåløpskjøringService::class.java)
@@ -61,6 +60,7 @@ class PåløpskjøringService(
                 genererPåløpsfil(påløp)
             }
             settOverføringstidspunktPåKonteringer(påløp)
+            avsluttDriftsavvik(påløp)
             fullførPåløp(påløp)
             if (genererFil) {
                 endreElinVedlikeholdsmodus(
@@ -68,10 +68,8 @@ class PåløpskjøringService(
                     "Påløp for ${påløp.forPeriode} er ferdig generert fra NAV."
                 )
             }
-            avsluttDriftsavvik(påløp)
             medLyttere { it.påløpFullført(påløp) }
             longTaskTimer.stop()
-            meterRegistry.gauge("palop-siste-palopskjoring-dato", påløp.kjøredato.toEpochSecond(ZoneOffset.UTC))
         } catch (e: Error) {
             medLyttere { it.påløpFeilet(påløp, e.toString()) }
             throw e

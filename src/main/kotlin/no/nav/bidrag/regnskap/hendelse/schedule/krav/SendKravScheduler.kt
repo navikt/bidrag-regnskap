@@ -62,7 +62,7 @@ class SendKravScheduler(
             kravService.sendKrav(it.value)
         }
 
-        LOGGER.info("Alle oppdrag(antall: ${oppdragMedIkkeOverførteKonteringer.size}) med unsendte konteringer er nå overført til skatt.")
+        LOGGER.info("Alle oppdrag(antall: ${oppdragMedIkkeOverførteKonteringer.size}) med unsendte konteringer er nå forsøkt overført til skatt.")
     }
 
     private fun oppdragHarNyligOpprettedeKonteringer(oppdrag: Oppdrag): Boolean {
