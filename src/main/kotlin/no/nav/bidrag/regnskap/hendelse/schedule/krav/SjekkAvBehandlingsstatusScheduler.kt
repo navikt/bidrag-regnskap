@@ -1,6 +1,7 @@
 package no.nav.bidrag.regnskap.hendelse.schedule.krav
 
 import io.github.oshai.KotlinLogging
+import io.micrometer.core.instrument.Gauge
 import io.micrometer.core.instrument.MeterRegistry
 import net.javacrumbs.shedlock.core.LockAssert
 import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock
@@ -23,18 +24,12 @@ class SjekkAvBehandlingsstatusScheduler(
     private val slackService: SlackService,
     private val meterRegistry: MeterRegistry
 ) {
-
-    companion object {
-        var behandlingsstatusAntallFeilet: Number = 0
-    }
-
     @Scheduled(cron = "\${scheduler.behandlingsstatus.cron}")
     @SchedulerLock(name = "skedulertSjekkAvBehandlingsstatus")
     @Transactional
     fun skedulertSjekkAvBehandlingsstatus() {
         LockAssert.assertLocked()
-        behandlingsstatusAntallFeilet = -1
-        meterRegistry.gauge("behandlingsstatus-feilet-for-antall", behandlingsstatusAntallFeilet)
+        Gauge.builder("behandlingsstatus-feilet-for-antall") { -1 }.strongReference(true).register(meterRegistry)
         LOGGER.info { "Starter schedulert sjekk av behandlingsstatus for allerede overførte konteringer." }
         if (kravSchedulerUtils.harAktivtDriftsavvik()) {
             LOGGER.warn { "Det finnes aktive driftsavvik. Starter derfor ikke sjekk av behandlingsstatus." }
@@ -48,8 +43,7 @@ class SjekkAvBehandlingsstatusScheduler(
 
         if (konteringerSomIkkeHarFåttGodkjentBehandlingsstatus.isEmpty()) {
             LOGGER.info { "Det finnes ingen konteringer som ikke har sjekket behandlingsstatus." }
-            behandlingsstatusAntallFeilet = 0
-            meterRegistry.gauge("behandlingsstatus-feilet-for-antall", behandlingsstatusAntallFeilet)
+            Gauge.builder("behandlingsstatus-feilet-for-antall") { 0 }.strongReference(true).register(meterRegistry)
             return
         }
 
@@ -62,11 +56,9 @@ class SjekkAvBehandlingsstatusScheduler(
 
             slackService.sendMelding(":ohno: @channel Sjekk av behandlingsstatus feilet for følgende batchUid:\n $feilmeldingSammenslått")
             LOGGER.error { "Det har oppstått feil ved overføring av krav på følgende batchUider med følgende feilmelding:\n $feilmeldingSammenslått" }
-            behandlingsstatusAntallFeilet = feiledeOverføringer.size
-            meterRegistry.gauge("behandlingsstatus-feilet-for-antall", behandlingsstatusAntallFeilet)
+            Gauge.builder("behandlingsstatus-feilet-for-antall") { feiledeOverføringer.size }.strongReference(true).register(meterRegistry)
         } else {
-            behandlingsstatusAntallFeilet = 0
-            meterRegistry.gauge("behandlingsstatus-feilet-for-antall", behandlingsstatusAntallFeilet)
+            Gauge.builder("behandlingsstatus-feilet-for-antall") { 0 }.strongReference(true).register(meterRegistry)
         }
     }
 }

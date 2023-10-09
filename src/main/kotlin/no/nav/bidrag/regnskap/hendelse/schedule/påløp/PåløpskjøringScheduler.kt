@@ -1,5 +1,6 @@
 package no.nav.bidrag.regnskap.hendelse.schedule.påløp
 
+import io.micrometer.core.instrument.Gauge
 import io.micrometer.core.instrument.MeterRegistry
 import net.javacrumbs.shedlock.core.LockAssert
 import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock
@@ -58,16 +59,14 @@ class PåløpskjøringScheduler(
 
         påløp.filter { it.fullførtTidspunkt != null }.maxByOrNull { it.kjøredato }?.also {
             sistePåløpskjøringsdato = it.kjøredato.toEpochSecond(ZoneOffset.UTC)
-            meterRegistry.gauge("palop-siste-palopskjoring-dato", sistePåløpskjøringsdato)
-        } ?: meterRegistry.gauge("palop-siste-palopskjoring-dato", sistePåløpskjøringsdato)
+        }
+        Gauge.builder("palop-siste-palopskjoring-dato") { sistePåløpskjøringsdato }.strongReference(true).register(meterRegistry)
 
         påløp.filter { it.fullførtTidspunkt == null }.minByOrNull { it.kjøredato }?.also {
             nestePåløpskjøring = it.kjøredato.toEpochSecond(ZoneOffset.UTC)
-            meterRegistry.gauge("palop-neste-palopskjoring-dato", nestePåløpskjøring)
         } ?: {
             nestePåløpskjøring = -1
-            meterRegistry.gauge("palop-neste-palopskjoring-dato", nestePåløpskjøring)
         }
-
+        Gauge.builder("palop-neste-palopskjoring-dato") { nestePåløpskjøring }.strongReference(true).register(meterRegistry)
     }
 }
