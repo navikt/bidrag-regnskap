@@ -33,6 +33,8 @@ class SjekkAvBehandlingsstatusScheduler(
     @Transactional
     fun skedulertSjekkAvBehandlingsstatus() {
         LockAssert.assertLocked()
+        behandlingsstatusAntallFeilet = -1
+        meterRegistry.gauge("behandlingsstatus-feilet-for-antall", behandlingsstatusAntallFeilet)
         LOGGER.info { "Starter schedulert sjekk av behandlingsstatus for allerede overførte konteringer." }
         if (kravSchedulerUtils.harAktivtDriftsavvik()) {
             LOGGER.warn { "Det finnes aktive driftsavvik. Starter derfor ikke sjekk av behandlingsstatus." }
