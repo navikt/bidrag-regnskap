@@ -8,7 +8,7 @@ scheduler:
   sendkrav:
     cron: "0 */10 * * * *" #Hvert 10. minutt
   behandlingsstatus:
-    cron: "0 0 22 * * *" #Hver dag kl 22:00
+    cron: "0 25 * * * *" #Hver time 25 minutter over hel
   avstemning:
     cron: "0 15 0 * * *" #Hver dag kl 00:15
   påløpkjøring:
