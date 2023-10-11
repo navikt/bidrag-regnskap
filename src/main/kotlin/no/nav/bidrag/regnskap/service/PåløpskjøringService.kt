@@ -1,6 +1,7 @@
 package no.nav.bidrag.regnskap.service
 
 import com.google.common.collect.Lists
+import com.jcraft.jsch.Logger
 import io.micrometer.core.instrument.LongTaskTimer
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.bidrag.domain.enums.regnskap.Årsakskode
@@ -41,6 +42,7 @@ class PåløpskjøringService(
 
     fun startPåløpskjøring(påløp: Påløp, schedulertKjøring: Boolean, genererFil: Boolean) {
         if (påløp.startetTidspunkt != null) {
+            LOGGER.warn("Påløpskjøring har satt startet tidspunkt! Dette kan være grunnet allerede kjørende påløp. Starter derfor ikke nytt påløp.")
             return
         }
         medLyttere { it.påløpStartet(påløp, schedulertKjøring, genererFil) }
