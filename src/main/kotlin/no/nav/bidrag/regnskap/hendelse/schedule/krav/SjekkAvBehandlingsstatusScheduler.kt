@@ -29,13 +29,14 @@ class SjekkAvBehandlingsstatusScheduler(
     @Transactional
     fun skedulertSjekkAvBehandlingsstatus() {
         LockAssert.assertLocked()
-        Gauge.builder("behandlingsstatus-feilet-for-antall") { -1 }.strongReference(true).register(meterRegistry)
         LOGGER.info { "Starter schedulert sjekk av behandlingsstatus for allerede overførte konteringer." }
         if (kravSchedulerUtils.harAktivtDriftsavvik()) {
             LOGGER.warn { "Det finnes aktive driftsavvik. Starter derfor ikke sjekk av behandlingsstatus." }
+            Gauge.builder("behandlingsstatus-feilet-for-antall") { -1 }.strongReference(true).register(meterRegistry)
             return
         } else if (kravSchedulerUtils.erVedlikeholdsmodusPåslått()) {
             LOGGER.warn { "Vedlikeholdsmodus er påslått! Starter derfor ikke sjekk av behandlingsstatus." }
+            Gauge.builder("behandlingsstatus-feilet-for-antall") { -1 }.strongReference(true).register(meterRegistry)
             return
         }
 
