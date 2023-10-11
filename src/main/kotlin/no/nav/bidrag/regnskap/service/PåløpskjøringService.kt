@@ -1,9 +1,9 @@
 package no.nav.bidrag.regnskap.service
 
 import com.google.common.collect.Lists
-import com.jcraft.jsch.Logger
 import io.micrometer.core.instrument.LongTaskTimer
 import io.micrometer.core.instrument.MeterRegistry
+import io.micrometer.core.instrument.Metrics
 import no.nav.bidrag.domain.enums.regnskap.Årsakskode
 import no.nav.bidrag.regnskap.consumer.SkattConsumer
 import no.nav.bidrag.regnskap.fil.overføring.FiloverføringTilElinKlient
@@ -71,7 +71,7 @@ class PåløpskjøringService(
                 )
             }
             medLyttere { it.påløpFullført(påløp) }
-            longTaskTimer.stop()
+            Metrics.timer("palop-kjoretid-ferdig").record<Long> {longTaskTimer.stop()}
         } catch (e: Error) {
             medLyttere { it.påløpFeilet(påløp, e.toString()) }
             throw e
