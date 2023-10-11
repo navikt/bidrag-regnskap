@@ -57,7 +57,7 @@ class PåløpskjøringScheduler(
 
         val påløp = persistenceService.hentPåløp()
 
-        påløp.filter { it.fullførtTidspunkt != null }.maxByOrNull { it.kjøredato }?.also {
+        påløp.filter { it.fullførtTidspunkt != null }.maxByOrNull { it.fullførtTidspunkt!! }?.also {
             sistePåløpskjøringsdato = it.fullførtTidspunkt!!.toEpochSecond(ZoneOffset.UTC)
         }
         Gauge.builder("palop-siste-palopskjoring-dato") { sistePåløpskjøringsdato }.strongReference(true).register(meterRegistry)
