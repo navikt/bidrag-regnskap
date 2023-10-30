@@ -3,8 +3,8 @@ package no.nav.bidrag.regnskap.consumer
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.github.oshai.KotlinLogging
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.bidrag.commons.security.maskinporten.MaskinportenClient
 import no.nav.bidrag.regnskap.SECURE_LOGGER
-import no.nav.bidrag.regnskap.maskinporten.MaskinportenClient
 import no.nav.bidrag.transport.regnskap.behandlingsstatus.BehandlingsstatusResponse
 import no.nav.bidrag.transport.regnskap.krav.Kravliste
 import no.nav.bidrag.transport.regnskap.vedlikeholdsmodus.Vedlikeholdsmodus

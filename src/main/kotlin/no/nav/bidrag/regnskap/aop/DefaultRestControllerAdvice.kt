@@ -1,7 +1,7 @@
 package no.nav.bidrag.regnskap.aop
 
 import io.github.oshai.KotlinLogging
-import no.nav.bidrag.regnskap.maskinporten.MaskinportenClientException
+import no.nav.bidrag.commons.security.maskinporten.MaskinportenClientException
 import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
