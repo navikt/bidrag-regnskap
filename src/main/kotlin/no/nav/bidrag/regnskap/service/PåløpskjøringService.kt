@@ -71,7 +71,7 @@ class PåløpskjøringService(
                 )
             }
             medLyttere { it.påløpFullført(påløp) }
-            Metrics.timer("palop-kjoretid-ferdig").record<Long> {longTaskTimer.stop()}
+            Metrics.timer("palop-kjoretid-ferdig").record<Long> { longTaskTimer.stop() }
         } catch (e: Error) {
             medLyttere { it.påløpFeilet(påløp, e.toString()) }
             throw e

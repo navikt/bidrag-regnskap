@@ -1,6 +1,6 @@
 package no.nav.bidrag.regnskap.hendelse.schedule.krav
 
-import io.github.oshai.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import net.javacrumbs.shedlock.core.LockAssert
 import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
@@ -62,7 +62,7 @@ class SendKravScheduler(
             kravService.sendKrav(it.value)
         }
 
-        LOGGER.info("Alle oppdrag(antall: ${oppdragMedIkkeOverførteKonteringer.size}) med unsendte konteringer er nå forsøkt overført til skatt.")
+        LOGGER.info { "Alle oppdrag(antall: ${oppdragMedIkkeOverførteKonteringer.size}) med unsendte konteringer er nå forsøkt overført til skatt." }
     }
 
     private fun oppdragHarNyligOpprettedeKonteringer(oppdrag: Oppdrag): Boolean {

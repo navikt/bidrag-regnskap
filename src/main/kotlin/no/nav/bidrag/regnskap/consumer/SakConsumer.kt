@@ -1,6 +1,6 @@
 package no.nav.bidrag.regnskap.consumer
 
-import io.github.oshai.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.nav.bidrag.commons.web.client.AbstractRestClient
 import no.nav.bidrag.domain.enums.Rolletype
 import no.nav.bidrag.transport.sak.BidragssakDto
@@ -31,7 +31,7 @@ class SakConsumer(
 
             hentFødselsnummerTilBmFraSak(responseEntity) ?: DUMMY_NUMMER
         } catch (e: Exception) {
-            LOGGER.error("Noe gikk galt i kommunikasjon med bidrag-sak for sakId: $sakId! \nGjeldende URL mot sak er: ${sakUrl + SAK_PATH} \nFeilmelding: ${e.message}")
+            LOGGER.error { "Noe gikk galt i kommunikasjon med bidrag-sak for sakId: $sakId! \nGjeldende URL mot sak er: ${sakUrl + SAK_PATH} \nFeilmelding: ${e.message}" }
             throw e
         }
     }

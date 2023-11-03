@@ -1,7 +1,7 @@
 package no.nav.bidrag.regnskap.consumer
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.github.oshai.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.bidrag.commons.security.maskinporten.MaskinportenClient
 import no.nav.bidrag.regnskap.SECURE_LOGGER
@@ -59,7 +59,8 @@ class SkattConsumer(
         kravliste.krav.forEach { krav ->
             krav.konteringer.forEach { kontering ->
                 meterRegistry.counter("krav-antall-overfort-grensesnitt", "transaksjonskode", kontering.transaksjonskode.name).increment()
-            } }
+            }
+        }
     }
 
     fun oppdaterVedlikeholdsmodus(vedlikeholdsmodus: Vedlikeholdsmodus): ResponseEntity<Any> {
