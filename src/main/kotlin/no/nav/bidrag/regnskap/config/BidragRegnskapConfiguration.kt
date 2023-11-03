@@ -20,7 +20,7 @@ import javax.sql.DataSource
 @ConfigurationPropertiesScan
 @SecurityScheme(bearerFormat = "JWT", name = "bearer-key", scheme = "bearer", type = SecuritySchemeType.HTTP)
 @OpenAPIDefinition(info = Info(title = "bidrag-regnskap", version = "v1"), security = [SecurityRequirement(name = "bearer-key")])
-@ComponentScan(basePackages = ["no.nav.bidrag.commons.util", "no.nav.bidrag.commons.security"])
+@ComponentScan(basePackages = ["no.nav.bidrag.commons.util", "no.nav.bidrag.commons.security.maskinporten"])
 class BidragRegnskapConfiguration {
 
     @Bean
