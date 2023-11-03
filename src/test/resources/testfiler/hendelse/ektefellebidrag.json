@@ -3,39 +3,43 @@
   "type": "FASTSETTELSE",
   "id": "4",
   "opprettetAv": "B129973",
-  "vedtakTidspunkt": "2020-12-21T00:00:00.000000000",
-  "enhetId": "4865",
-  "utsattTilDato": null,
+  "vedtakstidspunkt": "2020-12-21T00:00:00.000000000",
+  "enhetsnummer": "4865",
+  "innkrevingUtsattTilDato": null,
   "opprettetTidspunkt": "2020-12-21T16:00:23.254988482",
-  "stonadsendringListe": [
+  "stønadsendringListe": [
     {
       "type": "EKTEFELLEBIDRAG",
-      "sakId": "2004447",
-      "skyldnerId": "BP",
-      "kravhaverId": "",
-      "mottakerId": "",
-      "indeksreguleringAar": "NN  ",
-      "innkreving": "JA",
-      "endring": true,
+      "sak": "2004447",
+      "skyldner": "BP",
+      "kravhaver": "",
+      "mottaker": "",
+      "førsteIndeksreguleringsår": "2020",
+      "innkreving": "MED_INNKREVING",
+      "beslutning": "ENDRING",
       "periodeListe": [
         {
-          "fomDato": "2020-10-01",
-          "tilDato": "2020-11-01",
-          "belop": 19350.00,
+          "periode": {
+            "fom":"2020-10",
+            "til":"2020-11"
+          },
+          "beløp": 19350.00,
           "valutakode": "PLN",
           "resultatkode": "IV"
         },
         {
-          "fomDato": "2020-11-01",
-          "tilDato": null,
-          "belop": 1250.00,
+          "periode": {
+            "fom":"2020-11",
+            "til": null
+          },
+          "beløp": 1250.00,
           "valutakode": "PLN",
           "resultatkode": "IV"
         }
       ]
     }
   ],
-  "engangsbelopListe": [],
+  "engangsbeløpListe": [],
   "sporingsdata": {
     "correlationId": "12345"
   }

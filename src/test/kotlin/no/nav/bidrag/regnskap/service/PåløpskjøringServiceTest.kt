@@ -10,9 +10,9 @@ import io.mockk.every
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
-import no.nav.bidrag.domain.enums.VedtakType
-import no.nav.bidrag.domain.enums.regnskap.Søknadstype
-import no.nav.bidrag.domain.enums.regnskap.Type
+import no.nav.bidrag.domene.enums.Vedtakstype
+import no.nav.bidrag.domene.enums.regnskap.Søknadstype
+import no.nav.bidrag.domene.enums.regnskap.Type
 import no.nav.bidrag.regnskap.consumer.SkattConsumer
 import no.nav.bidrag.regnskap.fil.overføring.FiloverføringTilElinKlient
 import no.nav.bidrag.regnskap.persistence.bucket.GcpFilBucket
@@ -167,7 +167,7 @@ class PåløpskjøringServiceTest {
                 periodeFra = LocalDate.of(2022, 1, 1),
                 periodeTil = null,
                 konteringer = emptyList(),
-                vedtakType = VedtakType.INDEKSREGULERING,
+                vedtakType = Vedtakstype.INDEKSREGULERING,
                 aktivTil = null,
                 konteringerFullførtOpprettet = false,
                 oppdrag = oppdrag
@@ -213,7 +213,7 @@ class PåløpskjøringServiceTest {
             periodeFra = LocalDate.of(2022, 1, 1),
             periodeTil = LocalDate.of(2024, 1, 1),
             konteringer = emptyList(),
-            vedtakType = VedtakType.INDEKSREGULERING,
+            vedtakType = Vedtakstype.INDEKSREGULERING,
             aktivTil = null,
             konteringerFullførtOpprettet = false,
             oppdrag = oppdrag

@@ -2,26 +2,26 @@
   "kilde": "MANUELT",
   "type": "FASTSETTELSE",
   "id": "779",
-  "vedtakTidspunkt": "2022-01-03T00:00:00.000000000",
-  "enhetId": "4812",
+  "vedtakstidspunkt": "2022-01-03T00:00:00.000000000",
+  "enhetsnummer": "4812",
   "opprettetAv": "B101173",
   "opprettetTidspunkt": "2022-01-03T08:05:14.164984472",
-  "stonadsendringListe": [
+  "stønadsendringListe": [
   ],
-  "engangsbelopListe": [
+  "engangsbeløpListe": [
     {
       "type": "GEBYR_SKYLDNER",
-      "sakId": "2200381",
-      "skyldnerId": "",
-      "kravhaverId": "NAV",
-      "mottakerId": "NAV",
-      "belop": "1701.10",
+      "sak": "2200381",
+      "skyldner": "",
+      "kravhaver": "NAV",
+      "mottaker": "NAV",
+      "beløp": "1701.10",
       "valutakode": "NOK",
       "referanse": "GEBYR_SKYLDNER_REFERANSE",
-      "omgjorVedtakId": "778",
+      "omgjørVedtakId": "778",
       "resultatkode": "GIGI",
-      "innkreving": "JA",
-      "endring": true
+      "innkreving": "MED_INNKREVING",
+      "beslutning": "ENDRING"
     }
   ],
   "sporingsdata": {

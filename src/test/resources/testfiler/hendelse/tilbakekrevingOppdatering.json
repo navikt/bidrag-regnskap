@@ -3,25 +3,25 @@
   "type": "FASTSETTELSE",
   "id": "15",
   "opprettetAv": "D101753",
-  "vedtakTidspunkt": "2021-02-16T00:00:00.000000000",
-  "enhetId": "4849",
-  "utsattTilDato": null,
+  "vedtakstidspunkt": "2021-02-16T00:00:00.000000000",
+  "enhetsnummer": "4849",
+  "innkrevingUtsattTilDato": null,
   "opprettetTidspunkt": "2022-02-16T12:00:00.254988482",
-  "stonadsendringListe": [],
-  "engangsbelopListe": [
+  "stønadsendringListe": [],
+  "engangsbeløpListe": [
     {
       "type": "TILBAKEKREVING",
-      "sakId": "1313296",
-      "skyldnerId": "",
-      "kravhaverId": "",
-      "mottakerId": "NAV",
-      "belop": 3316.00,
+      "sak": "1313296",
+      "skyldner": "",
+      "kravhaver": "",
+      "mottaker": "NAV",
+      "beløp": 3316.00,
       "valutakode": "NOK",
       "resultatkode": "TB",
-      "innkreving": "JA",
+      "innkreving": "MED_INNKREVING",
       "referanse": "TILBAKEKREVING_REFERANSE",
-      "omgjorVedtakId": "1337",
-      "endring": true
+      "omgjørVedtakId": "1337",
+      "beslutning": "ENDRING"
     }
   ],
   "sporingsdata": {

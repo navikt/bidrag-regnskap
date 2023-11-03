@@ -3,32 +3,34 @@
   "type": "FASTSETTELSE",
   "id": "5",
   "opprettetAv": "B129973",
-  "vedtakTidspunkt": "2022-06-01T00:00:00.000000000",
-  "enhetId": "4865",
-  "utsattTilDato": null,
+  "vedtakstidspunkt": "2022-06-01T00:00:00.000000000",
+  "enhetsnummer": "4865",
+  "innkrevingUtsattTilDato": null,
   "opprettetTidspunkt": "2022-06-01T16:00:23.254988482",
-  "stonadsendringListe": [
+  "stønadsendringListe": [
     {
       "type": "EKTEFELLEBIDRAG",
-      "sakId": "2004447",
-      "skyldnerId": "BP",
-      "kravhaverId": "",
-      "mottakerId": "",
-      "indeksreguleringAar": "NN  ",
-      "innkreving": "JA",
-      "endring": true,
+      "sak": "2004447",
+      "skyldner": "BP",
+      "kravhaver": "",
+      "mottaker": "",
+      "førsteIndeksreguleringsår": "2020",
+      "innkreving": "MED_INNKREVING",
+      "beslutning": "ENDRING",
       "periodeListe": [
         {
-          "fomDato": "2022-02-01",
-          "tilDato": null,
-          "belop": 2250.00,
+          "periode": {
+            "fom":"2022-02",
+            "til": null
+          },
+          "beløp": 2250.00,
           "valutakode": "PLN",
           "resultatkode": "IV"
         }
       ]
     }
   ],
-  "engangsbelopListe": [],
+  "engangsbeløpListe": [],
   "sporingsdata": {
     "correlationId": "12345"
   }

@@ -4,13 +4,14 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import no.nav.bidrag.domain.enums.Innkreving
+import no.nav.bidrag.domene.enums.Beslutningstype
+import no.nav.bidrag.domene.enums.Innkrevingstype
 import no.nav.bidrag.regnskap.SECURE_LOGGER
 import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
 import no.nav.bidrag.regnskap.dto.vedtak.Periode
 import no.nav.bidrag.regnskap.util.IdentUtils
-import no.nav.bidrag.transport.behandling.vedtak.Engangsbelop
-import no.nav.bidrag.transport.behandling.vedtak.Stonadsendring
+import no.nav.bidrag.transport.behandling.vedtak.Engangsbeløp
+import no.nav.bidrag.transport.behandling.vedtak.Stønadsendring
 import no.nav.bidrag.transport.behandling.vedtak.VedtakHendelse
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -36,14 +37,14 @@ class VedtakshendelseService(
 
         val opprettedeOppdrag = mutableListOf<Int>()
 
-        vedtakHendelse.stonadsendringListe?.forEach { stønadsendring ->
-            opprettOppdragForStonadsending(vedtakHendelse, stønadsendring)?.let {
+        vedtakHendelse.stønadsendringListe?.forEach { stønadsendring ->
+            opprettOppdragForStønadsending(vedtakHendelse, stønadsendring)?.let {
                 opprettedeOppdrag.add(it)
             }
         }
 
-        vedtakHendelse.engangsbelopListe?.forEach { engangsbelop ->
-            opprettOppdragForEngangsbelop(vedtakHendelse, engangsbelop)?.let {
+        vedtakHendelse.engangsbeløpListe?.forEach { engangsbelop ->
+            opprettOppdragForEngangsbeløp(vedtakHendelse, engangsbelop)?.let {
                 opprettedeOppdrag.add(it)
             }
         }
@@ -59,71 +60,71 @@ class VedtakshendelseService(
         }
     }
 
-    private fun opprettOppdragForStonadsending(vedtakHendelse: VedtakHendelse, stonadsendring: Stonadsendring): Int? {
-        LOGGER.debug("Oppretter oppdrag for stonadendring.")
+    private fun opprettOppdragForStønadsending(vedtakHendelse: VedtakHendelse, stønadsendring: Stønadsendring): Int? {
+        LOGGER.debug("Oppretter oppdrag for stønadendring.")
 
-        if (erInnkrevingOgEndring(stonadsendring.innkreving, stonadsendring.endring)) {
+        if (erInnkrevingOgEndring(stønadsendring.innkreving, stønadsendring.beslutning)) {
             val hendelse = Hendelse(
-                type = stonadsendring.type.name,
+                type = stønadsendring.type.name,
                 vedtakType = vedtakHendelse.type,
-                kravhaverIdent = identUtils.hentNyesteIdent(stonadsendring.kravhaverId),
-                skyldnerIdent = identUtils.hentNyesteIdent(stonadsendring.skyldnerId),
-                mottakerIdent = identUtils.hentNyesteIdent(stonadsendring.mottakerId),
-                sakId = stonadsendring.sakId,
+                kravhaverIdent = identUtils.hentNyesteIdent(stønadsendring.kravhaver.verdi),
+                skyldnerIdent = identUtils.hentNyesteIdent(stønadsendring.skyldner.verdi),
+                mottakerIdent = identUtils.hentNyesteIdent(stønadsendring.mottaker.verdi),
+                sakId = stønadsendring.sak.verdi,
                 vedtakId = vedtakHendelse.id,
-                vedtakDato = vedtakHendelse.vedtakTidspunkt.toLocalDate(),
+                vedtakDato = vedtakHendelse.vedtakstidspunkt.toLocalDate(),
                 opprettetAv = vedtakHendelse.opprettetAv,
-                eksternReferanse = stonadsendring.eksternReferanse,
-                utsattTilDato = vedtakHendelse.utsattTilDato,
-                omgjørVedtakId = stonadsendring.omgjorVedtakId,
-                periodeListe = mapPeriodelisteTilDomene(stonadsendring.periodeListe)
+                eksternReferanse = stønadsendring.eksternReferanse,
+                utsattTilDato = vedtakHendelse.innkrevingUtsattTilDato,
+                omgjørVedtakId = stønadsendring.omgjørVedtakId,
+                periodeListe = mapPeriodelisteTilDomene(stønadsendring.periodeListe)
             )
             return oppdragService.lagreHendelse(hendelse)
         }
         return null
     }
 
-    private fun erInnkrevingOgEndring(innkreving: Innkreving, endring: Boolean): Boolean {
-        return innkreving == Innkreving.JA && endring
+    private fun erInnkrevingOgEndring(innkreving: Innkrevingstype, beslutningstype: Beslutningstype): Boolean {
+        return innkreving == Innkrevingstype.MED_INNKREVING && beslutningstype == Beslutningstype.ENDRING
     }
 
     private fun mapPeriodelisteTilDomene(periodeListe: List<no.nav.bidrag.transport.behandling.vedtak.Periode>): List<Periode> {
         return periodeListe.map { periode ->
             Periode(
-                beløp = periode.belop,
+                beløp = periode.beløp,
                 valutakode = periode.valutakode,
-                periodeFomDato = periode.fomDato,
-                periodeTilDato = periode.tilDato,
+                periodeFomDato = periode.periode.fomDato.verdi,
+                periodeTilDato = periode.periode.tilDato?.verdi,
                 delytelsesId = periode.delytelseId?.let { Integer.valueOf(it) }
             )
         }
     }
 
-    private fun opprettOppdragForEngangsbelop(vedtakHendelse: VedtakHendelse, engangsbelop: Engangsbelop): Int? {
+    private fun opprettOppdragForEngangsbeløp(vedtakHendelse: VedtakHendelse, engangsbeløp: Engangsbeløp): Int? {
         LOGGER.debug("Oppretter oppdrag for engangsbeløp.")
 
-        if (erInnkrevingOgEndring(engangsbelop.innkreving, engangsbelop.endring)) {
+        if (erInnkrevingOgEndring(engangsbeløp.innkreving, engangsbeløp.beslutning)) {
             val hendelse = Hendelse(
-                type = engangsbelop.type.name,
+                type = engangsbeløp.type.name,
                 vedtakType = vedtakHendelse.type,
-                kravhaverIdent = identUtils.hentNyesteIdent(engangsbelop.kravhaverId),
-                skyldnerIdent = identUtils.hentNyesteIdent(engangsbelop.skyldnerId),
-                mottakerIdent = identUtils.hentNyesteIdent(engangsbelop.mottakerId),
-                sakId = engangsbelop.sakId,
+                kravhaverIdent = identUtils.hentNyesteIdent(engangsbeløp.kravhaver.verdi),
+                skyldnerIdent = identUtils.hentNyesteIdent(engangsbeløp.skyldner.verdi),
+                mottakerIdent = identUtils.hentNyesteIdent(engangsbeløp.mottaker.verdi),
+                sakId = engangsbeløp.sak.verdi,
                 vedtakId = vedtakHendelse.id,
-                vedtakDato = vedtakHendelse.vedtakTidspunkt.toLocalDate(),
+                vedtakDato = vedtakHendelse.vedtakstidspunkt.toLocalDate(),
                 opprettetAv = vedtakHendelse.opprettetAv,
-                eksternReferanse = engangsbelop.eksternReferanse,
-                utsattTilDato = vedtakHendelse.utsattTilDato,
-                referanse = engangsbelop.referanse,
-                omgjørVedtakId = engangsbelop.omgjorVedtakId,
+                eksternReferanse = engangsbeløp.eksternReferanse,
+                utsattTilDato = vedtakHendelse.innkrevingUtsattTilDato,
+                referanse = engangsbeløp.referanse,
+                omgjørVedtakId = engangsbeløp.omgjørVedtakId,
                 periodeListe = listOf(
                     Periode(
-                        periodeFomDato = vedtakHendelse.vedtakTidspunkt.toLocalDate().withDayOfMonth(1),
-                        periodeTilDato = vedtakHendelse.vedtakTidspunkt.toLocalDate().withDayOfMonth(1).plusMonths(1),
-                        beløp = engangsbelop.belop,
-                        valutakode = engangsbelop.valutakode,
-                        delytelsesId = engangsbelop.delytelseId?.let { Integer.valueOf(it) }
+                        periodeFomDato = vedtakHendelse.vedtakstidspunkt.toLocalDate().withDayOfMonth(1),
+                        periodeTilDato = vedtakHendelse.vedtakstidspunkt.toLocalDate().withDayOfMonth(1).plusMonths(1),
+                        beløp = engangsbeløp.beløp,
+                        valutakode = engangsbeløp.valutakode,
+                        delytelsesId = engangsbeløp.delytelseId?.let { Integer.valueOf(it) }
                     )
                 )
             )

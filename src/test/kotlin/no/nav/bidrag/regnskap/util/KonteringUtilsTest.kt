@@ -1,7 +1,7 @@
 package no.nav.bidrag.regnskap.util
 
 import io.kotest.matchers.shouldBe
-import no.nav.bidrag.domain.enums.regnskap.Type
+import no.nav.bidrag.domene.enums.regnskap.Type
 import no.nav.bidrag.regnskap.utils.TestData
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested

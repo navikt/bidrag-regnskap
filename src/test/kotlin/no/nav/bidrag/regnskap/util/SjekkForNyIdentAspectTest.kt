@@ -4,7 +4,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import no.nav.bidrag.commons.util.PersonidentGenerator
 import no.nav.bidrag.commons.util.SjekkForNyIdent
-import no.nav.bidrag.domain.ident.Ident
+import no.nav.bidrag.domene.ident.Ident
 import no.nav.bidrag.regnskap.BidragRegnskapLocal
 import no.nav.bidrag.regnskap.consumer.PersonApiWireMock
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server

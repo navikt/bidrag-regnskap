@@ -3,25 +3,27 @@
   "type": "FASTSETTELSE",
   "id": "9",
   "opprettetAv": "J141208",
-  "vedtakTidspunkt": "2022-05-01T00:00:00.000000000",
-  "enhetId": "4833",
-  "utsattTilDato": null,
+  "vedtakstidspunkt": "2022-05-01T00:00:00.000000000",
+  "enhetsnummer": "4833",
+  "innkrevingUtsattTilDato": null,
   "opprettetTidspunkt": "2022-05-01T16:00:23.254988482",
-  "stonadsendringListe": [
+  "stønadsendringListe": [
     {
       "type": "OPPFOSTRINGSBIDRAG",
-      "sakId": "1210712",
-      "skyldnerId": "BP",
-      "kravhaverId": "BARN1",
-      "mottakerId": "80000364510",
-      "indeksreguleringAar": "2023",
-      "innkreving": "JA",
-      "endring": true,
+      "sak": "1210712",
+      "skyldner": "BP",
+      "kravhaver": "BARN1",
+      "mottaker": "80000364510",
+      "førsteIndeksreguleringsår": "2023",
+      "innkreving": "MED_INNKREVING",
+      "beslutning": "ENDRING",
       "periodeListe": [
         {
-          "fomDato": "2021-11-01",
-          "tilDato": null,
-          "belop": 5000.00,
+          "periode": {
+            "fom":"2021-11",
+            "til": null
+          },
+          "beløp": 5000.00,
           "valutakode": "NOK",
           "resultatkode": "IV",
           "delytelseId": "26683039"
@@ -30,18 +32,20 @@
     },
     {
       "type": "OPPFOSTRINGSBIDRAG",
-      "sakId": "1210712",
-      "skyldnerId": "BP",
-      "kravhaverId": "BARN2",
-      "mottakerId": "80000364510",
-      "indeksreguleringAar": "2023",
-      "innkreving": "JA",
-      "endring": true,
+      "sak": "1210712",
+      "skyldner": "BP",
+      "kravhaver": "BARN2",
+      "mottaker": "80000364510",
+      "førsteIndeksreguleringsår": "2023",
+      "innkreving": "MED_INNKREVING",
+      "beslutning": "ENDRING",
       "periodeListe": [
         {
-          "fomDato": "2021-11-01",
-          "tilDato": null,
-          "belop": 5000.00,
+          "periode": {
+            "fom":"2021-11",
+            "til": null
+          },
+          "beløp": 5000.00,
           "valutakode": "NOK",
           "resultatkode": "IV",
           "delytelseId": "26683038"
@@ -49,7 +53,7 @@
       ]
     }
   ],
-  "engangsbelopListe": [],
+  "engangsbeløpListe": [],
   "sporingsdata": {
     "correlationId": "12345"
   }

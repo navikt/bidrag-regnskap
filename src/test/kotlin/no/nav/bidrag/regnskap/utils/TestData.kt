@@ -1,12 +1,12 @@
 package no.nav.bidrag.regnskap.utils
 
 import no.nav.bidrag.commons.util.PersonidentGenerator
-import no.nav.bidrag.domain.enums.EngangsbelopType
-import no.nav.bidrag.domain.enums.StonadType
-import no.nav.bidrag.domain.enums.VedtakType
-import no.nav.bidrag.domain.enums.regnskap.Søknadstype
-import no.nav.bidrag.domain.enums.regnskap.Transaksjonskode
-import no.nav.bidrag.domain.enums.regnskap.Type
+import no.nav.bidrag.domene.enums.Engangsbeløptype
+import no.nav.bidrag.domene.enums.Stønadstype
+import no.nav.bidrag.domene.enums.Vedtakstype
+import no.nav.bidrag.domene.enums.regnskap.Søknadstype
+import no.nav.bidrag.domene.enums.regnskap.Transaksjonskode
+import no.nav.bidrag.domene.enums.regnskap.Type
 import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
 import no.nav.bidrag.regnskap.dto.vedtak.Periode
 import no.nav.bidrag.regnskap.persistence.entity.Driftsavvik
@@ -24,8 +24,8 @@ object TestData {
 
     fun opprettOppdrag(
         oppdragId: Int = 0,
-        stonadType: StonadType? = StonadType.BIDRAG,
-        engangsbelopType: EngangsbelopType? = null,
+        stonadType: Stønadstype? = Stønadstype.BIDRAG,
+        engangsbelopType: Engangsbeløptype? = null,
         sakId: String = "123456",
         skyldnerIdent: String = PersonidentGenerator.genererFødselsnummer(),
         oppdragsperioder: List<Oppdragsperiode> = listOf(opprettOppdragsperiode()),
@@ -48,8 +48,8 @@ object TestData {
     }
 
     fun opprettHendelse(
-        type: String = StonadType.BIDRAG.name,
-        vedtakType: VedtakType = VedtakType.FASTSETTELSE,
+        type: String = Stønadstype.BIDRAG.name,
+        vedtakType: Vedtakstype = Vedtakstype.FASTSETTELSE,
         kravhaverIdent: String = PersonidentGenerator.genererFødselsnummer(),
         skyldnerIdent: String = PersonidentGenerator.genererFødselsnummer(),
         mottakerIdent: String = PersonidentGenerator.genererFødselsnummer(),
@@ -97,7 +97,7 @@ object TestData {
         oppdragsperiodeId: Int = 0,
         oppdrag: Oppdrag? = null,
         vedtakId: Int = 654321,
-        vedtakType: VedtakType = VedtakType.FASTSETTELSE,
+        vedtakType: Vedtakstype = Vedtakstype.FASTSETTELSE,
         referanse: String? = null,
         mottakerIdent: String = PersonidentGenerator.genererFødselsnummer(),
         belop: BigDecimal = BigDecimal(7500),

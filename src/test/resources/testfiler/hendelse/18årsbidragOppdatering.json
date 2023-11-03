@@ -3,32 +3,34 @@
   "type": "FASTSETTELSE",
   "id": "2",
   "opprettetAv": "L105567",
-  "vedtakTidspunkt": "2022-06-27T00:00:00.000000000",
-  "enhetId": "4820",
-  "utsattTilDato": null,
+  "vedtakstidspunkt": "2022-06-27T00:00:00.000000000",
+  "enhetsnummer": "4820",
+  "innkrevingUtsattTilDato": null,
   "opprettetTidspunkt": "2022-06-27T16:00:23.254988482",
-  "stonadsendringListe": [
+  "stønadsendringListe": [
     {
       "type": "BIDRAG18AAR",
-      "sakId": "0403128",
-      "skyldnerId": "BP",
-      "kravhaverId": "",
-      "mottakerId": "",
-      "indeksreguleringAar": "2023",
-      "innkreving": "JA",
-      "endring": true,
+      "sak": "0403128",
+      "skyldner": "BP",
+      "kravhaver": "",
+      "mottaker": "",
+      "førsteIndeksreguleringsår": "2023",
+      "innkreving": "MED_INNKREVING",
+      "beslutning": "ENDRING",
       "periodeListe": [
         {
-          "fomDato": "2022-01-01",
-          "tilDato": "2023-06-01",
-          "belop": 6540.00,
+          "periode": {
+            "fom":"2022-01",
+            "til":"2023-06"
+          },
+          "beløp": 6540.00,
           "valutakode": "NOK",
           "resultatkode": "KBB"
         }
       ]
     }
   ],
-  "engangsbelopListe": [],
+  "engangsbeløpListe": [],
   "sporingsdata": {
     "correlationId": "12345"
   }

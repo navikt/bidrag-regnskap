@@ -3,25 +3,25 @@
   "type": "FASTSETTELSE",
   "id": "3",
   "opprettetAv": "O163248",
-  "vedtakTidspunkt": "2022-02-28T00:00:00.000000000",
-  "enhetId": "4817",
-  "utsattTilDato": null,
+  "vedtakstidspunkt": "2022-02-28T00:00:00.000000000",
+  "enhetsnummer": "4817",
+  "innkrevingUtsattTilDato": null,
   "opprettetTidspunkt": "2022-02-28T16:00:23.254988482",
-  "stonadsendringListe": [],
-  "engangsbelopListe": [
+  "stønadsendringListe": [],
+  "engangsbeløpListe": [
     {
       "type": "DIREKTE_OPPGJOR",
-      "sakId": "0809546",
-      "skyldnerId": "",
-      "kravhaverId": "",
-      "mottakerId": "",
-      "belop": 7999.00,
+      "sak": "0809546",
+      "skyldner": "",
+      "kravhaver": "",
+      "mottaker": "",
+      "beløp": 7999.00,
       "valutakode": "NOK",
       "resultatkode": "HE",
       "referanse": "DIREKTE_OPPGOR_REFERANSE",
       "delytelseId": "26681272",
-      "innkreving": "JA",
-      "endring": true
+      "innkreving": "MED_INNKREVING",
+      "beslutning": "ENDRING"
     }
   ],
   "sporingsdata": {

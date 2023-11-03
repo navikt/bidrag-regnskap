@@ -9,9 +9,9 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.verify
 import no.nav.bidrag.commons.util.PersonidentGenerator
-import no.nav.bidrag.domain.enums.EngangsbelopType
-import no.nav.bidrag.domain.enums.regnskap.Søknadstype
-import no.nav.bidrag.domain.enums.regnskap.Transaksjonskode
+import no.nav.bidrag.domene.enums.Engangsbeløptype
+import no.nav.bidrag.domene.enums.regnskap.Søknadstype
+import no.nav.bidrag.domene.enums.regnskap.Transaksjonskode
 import no.nav.bidrag.regnskap.consumer.SkattConsumer
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.utils.TestData
@@ -20,7 +20,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.http.ResponseEntity
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.*
 
 @ExtendWith(MockKExtension::class)
 class KravServiceTest {
@@ -145,8 +144,8 @@ class KravServiceTest {
         val nav = "80000345435"
 
         val bidragOppdrag = TestData.opprettOppdrag(oppdragId = 1, skyldnerIdent = bp, kravhaverIdent = bm, gjelderIdent = barn, sakId = "123456")
-        val gebyrBpOppdrag = TestData.opprettOppdrag(stonadType = null, engangsbelopType = EngangsbelopType.GEBYR_SKYLDNER, oppdragId = 2, skyldnerIdent = bp, kravhaverIdent = nav, gjelderIdent = bp, sakId = "123456")
-        val gebyrBmOppdrag = TestData.opprettOppdrag(stonadType = null, engangsbelopType = EngangsbelopType.GEBYR_MOTTAKER, oppdragId = 3, skyldnerIdent = bm, kravhaverIdent = nav, gjelderIdent = bm, sakId = "123456")
+        val gebyrBpOppdrag = TestData.opprettOppdrag(stonadType = null, engangsbelopType = Engangsbeløptype.GEBYR_SKYLDNER, oppdragId = 2, skyldnerIdent = bp, kravhaverIdent = nav, gjelderIdent = bp, sakId = "123456")
+        val gebyrBmOppdrag = TestData.opprettOppdrag(stonadType = null, engangsbelopType = Engangsbeløptype.GEBYR_MOTTAKER, oppdragId = 3, skyldnerIdent = bm, kravhaverIdent = nav, gjelderIdent = bm, sakId = "123456")
 
         val bidragOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = bidragOppdrag, oppdragsperiodeId = 1, mottakerIdent = bm, periodeTil = null)
         val gebyrBpOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = gebyrBpOppdrag, oppdragsperiodeId = 2, mottakerIdent = nav, periodeFra = LocalDate.now())
@@ -181,8 +180,8 @@ class KravServiceTest {
         val nav = "80000345435"
 
         val bidragOppdrag = TestData.opprettOppdrag(oppdragId = 1, skyldnerIdent = bp, kravhaverIdent = bm, gjelderIdent = barn, sakId = "123456")
-        val gebyrBpOppdrag = TestData.opprettOppdrag(stonadType = null, engangsbelopType = EngangsbelopType.GEBYR_SKYLDNER, oppdragId = 2, skyldnerIdent = bp, kravhaverIdent = nav, gjelderIdent = bp, sakId = "123456")
-        val gebyrBmOppdrag = TestData.opprettOppdrag(stonadType = null, engangsbelopType = EngangsbelopType.GEBYR_MOTTAKER, oppdragId = 3, skyldnerIdent = bm, kravhaverIdent = nav, gjelderIdent = bm, sakId = "123456")
+        val gebyrBpOppdrag = TestData.opprettOppdrag(stonadType = null, engangsbelopType = Engangsbeløptype.GEBYR_SKYLDNER, oppdragId = 2, skyldnerIdent = bp, kravhaverIdent = nav, gjelderIdent = bp, sakId = "123456")
+        val gebyrBmOppdrag = TestData.opprettOppdrag(stonadType = null, engangsbelopType = Engangsbeløptype.GEBYR_MOTTAKER, oppdragId = 3, skyldnerIdent = bm, kravhaverIdent = nav, gjelderIdent = bm, sakId = "123456")
 
         val bidragOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = bidragOppdrag, vedtakId = 123456, oppdragsperiodeId = 1, mottakerIdent = bm, periodeTil = null)
         val gebyrBpOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = gebyrBpOppdrag, oppdragsperiodeId = 2, mottakerIdent = nav, periodeFra = LocalDate.now())
@@ -217,8 +216,8 @@ class KravServiceTest {
         val nav = "80000345435"
 
         val bidragOppdrag = TestData.opprettOppdrag(oppdragId = 1, skyldnerIdent = bp, kravhaverIdent = bm, gjelderIdent = barn, sakId = "123456")
-        val gebyrBpOppdrag = TestData.opprettOppdrag(stonadType = null, engangsbelopType = EngangsbelopType.GEBYR_SKYLDNER, oppdragId = 2, skyldnerIdent = bp, kravhaverIdent = nav, gjelderIdent = bp, sakId = "123456")
-        val gebyrBmOppdrag = TestData.opprettOppdrag(stonadType = null, engangsbelopType = EngangsbelopType.GEBYR_MOTTAKER, oppdragId = 3, skyldnerIdent = bm, kravhaverIdent = nav, gjelderIdent = bm, sakId = "123456")
+        val gebyrBpOppdrag = TestData.opprettOppdrag(stonadType = null, engangsbelopType = Engangsbeløptype.GEBYR_SKYLDNER, oppdragId = 2, skyldnerIdent = bp, kravhaverIdent = nav, gjelderIdent = bp, sakId = "123456")
+        val gebyrBmOppdrag = TestData.opprettOppdrag(stonadType = null, engangsbelopType = Engangsbeløptype.GEBYR_MOTTAKER, oppdragId = 3, skyldnerIdent = bm, kravhaverIdent = nav, gjelderIdent = bm, sakId = "123456")
 
         val bidragOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = bidragOppdrag, vedtakId = 123456, oppdragsperiodeId = 1, mottakerIdent = bm, periodeTil = null)
         val gebyrBpOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = gebyrBpOppdrag, vedtakId = 12345, oppdragsperiodeId = 2, mottakerIdent = nav, periodeFra = LocalDate.now())

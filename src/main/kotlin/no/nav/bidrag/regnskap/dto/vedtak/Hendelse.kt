@@ -1,11 +1,11 @@
 package no.nav.bidrag.regnskap.dto.vedtak
 
-import no.nav.bidrag.domain.enums.VedtakType
+import no.nav.bidrag.domene.enums.Vedtakstype
 import java.time.LocalDate
 
 data class Hendelse(
     val type: String,
-    val vedtakType: VedtakType,
+    val vedtakType: Vedtakstype,
     val kravhaverIdent: String?,
     val skyldnerIdent: String,
     val mottakerIdent: String,
