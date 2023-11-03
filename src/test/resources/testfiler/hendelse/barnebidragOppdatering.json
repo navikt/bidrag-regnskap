@@ -3,25 +3,27 @@
   "type": "FASTSETTELSE",
   "id": "64847",
   "opprettetAv": "B138788",
-  "vedtakTidspunkt": "2022-01-02T00:00:00.000000000",
-  "enhetId": "4849",
-  "utsattTilDato": null,
+  "vedtakstidspunkt": "2022-01-02T00:00:00.000000000",
+  "enhetsnummer": "4849",
+  "innkrevingUtsattTilDato": null,
   "opprettetTidspunkt": "2022-01-02T16:00:23.254988482",
-  "stonadsendringListe": [
+  "stønadsendringListe": [
     {
       "type": "BIDRAG",
-      "sakId": "2203234",
-      "skyldnerId": "BP",
-      "kravhaverId": "BARN1",
-      "mottakerId": "BM",
-      "indeksreguleringAar": "2023",
-      "innkreving": "JA",
-      "endring": true,
+      "sak": "2203234",
+      "skyldner": "BP",
+      "kravhaver": "BARN1",
+      "mottaker": "BM",
+      "førsteIndeksreguleringsår": "2023",
+      "innkreving": "MED_INNKREVING",
+      "beslutning": "ENDRING",
       "periodeListe": [
         {
-          "fomDato": "2022-03-01",
-          "tilDato": null,
-          "belop": 5520.00,
+          "periode": {
+            "fom":"2022-03",
+            "til": null
+          },
+          "beløp": 5520.00,
           "valutakode": "NOK",
           "resultatkode": "KBB"
         }
@@ -29,25 +31,27 @@
     },
     {
       "type": "BIDRAG",
-      "sakId": "2203234",
-      "skyldnerId": "BP",
-      "kravhaverId": "BARN2",
-      "mottakerId": "BM",
-      "indeksreguleringAar": "2023",
-      "innkreving": "JA",
-      "endring": true,
+      "sak": "2203234",
+      "skyldner": "BP",
+      "kravhaver": "BARN2",
+      "mottaker": "BM",
+      "førsteIndeksreguleringsår": "2023",
+      "innkreving": "MED_INNKREVING",
+      "beslutning": "ENDRING",
       "periodeListe": [
         {
-          "fomDato": "2022-03-01",
-          "tilDato": null,
-          "belop": 4950.00,
+          "periode": {
+            "fom":"2022-03",
+            "til": null
+          },
+          "beløp": 4950.00,
           "valutakode": "NOK",
           "resultatkode": "KBB"
         }
       ]
     }
   ],
-  "engangsbelopListe": [],
+  "engangsbeløpListe": [],
   "sporingsdata": {
     "correlationId": "12345"
   }

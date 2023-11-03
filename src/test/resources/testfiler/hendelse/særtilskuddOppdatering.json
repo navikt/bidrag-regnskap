@@ -2,26 +2,26 @@
   "kilde": "MANUELT",
   "type": "FASTSETTELSE",
   "id": "801",
-  "vedtakTidspunkt": "2022-01-02T00:00:00.000000000",
-  "enhetId": "4812",
+  "vedtakstidspunkt": "2022-01-02T00:00:00.000000000",
+  "enhetsnummer": "4812",
   "opprettetAv": "B101173",
   "opprettetTidspunkt": "2022-01-02T16:00:23.254988482",
-  "stonadsendringListe": [
+  "stønadsendringListe": [
   ],
-  "engangsbelopListe": [
+  "engangsbeløpListe": [
     {
       "type": "SAERTILSKUDD",
-      "sakId": "2200400",
-      "skyldnerId": "",
-      "kravhaverId": "",
-      "mottakerId": "",
-      "belop": "15010.40",
+      "sak": "2200400",
+      "skyldner": "",
+      "kravhaver": "",
+      "mottaker": "",
+      "beløp": "15010.40",
       "valutakode": "NOK",
       "referanse": "SARTILSKUDD_REFERANSE",
-      "omgjorVedtakId": "800",
+      "omgjørVedtakId": "800",
       "resultatkode": "GIGI",
-      "innkreving": "JA",
-      "endring": true
+      "innkreving": "MED_INNKREVING",
+      "beslutning": "ENDRING"
     }
   ],
   "sporingsdata": {

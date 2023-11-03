@@ -32,7 +32,7 @@ class SakApiWireMock {
              "ukjentPart": "false",
              "roller": [
                {
-                 "fodselsnummer": "${PersonidentGenerator.genererFødselsnummer()}",
+                 "fødselsnummer": "${PersonidentGenerator.genererFødselsnummer()}",
                  "type": "BA"
                }
              ]

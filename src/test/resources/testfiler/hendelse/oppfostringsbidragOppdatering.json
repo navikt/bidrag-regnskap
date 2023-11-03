@@ -3,25 +3,27 @@
   "type": "FASTSETTELSE",
   "id": "10",
   "opprettetAv": "J141208",
-  "vedtakTidspunkt": "2022-05-02T00:00:00.000000000",
-  "enhetId": "4833",
-  "utsattTilDato": null,
+  "vedtakstidspunkt": "2022-05-02T00:00:00.000000000",
+  "enhetsnummer": "4833",
+  "innkrevingUtsattTilDato": null,
   "opprettetTidspunkt": "2022-05-02T16:00:23.254988482",
-  "stonadsendringListe": [
+  "stønadsendringListe": [
     {
       "type": "OPPFOSTRINGSBIDRAG",
-      "sakId": "1210712",
-      "skyldnerId": "BP",
-      "kravhaverId": "BARN1",
-      "mottakerId": "80000364510",
-      "indeksreguleringAar": "2023",
-      "innkreving": "JA",
-      "endring": true,
+      "sak": "1210712",
+      "skyldner": "BP",
+      "kravhaver": "BARN1",
+      "mottaker": "80000364510",
+      "førsteIndeksreguleringsår": "2023",
+      "innkreving": "MED_INNKREVING",
+      "beslutning": "ENDRING",
       "periodeListe": [
         {
-          "fomDato": "2021-11-01",
-          "tilDato": null,
-          "belop": 5100.00,
+          "periode": {
+            "fom":"2021-11",
+            "til": null
+          },
+          "beløp": 5100.00,
           "valutakode": "NOK",
           "resultatkode": "IV"
         }
@@ -29,25 +31,27 @@
     },
     {
       "type": "OPPFOSTRINGSBIDRAG",
-      "sakId": "1210712",
-      "skyldnerId": "BP",
-      "kravhaverId": "BARN2",
-      "mottakerId": "80000364510",
-      "indeksreguleringAar": "2023",
-      "innkreving": "JA",
-      "endring": true,
+      "sak": "1210712",
+      "skyldner": "BP",
+      "kravhaver": "BARN2",
+      "mottaker": "80000364510",
+      "førsteIndeksreguleringsår": "2023",
+      "innkreving": "MED_INNKREVING",
+      "beslutning": "ENDRING",
       "periodeListe": [
         {
-          "fomDato": "2021-11-01",
-          "tilDato": null,
-          "belop": 5100.00,
+          "periode": {
+            "fom":"2021-11",
+            "til": null
+          },
+          "beløp": 5100.00,
           "valutakode": "NOK",
           "resultatkode": "IV"
         }
       ]
     }
   ],
-  "engangsbelopListe": [],
+  "engangsbeløpListe": [],
   "sporingsdata": {
     "correlationId": "12345"
   }

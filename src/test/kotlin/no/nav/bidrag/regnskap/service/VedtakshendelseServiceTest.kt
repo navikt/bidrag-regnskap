@@ -9,8 +9,8 @@ import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.verify
-import no.nav.bidrag.domain.enums.EngangsbelopType
-import no.nav.bidrag.domain.enums.StonadType
+import no.nav.bidrag.domene.enums.Engangsbeløptype
+import no.nav.bidrag.domene.enums.Stønadstype
 import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
 import no.nav.bidrag.regnskap.util.IdentUtils
 import org.junit.jupiter.api.Assertions.assertDoesNotThrow
@@ -51,8 +51,8 @@ class VedtakshendelseServiceTest {
 
         vedtakHendelse shouldNotBe null
         vedtakHendelse.id shouldBe 123
-        vedtakHendelse.engangsbelopListe?.shouldHaveSize(1)
-        vedtakHendelse.stonadsendringListe?.shouldHaveSize(1)
+        vedtakHendelse.engangsbeløpListe?.shouldHaveSize(1)
+        vedtakHendelse.stønadsendringListe?.shouldHaveSize(1)
     }
 
     @Test
@@ -65,8 +65,8 @@ class VedtakshendelseServiceTest {
         vedtakshendelseService.behandleHendelse(hendelse)
 
         verify(exactly = 2) { oppdragService.lagreHendelse(any()) }
-        hendelseCaptor[0].type shouldBe StonadType.BIDRAG.name
-        hendelseCaptor[1].type shouldBe EngangsbelopType.GEBYR_SKYLDNER.name
+        hendelseCaptor[0].type shouldBe Stønadstype.BIDRAG.name
+        hendelseCaptor[1].type shouldBe Engangsbeløptype.GEBYR_SKYLDNER.name
     }
 
     @Test
@@ -78,13 +78,13 @@ class VedtakshendelseServiceTest {
           "kilde":"MANUELT",
           "type":"INDEKSREGULERING",
           "id":"779",
-          "vedtakTidspunkt":"2022-06-03T00:00:00.000000000",
-          "enhetId":"4812",
+          "vedtakstidspunkt":"2022-06-03T00:00:00.000000000",
+          "enhetsnummer":"4812",
           "opprettetAv":"B101173",
           "opprettetTidspunkt":"2022-10-19T16:00:23.254988482",
-          "stonadsendringListe":[
+          "stønadsendringListe":[
           ],
-          "engangsbelopListe":[
+          "engangsbeløpListe":[
           ],
           "sporingsdata": {
             "correlationId": "12345"
@@ -128,31 +128,35 @@ class VedtakshendelseServiceTest {
         "kilde":"MANUELT",
         "type":"INNKREVING",
         "id":"123",
-        "vedtakTidspunkt":"2022-06-01T00:00:00.000000000",
-        "enhetId":"4812",
+        "vedtakstidspunkt":"2022-06-01T00:00:00.000000000",
+        "enhetsnummer":"4812",
         "opprettetAv":"B111111",
         "opprettetTidspunkt":"2022-01-01T16:00:00.000000000",
-        "stonadsendringListe":[
+        "stønadsendringListe":[
           {
             "type":"BIDRAG",
-            "sakId":"456",
-            "skyldnerId":"11111111111",
-            "kravhaverId":"22222222222",
-            "mottakerId":"333333333333",
-            "innkreving":"JA",
-            "endring":true,
+            "sak":"456",
+            "skyldner":"11111111111",
+            "kravhaver":"22222222222",
+            "mottaker":"333333333333",
+            "innkreving":"MED_INNKREVING",
+            "beslutning":"ENDRING",
             "periodeListe":[
               {
-                "fomDato":"2022-01-01",
-                "tilDato":"2022-03-01",
-                "belop":"2910",
+                "periode": {
+                    "fom":"2022-01",
+                    "til":"2022-03"
+                },
+                "beløp":"2910",
                 "valutakode":"NOK",
                 "resultatkode":"KBB"
               },
               {
-                "fomDato":"2022-03-01",
-                "tilDato":null,
-                "belop":"2930",
+                "periode": {
+                    "fom":"2022-03",
+                    "til":null
+                },
+                "beløp":"2930",
                 "valutakode":"NOK",
                 "resultatkode":"KBB"
               }
@@ -160,19 +164,19 @@ class VedtakshendelseServiceTest {
           }
         ]
         ,
-        "engangsbelopListe":[
+        "engangsbeløpListe":[
           {
             "type":"GEBYR_SKYLDNER",
-            "sakId":"789",
-            "skyldnerId":"11111111111",
-            "kravhaverId":"22222222222",
-            "mottakerId":"333333333333",
+            "sak":"789",
+            "skyldner":"11111111111",
+            "kravhaver":"22222222222",
+            "mottaker":"333333333333",
             "belop":"1790",
             "valutakode":"NOK",
             "resultatkode":"GIGI",
-            "innkreving":"JA",
+            "innkreving":"MED_INNKREVING",
             "referanse":"REFERANSE",
-            "endring":true
+            "beslutning":"ENDRING"
           }
         ],
          "sporingsdata": {

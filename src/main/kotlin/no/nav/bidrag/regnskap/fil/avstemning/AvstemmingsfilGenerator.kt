@@ -1,6 +1,6 @@
 package no.nav.bidrag.regnskap.fil.avstemning
 
-import no.nav.bidrag.domain.enums.regnskap.Transaksjonskode
+import no.nav.bidrag.domene.enums.regnskap.Transaksjonskode
 import no.nav.bidrag.regnskap.fil.overføring.FiloverføringTilElinKlient
 import no.nav.bidrag.regnskap.persistence.bucket.GcpFilBucket
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
@@ -92,7 +92,7 @@ class AvstemmingsfilGenerator(
         var totalSum = BigDecimal.ZERO
         var totalAntall = 0
 
-        summering.forEach { name, avstemningSummering ->
+        summering.forEach { (name, avstemningSummering) ->
             if (avstemningSummering.antallKonteringer != 0) {
                 avstemningSummeringFil.write(
                     (

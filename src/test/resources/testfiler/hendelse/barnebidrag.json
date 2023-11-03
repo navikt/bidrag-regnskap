@@ -3,33 +3,37 @@
   "type": "FASTSETTELSE",
   "id": "64846",
   "opprettetAv": "B138788",
-  "vedtakTidspunkt": "2022-01-02T00:00:00.000000000",
-  "enhetId": "4849",
-  "utsattTilDato": null,
+  "vedtakstidspunkt": "2022-01-02T00:00:00.000000000",
+  "enhetsnummer": "4849",
+  "innkrevingUtsattTilDato": null,
   "opprettetTidspunkt": "2022-01-02T16:00:23.254988482",
-  "stonadsendringListe": [
+  "stønadsendringListe": [
     {
       "type": "BIDRAG",
-      "sakId": "2203234",
-      "skyldnerId": "BP",
-      "kravhaverId": "BARN1",
-      "mottakerId": "BM",
-      "indeksreguleringAar": "2023",
-      "innkreving": "JA",
-      "endring": true,
+      "sak": "2203234",
+      "skyldner": "BP",
+      "kravhaver": "BARN1",
+      "mottaker": "BM",
+      "førsteIndeksreguleringsår": "2023",
+      "innkreving": "MED_INNKREVING",
+      "beslutning": "ENDRING",
       "periodeListe": [
         {
-          "fomDato": "2022-01-01",
-          "tilDato": "2022-03-01",
-          "belop": 4820.00,
+          "periode": {
+            "fom":"2022-01",
+            "til":"2022-03"
+          },
+          "beløp": 4820.00,
           "valutakode": "NOK",
           "resultatkode": "KBB",
           "delytelseId": "26683715"
         },
         {
-          "fomDato": "2022-03-01",
-          "tilDato": null,
-          "belop": 5510.00,
+          "periode": {
+            "fom":"2022-03",
+            "til": null
+          },
+          "beløp": 5510.00,
           "valutakode": "NOK",
           "resultatkode": "KBB",
           "delytelseId": "26683717"
@@ -38,26 +42,30 @@
     },
     {
       "type": "BIDRAG",
-      "sakId": "2203234",
-      "skyldnerId": "BP",
-      "kravhaverId": "BARN2",
-      "mottakerId": "BM",
-      "indeksreguleringAar": "2023",
-      "innkreving": "JA",
-      "endring": true,
+      "sak": "2203234",
+      "skyldner": "BP",
+      "kravhaver": "BARN2",
+      "mottaker": "BM",
+      "førsteIndeksreguleringsår": "2023",
+      "innkreving": "MED_INNKREVING",
+      "beslutning": "ENDRING",
       "periodeListe": [
         {
-          "fomDato": "2022-01-01",
-          "tilDato": "2022-03-01",
-          "belop": 4820.00,
+          "periode": {
+            "fom":"2022-01",
+            "til":"2022-03"
+          },
+          "beløp": 4820.00,
           "valutakode": "NOK",
           "resultatkode": "KBB",
           "delytelseId": "26683716"
         },
         {
-          "fomDato": "2022-03-01",
-          "tilDato": null,
-          "belop": 4940.00,
+          "periode": {
+            "fom":"2022-03",
+            "til": null
+          },
+          "beløp": 4940.00,
           "valutakode": "NOK",
           "resultatkode": "KBB",
           "delytelseId": "26683718"
@@ -65,34 +73,34 @@
       ]
     }
   ],
-  "engangsbelopListe": [
+  "engangsbeløpListe": [
     {
       "type": "GEBYR_SKYLDNER",
-      "sakId": "2203234",
-      "skyldnerId": "BP",
-      "kravhaverId": "NAV",
-      "mottakerId": "NAV",
-      "belop": 1223.00,
+      "sak": "2203234",
+      "skyldner": "BP",
+      "kravhaver": "NAV",
+      "mottaker": "NAV",
+      "beløp": 1223.00,
       "valutakode": "NOK",
       "resultatkode": "GIGI",
       "referanse": "BARNEBIDRAG-REFERANSE1",
       "delytelseId": "26683719",
-      "innkreving": "JA",
-      "endring": true
+      "innkreving": "MED_INNKREVING",
+      "beslutning": "ENDRING"
     },
     {
       "type": "GEBYR_MOTTAKER",
-      "sakId": "2203234",
-      "skyldnerId": "BM",
-      "kravhaverId": "NAV",
-      "mottakerId": "NAV",
-      "belop": 1223.00,
+      "sak": "2203234",
+      "skyldner": "BM",
+      "kravhaver": "NAV",
+      "mottaker": "NAV",
+      "beløp": 1223.00,
       "valutakode": "NOK",
       "resultatkode": "GIGI",
       "referanse": "BARNEBIDRAG-REFERANSE2",
       "delytelseId": "26683720",
-      "innkreving": "JA",
-      "endring": true
+      "innkreving": "MED_INNKREVING",
+      "beslutning": "ENDRING"
     }
   ],
   "sporingsdata": {

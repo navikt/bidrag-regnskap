@@ -7,17 +7,17 @@ import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import no.nav.bidrag.commons.util.PersonidentGenerator
-import no.nav.bidrag.domain.bool.BegrensetTilgang
-import no.nav.bidrag.domain.bool.LevdeAdskilt
-import no.nav.bidrag.domain.bool.Paragraf19
-import no.nav.bidrag.domain.bool.UkjentPart
-import no.nav.bidrag.domain.enums.Bidragssakstatus
-import no.nav.bidrag.domain.enums.Rolletype
-import no.nav.bidrag.domain.enums.Sakskategori
-import no.nav.bidrag.domain.ident.PersonIdent
-import no.nav.bidrag.domain.string.Enhetsnummer
-import no.nav.bidrag.domain.string.Saksnummer
-import no.nav.bidrag.domain.tid.OpprettetDato
+import no.nav.bidrag.domene.bool.BegrensetTilgang
+import no.nav.bidrag.domene.bool.LevdeAdskilt
+import no.nav.bidrag.domene.bool.Paragraf19
+import no.nav.bidrag.domene.bool.UkjentPart
+import no.nav.bidrag.domene.enums.Bidragssakstatus
+import no.nav.bidrag.domene.enums.Rolletype
+import no.nav.bidrag.domene.enums.Sakskategori
+import no.nav.bidrag.domene.ident.Personident
+import no.nav.bidrag.domene.streng.Enhetsnummer
+import no.nav.bidrag.domene.streng.Saksnummer
+import no.nav.bidrag.domene.tid.OpprettetDato
 import no.nav.bidrag.transport.sak.BidragssakDto
 import no.nav.bidrag.transport.sak.RolleDto
 import org.junit.jupiter.api.BeforeEach
@@ -81,7 +81,7 @@ internal class SakConsumerTest {
             UkjentPart(false),
             roller = listOf(
                 RolleDto(
-                    PersonIdent(PersonidentGenerator.genererFødselsnummer()),
+                    Personident(PersonidentGenerator.genererFødselsnummer()),
                     rolletype
                 )
             )

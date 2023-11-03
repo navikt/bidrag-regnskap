@@ -3,25 +3,27 @@
   "type": "FASTSETTELSE",
   "id": "8",
   "opprettetAv": "E158931",
-  "vedtakTidspunkt": "2021-06-30T00:00:00.000000000",
-  "enhetId": "9401",
-  "utsattTilDato": null,
+  "vedtakstidspunkt": "2021-06-30T00:00:00.000000000",
+  "enhetsnummer": "9401",
+  "innkrevingUtsattTilDato": null,
   "opprettetTidspunkt": "2021-06-30T16:00:23.254988482",
-  "stonadsendringListe": [
+  "stønadsendringListe": [
     {
       "type": "MOTREGNING",
-      "sakId": "1706132",
-      "skyldnerId": "",
-      "kravhaverId": "",
-      "mottakerId": "",
-      "indeksreguleringAar": "2023",
-      "innkreving": "JA",
-      "endring": true,
+      "sak": "1706132",
+      "skyldner": "",
+      "kravhaver": "",
+      "mottaker": "",
+      "førsteIndeksreguleringsår": "2023",
+      "innkreving": "MED_INNKREVING",
+      "beslutning": "ENDRING",
       "periodeListe": [
         {
-          "fomDato": "2021-08-01",
-          "tilDato": "2022-08-01",
-          "belop": 815.00,
+          "periode": {
+            "fom":"2021-08",
+            "til":"2022-08"
+          },
+          "beløp": 815.00,
           "valutakode": "NOK",
           "resultatkode": "IV",
           "delytelseId": "26681362"
@@ -29,7 +31,7 @@
       ]
     }
   ],
-  "engangsbelopListe": [],
+  "engangsbeløpListe": [],
   "sporingsdata": {
     "correlationId": "12345"
   }

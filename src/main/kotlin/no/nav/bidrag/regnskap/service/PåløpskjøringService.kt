@@ -4,7 +4,7 @@ import com.google.common.collect.Lists
 import io.micrometer.core.instrument.LongTaskTimer
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Metrics
-import no.nav.bidrag.domain.enums.regnskap.Årsakskode
+import no.nav.bidrag.domene.enums.regnskap.Årsakskode
 import no.nav.bidrag.regnskap.consumer.SkattConsumer
 import no.nav.bidrag.regnskap.fil.overføring.FiloverføringTilElinKlient
 import no.nav.bidrag.regnskap.fil.påløp.PåløpsfilGenerator

@@ -1,6 +1,6 @@
 package no.nav.bidrag.regnskap.service
 
-import no.nav.bidrag.domain.enums.regnskap.behandlingsstatus.Batchstatus
+import no.nav.bidrag.domene.enums.regnskap.behandlingsstatus.Batchstatus
 import no.nav.bidrag.regnskap.consumer.SkattConsumer
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.transport.regnskap.behandlingsstatus.BehandlingsstatusResponse

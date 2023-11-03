@@ -3,41 +3,47 @@
   "type": "FASTSETTELSE",
   "id": "1",
   "opprettetAv": "L105567",
-  "vedtakTidspunkt": "2022-06-27T00:00:00.000000000",
-  "enhetId": "4820",
-  "utsattTilDato": null,
+  "vedtakstidspunkt": "2022-06-27T00:00:00.000000000",
+  "enhetsnummer": "4820",
+  "innkrevingUtsattTilDato": null,
   "opprettetTidspunkt": "2022-06-27T16:00:23.254988482",
-  "stonadsendringListe": [
+  "stønadsendringListe": [
     {
       "type": "BIDRAG18AAR",
-      "sakId": "0403128",
-      "skyldnerId": "BP",
-      "kravhaverId": "",
-      "mottakerId": "",
-      "indeksreguleringAar": "2023",
-      "innkreving": "JA",
-      "endring": true,
+      "sak": "0403128",
+      "skyldner": "BP",
+      "kravhaver": "",
+      "mottaker": "",
+      "førsteIndeksreguleringsår": "2023",
+      "innkreving": "MED_INNKREVING",
+      "beslutning": "ENDRING",
       "periodeListe": [
         {
-          "fomDato": "2022-02-01",
-          "tilDato": "2022-03-01",
-          "belop": 6330.00,
+          "periode": {
+            "fom":"2022-02",
+            "til":"2022-03"
+          },
+          "beløp": 6330.00,
           "valutakode": "NOK",
           "resultatkode": "KBB",
           "delytelseId": "26679759"
         },
         {
-          "fomDato": "2022-03-01",
-          "tilDato": "2022-04-01",
-          "belop": 6340.00,
+          "periode": {
+            "fom":"2022-03",
+            "til":"2022-04"
+          },
+          "beløp": 6340.00,
           "valutakode": "NOK",
           "resultatkode": "KBB",
           "delytelseId": "26679760"
         },
         {
-          "fomDato": "2022-04-01",
-          "tilDato": "2023-05-01",
-          "belop": 6440.00,
+          "periode": {
+            "fom":"2022-04",
+            "til":"2023-05"
+          },
+          "beløp": 6440.00,
           "valutakode": "NOK",
           "resultatkode": "KBB",
           "delytelseId": "26679761"
@@ -45,7 +51,7 @@
       ]
     }
   ],
-  "engangsbelopListe": [],
+  "engangsbeløpListe": [],
   "sporingsdata": {
     "correlationId": "12345"
   }

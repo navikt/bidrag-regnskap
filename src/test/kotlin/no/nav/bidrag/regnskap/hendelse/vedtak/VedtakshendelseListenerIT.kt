@@ -11,11 +11,11 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.types.shouldBeSameInstanceAs
 import no.nav.bidrag.commons.util.PersonidentGenerator
-import no.nav.bidrag.domain.enums.EngangsbelopType
-import no.nav.bidrag.domain.enums.StonadType
-import no.nav.bidrag.domain.enums.regnskap.Søknadstype
-import no.nav.bidrag.domain.enums.regnskap.Transaksjonskode
-import no.nav.bidrag.domain.enums.regnskap.Type
+import no.nav.bidrag.domene.enums.Engangsbeløptype
+import no.nav.bidrag.domene.enums.Stønadstype
+import no.nav.bidrag.domene.enums.regnskap.Søknadstype
+import no.nav.bidrag.domene.enums.regnskap.Transaksjonskode
+import no.nav.bidrag.domene.enums.regnskap.Type
 import no.nav.bidrag.regnskap.BidragRegnskapLocal
 import no.nav.bidrag.regnskap.consumer.KravApiWireMock
 import no.nav.bidrag.regnskap.consumer.PersonApiWireMock
@@ -150,9 +150,9 @@ internal class VedtakshendelseListenerIT {
         val kontering = assertVedOpprettelseAvEngangsbeløp(
             1,
             vedtakHendelse,
-            EngangsbelopType.GEBYR_SKYLDNER,
+            Engangsbeløptype.GEBYR_SKYLDNER,
             Transaksjonskode.G1,
-            Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].delytelseId),
+            Integer.valueOf(vedtakHendelse.engangsbeløpListe!![0].delytelseId),
             Søknadstype.FABP
         )
 
@@ -182,9 +182,9 @@ internal class VedtakshendelseListenerIT {
         val kontering = assertVedOpprettelseAvEngangsbeløp(
             2,
             vedtakHendelse,
-            EngangsbelopType.GEBYR_MOTTAKER,
+            Engangsbeløptype.GEBYR_MOTTAKER,
             Transaksjonskode.G1,
-            Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].delytelseId),
+            Integer.valueOf(vedtakHendelse.engangsbeløpListe!![0].delytelseId),
             Søknadstype.FABM
         )
 
@@ -218,7 +218,7 @@ internal class VedtakshendelseListenerIT {
         val kontering = assertVedOpprettelseAvEngangsbeløp(
             3,
             vedtakHendelse,
-            EngangsbelopType.SAERTILSKUDD,
+            Engangsbeløptype.SAERTILSKUDD,
             Transaksjonskode.E1,
             100000002,
             Søknadstype.EN
@@ -254,9 +254,9 @@ internal class VedtakshendelseListenerIT {
         val kontering = assertVedOpprettelseAvEngangsbeløp(
             4,
             vedtakHendelse,
-            EngangsbelopType.TILBAKEKREVING,
+            Engangsbeløptype.TILBAKEKREVING,
             Transaksjonskode.H1,
-            Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].delytelseId),
+            Integer.valueOf(vedtakHendelse.engangsbeløpListe!![0].delytelseId),
             Søknadstype.EN
         )
 
@@ -290,9 +290,9 @@ internal class VedtakshendelseListenerIT {
         val kontering = assertVedOpprettelseAvEngangsbeløp(
             5,
             vedtakHendelse,
-            EngangsbelopType.ETTERGIVELSE,
+            Engangsbeløptype.ETTERGIVELSE,
             Transaksjonskode.K1,
-            Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].delytelseId),
+            Integer.valueOf(vedtakHendelse.engangsbeløpListe!![0].delytelseId),
             Søknadstype.EN
         )
 
@@ -307,9 +307,9 @@ internal class VedtakshendelseListenerIT {
         val kontering = assertVedOpprettelseAvEngangsbeløp(
             7,
             vedtakHendelse,
-            EngangsbelopType.DIREKTE_OPPGJOR,
+            Engangsbeløptype.DIREKTE_OPPGJOR,
             Transaksjonskode.K2,
-            Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].delytelseId),
+            Integer.valueOf(vedtakHendelse.engangsbeløpListe!![0].delytelseId),
             Søknadstype.EN
         )
 
@@ -324,9 +324,9 @@ internal class VedtakshendelseListenerIT {
         val kontering = assertVedOpprettelseAvEngangsbeløp(
             8,
             vedtakHendelse,
-            EngangsbelopType.ETTERGIVELSE_TILBAKEKREVING,
+            Engangsbeløptype.ETTERGIVELSE_TILBAKEKREVING,
             Transaksjonskode.K3,
-            Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].delytelseId),
+            Integer.valueOf(vedtakHendelse.engangsbeløpListe!![0].delytelseId),
             Søknadstype.EN
         )
 
@@ -344,7 +344,7 @@ internal class VedtakshendelseListenerIT {
         val oppdrag = assertStønader(
             9,
             vedtakHendelse,
-            StonadType.FORSKUDD,
+            Stønadstype.FORSKUDD,
             3,
             3,
             Transaksjonskode.A1,
@@ -372,7 +372,7 @@ internal class VedtakshendelseListenerIT {
         val oppdrag = assertStønader(
             9,
             vedtakHendelse,
-            StonadType.FORSKUDD,
+            Stønadstype.FORSKUDD,
             4,
             1,
             Transaksjonskode.A1,
@@ -407,7 +407,7 @@ internal class VedtakshendelseListenerIT {
         val oppdrag1 = assertStønader(
             10,
             vedtakHendelse,
-            StonadType.BIDRAG,
+            Stønadstype.BIDRAG,
             2,
             2,
             Transaksjonskode.B1,
@@ -417,7 +417,7 @@ internal class VedtakshendelseListenerIT {
         val oppdrag2 = assertStønader(
             11,
             vedtakHendelse,
-            StonadType.BIDRAG,
+            Stønadstype.BIDRAG,
             2,
             2,
             Transaksjonskode.B1,
@@ -428,18 +428,18 @@ internal class VedtakshendelseListenerIT {
         val gebyrBp = assertVedOpprettelseAvEngangsbeløp(
             12,
             vedtakHendelse,
-            EngangsbelopType.GEBYR_SKYLDNER,
+            Engangsbeløptype.GEBYR_SKYLDNER,
             Transaksjonskode.G1,
-            Integer.valueOf(vedtakHendelse.engangsbelopListe!![0].delytelseId),
+            Integer.valueOf(vedtakHendelse.engangsbeløpListe!![0].delytelseId),
             Søknadstype.FABP
         )
 
         val gebyrBm = assertVedOpprettelseAvEngangsbeløp(
             13,
             vedtakHendelse,
-            EngangsbelopType.GEBYR_MOTTAKER,
+            Engangsbeløptype.GEBYR_MOTTAKER,
             Transaksjonskode.G1,
-            Integer.valueOf(vedtakHendelse.engangsbelopListe!![1].delytelseId),
+            Integer.valueOf(vedtakHendelse.engangsbeløpListe!![1].delytelseId),
             Søknadstype.FABM,
             engangsbeløpIndex = 1
         )
@@ -465,7 +465,7 @@ internal class VedtakshendelseListenerIT {
         val oppdrag1 = assertStønader(
             10,
             vedtakHendelse,
-            StonadType.BIDRAG,
+            Stønadstype.BIDRAG,
             3,
             1,
             Transaksjonskode.B1,
@@ -481,7 +481,7 @@ internal class VedtakshendelseListenerIT {
         val oppdrag2 = assertStønader(
             11,
             vedtakHendelse,
-            StonadType.BIDRAG,
+            Stønadstype.BIDRAG,
             3,
             1,
             Transaksjonskode.B1,
@@ -518,7 +518,7 @@ internal class VedtakshendelseListenerIT {
         val oppdrag1 = assertStønader(
             14,
             vedtakHendelse,
-            StonadType.OPPFOSTRINGSBIDRAG,
+            Stønadstype.OPPFOSTRINGSBIDRAG,
             1,
             1,
             Transaksjonskode.B1,
@@ -532,7 +532,7 @@ internal class VedtakshendelseListenerIT {
         val oppdrag2 = assertStønader(
             15,
             vedtakHendelse,
-            StonadType.OPPFOSTRINGSBIDRAG,
+            Stønadstype.OPPFOSTRINGSBIDRAG,
             1,
             1,
             Transaksjonskode.B1,
@@ -557,7 +557,7 @@ internal class VedtakshendelseListenerIT {
         val oppdrag1 = assertStønader(
             14,
             vedtakHendelse,
-            StonadType.OPPFOSTRINGSBIDRAG,
+            Stønadstype.OPPFOSTRINGSBIDRAG,
             2,
             1,
             Transaksjonskode.B1,
@@ -574,7 +574,7 @@ internal class VedtakshendelseListenerIT {
         val oppdrag2 = assertStønader(
             15,
             vedtakHendelse,
-            StonadType.OPPFOSTRINGSBIDRAG,
+            Stønadstype.OPPFOSTRINGSBIDRAG,
             2,
             1,
             Transaksjonskode.B1,
@@ -606,7 +606,7 @@ internal class VedtakshendelseListenerIT {
         val oppdrag = assertStønader(
             16,
             vedtakHendelse,
-            StonadType.BIDRAG18AAR,
+            Stønadstype.BIDRAG18AAR,
             3,
             3,
             Transaksjonskode.D1,
@@ -629,7 +629,7 @@ internal class VedtakshendelseListenerIT {
         val oppdrag = assertStønader(
             16,
             vedtakHendelse,
-            StonadType.BIDRAG18AAR,
+            Stønadstype.BIDRAG18AAR,
             4,
             1,
             Transaksjonskode.D1,
@@ -663,7 +663,7 @@ internal class VedtakshendelseListenerIT {
         val oppdrag = assertStønader(
             17,
             vedtakHendelse,
-            StonadType.EKTEFELLEBIDRAG,
+            Stønadstype.EKTEFELLEBIDRAG,
             2,
             2,
             Transaksjonskode.F1,
@@ -686,7 +686,7 @@ internal class VedtakshendelseListenerIT {
         val oppdrag = assertStønader(
             17,
             vedtakHendelse,
-            StonadType.EKTEFELLEBIDRAG,
+            Stønadstype.EKTEFELLEBIDRAG,
             3,
             1,
             Transaksjonskode.F1,
@@ -715,7 +715,7 @@ internal class VedtakshendelseListenerIT {
         val oppdrag = assertStønader(
             18,
             vedtakHendelse,
-            StonadType.MOTREGNING,
+            Stønadstype.MOTREGNING,
             1,
             1,
             Transaksjonskode.I1,
@@ -728,7 +728,7 @@ internal class VedtakshendelseListenerIT {
     private fun assertStønader(
         oppdragId: Int,
         vedtakHendelse: VedtakHendelse,
-        stønadstype: StonadType,
+        stønadstype: Stønadstype,
         antallOppdragsperioder: Int,
         antallOpprettetIGjeldendeFil: Int,
         forventetTransaksjonskode: Transaksjonskode,
@@ -741,23 +741,23 @@ internal class VedtakshendelseListenerIT {
 
         oppdrag.stønadType shouldBe stønadstype.name
         oppdrag.oppdragsperioder.size shouldBe antallOppdragsperioder
-        oppdrag.sakId shouldBe vedtakHendelse.stonadsendringListe!![stonadsendringIndex].sakId
+        oppdrag.sakId shouldBe vedtakHendelse.stønadsendringListe!![stonadsendringIndex].sak.verdi
         oppdrag.oppdragsperioder.subList(antallOppdragsperioder - antallOpprettetIGjeldendeFil, antallOppdragsperioder)
             .forEachIndexed { i: Int, oppdragsperiode: Oppdragsperiode ->
-                oppdragsperiode.vedtaksdato shouldBe vedtakHendelse.vedtakTidspunkt.toLocalDate()
+                oppdragsperiode.vedtaksdato shouldBe vedtakHendelse.vedtakstidspunkt.toLocalDate()
                 oppdragsperiode.vedtakId shouldBe vedtakHendelse.id
-                oppdragsperiode.eksternReferanse shouldBe vedtakHendelse.stonadsendringListe!![stonadsendringIndex].eksternReferanse
+                oppdragsperiode.eksternReferanse shouldBe vedtakHendelse.stønadsendringListe!![stonadsendringIndex].eksternReferanse
                 oppdragsperiode.opprettetAv shouldBe vedtakHendelse.opprettetAv
-                oppdragsperiode.mottakerIdent shouldBe vedtakHendelse.stonadsendringListe!![stonadsendringIndex].mottakerId
+                oppdragsperiode.mottakerIdent shouldBe vedtakHendelse.stønadsendringListe!![stonadsendringIndex].mottaker.verdi
                 oppdragsperiode.delytelseId shouldNotBe null
-                oppdragsperiode.periodeFra shouldBe vedtakHendelse.stonadsendringListe!![stonadsendringIndex].periodeListe[i].fomDato
-                oppdragsperiode.periodeTil shouldBe vedtakHendelse.stonadsendringListe!![stonadsendringIndex].periodeListe[i].tilDato
-                oppdragsperiode.beløp shouldBe vedtakHendelse.stonadsendringListe!![stonadsendringIndex].periodeListe[i].belop
-                oppdragsperiode.valuta shouldBe vedtakHendelse.stonadsendringListe!![stonadsendringIndex].periodeListe[i].valutakode
+                oppdragsperiode.periodeFra shouldBe vedtakHendelse.stønadsendringListe!![stonadsendringIndex].periodeListe[i].periode.fomDato.verdi
+                oppdragsperiode.periodeTil shouldBe vedtakHendelse.stønadsendringListe!![stonadsendringIndex].periodeListe[i].periode.tilDato?.verdi
+                oppdragsperiode.beløp shouldBe vedtakHendelse.stønadsendringListe!![stonadsendringIndex].periodeListe[i].beløp
+                oppdragsperiode.valuta shouldBe vedtakHendelse.stønadsendringListe!![stonadsendringIndex].periodeListe[i].valutakode
 
                 val månederForKontering = finnAlleMånederForKonteringer(
-                    vedtakHendelse.stonadsendringListe!![stonadsendringIndex].periodeListe[i].fomDato,
-                    vedtakHendelse.stonadsendringListe!![stonadsendringIndex].periodeListe[i].tilDato
+                    vedtakHendelse.stønadsendringListe!![stonadsendringIndex].periodeListe[i].periode.fomDato.verdi,
+                    vedtakHendelse.stønadsendringListe!![stonadsendringIndex].periodeListe[i].periode.tilDato?.verdi
                 )
 
                 oppdragsperiode.konteringer.size shouldBe månederForKontering.size
@@ -836,7 +836,7 @@ internal class VedtakshendelseListenerIT {
     private fun assertVedOpprettelseAvEngangsbeløp(
         oppdragId: Int,
         vedtakHendelse: VedtakHendelse,
-        forventetEngangsbeløpType: EngangsbelopType,
+        forventetEngangsbeløpType: Engangsbeløptype,
         forventetTransaksjonskode: Transaksjonskode,
         forventetDelytelsesId: Int,
         søknadstype: Søknadstype,
@@ -846,19 +846,19 @@ internal class VedtakshendelseListenerIT {
             ?: error("Det finnes ingen oppdrag med angitt oppdragsId: $oppdragId")
         assertSoftly {
             oppdrag.stønadType shouldBe forventetEngangsbeløpType.name
-            oppdrag.sakId shouldBe vedtakHendelse.engangsbelopListe!![engangsbeløpIndex].sakId
+            oppdrag.sakId shouldBe vedtakHendelse.engangsbeløpListe!![engangsbeløpIndex].sak.verdi
         }
 
         val oppdragsperiode = oppdrag.oppdragsperioder.first()
         assertSoftly {
-            oppdragsperiode.referanse shouldBe vedtakHendelse.engangsbelopListe!![engangsbeløpIndex].referanse
+            oppdragsperiode.referanse shouldBe vedtakHendelse.engangsbeløpListe!![engangsbeløpIndex].referanse
             oppdragsperiode.oppdrag shouldBeSameInstanceAs oppdrag
             oppdragsperiode.vedtakId shouldBe vedtakHendelse.id
-            oppdragsperiode.beløp shouldBe vedtakHendelse.engangsbelopListe!![engangsbeløpIndex].belop
-            oppdragsperiode.valuta shouldBe vedtakHendelse.engangsbelopListe!![engangsbeløpIndex].valutakode
-            oppdragsperiode.vedtaksdato shouldBe vedtakHendelse.vedtakTidspunkt.toLocalDate()
-            oppdragsperiode.periodeFra shouldBe vedtakHendelse.vedtakTidspunkt.toLocalDate().withDayOfMonth(1)
-            oppdragsperiode.periodeTil shouldBe vedtakHendelse.vedtakTidspunkt.toLocalDate().plusMonths(1)
+            oppdragsperiode.beløp shouldBe vedtakHendelse.engangsbeløpListe!![engangsbeløpIndex].beløp
+            oppdragsperiode.valuta shouldBe vedtakHendelse.engangsbeløpListe!![engangsbeløpIndex].valutakode
+            oppdragsperiode.vedtaksdato shouldBe vedtakHendelse.vedtakstidspunkt.toLocalDate()
+            oppdragsperiode.periodeFra shouldBe vedtakHendelse.vedtakstidspunkt.toLocalDate().withDayOfMonth(1)
+            oppdragsperiode.periodeTil shouldBe vedtakHendelse.vedtakstidspunkt.toLocalDate().plusMonths(1)
                 .withDayOfMonth(1)
             oppdragsperiode.opprettetAv shouldBe vedtakHendelse.opprettetAv
             oppdragsperiode.delytelseId shouldBe forventetDelytelsesId
@@ -867,7 +867,7 @@ internal class VedtakshendelseListenerIT {
         val kontering = hentAlleKonteringerForOppdrag(oppdrag).first()
         assertSoftly {
             kontering.transaksjonskode shouldBe forventetTransaksjonskode.name
-            kontering.overføringsperiode shouldBe YearMonth.from(vedtakHendelse.vedtakTidspunkt.toLocalDate())
+            kontering.overføringsperiode shouldBe YearMonth.from(vedtakHendelse.vedtakstidspunkt.toLocalDate())
                 .toString()
             kontering.type shouldBe Type.NY.name
             kontering.søknadType shouldBe søknadstype.name
@@ -891,16 +891,16 @@ internal class VedtakshendelseListenerIT {
         barn2: String
     ): String {
         return vedtakFil.replace(
-            "\"skyldnerId\": \"\"",
-            "\"skyldnerId\" : \"${PersonidentGenerator.genererFødselsnummer()}\""
+            "\"skyldner\": \"\"",
+            "\"skyldner\" : \"${PersonidentGenerator.genererFødselsnummer()}\""
         )
-            .replace("\"kravhaverId\": \"\"", "\"kravhaverId\" : \"$kravhaverIdent\"")
-            .replace("\"mottakerId\": \"\"", "\"mottakerId\" : \"$mottaker\"")
-            .replace("\"skyldnerId\": \"BP\"", "\"skyldnerId\" : \"$bp\"")
-            .replace("\"skyldnerId\": \"BM\"", "\"skyldnerId\" : \"$bm\"")
-            .replace("\"kravhaverId\": \"BARN1\"", "\"kravhaverId\" : \"$barn1\"")
-            .replace("\"kravhaverId\": \"BARN2\"", "\"kravhaverId\" : \"$barn2\"")
-            .replace("\"mottakerId\": \"BM\"", "\"mottakerId\" : \"$bm\"")
+            .replace("\"kravhaver\": \"\"", "\"kravhaver\" : \"$kravhaverIdent\"")
+            .replace("\"mottaker\": \"\"", "\"mottaker\" : \"$mottaker\"")
+            .replace("\"skyldner\": \"BP\"", "\"skyldner\" : \"$bp\"")
+            .replace("\"skyldner\": \"BM\"", "\"skyldner\" : \"$bm\"")
+            .replace("\"kravhaver\": \"BARN1\"", "\"kravhaver\" : \"$barn1\"")
+            .replace("\"kravhaver\": \"BARN2\"", "\"kravhaver\" : \"$barn2\"")
+            .replace("\"mottaker\": \"BM\"", "\"mottaker\" : \"$bm\"")
     }
 
     private fun hentAlleKonteringerForOppdrag(oppdrag: Oppdrag): List<Kontering> {

@@ -3,32 +3,34 @@
   "type": "FASTSETTELSE",
   "id": "7941",
   "opprettetAv": "F102622",
-  "vedtakTidspunkt": "2022-05-19T00:00:00.000000000",
-  "enhetId": "4806",
-  "utsattTilDato": null,
+  "vedtakstidspunkt": "2022-05-19T00:00:00.000000000",
+  "enhetsnummer": "4806",
+  "innkrevingUtsattTilDato": null,
   "opprettetTidspunkt": "2022-05-19T16:00:23.254988482",
-  "stonadsendringListe": [
+  "stønadsendringListe": [
     {
       "type": "FORSKUDD",
-      "sakId": "2007671",
-      "skyldnerId": "NAV",
-      "kravhaverId": "",
-      "mottakerId": "",
-      "indeksreguleringAar": "2023",
-      "innkreving": "JA",
-      "endring": true,
+      "sak": "2007671",
+      "skyldner": "NAV",
+      "kravhaver": "",
+      "mottaker": "",
+      "førsteIndeksreguleringsår": "2023",
+      "innkreving": "MED_INNKREVING",
+      "beslutning": "ENDRING",
       "periodeListe": [
         {
-          "fomDato": "2022-01-01",
-          "tilDato": "2022-05-01",
-          "belop": 1710.50,
+          "periode": {
+            "fom":"2022-01",
+            "til":"2022-05"
+          },
+          "beløp": 1710.50,
           "valutakode": "NOK",
           "resultatkode": "100"
         }
       ]
     }
   ],
-  "engangsbelopListe": [],
+  "engangsbeløpListe": [],
   "sporingsdata": {
     "correlationId": "12345"
   }

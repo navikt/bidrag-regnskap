@@ -1,6 +1,6 @@
 package no.nav.bidrag.regnskap.fil.avstemning
 
-import no.nav.bidrag.domain.enums.regnskap.Transaksjonskode
+import no.nav.bidrag.domene.enums.regnskap.Transaksjonskode
 import java.math.BigDecimal
 
 data class AvstemmingsfilSummeringer(
