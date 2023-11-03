@@ -1,6 +1,6 @@
 package no.nav.bidrag.regnskap.aop
 
-import io.github.oshai.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.nav.bidrag.commons.security.maskinporten.MaskinportenClientException
 import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException
 import org.springframework.http.HttpHeaders
@@ -55,7 +55,7 @@ class DefaultRestControllerAdvice {
     @ResponseBody
     @ExceptionHandler(MaskinportenClientException::class)
     fun handleMaskinportenClientExcpetion(exception: MaskinportenClientException): ResponseEntity<*> {
-        LOGGER.error("Noe gikk galt ved kall til maskinporten: ${exception.message}}", exception)
+        LOGGER.error(exception) { "Noe gikk galt ved kall til maskinporten: ${exception.message}}" }
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(exception.message)
     }

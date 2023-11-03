@@ -1,6 +1,6 @@
 package no.nav.bidrag.regnskap.hendelse.schedule.krav
 
-import io.github.oshai.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.micrometer.core.instrument.Gauge
 import io.micrometer.core.instrument.MeterRegistry
 import net.javacrumbs.shedlock.core.LockAssert

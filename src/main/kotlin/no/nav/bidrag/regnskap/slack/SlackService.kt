@@ -1,10 +1,9 @@
 package no.nav.bidrag.regnskap.slack
 
 import com.slack.api.Slack
-import io.github.oshai.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
-import java.time.Instant
 
 @Service
 class SlackService(
@@ -24,15 +23,14 @@ class SlackService(
         }
 
         if (response.isOk) {
-            LOGGER.debug("Slack melding sendt: $melding")
+            LOGGER.debug { "Slack melding sendt: $melding" }
         } else {
-            LOGGER.error("Feil ved sending av slackmelding: ${response.error}")
+            LOGGER.error { "Feil ved sending av slackmelding: ${response.error}" }
         }
         return SlackMelding(ts = response.ts, channel = response.channel)
     }
 
     inner class SlackMelding(
-        private val opprettetTidspunkt: Instant = Instant.now(),
         private val ts: String?,
         private val threadTs: String? = ts,
         private val channel: String?
@@ -40,7 +38,7 @@ class SlackService(
 
         fun oppdaterMelding(melding: String) {
             if (ts == null) {
-                LOGGER.warn("Ingen melding å oppdatere...")
+                LOGGER.warn { "Ingen melding å oppdatere..." }
                 return
             }
             val response = Slack.getInstance().methods(oauthToken).chatUpdate {
@@ -49,16 +47,16 @@ class SlackService(
                     .text(melding)
             }
             if (response.isOk) {
-                LOGGER.trace("Slack melding oppdatert: $melding")
+                LOGGER.trace { "Slack melding oppdatert: $melding" }
                 return
             } else {
-                LOGGER.error("Feil ved oppdatering av slackmelding: ${response.error}")
+                LOGGER.error { "Feil ved oppdatering av slackmelding: ${response.error}" }
             }
         }
 
         fun svarITråd(melding: String): SlackMelding {
             if (ts == null) {
-                LOGGER.trace("Ingen melding å svare på...")
+                LOGGER.trace { "Ingen melding å svare på..." }
                 return this
             }
             return sendMelding(melding = melding, threadTs = threadTs)
