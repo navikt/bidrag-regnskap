@@ -1,0 +1,18 @@
+name: Deploy feature
+on:
+  push:
+    branches:
+      - '**'
+      - '!main'
+      - '!dependabot/**'
+
+jobs:
+  build_and_deploy:
+    name: "Build and deploy to feature"
+    permissions:
+      contents: "read"
+      id-token: "write"
+    uses: navikt/bidrag-workflow/.github/workflows/deploy.yaml@mavenOptions
+    secrets: inherit
+    with:
+      maven_options: -B -q -fae -Pit
