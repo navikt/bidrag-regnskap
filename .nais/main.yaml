@@ -28,3 +28,7 @@ env:
   JAVA_OPTS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -XX:MaxRAMPercentage=80.0
   MASKINPORTEN_SCOPES: "nav:bidrag/v1/bidragskrav"
   KONTERINGER_FORELDET_DATO: 2006-04
+  SEND_KRAV_CRON: "0 */10 * * * *" #Hvert 10. minutt
+  BEHANDLINGSSTATUS_CRON: "0 25 * * * *" #Hver time 25 minutter over hel
+  AVSTEMNING_CRON: "0 15 0 * * *" #Hver dag kl 00:15
+  PALOSKJORING_CRON: "0 5 * * * *" #Hver time 5 minutter over hel

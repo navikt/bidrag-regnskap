@@ -28,3 +28,7 @@ env:
   MASKINPORTEN_SCOPES: "nav:bidrag/v1/bidragskrav"
   JAVA_OPTS: -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -XX:MaxRAMPercentage=80.0
   KONTERINGER_FORELDET_DATO: 2006-04
+  SEND_KRAV_CRON: "-" #Deaktivert midlertidig TODO()
+  BEHANDLINGSSTATUS_CRON: "-" #Deaktivert midlertidig TODO()
+  AVSTEMNING_CRON: "-" #Deaktivert midlertidig TODO()
+  PALOSKJORING_CRON: "-" #Deaktivert midlertidig TODO()
