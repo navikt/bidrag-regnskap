@@ -33,7 +33,7 @@ class ManglendeKonteringerService(
         }
         LOGGER.info {
             "TIDSBRUK opprettKonteringerForAlleOppdragsperiodePartisjon: ${System.currentTimeMillis() - startTime}ms, Ledig minne: ${
-                Runtime.getRuntime().freeMemory()
+            Runtime.getRuntime().freeMemory()
             }"
         }
     }

@@ -6,13 +6,13 @@ management:
 
 scheduler:
   sendkrav:
-    cron: "0 */10 * * * *" #Hvert 10. minutt
+    cron: ${SEND_KRAV_CRON}
   behandlingsstatus:
-    cron: "0 25 * * * *" #Hver time 25 minutter over hel
+    cron: ${BEHANDLINGSSTATUS_CRON}
   avstemning:
-    cron: "0 15 0 * * *" #Hver dag kl 00:15
+    cron: ${AVSTEMNING_CRON}
   påløpkjøring:
-    cron: "0 5 * * * *" #Hver time 5 minutter over hel
+    cron: ${PALOSKJORING_CRON}
 
 springdoc:
   packages-to-scan: no.nav.bidrag.regnskap.controller
