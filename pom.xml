@@ -32,7 +32,7 @@
     <jsch.version>0.2.8</jsch.version>
     <testcontainers.version>1.19.1</testcontainers.version>
     <maven-failsafe-plugin.version>3.1.0</maven-failsafe-plugin.version>
-    <spring-kafka.version>3.0.10</spring-kafka.version>
+    <spring-kafka.version>3.0.12</spring-kafka.version>
     <scala.version>2.13.11-M1</scala.version>
     <kotlin-logging-jwv.version>5.1.0</kotlin-logging-jwv.version>
     <slack-api.version>1.29.2</slack-api.version>
