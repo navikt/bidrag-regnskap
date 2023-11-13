@@ -35,7 +35,7 @@
     <spring-kafka.version>3.0.10</spring-kafka.version>
     <scala.version>2.13.11-M1</scala.version>
     <kotlin-logging-jwv.version>5.1.0</kotlin-logging-jwv.version>
-    <slack-api.version>1.29.2</slack-api.version>
+    <slack-api.version>1.35.0</slack-api.version>
     <avro.version>1.11.3</avro.version>
     <avro-serializer.version>7.4.0</avro-serializer.version>
   </properties>
