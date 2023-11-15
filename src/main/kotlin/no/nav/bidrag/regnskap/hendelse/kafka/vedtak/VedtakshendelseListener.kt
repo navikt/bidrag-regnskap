@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JacksonException
 import no.nav.bidrag.regnskap.SECURE_LOGGER
 import no.nav.bidrag.regnskap.service.VedtakshendelseService
 import org.slf4j.LoggerFactory
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
 import org.springframework.kafka.support.KafkaHeaders
@@ -62,6 +63,9 @@ class VedtakshendelseListener(
                     "\nFeil: $e \n\nHendelse: $hendelse"
             )
             throw e
+        } catch (e: DataIntegrityViolationException) {
+            SECURE_LOGGER.error("Fant duplikat av melding basert på delytelsesId for kafkamelding med offsett: $offset, topic: $topic, recieved_partition: $partition, groupId: $groupId \nFeil: $e \nHendelse: $hendelse")
+            acknowledgment.acknowledge()
         }
     }
 
