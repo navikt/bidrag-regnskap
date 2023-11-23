@@ -25,7 +25,7 @@ data class Påløp(
     val fullførtTidspunkt: LocalDateTime? = null,
 
     @Column(name = "for_periode")
-    val forPeriode: String
+    val forPeriode: String,
 ) {
 
     override fun toString(): String {

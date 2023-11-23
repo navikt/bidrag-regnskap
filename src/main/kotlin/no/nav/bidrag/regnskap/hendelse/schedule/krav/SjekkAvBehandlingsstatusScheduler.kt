@@ -22,7 +22,7 @@ class SjekkAvBehandlingsstatusScheduler(
     private val behandlingsstatusService: BehandlingsstatusService,
     private val kravSchedulerUtils: KravSchedulerUtils,
     private val slackService: SlackService,
-    private val meterRegistry: MeterRegistry
+    private val meterRegistry: MeterRegistry,
 ) {
     @Scheduled(cron = "\${scheduler.behandlingsstatus.cron}")
     @SchedulerLock(name = "skedulertSjekkAvBehandlingsstatus")
@@ -51,7 +51,11 @@ class SjekkAvBehandlingsstatusScheduler(
         val feiledeOverføringer: HashMap<String, String> =
             behandlingsstatusService.hentBehandlingsstatusForIkkeGodkjenteKonteringer(konteringerSomIkkeHarFåttGodkjentBehandlingsstatus)
 
-        LOGGER.info { "${konteringerSomIkkeHarFåttGodkjentBehandlingsstatus.size} batchUider har nå fått sjekket behandlingsstatus. (${konteringerSomIkkeHarFåttGodkjentBehandlingsstatus.entries.joinToString(", ") { it.key }})" }
+        LOGGER.info {
+            "${konteringerSomIkkeHarFåttGodkjentBehandlingsstatus.size} batchUider har nå fått sjekket behandlingsstatus. (${konteringerSomIkkeHarFåttGodkjentBehandlingsstatus.entries.joinToString(
+                ", ",
+            ) { it.key }})"
+        }
         if (feiledeOverføringer.isNotEmpty()) {
             val feilmeldingSammenslått = feiledeOverføringer.entries.joinToString("\n") { it.value }
 

@@ -8,7 +8,7 @@ interface PåløpRepository : JpaRepository<Påløp, Int> {
 
     @Query(
         value = "SELECT max(for_periode) FROM palop WHERE fullfort_tidspunkt IS NOT NULL",
-        nativeQuery = true
+        nativeQuery = true,
     )
     fun finnSisteOverførtePeriodeForPåløp(): String?
 

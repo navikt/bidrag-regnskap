@@ -73,14 +73,14 @@ internal class PersistenceServiceIT {
             oppdragTestData.stønadType,
             oppdragTestData.kravhaverIdent,
             oppdragTestData.skyldnerIdent,
-            oppdragTestData.sakId
+            oppdragTestData.sakId,
         )
 
         val oppdragHentetPåUnikeIdentifikatorerUtenTreff = persistenceService.hentOppdragPaUnikeIdentifikatorer(
             oppdragTestData.stønadType,
             "ingentreff",
             oppdragTestData.skyldnerIdent,
-            oppdragTestData.sakId
+            oppdragTestData.sakId,
         )
 
         oppdrag shouldNotBe null
@@ -174,7 +174,7 @@ internal class PersistenceServiceIT {
             TestData.opprettDriftsavvik(tidspunktFra = LocalDateTime.now(), tidspunktTil = LocalDateTime.now().plusMinutes(10))
         val gammeltDriftsavvik = TestData.opprettDriftsavvik(
             tidspunktFra = LocalDateTime.now().minusMinutes(10),
-            tidspunktTil = LocalDateTime.now().minusMinutes(1)
+            tidspunktTil = LocalDateTime.now().minusMinutes(1),
         )
 
         val aktivtDriftsavvikId = persistenceService.lagreDriftsavvik(aktivtDriftsavvik)
@@ -195,13 +195,13 @@ internal class PersistenceServiceIT {
         val påløpId = persistenceService.lagrePåløp(
             TestData.opprettPåløp(
                 forPeriode = "1900-01",
-                fullførtTidspunkt = LocalDateTime.now().minusYears(100)
-            )
+                fullførtTidspunkt = LocalDateTime.now().minusYears(100),
+            ),
         )
         val driftsavvikMedPåløp = TestData.opprettDriftsavvik(
             påløpId = påløpId,
             tidspunktFra = LocalDateTime.now().minusMinutes(10),
-            tidspunktTil = LocalDateTime.now().minusMinutes(1)
+            tidspunktTil = LocalDateTime.now().minusMinutes(1),
         )
         persistenceService.lagreDriftsavvik(driftsavvikMedPåløp)
         val driftsavvikForPåløp = persistenceService.hentDriftsavvikForPåløp(påløpId)

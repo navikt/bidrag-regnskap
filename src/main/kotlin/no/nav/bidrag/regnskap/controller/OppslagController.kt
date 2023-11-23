@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController
 @Protected
 @Tag(name = "Oppslag")
 class OppslagController(
-    private val oppslagService: OppslagService
+    private val oppslagService: OppslagService,
 ) {
 
     @GetMapping("/oppdrag")
@@ -31,7 +31,7 @@ class OppslagController(
         description = "Operasjon for å hente lagrede oppdrag med tilhørende oppdragsperioder og konteringer. " +
             "Oppdraget returneres med alle historiske konteringer og oppdragsperioder. " +
             "Dette endepunktet er ment til bruk ved feilsøking.",
-        security = [SecurityRequirement(name = "bearer-key")]
+        security = [SecurityRequirement(name = "bearer-key")],
     )
     @ApiResponses(
         value = [
@@ -41,15 +41,15 @@ class OppslagController(
                 content = [
                     (
                         Content(
-                            array = (ArraySchema(schema = Schema(implementation = OppdragResponse::class)))
+                            array = (ArraySchema(schema = Schema(implementation = OppdragResponse::class))),
                         )
-                        )
-                ]
+                        ),
+                ],
             ), ApiResponse(
                 responseCode = "204",
-                description = "Oppdraget finnes ikke."
-            )
-        ]
+                description = "Oppdraget finnes ikke.",
+            ),
+        ],
     )
     fun hentOppdrag(oppdragId: Int): ResponseEntity<*> {
         val oppdragResponse = oppslagService.hentOppdrag(oppdragId)
@@ -67,7 +67,7 @@ class OppslagController(
         summary = "Hent alle lagrede oppdrag, oppdragsperioder, konteringer og overførte konteringer for en sak",
         description = "Operasjon for å hente alle lagrede oppdrag med tilhørende oppdragsperioder, konteringer og " +
             "overførte konteringer for en sak.",
-        security = [SecurityRequirement(name = "bearer-key")]
+        security = [SecurityRequirement(name = "bearer-key")],
     )
     @ApiResponses(
         value = [
@@ -77,15 +77,15 @@ class OppslagController(
                 content = [
                     (
                         Content(
-                            array = (ArraySchema(schema = Schema(implementation = OppslagAvOppdragPåSakIdResponse::class)))
+                            array = (ArraySchema(schema = Schema(implementation = OppslagAvOppdragPåSakIdResponse::class))),
                         )
-                        )
-                ]
+                        ),
+                ],
             ), ApiResponse(
                 responseCode = "204",
-                description = "Fant ingenting lagret på saken."
-            )
-        ]
+                description = "Fant ingenting lagret på saken.",
+            ),
+        ],
     )
     fun hentSak(sakId: String): ResponseEntity<*> {
         val sakReponse = oppslagService.hentPåSakId(sakId)

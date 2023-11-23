@@ -13,7 +13,7 @@ constructor(
     val port: Int,
     val privateKey: String,
     val directory: String = "inbound",
-    val skalOverforeFil: Boolean
+    val skalOverforeFil: Boolean,
 ) {
 
     companion object {

@@ -26,7 +26,7 @@ class RestTemplateConfiguration {
     @Scope("prototype")
     fun baseRestTemplate(
         @Value("\${NAIS_APP_NAME}") naisAppName: String,
-        observationRestTemplateCustomizer: ObservationRestTemplateCustomizer
+        observationRestTemplateCustomizer: ObservationRestTemplateCustomizer,
     ): RestTemplate {
         val restTemplate = HttpHeaderRestTemplate()
         restTemplate.requestFactory = HttpComponentsClientHttpRequestFactory()

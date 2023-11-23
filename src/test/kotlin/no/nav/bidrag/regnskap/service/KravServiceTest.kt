@@ -44,7 +44,7 @@ class KravServiceTest {
     fun `skal sende kontering til skatt når oppdragsperioden er innenfor innsendt periode`() {
         every { persistenceService.hentOppdrag(oppdragsId) } returns opprettOppdragForPeriode(
             now.minusMonths(3),
-            now.plusMonths(1)
+            now.plusMonths(1),
         )
         every { skattConsumer.sendKrav(any()) } returns ResponseEntity.accepted().body(batchUid)
 
@@ -57,7 +57,7 @@ class KravServiceTest {
     fun `skal sende kontering om perioden kun er for en måned`() {
         every { persistenceService.hentOppdrag(oppdragsId) } returns opprettOppdragForPeriode(
             now,
-            now.plusMonths(1)
+            now.plusMonths(1),
         )
         every { skattConsumer.sendKrav(any()) } returns ResponseEntity.accepted().body(batchUid)
 
@@ -71,9 +71,9 @@ class KravServiceTest {
         every { persistenceService.hentOppdrag(oppdragsId) } returns TestData.opprettOppdrag(
             oppdragsperioder = listOf(
                 TestData.opprettOppdragsperiode(
-                    konteringer = listOf(TestData.opprettKontering(overforingstidspunkt = LocalDateTime.now()))
-                )
-            )
+                    konteringer = listOf(TestData.opprettKontering(overforingstidspunkt = LocalDateTime.now())),
+                ),
+            ),
         )
 
         kravService.sendKrav(listOf(oppdragsId))
@@ -84,7 +84,7 @@ class KravServiceTest {
     @Test
     fun `skal ikke sende konteringer som er utsatt`() {
         every { persistenceService.hentOppdrag(oppdragsId) } returns TestData.opprettOppdrag(
-            utsattTilDato = LocalDate.now().plusDays(1)
+            utsattTilDato = LocalDate.now().plusDays(1),
         )
 
         kravService.sendKrav(listOf(oppdragsId))
@@ -96,7 +96,7 @@ class KravServiceTest {
     fun `skal sende konteringer hvor utsatt dato er passert`() {
         val oppdrag = opprettOppdragForPeriode(
             now.minusMonths(3),
-            now.plusMonths(1)
+            now.plusMonths(1),
         )
         oppdrag.utsattTilDato = LocalDate.now().minusDays(1)
 
@@ -112,14 +112,16 @@ class KravServiceTest {
     fun `skal ikke sende konteringer hvor det finnes ikke godkjente overføringer`() {
         val oppdrag = opprettOppdragForPeriode(
             now.minusMonths(3),
-            now.plusMonths(1)
+            now.plusMonths(1),
         )
         val refernsekode = "test"
 
         oppdrag.oppdragsperioder.first().konteringer.first().sisteReferansekode = refernsekode
 
         every { persistenceService.hentOppdrag(oppdragsId) } returns oppdrag
-        every { behandlingsstatusService.hentBehandlingsstatusForIkkeGodkjenteKonteringerForReferansekode(listOf(refernsekode)) } returns hashMapOf(Pair("batchUid", "FEIL"), Pair("batchuid2", "FEIL2"))
+        every {
+            behandlingsstatusService.hentBehandlingsstatusForIkkeGodkjenteKonteringerForReferansekode(listOf(refernsekode))
+        } returns hashMapOf(Pair("batchUid", "FEIL"), Pair("batchuid2", "FEIL2"))
 
         kravService.sendKrav(listOf(oppdragsId))
 
@@ -144,16 +146,61 @@ class KravServiceTest {
         val nav = "80000345435"
 
         val bidragOppdrag = TestData.opprettOppdrag(oppdragId = 1, skyldnerIdent = bp, kravhaverIdent = bm, gjelderIdent = barn, sakId = "123456")
-        val gebyrBpOppdrag = TestData.opprettOppdrag(stonadType = null, engangsbelopType = Engangsbeløptype.GEBYR_SKYLDNER, oppdragId = 2, skyldnerIdent = bp, kravhaverIdent = nav, gjelderIdent = bp, sakId = "123456")
-        val gebyrBmOppdrag = TestData.opprettOppdrag(stonadType = null, engangsbelopType = Engangsbeløptype.GEBYR_MOTTAKER, oppdragId = 3, skyldnerIdent = bm, kravhaverIdent = nav, gjelderIdent = bm, sakId = "123456")
+        val gebyrBpOppdrag = TestData.opprettOppdrag(
+            stonadType = null,
+            engangsbelopType = Engangsbeløptype.GEBYR_SKYLDNER,
+            oppdragId = 2,
+            skyldnerIdent = bp,
+            kravhaverIdent = nav,
+            gjelderIdent = bp,
+            sakId = "123456",
+        )
+        val gebyrBmOppdrag = TestData.opprettOppdrag(
+            stonadType = null,
+            engangsbelopType = Engangsbeløptype.GEBYR_MOTTAKER,
+            oppdragId = 3,
+            skyldnerIdent = bm,
+            kravhaverIdent = nav,
+            gjelderIdent = bm,
+            sakId = "123456",
+        )
 
-        val bidragOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = bidragOppdrag, oppdragsperiodeId = 1, mottakerIdent = bm, periodeTil = null)
-        val gebyrBpOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = gebyrBpOppdrag, oppdragsperiodeId = 2, mottakerIdent = nav, periodeFra = LocalDate.now())
-        val gebyrBmOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = gebyrBmOppdrag, oppdragsperiodeId = 3, mottakerIdent = nav, periodeFra = LocalDate.now())
+        val bidragOppdragsperiode = TestData.opprettOppdragsperiode(
+            oppdrag = bidragOppdrag,
+            oppdragsperiodeId = 1,
+            mottakerIdent = bm,
+            periodeTil = null,
+        )
+        val gebyrBpOppdragsperiode = TestData.opprettOppdragsperiode(
+            oppdrag = gebyrBpOppdrag,
+            oppdragsperiodeId = 2,
+            mottakerIdent = nav,
+            periodeFra = LocalDate.now(),
+        )
+        val gebyrBmOppdragsperiode = TestData.opprettOppdragsperiode(
+            oppdrag = gebyrBmOppdrag,
+            oppdragsperiodeId = 3,
+            mottakerIdent = nav,
+            periodeFra = LocalDate.now(),
+        )
 
-        val bidragKontering = TestData.opprettKontering(oppdragsperiode = bidragOppdragsperiode, konteringId = 1, transaksjonskode = Transaksjonskode.B1.name)
-        val gebyrBpKontering = TestData.opprettKontering(oppdragsperiode = gebyrBpOppdragsperiode, konteringId = 2, transaksjonskode = Transaksjonskode.G1.name, søknadstype = Søknadstype.FABP.name)
-        val gebyrBmKontering = TestData.opprettKontering(oppdragsperiode = gebyrBmOppdragsperiode, konteringId = 3, transaksjonskode = Transaksjonskode.G1.name, søknadstype = Søknadstype.FABM.name)
+        val bidragKontering = TestData.opprettKontering(
+            oppdragsperiode = bidragOppdragsperiode,
+            konteringId = 1,
+            transaksjonskode = Transaksjonskode.B1.name,
+        )
+        val gebyrBpKontering = TestData.opprettKontering(
+            oppdragsperiode = gebyrBpOppdragsperiode,
+            konteringId = 2,
+            transaksjonskode = Transaksjonskode.G1.name,
+            søknadstype = Søknadstype.FABP.name,
+        )
+        val gebyrBmKontering = TestData.opprettKontering(
+            oppdragsperiode = gebyrBmOppdragsperiode,
+            konteringId = 3,
+            transaksjonskode = Transaksjonskode.G1.name,
+            søknadstype = Søknadstype.FABM.name,
+        )
 
         bidragOppdragsperiode.konteringer = listOf(bidragKontering)
         gebyrBpOppdragsperiode.konteringer = listOf(gebyrBpKontering)
@@ -180,16 +227,62 @@ class KravServiceTest {
         val nav = "80000345435"
 
         val bidragOppdrag = TestData.opprettOppdrag(oppdragId = 1, skyldnerIdent = bp, kravhaverIdent = bm, gjelderIdent = barn, sakId = "123456")
-        val gebyrBpOppdrag = TestData.opprettOppdrag(stonadType = null, engangsbelopType = Engangsbeløptype.GEBYR_SKYLDNER, oppdragId = 2, skyldnerIdent = bp, kravhaverIdent = nav, gjelderIdent = bp, sakId = "123456")
-        val gebyrBmOppdrag = TestData.opprettOppdrag(stonadType = null, engangsbelopType = Engangsbeløptype.GEBYR_MOTTAKER, oppdragId = 3, skyldnerIdent = bm, kravhaverIdent = nav, gjelderIdent = bm, sakId = "123456")
+        val gebyrBpOppdrag = TestData.opprettOppdrag(
+            stonadType = null,
+            engangsbelopType = Engangsbeløptype.GEBYR_SKYLDNER,
+            oppdragId = 2,
+            skyldnerIdent = bp,
+            kravhaverIdent = nav,
+            gjelderIdent = bp,
+            sakId = "123456",
+        )
+        val gebyrBmOppdrag = TestData.opprettOppdrag(
+            stonadType = null,
+            engangsbelopType = Engangsbeløptype.GEBYR_MOTTAKER,
+            oppdragId = 3,
+            skyldnerIdent = bm,
+            kravhaverIdent = nav,
+            gjelderIdent = bm,
+            sakId = "123456",
+        )
 
-        val bidragOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = bidragOppdrag, vedtakId = 123456, oppdragsperiodeId = 1, mottakerIdent = bm, periodeTil = null)
-        val gebyrBpOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = gebyrBpOppdrag, oppdragsperiodeId = 2, mottakerIdent = nav, periodeFra = LocalDate.now())
-        val gebyrBmOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = gebyrBmOppdrag, oppdragsperiodeId = 3, mottakerIdent = nav, periodeFra = LocalDate.now())
+        val bidragOppdragsperiode = TestData.opprettOppdragsperiode(
+            oppdrag = bidragOppdrag,
+            vedtakId = 123456,
+            oppdragsperiodeId = 1,
+            mottakerIdent = bm,
+            periodeTil = null,
+        )
+        val gebyrBpOppdragsperiode = TestData.opprettOppdragsperiode(
+            oppdrag = gebyrBpOppdrag,
+            oppdragsperiodeId = 2,
+            mottakerIdent = nav,
+            periodeFra = LocalDate.now(),
+        )
+        val gebyrBmOppdragsperiode = TestData.opprettOppdragsperiode(
+            oppdrag = gebyrBmOppdrag,
+            oppdragsperiodeId = 3,
+            mottakerIdent = nav,
+            periodeFra = LocalDate.now(),
+        )
 
-        val bidragKontering = TestData.opprettKontering(oppdragsperiode = bidragOppdragsperiode, konteringId = 1, transaksjonskode = Transaksjonskode.B1.name)
-        val gebyrBpKontering = TestData.opprettKontering(oppdragsperiode = gebyrBpOppdragsperiode, konteringId = 2, transaksjonskode = Transaksjonskode.G1.name, søknadstype = Søknadstype.FABP.name)
-        val gebyrBmKontering = TestData.opprettKontering(oppdragsperiode = gebyrBmOppdragsperiode, konteringId = 3, transaksjonskode = Transaksjonskode.G1.name, søknadstype = Søknadstype.FABM.name)
+        val bidragKontering = TestData.opprettKontering(
+            oppdragsperiode = bidragOppdragsperiode,
+            konteringId = 1,
+            transaksjonskode = Transaksjonskode.B1.name,
+        )
+        val gebyrBpKontering = TestData.opprettKontering(
+            oppdragsperiode = gebyrBpOppdragsperiode,
+            konteringId = 2,
+            transaksjonskode = Transaksjonskode.G1.name,
+            søknadstype = Søknadstype.FABP.name,
+        )
+        val gebyrBmKontering = TestData.opprettKontering(
+            oppdragsperiode = gebyrBmOppdragsperiode,
+            konteringId = 3,
+            transaksjonskode = Transaksjonskode.G1.name,
+            søknadstype = Søknadstype.FABM.name,
+        )
 
         bidragOppdragsperiode.konteringer = listOf(bidragKontering)
         gebyrBpOppdragsperiode.konteringer = listOf(gebyrBpKontering)
@@ -216,16 +309,67 @@ class KravServiceTest {
         val nav = "80000345435"
 
         val bidragOppdrag = TestData.opprettOppdrag(oppdragId = 1, skyldnerIdent = bp, kravhaverIdent = bm, gjelderIdent = barn, sakId = "123456")
-        val gebyrBpOppdrag = TestData.opprettOppdrag(stonadType = null, engangsbelopType = Engangsbeløptype.GEBYR_SKYLDNER, oppdragId = 2, skyldnerIdent = bp, kravhaverIdent = nav, gjelderIdent = bp, sakId = "123456")
-        val gebyrBmOppdrag = TestData.opprettOppdrag(stonadType = null, engangsbelopType = Engangsbeløptype.GEBYR_MOTTAKER, oppdragId = 3, skyldnerIdent = bm, kravhaverIdent = nav, gjelderIdent = bm, sakId = "123456")
+        val gebyrBpOppdrag = TestData.opprettOppdrag(
+            stonadType = null,
+            engangsbelopType = Engangsbeløptype.GEBYR_SKYLDNER,
+            oppdragId = 2,
+            skyldnerIdent = bp,
+            kravhaverIdent = nav,
+            gjelderIdent = bp,
+            sakId = "123456",
+        )
+        val gebyrBmOppdrag = TestData.opprettOppdrag(
+            stonadType = null,
+            engangsbelopType = Engangsbeløptype.GEBYR_MOTTAKER,
+            oppdragId = 3,
+            skyldnerIdent = bm,
+            kravhaverIdent = nav,
+            gjelderIdent = bm,
+            sakId = "123456",
+        )
 
-        val bidragOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = bidragOppdrag, vedtakId = 123456, oppdragsperiodeId = 1, mottakerIdent = bm, periodeTil = null)
-        val gebyrBpOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = gebyrBpOppdrag, vedtakId = 12345, oppdragsperiodeId = 2, mottakerIdent = nav, periodeFra = LocalDate.now())
-        val gebyrBmOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = gebyrBmOppdrag, vedtakId = 1234, oppdragsperiodeId = 3, mottakerIdent = nav, periodeFra = LocalDate.now())
+        val bidragOppdragsperiode = TestData.opprettOppdragsperiode(
+            oppdrag = bidragOppdrag,
+            vedtakId = 123456,
+            oppdragsperiodeId = 1,
+            mottakerIdent = bm,
+            periodeTil = null,
+        )
+        val gebyrBpOppdragsperiode = TestData.opprettOppdragsperiode(
+            oppdrag = gebyrBpOppdrag,
+            vedtakId = 12345,
+            oppdragsperiodeId = 2,
+            mottakerIdent = nav,
+            periodeFra = LocalDate.now(),
+        )
+        val gebyrBmOppdragsperiode = TestData.opprettOppdragsperiode(
+            oppdrag = gebyrBmOppdrag,
+            vedtakId = 1234,
+            oppdragsperiodeId = 3,
+            mottakerIdent = nav,
+            periodeFra = LocalDate.now(),
+        )
 
-        val bidragKontering = TestData.opprettKontering(oppdragsperiode = bidragOppdragsperiode, konteringId = 1, transaksjonskode = Transaksjonskode.B1.name, vedtakId = 3)
-        val gebyrBpKontering = TestData.opprettKontering(oppdragsperiode = gebyrBpOppdragsperiode, konteringId = 2, transaksjonskode = Transaksjonskode.G1.name, søknadstype = Søknadstype.FABP.name, vedtakId = 2)
-        val gebyrBmKontering = TestData.opprettKontering(oppdragsperiode = gebyrBmOppdragsperiode, konteringId = 3, transaksjonskode = Transaksjonskode.G1.name, søknadstype = Søknadstype.FABM.name, vedtakId = 1)
+        val bidragKontering = TestData.opprettKontering(
+            oppdragsperiode = bidragOppdragsperiode,
+            konteringId = 1,
+            transaksjonskode = Transaksjonskode.B1.name,
+            vedtakId = 3,
+        )
+        val gebyrBpKontering = TestData.opprettKontering(
+            oppdragsperiode = gebyrBpOppdragsperiode,
+            konteringId = 2,
+            transaksjonskode = Transaksjonskode.G1.name,
+            søknadstype = Søknadstype.FABP.name,
+            vedtakId = 2,
+        )
+        val gebyrBmKontering = TestData.opprettKontering(
+            oppdragsperiode = gebyrBmOppdragsperiode,
+            konteringId = 3,
+            transaksjonskode = Transaksjonskode.G1.name,
+            søknadstype = Søknadstype.FABM.name,
+            vedtakId = 1,
+        )
 
         bidragOppdragsperiode.konteringer = listOf(bidragKontering)
         gebyrBpOppdragsperiode.konteringer = listOf(gebyrBpKontering)
@@ -235,7 +379,9 @@ class KravServiceTest {
         gebyrBpOppdrag.oppdragsperioder = listOf(gebyrBpOppdragsperiode)
         gebyrBmOppdrag.oppdragsperioder = listOf(gebyrBmOppdragsperiode)
 
-        val oppdragsperioderMedIkkeOverførteKonteringerListe = listOf(bidragOppdrag, gebyrBmOppdrag, gebyrBpOppdrag).flatMap { kravService.hentOppdragsperioderMedIkkeOverførteKonteringer(it) }
+        val oppdragsperioderMedIkkeOverførteKonteringerListe = listOf(bidragOppdrag, gebyrBmOppdrag, gebyrBpOppdrag).flatMap {
+            kravService.hentOppdragsperioderMedIkkeOverførteKonteringer(it)
+        }
 
         val kravliste = kravService.opprettKravliste(oppdragsperioderMedIkkeOverførteKonteringerListe)
 
@@ -254,12 +400,12 @@ class KravServiceTest {
                     konteringer = listOf(
                         TestData.opprettKontering(
                             oppdragsperiode = TestData.opprettOppdragsperiode(
-                                oppdrag = TestData.opprettOppdrag()
-                            )
-                        )
-                    )
-                )
-            )
+                                oppdrag = TestData.opprettOppdrag(),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
         )
     }
 }

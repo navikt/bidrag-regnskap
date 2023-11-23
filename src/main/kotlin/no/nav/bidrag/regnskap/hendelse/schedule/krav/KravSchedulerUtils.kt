@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component
 @Component
 class KravSchedulerUtils(
     private val kravService: KravService,
-    private val persistenceService: PersistenceService
+    private val persistenceService: PersistenceService,
 ) {
 
     fun erVedlikeholdsmodusPåslått(): Boolean {

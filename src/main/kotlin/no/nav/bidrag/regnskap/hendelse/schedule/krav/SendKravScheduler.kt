@@ -22,7 +22,7 @@ private val LOGGER = KotlinLogging.logger { }
 class SendKravScheduler(
     private val persistenceService: PersistenceService,
     private val kravService: KravService,
-    private val kravSchedulerUtils: KravSchedulerUtils
+    private val kravSchedulerUtils: KravSchedulerUtils,
 ) {
 
     companion object {

@@ -15,7 +15,7 @@ class OppdragService(
     private val persistenceService: PersistenceService,
     private val oppdragsperiodeService: OppdragsperiodeService,
     private val konteringService: KonteringService,
-    private val sakConsumer: SakConsumer
+    private val sakConsumer: SakConsumer,
 ) {
 
     @Transactional
@@ -40,14 +40,19 @@ class OppdragService(
             val oppdragsperiode = oppdragsperiodeService.opprettNyOppdragsperiode(hendelse, periode, oppdrag)
             if (erOppdatering) {
                 konteringService.opprettKorreksjonskonteringer(oppdrag, oppdragsperiode, sisteOverførtePeriode, hendelse)
-                konteringService.opprettManglendeKonteringerVedOppstartAvOpphørtOppdragsperiode(oppdrag, oppdragsperiode, sisteOverførtePeriode, hendelse)
+                konteringService.opprettManglendeKonteringerVedOppstartAvOpphørtOppdragsperiode(
+                    oppdrag,
+                    oppdragsperiode,
+                    sisteOverførtePeriode,
+                    hendelse,
+                )
             }
             oppdragsperiodeService.settAktivTilDatoPåEksisterendeOppdragsperioder(oppdrag, oppdragsperiode.periodeFra)
             oppdrag.oppdragsperioder = oppdrag.oppdragsperioder.plus(oppdragsperiode)
             konteringService.opprettNyeKonteringerPåOppdragsperiode(
                 oppdragsperiode,
                 hendelse,
-                sisteOverførtePeriode
+                sisteOverførtePeriode,
             )
         }
 
@@ -67,7 +72,7 @@ class OppdragService(
                 hendelse.type,
                 hendelse.kravhaverIdent,
                 hendelse.skyldnerIdent,
-                hendelse.sakId
+                hendelse.sakId,
             )
         }
         return null
@@ -81,7 +86,7 @@ class OppdragService(
             kravhaverIdent = hendelse.kravhaverIdent,
             skyldnerIdent = hendelse.skyldnerIdent,
             gjelderIdent = sakConsumer.hentBmFraSak(hendelse.sakId),
-            utsattTilDato = hendelse.utsattTilDato
+            utsattTilDato = hendelse.utsattTilDato,
         )
     }
 

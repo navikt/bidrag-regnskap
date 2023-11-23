@@ -16,7 +16,7 @@ object PeriodeUtils {
     fun hentAllePerioderMellomDato(
         periodeFraForOppdragsperiode: LocalDate,
         periodeTilForOppdragsperiode: LocalDate?,
-        sisteOverførtePeriode: YearMonth
+        sisteOverførtePeriode: YearMonth,
     ): List<YearMonth> {
         val sisteOverførtePeriodeDato =
             LocalDate.of(sisteOverførtePeriode.year, sisteOverførtePeriode.month, 1).plusMonths(1)
@@ -39,16 +39,13 @@ object PeriodeUtils {
         return Stream.iterate(periodeFraForOppdragsperiode) { date: LocalDate -> date.plusMonths(1) }.limit(
             ChronoUnit.MONTHS.between(
                 periodeFraForOppdragsperiode,
-                periodeTil
-            )
+                periodeTil,
+            ),
         ).map { it.format(DateTimeFormatter.ofPattern("yyyy-MM")) }.map { YearMonth.parse(it) }
             .collect(Collectors.toList())
     }
 
-    fun erFørsteDatoSammeSomEllerTidligereEnnAndreDato(
-        førsteDato: LocalDate?,
-        andreDato: LocalDate
-    ): Boolean {
+    fun erFørsteDatoSammeSomEllerTidligereEnnAndreDato(førsteDato: LocalDate?, andreDato: LocalDate): Boolean {
         return førsteDato != null && (førsteDato.isBefore(andreDato) || førsteDato.isEqual(andreDato))
     }
 }

@@ -35,12 +35,12 @@ private val objectMapper = jacksonObjectMapper().registerModule(JavaTimeModule()
 class KravService(
     private val skattConsumer: SkattConsumer,
     private val persistenceService: PersistenceService,
-    private val behandlingsstatusService: BehandlingsstatusService
+    private val behandlingsstatusService: BehandlingsstatusService,
 ) {
 
     @Transactional(
         noRollbackFor = [HttpClientErrorException::class, HttpServerErrorException::class, JwtTokenUnauthorizedException::class],
-        propagation = Propagation.REQUIRES_NEW
+        propagation = Propagation.REQUIRES_NEW,
     )
     fun sendKrav(oppdragIdListe: List<Int>) {
         val oppdragListe = oppdragIdListe.mapNotNull { persistenceService.hentOppdrag(it) }.toMutableList()
@@ -61,7 +61,7 @@ class KravService(
                 try {
                     feiledeOverføringer =
                         behandlingsstatusService.hentBehandlingsstatusForIkkeGodkjenteKonteringerForReferansekode(
-                            hentSisteReferansekoder(oppdrag)
+                            hentSisteReferansekoder(oppdrag),
                         )
                 } catch (e: Exception) {
                     LOGGER.error("Noe gikk galt ved kall mot behandlingsstatus! ${e.stackTrace}")
@@ -70,7 +70,9 @@ class KravService(
 
                 if (feiledeOverføringer.isNotEmpty()) {
                     val feilmeldingSammenslått = feiledeOverføringer.entries.joinToString("\n") { it.value }
-                    LOGGER.error("Det har oppstått feil ved overføring av krav for oppdrag ${oppdrag.oppdragId} på følgende batchUider med følgende feilmelding:\n $feilmeldingSammenslått")
+                    LOGGER.error(
+                        "Det har oppstått feil ved overføring av krav for oppdrag ${oppdrag.oppdragId} på følgende batchUider med følgende feilmelding:\n $feilmeldingSammenslått",
+                    )
                     return
                 }
             }
@@ -95,7 +97,7 @@ class KravService(
             lagreOverføringAvKrav(
                 skattResponse,
                 finnAlleIkkeOverførteKonteringer(oppdragsperioderMedIkkeOverførteKonteringerListe),
-                oppdragListe
+                oppdragListe,
             )
         } catch (e: Exception) {
             LOGGER.error("Kallet mot skatt feilet på noe uventet! Feil: ${e.message}, stacktrace: ${e.stackTraceToString()}")
@@ -104,19 +106,17 @@ class KravService(
         LOGGER.info("Overføring til skatt fullført for oppdrag: $oppdragIdListe")
     }
 
-    private fun hentSisteReferansekoder(oppdrag: Oppdrag) =
-        oppdrag.oppdragsperioder.flatMap { oppdragsperiode ->
-            oppdragsperiode.konteringer.flatMap { kontering ->
-                listOfNotNull(kontering.sisteReferansekode)
-            }
-        }.distinct()
-
-    private fun harOppdragFeiledeOverføringer(oppdrag: Oppdrag) =
-        oppdrag.oppdragsperioder.any { oppdragsperiode ->
-            oppdragsperiode.konteringer.any { kontering ->
-                kontering.behandlingsstatusOkTidspunkt == null && kontering.sisteReferansekode != null
-            }
+    private fun hentSisteReferansekoder(oppdrag: Oppdrag) = oppdrag.oppdragsperioder.flatMap { oppdragsperiode ->
+        oppdragsperiode.konteringer.flatMap { kontering ->
+            listOfNotNull(kontering.sisteReferansekode)
         }
+    }.distinct()
+
+    private fun harOppdragFeiledeOverføringer(oppdrag: Oppdrag) = oppdrag.oppdragsperioder.any { oppdragsperiode ->
+        oppdragsperiode.konteringer.any { kontering ->
+            kontering.behandlingsstatusOkTidspunkt == null && kontering.sisteReferansekode != null
+        }
+    }
 
     fun opprettKravliste(oppdragsperioderMedIkkeOverførteKonteringerListe: List<Oppdragsperiode>): Kravliste {
         // Gruperer alle oppdragene på vedtakId for å sende over oppdrag knyttet til en vedtakId om gangen,
@@ -128,15 +128,11 @@ class KravService(
                 .mapValues { entry ->
                     entry.value.sortedBy { kontering -> kontering.vedtakId }
                 }.toSortedMap()
-                .map { opprettKravKonteringListe(it.value) }
+                .map { opprettKravKonteringListe(it.value) },
         )
     }
 
-    private fun lagreOverføringAvKrav(
-        skattResponse: ResponseEntity<String>,
-        alleIkkeOverførteKonteringer: List<Kontering>,
-        oppdrag: List<Oppdrag>
-    ) {
+    private fun lagreOverføringAvKrav(skattResponse: ResponseEntity<String>, alleIkkeOverførteKonteringer: List<Kontering>, oppdrag: List<Oppdrag>) {
         try {
             when (skattResponse.statusCode) {
                 HttpStatus.ACCEPTED -> {
@@ -154,14 +150,14 @@ class KravService(
                     LOGGER.error(
                         "Skatt svarte med uventet statuskode: ${skattResponse.statusCode}. " +
                             "Tjenesten hos skatt er slått av. Dette kan skje enten ved innlesing av påløpsfil eller ved andre uventede feil. " +
-                            "Feilmelding: ${skattResponse.body}"
+                            "Feilmelding: ${skattResponse.body}",
                     )
                 }
 
                 HttpStatus.UNAUTHORIZED, HttpStatus.FORBIDDEN -> {
                     LOGGER.error(
                         "Skatt svarte med uventet statuskode: ${skattResponse.statusCode}. " +
-                            "Bidrag-Regnskap er ikke autorisert eller mangler rettigheter for kallet mot skatt. Feilmelding: ${skattResponse.body}"
+                            "Bidrag-Regnskap er ikke autorisert eller mangler rettigheter for kallet mot skatt. Feilmelding: ${skattResponse.body}",
                     )
                 }
 
@@ -178,11 +174,7 @@ class KravService(
         return skattConsumer.hentStatusPåVedlikeholdsmodus().statusCode == HttpStatus.SERVICE_UNAVAILABLE
     }
 
-    private fun lagreVellykketOverføringAvKrav(
-        alleIkkeOverforteKonteringer: List<Kontering>,
-        kravResponse: KravResponse,
-        oppdrag: List<Oppdrag>
-    ) {
+    private fun lagreVellykketOverføringAvKrav(alleIkkeOverforteKonteringer: List<Kontering>, kravResponse: KravResponse, oppdrag: List<Oppdrag>) {
         alleIkkeOverforteKonteringer.forEach { kontering ->
             val now = LocalDateTime.now()
             kontering.overføringstidspunkt = now
@@ -202,7 +194,14 @@ class KravService(
                     kravhaverIdent = kontering.oppdragsperiode.oppdrag!!.kravhaverIdent,
                     mottakerIdent = kontering.oppdragsperiode.mottakerIdent,
                     skyldnerIdent = kontering.oppdragsperiode.oppdrag.skyldnerIdent,
-                    belop = if (Transaksjonskode.valueOf(kontering.transaksjonskode).negativtBeløp) kontering.oppdragsperiode.beløp.negate() else kontering.oppdragsperiode.beløp,
+                    belop = if (Transaksjonskode.valueOf(
+                            kontering.transaksjonskode,
+                        ).negativtBeløp
+                    ) {
+                        kontering.oppdragsperiode.beløp.negate()
+                    } else {
+                        kontering.oppdragsperiode.beløp
+                    },
                     valuta = kontering.oppdragsperiode.valuta,
                     periode = kontering.overføringsperiode,
                     vedtaksdato = kontering.oppdragsperiode.vedtaksdato.toString(),
@@ -211,15 +210,13 @@ class KravService(
                     attestantId = kontering.oppdragsperiode.opprettetAv,
                     tekst = kontering.oppdragsperiode.eksternReferanse,
                     fagsystemId = kontering.oppdragsperiode.oppdrag.sakId,
-                    delytelsesId = kontering.oppdragsperiode.delytelseId.toString()
+                    delytelsesId = kontering.oppdragsperiode.delytelseId.toString(),
                 )
-            }
+            },
         )
     }
 
-    fun hentOppdragsperioderMedIkkeOverførteKonteringer(
-        oppdrag: Oppdrag
-    ): List<Oppdragsperiode> {
+    fun hentOppdragsperioderMedIkkeOverførteKonteringer(oppdrag: Oppdrag): List<Oppdragsperiode> {
         return oppdrag.oppdragsperioder.filter { finnesDetIkkeOverførteKonteringer(it) }
     }
 

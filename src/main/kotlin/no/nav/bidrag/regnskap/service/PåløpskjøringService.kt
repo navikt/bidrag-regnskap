@@ -23,7 +23,7 @@ import java.util.function.Consumer
 
 private val LOGGER = LoggerFactory.getLogger(PåløpskjøringService::class.java)
 
-private const val partisjonStørrelse = 1000
+private const val PARTISJONSSTØRRELSE = 1000
 
 @Service
 class PåløpskjøringService(
@@ -34,7 +34,7 @@ class PåløpskjøringService(
     private val filoverføringTilElinKlient: FiloverføringTilElinKlient,
     private val skattConsumer: SkattConsumer,
     private val meterRegistry: MeterRegistry,
-    @Autowired(required = false) private val lyttere: List<PåløpskjøringLytter> = emptyList()
+    @Autowired(required = false) private val lyttere: List<PåløpskjøringLytter> = emptyList(),
 ) {
 
     @Transactional
@@ -54,7 +54,7 @@ class PåløpskjøringService(
             if (genererFil) {
                 endreElinVedlikeholdsmodus(
                     Årsakskode.PAALOEP_GENERERES,
-                    "Påløp for ${påløp.forPeriode} genereres hos NAV."
+                    "Påløp for ${påløp.forPeriode} genereres hos NAV.",
                 )
             }
             opprettKonteringerForAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer(påløp)
@@ -67,7 +67,7 @@ class PåløpskjøringService(
             if (genererFil) {
                 endreElinVedlikeholdsmodus(
                     Årsakskode.PAALOEP_LEVERT,
-                    "Påløp for ${påløp.forPeriode} er ferdig generert fra NAV."
+                    "Påløp for ${påløp.forPeriode} er ferdig generert fra NAV.",
                 )
             }
             medLyttere { it.påløpFullført(påløp) }
@@ -91,8 +91,8 @@ class PåløpskjøringService(
             persistenceService.lagreDriftsavvik(
                 opprettDriftsavvik(
                     påløp,
-                    schedulertKjøring
-                )
+                    schedulertKjøring,
+                ),
             )
         }
     }
@@ -102,7 +102,7 @@ class PåløpskjøringService(
             påløpId = påløp.påløpId,
             tidspunktFra = LocalDateTime.now(),
             opprettetAv = if (schedulertKjøring) "Automatisk påløpskjøringer" else "Manuel påløpskjøring (REST)",
-            årsak = "Påløpskjøring"
+            årsak = "Påløpskjøring",
         )
     }
 
@@ -118,10 +118,10 @@ class PåløpskjøringService(
 
         medLyttere { it.rapporterOppdragsperioderBehandlet(påløp, antallBehandlet, oppdragsperioder.size) }
 
-        Lists.partition(oppdragsperioder, partisjonStørrelse).forEach { oppdragsperiodeIds ->
+        Lists.partition(oppdragsperioder, PARTISJONSSTØRRELSE).forEach { oppdragsperiodeIds ->
             manglendeKonteringerService.opprettKonteringerForAlleOppdragsperiodePartisjon(
                 påløpsPeriode,
-                oppdragsperiodeIds
+                oppdragsperiodeIds,
             )
 
             antallBehandlet += oppdragsperiodeIds.size
@@ -144,7 +144,7 @@ class PåløpskjøringService(
 
         LOGGER.info("Starter å sette overføringstidspunkt konteringer.")
         val konteringer = ArrayList(persistenceService.hentAlleIkkeOverførteKonteringer())
-        Lists.partition(konteringer, partisjonStørrelse).forEach { konteringerPartition ->
+        Lists.partition(konteringer, PARTISJONSSTØRRELSE).forEach { konteringerPartition ->
             konteringerPartition.forEach {
                 it.overføringstidspunkt = timestamp
                 it.behandlingsstatusOkTidspunkt = timestamp

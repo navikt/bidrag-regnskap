@@ -17,7 +17,7 @@ private val LOGGER = LoggerFactory.getLogger(AvstemmingsfilGenerator::class.java
 @Component
 class AvstemmingsfilGenerator(
     private val gcpFilBucket: GcpFilBucket,
-    private val filoverføringTilElinKlient: FiloverføringTilElinKlient
+    private val filoverføringTilElinKlient: FiloverføringTilElinKlient,
 ) {
 
     fun skrivAvstemmingsfil(konteringer: List<Kontering>, now: LocalDate) {
@@ -45,7 +45,7 @@ class AvstemmingsfilGenerator(
     private fun opprettAvstemmingFil(
         konteringer: List<Kontering>,
         summering: Map<String, AvstemmingsfilSummeringer>,
-        now: LocalDate
+        now: LocalDate,
     ): ByteArrayOutputStreamTilByteBuffer {
         val avstemningsfilBuffer = ByteArrayOutputStreamTilByteBuffer()
 
@@ -73,7 +73,7 @@ class AvstemmingsfilGenerator(
                         kontering.oppdragsperiode.oppdrag.kravhaverIdent + ";" +
                         "\n"
                     )
-                    .toByteArray()
+                    .toByteArray(),
             )
 
             if (index + 1 % 100 == 0) {
@@ -102,7 +102,7 @@ class AvstemmingsfilGenerator(
                             avstemningSummering.antallKonteringer + ";" +
                             "\n"
                         )
-                        .toByteArray()
+                        .toByteArray(),
                 )
                 totalSum += if (avstemningSummering.transaksjonskode.negativtBeløp) avstemningSummering.sum.negate() else avstemningSummering.sum
                 totalAntall += avstemningSummering.antallKonteringer
@@ -120,7 +120,7 @@ class AvstemmingsfilGenerator(
                     } +
                     totalAntall + ";"
                 )
-                .toByteArray()
+                .toByteArray(),
         )
         return avstemningSummeringFil
     }

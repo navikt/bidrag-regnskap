@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class AktørhendelseListener(
-    private val aktørhendelseService: AktørhendelseService
+    private val aktørhendelseService: AktørhendelseService,
 ) {
 
     companion object {
@@ -23,7 +23,7 @@ class AktørhendelseListener(
     @KafkaListener(
         groupId = "\${AKTOR_V2_GROUP_ID}",
         topics = ["\${TOPIC_PDL_AKTOR_V2}"],
-        containerFactory = "kafkaAktorV2HendelseContainerFactory"
+        containerFactory = "kafkaAktorV2HendelseContainerFactory",
     )
     fun lesHendelse(
         consumerRecord: ConsumerRecord<String, Aktor?>,
@@ -31,7 +31,7 @@ class AktørhendelseListener(
         @Header(KafkaHeaders.RECEIVED_TOPIC) topic: String,
         @Header(KafkaHeaders.RECEIVED_PARTITION) partition: Int,
         @Header(KafkaHeaders.GROUP_ID) groupId: String,
-        acknowledgment: Acknowledgment
+        acknowledgment: Acknowledgment,
     ) {
         try {
             LOGGER.info("Behandler aktorhendelse med offset: $offset i consumergroup: $groupId for topic: $topic")
@@ -46,12 +46,12 @@ class AktørhendelseListener(
         } catch (e: RuntimeException) {
             LOGGER.warn(
                 "Feil i prosessering av ident-hendelser med offsett: $offset, topic: $topic, recieved_partition: $partition, groupId: $groupId",
-                e
+                e,
             )
             SECURE_LOGGER.warn(
                 "Feil i prosessering av ident-hendelser med offsett: $offset, topic: $topic, recieved_partition: $partition, groupId: $groupId." +
                     "\n$consumerRecord",
-                e
+                e,
             )
             throw RuntimeException("Feil i prosessering av ident-hendelser")
         }

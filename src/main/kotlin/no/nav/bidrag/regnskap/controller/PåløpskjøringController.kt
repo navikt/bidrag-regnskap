@@ -24,7 +24,7 @@ import java.time.LocalDate
 class PåløpskjøringController(
     private val påløpskjøringService: PåløpskjøringService,
     private val manglendeKonteringerService: ManglendeKonteringerService,
-    private val oppdragsperiodeRepo: OppdragsperiodeRepository
+    private val oppdragsperiodeRepo: OppdragsperiodeRepository,
 ) {
 
     @PostMapping("/palopskjoring")
@@ -32,19 +32,19 @@ class PåløpskjøringController(
         summary = "Start manuel generering av påløpsfil",
         description = "Operasjon for å starte påløpskjøring. Vil starte eldste ikke gjennomførte påløp i 'palop' tabellen. " +
             "Informasjon om påløp kan hentes fra \"/palop\" endepunktet.",
-        security = [SecurityRequirement(name = "bearer-key")]
+        security = [SecurityRequirement(name = "bearer-key")],
     )
     @ApiResponses(
         value = [
             ApiResponse(
                 responseCode = "201",
-                description = "Påløpskjøringen har startet. Returnerer ID'en til påløpet."
+                description = "Påløpskjøringen har startet. Returnerer ID'en til påløpet.",
             ), ApiResponse(
                 responseCode = "204",
                 description = "Det finnes ingen ikke gjennomførte påløp.",
-                content = [Content()]
-            )
-        ]
+                content = [Content()],
+            ),
+        ],
     )
     fun startPåløpskjøring(@RequestParam(required = true) genererFil: Boolean): ResponseEntity<Int> {
         val påløp = påløpskjøringService.hentPåløp()?.copy(startetTidspunkt = null) ?: return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
@@ -56,20 +56,17 @@ class PåløpskjøringController(
     @Operation(
         summary = "Kjører påløp for oppdragsperiode",
         description = "Operasjon for å starte påløp for en enkelt oppdragsperiode",
-        security = [SecurityRequirement(name = "bearer-key")]
+        security = [SecurityRequirement(name = "bearer-key")],
     )
     @ApiResponses(
         value = [
             ApiResponse(
                 responseCode = "200",
-                description = "Påløp er kjørt for oppdragsperioden"
-            )
-        ]
+                description = "Påløp er kjørt for oppdragsperioden",
+            ),
+        ],
     )
-    fun kjørPåløpForOppdragsperiode(
-        @RequestParam(required = true) oppdragsperiode: Int,
-        @RequestParam(required = true) tom: String
-    ) {
+    fun kjørPåløpForOppdragsperiode(@RequestParam(required = true) oppdragsperiode: Int, @RequestParam(required = true) tom: String) {
         val fom = LocalDate.parse(tom + "-01")
 
         manglendeKonteringerService.opprettKonteringerForOppdragsperiode(fom, oppdragsperiode)
@@ -79,7 +76,7 @@ class PåløpskjøringController(
     @Operation(
         summary = "Henter oppdragsperioder som mangler konteringer",
         description = "Operasjon for å hente oppdragsperioder som mangler konteringer",
-        security = [SecurityRequirement(name = "bearer-key")]
+        security = [SecurityRequirement(name = "bearer-key")],
     )
     fun hentIkkefullførteOppdragsperioder(): List<Int> {
         return oppdragsperiodeRepo.hentAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer()

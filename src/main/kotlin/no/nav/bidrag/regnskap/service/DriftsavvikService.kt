@@ -8,7 +8,7 @@ import java.time.LocalDateTime
 
 @Service
 class DriftsavvikService(
-    private val persistenceService: PersistenceService
+    private val persistenceService: PersistenceService,
 ) {
 
     fun hentFlereDriftsavvik(antallDriftsavvik: Int): List<Driftsavvik> {
@@ -21,7 +21,7 @@ class DriftsavvikService(
 
     fun lagreDriftsavvik(tidspunktFra: LocalDateTime, tidspunktTil: LocalDateTime?, opprettetAv: String?, årsak: String?): Int {
         return persistenceService.lagreDriftsavvik(
-            Driftsavvik(tidspunktFra = tidspunktFra, tidspunktTil = tidspunktTil, opprettetAv = opprettetAv, årsak = årsak)
+            Driftsavvik(tidspunktFra = tidspunktFra, tidspunktTil = tidspunktTil, opprettetAv = opprettetAv, årsak = årsak),
         )
     }
 

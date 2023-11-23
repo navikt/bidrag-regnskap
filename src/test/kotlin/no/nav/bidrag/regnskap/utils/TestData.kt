@@ -32,7 +32,7 @@ object TestData {
         kravhaverIdent: String = PersonidentGenerator.genererFødselsnummer(),
         gjelderIdent: String = PersonidentGenerator.genererFødselsnummer(),
         utsattTilDato: LocalDate? = null,
-        endretTidspunkt: LocalDateTime? = null
+        endretTidspunkt: LocalDateTime? = null,
     ): Oppdrag {
         return Oppdrag(
             oppdragId = oppdragId,
@@ -43,7 +43,7 @@ object TestData {
             kravhaverIdent = kravhaverIdent,
             gjelderIdent = gjelderIdent,
             utsattTilDato = utsattTilDato,
-            endretTidspunkt = endretTidspunkt
+            endretTidspunkt = endretTidspunkt,
         )
     }
 
@@ -59,7 +59,7 @@ object TestData {
         opprettetAv: String = "SaksbehandlerId",
         eksternReferanse: String? = "UTENLANDSREFERANSE",
         utsattTilDato: LocalDate? = LocalDate.now().plusDays(7),
-        periodeListe: List<Periode> = listOf(opprettPeriodeDomene())
+        periodeListe: List<Periode> = listOf(opprettPeriodeDomene()),
     ): Hendelse {
         return Hendelse(
             type = type,
@@ -73,7 +73,7 @@ object TestData {
             opprettetAv = opprettetAv,
             eksternReferanse = eksternReferanse,
             utsattTilDato = utsattTilDato,
-            periodeListe = periodeListe
+            periodeListe = periodeListe,
         )
     }
 
@@ -82,14 +82,14 @@ object TestData {
         valutakode: String? = "NOK",
         periodeFomDato: LocalDate = LocalDate.now().minusMonths(2).withDayOfMonth(1),
         periodeTilDato: LocalDate? = LocalDate.now(),
-        referanse: Int? = Random.nextInt()
+        referanse: Int? = Random.nextInt(),
     ): Periode {
         return Periode(
             beløp = beløp,
             valutakode = valutakode,
             periodeFomDato = periodeFomDato,
             periodeTilDato = periodeTilDato,
-            delytelsesId = referanse
+            delytelsesId = referanse,
         )
     }
 
@@ -109,8 +109,7 @@ object TestData {
         konteringerFullførtOpprettet: Boolean = false,
         delytelseId: Int? = Random.nextInt(),
         aktivTil: LocalDate? = null,
-        konteringer: List<Kontering> = listOf(opprettKontering())
-
+        konteringer: List<Kontering> = listOf(opprettKontering()),
     ): Oppdragsperiode {
         return Oppdragsperiode(
             oppdragsperiodeId = oppdragsperiodeId,
@@ -128,7 +127,7 @@ object TestData {
             konteringerFullførtOpprettet = konteringerFullførtOpprettet,
             delytelseId = delytelseId,
             aktivTil = aktivTil,
-            konteringer = konteringer
+            konteringer = konteringer,
         )
     }
 
@@ -142,7 +141,7 @@ object TestData {
         søknadstype: String = Søknadstype.EN.name,
         sendtIPalopsperiode: String? = null,
         opprettetTidspunkt: LocalDateTime = LocalDateTime.now(),
-        vedtakId: Int = 654321
+        vedtakId: Int = 654321,
     ): Kontering {
         return Kontering(
             konteringId = konteringId,
@@ -154,7 +153,7 @@ object TestData {
             søknadType = søknadstype,
             sendtIPåløpsperiode = sendtIPalopsperiode,
             opprettetTidspunkt = opprettetTidspunkt,
-            vedtakId = vedtakId
+            vedtakId = vedtakId,
         )
     }
 
@@ -162,13 +161,13 @@ object TestData {
         påløpId: Int = 0,
         kjøredato: LocalDateTime = LocalDateTime.now(),
         fullførtTidspunkt: LocalDateTime? = null,
-        forPeriode: String = "2022-01"
+        forPeriode: String = "2022-01",
     ): Påløp {
         return Påløp(
             påløpId = påløpId,
             kjøredato = kjøredato,
             fullførtTidspunkt = fullførtTidspunkt,
-            forPeriode = forPeriode
+            forPeriode = forPeriode,
         )
     }
 
@@ -178,7 +177,7 @@ object TestData {
         tidspunktFra: LocalDateTime = LocalDateTime.now(),
         tidspunktTil: LocalDateTime? = LocalDateTime.now().plusHours(1),
         opprettetAv: String? = "Manuelt REST",
-        årsak: String? = "Feil ved overføringer"
+        årsak: String? = "Feil ved overføringer",
     ): Driftsavvik {
         return Driftsavvik(
             driftsavvikId = driftsavvikId,
@@ -186,7 +185,7 @@ object TestData {
             tidspunktFra = tidspunktFra,
             tidspunktTil = tidspunktTil,
             opprettetAv = opprettetAv,
-            årsak = årsak
+            årsak = årsak,
         )
     }
 }

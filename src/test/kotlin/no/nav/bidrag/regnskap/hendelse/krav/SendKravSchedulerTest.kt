@@ -146,20 +146,72 @@ internal class SendKravSchedulerTest {
         val annetOppdrag = TestData.opprettOppdrag(oppdragId = 0, sakId = "654321")
 
         val bidragOppdrag = TestData.opprettOppdrag(oppdragId = 1, skyldnerIdent = bp, kravhaverIdent = bm, gjelderIdent = barn, sakId = "123456")
-        val gebyrBpOppdrag = TestData.opprettOppdrag(stonadType = null, engangsbelopType = Engangsbeløptype.GEBYR_SKYLDNER, oppdragId = 2, skyldnerIdent = bp, kravhaverIdent = nav, gjelderIdent = bp, sakId = "123456")
-        val gebyrBmOppdrag = TestData.opprettOppdrag(stonadType = null, engangsbelopType = Engangsbeløptype.GEBYR_MOTTAKER, oppdragId = 3, skyldnerIdent = bm, kravhaverIdent = nav, gjelderIdent = bm, sakId = "123456")
+        val gebyrBpOppdrag = TestData.opprettOppdrag(
+            stonadType = null,
+            engangsbelopType = Engangsbeløptype.GEBYR_SKYLDNER,
+            oppdragId = 2,
+            skyldnerIdent = bp,
+            kravhaverIdent = nav,
+            gjelderIdent = bp,
+            sakId = "123456",
+        )
+        val gebyrBmOppdrag = TestData.opprettOppdrag(
+            stonadType = null,
+            engangsbelopType = Engangsbeløptype.GEBYR_MOTTAKER,
+            oppdragId = 3,
+            skyldnerIdent = bm,
+            kravhaverIdent = nav,
+            gjelderIdent = bm,
+            sakId = "123456",
+        )
 
         val annenOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = annetOppdrag, oppdragsperiodeId = 0)
 
-        val bidragOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = bidragOppdrag, oppdragsperiodeId = 1, mottakerIdent = bm, periodeTil = null)
-        val gebyrBpOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = gebyrBpOppdrag, oppdragsperiodeId = 2, mottakerIdent = nav, periodeFra = LocalDate.now())
-        val gebyrBmOppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = gebyrBmOppdrag, oppdragsperiodeId = 3, mottakerIdent = nav, periodeFra = LocalDate.now())
+        val bidragOppdragsperiode = TestData.opprettOppdragsperiode(
+            oppdrag = bidragOppdrag,
+            oppdragsperiodeId = 1,
+            mottakerIdent = bm,
+            periodeTil = null,
+        )
+        val gebyrBpOppdragsperiode = TestData.opprettOppdragsperiode(
+            oppdrag = gebyrBpOppdrag,
+            oppdragsperiodeId = 2,
+            mottakerIdent = nav,
+            periodeFra = LocalDate.now(),
+        )
+        val gebyrBmOppdragsperiode = TestData.opprettOppdragsperiode(
+            oppdrag = gebyrBmOppdrag,
+            oppdragsperiodeId = 3,
+            mottakerIdent = nav,
+            periodeFra = LocalDate.now(),
+        )
 
-        val annenKontering = TestData.opprettKontering(oppdragsperiode = annenOppdragsperiode, konteringId = 0, opprettetTidspunkt = LocalDateTime.now().minusMinutes(1))
+        val annenKontering = TestData.opprettKontering(
+            oppdragsperiode = annenOppdragsperiode,
+            konteringId = 0,
+            opprettetTidspunkt = LocalDateTime.now().minusMinutes(1),
+        )
 
-        val bidragKontering = TestData.opprettKontering(oppdragsperiode = bidragOppdragsperiode, konteringId = 1, transaksjonskode = Transaksjonskode.B1.name, opprettetTidspunkt = LocalDateTime.now().minusMinutes(1))
-        val gebyrBpKontering = TestData.opprettKontering(oppdragsperiode = gebyrBpOppdragsperiode, konteringId = 2, transaksjonskode = Transaksjonskode.G1.name, søknadstype = Søknadstype.FABP.name, opprettetTidspunkt = LocalDateTime.now().minusMinutes(1))
-        val gebyrBmKontering = TestData.opprettKontering(oppdragsperiode = gebyrBmOppdragsperiode, konteringId = 3, transaksjonskode = Transaksjonskode.G1.name, søknadstype = Søknadstype.FABM.name, opprettetTidspunkt = LocalDateTime.now().minusMinutes(1))
+        val bidragKontering = TestData.opprettKontering(
+            oppdragsperiode = bidragOppdragsperiode,
+            konteringId = 1,
+            transaksjonskode = Transaksjonskode.B1.name,
+            opprettetTidspunkt = LocalDateTime.now().minusMinutes(1),
+        )
+        val gebyrBpKontering = TestData.opprettKontering(
+            oppdragsperiode = gebyrBpOppdragsperiode,
+            konteringId = 2,
+            transaksjonskode = Transaksjonskode.G1.name,
+            søknadstype = Søknadstype.FABP.name,
+            opprettetTidspunkt = LocalDateTime.now().minusMinutes(1),
+        )
+        val gebyrBmKontering = TestData.opprettKontering(
+            oppdragsperiode = gebyrBmOppdragsperiode,
+            konteringId = 3,
+            transaksjonskode = Transaksjonskode.G1.name,
+            søknadstype = Søknadstype.FABM.name,
+            opprettetTidspunkt = LocalDateTime.now().minusMinutes(1),
+        )
 
         gebyrBmOppdragsperiode.konteringer = listOf(gebyrBmKontering)
         gebyrBpOppdragsperiode.konteringer = listOf(gebyrBpKontering)

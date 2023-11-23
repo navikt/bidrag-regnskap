@@ -26,7 +26,7 @@ class PåløpskjøringScheduler(
     private val påløpskjøringService: PåløpskjøringService,
     private val slackService: SlackService,
     private val meterRegistry: MeterRegistry,
-    @Value("\${NAIS_CLUSTER_NAME}") private val clusterName: String
+    @Value("\${NAIS_CLUSTER_NAME}") private val clusterName: String,
 ) {
 
     companion object {
@@ -45,7 +45,9 @@ class PåløpskjøringScheduler(
                 if (it.kjøredato.isBefore(LocalDateTime.now())) {
                     påløpskjøringService.startPåløpskjøring(it, true, true)
                 } else {
-                    LOGGER.info("Fant ingen påløp som skulle kjøres på dette tidspunkt. Neste påløpskjøring er for periode: ${it.forPeriode} som kjøres: ${it.kjøredato}")
+                    LOGGER.info(
+                        "Fant ingen påløp som skulle kjøres på dette tidspunkt. Neste påløpskjøring er for periode: ${it.forPeriode} som kjøres: ${it.kjøredato}",
+                    )
                 }
             } else {
                 if (clusterName == "prod-gcp") {

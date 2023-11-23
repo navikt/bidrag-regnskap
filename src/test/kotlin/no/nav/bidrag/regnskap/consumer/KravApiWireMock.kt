@@ -23,9 +23,9 @@ class KravApiWireMock {
             {
               "BatchUid": "STUBBED-BATCHUID"
             }
-               """
-                )
-            )
+               """,
+                ),
+            ),
         )
     }
 
@@ -42,17 +42,17 @@ class KravApiWireMock {
                           "mislyketAntall": 0,
                           "fullfoertAntall": 1
                         }
-                        """
-                )
-            )
+                        """,
+                ),
+            ),
         )
     }
 
     internal fun livenessMedGyldigResponse() {
         mock.stubFor(
             WireMock.get(WireMock.urlEqualTo(SkattConsumer.LIVENESS_PATH)).willReturn(
-                WireMock.ok()
-            )
+                WireMock.ok(),
+            ),
         )
     }
 }

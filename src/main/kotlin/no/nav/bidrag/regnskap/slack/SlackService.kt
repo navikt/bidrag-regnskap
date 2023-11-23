@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class SlackService(
-    @Value("\${BIDRAG_BOT_SLACK_OAUTH_TOKEN}") private val oauthToken: String
+    @Value("\${BIDRAG_BOT_SLACK_OAUTH_TOKEN}") private val oauthToken: String,
 ) {
 
     companion object {
@@ -33,7 +33,7 @@ class SlackService(
     inner class SlackMelding(
         private val ts: String?,
         private val threadTs: String? = ts,
-        private val channel: String?
+        private val channel: String?,
     ) {
 
         fun oppdaterMelding(melding: String) {

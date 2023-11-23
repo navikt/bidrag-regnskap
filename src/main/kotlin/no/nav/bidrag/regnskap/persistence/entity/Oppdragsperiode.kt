@@ -76,7 +76,7 @@ data class Oppdragsperiode(
 
     @OneToMany(mappedBy = "oppdragsperiode", cascade = [CascadeType.ALL])
     @OrderBy("konteringId")
-    var konteringer: List<Kontering> = emptyList()
+    var konteringer: List<Kontering> = emptyList(),
 ) {
 
     override fun toString(): String {

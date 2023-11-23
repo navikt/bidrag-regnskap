@@ -22,7 +22,7 @@ import java.time.LocalDateTime
 @Protected
 @Tag(name = "Avstemming")
 class AvstemmingController(
-    private val avstemmingService: AvstemmingService
+    private val avstemmingService: AvstemmingService,
 ) {
 
     @GetMapping("/avstemming")
@@ -30,27 +30,27 @@ class AvstemmingController(
         summary = "Start manuell generering av avstemming- og summeringsfil for dato.",
         description = "Operasjon for å starte generering av avstemmingsfil og summeringsfil for alle konteringer lest inn en spesifikk dato." +
             "Disse filene blir lastet opp i bucket på GCP og deretter overført til en sftp filsluse hvor ELIN plukker ned filene.",
-        security = [SecurityRequirement(name = "bearer-key")]
+        security = [SecurityRequirement(name = "bearer-key")],
     )
     @ApiResponses(
         value = [
             ApiResponse(
                 responseCode = "200",
                 description = "Avstemmingsfilene har blitt generert.",
-                content = [Content()]
+                content = [Content()],
             ), ApiResponse(
                 responseCode = "400",
                 description = "Dato er satt frem i tid. Generering blir derfor ikke startet.",
-                content = [Content()]
-            )
-        ]
+                content = [Content()],
+            ),
+        ],
     )
     @Parameters(
         value = [
             Parameter(name = "dato", example = "2022-01-01"),
             Parameter(name = "fomTidspunkt", example = "2022-01-01T10:00:00"),
-            Parameter(name = "tomTidspunkt", example = "2022-01-01T11:00:00")
-        ]
+            Parameter(name = "tomTidspunkt", example = "2022-01-01T11:00:00"),
+        ],
     )
     fun startAvstemmingsgenerering(
         @RequestParam(required = true)
@@ -61,7 +61,7 @@ class AvstemmingController(
         fomTidspunkt: LocalDateTime?,
         @RequestParam(required = false)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-        tomTidspunkt: LocalDateTime?
+        tomTidspunkt: LocalDateTime?,
     ): ResponseEntity<Any> {
         if (dato.isAfter(LocalDate.now())) {
             return ResponseEntity.badRequest().build()

@@ -31,6 +31,11 @@ import java.time.LocalDate
 @ExtendWith(MockKExtension::class)
 internal class SakConsumerTest {
 
+    companion object {
+        private const val SAK_PATH = "/bidrag-sak/sak"
+        private const val DUMMY_NUMMER = "22222222226"
+    }
+
     @MockK
     private lateinit var restTemplate: RestTemplate
 
@@ -38,8 +43,6 @@ internal class SakConsumerTest {
     private lateinit var sakConsumer: SakConsumer
 
     private val sakUrl = "localhost:8080"
-    private val SAK_PATH = "/bidrag-sak/sak"
-    private val DUMMY_NUMMER = "22222222226"
 
     @BeforeEach
     fun setup() {
@@ -49,7 +52,7 @@ internal class SakConsumerTest {
     @Test
     fun `skal hente ut fødelsnummer fra bm`() {
         every { restTemplate.getForEntity("$sakUrl$SAK_PATH/123", BidragssakDto::class.java) } returns ResponseEntity.ok(
-            opprettBidragSak(Rolletype.BIDRAGSMOTTAKER)
+            opprettBidragSak(Rolletype.BIDRAGSMOTTAKER),
         )
 
         val fødelsnummer = sakConsumer.hentBmFraSak("123")
@@ -60,7 +63,7 @@ internal class SakConsumerTest {
     @Test
     fun `skal bruke dummynr om det ikke finnes en bm på sak`() {
         every { restTemplate.getForEntity("$sakUrl$SAK_PATH/123", BidragssakDto::class.java) } returns ResponseEntity.ok(
-            opprettBidragSak(Rolletype.BIDRAGSPLIKTIG)
+            opprettBidragSak(Rolletype.BIDRAGSPLIKTIG),
         )
 
         val fødelsnummer = sakConsumer.hentBmFraSak("123")
@@ -82,9 +85,9 @@ internal class SakConsumerTest {
             roller = listOf(
                 RolleDto(
                     Personident(PersonidentGenerator.genererFødselsnummer()),
-                    rolletype
-                )
-            )
+                    rolletype,
+                ),
+            ),
         )
     }
 }

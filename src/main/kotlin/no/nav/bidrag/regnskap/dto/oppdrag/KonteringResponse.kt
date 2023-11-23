@@ -7,19 +7,19 @@ import no.nav.bidrag.domene.enums.regnskap.Type
 
 @Schema(
     name = "KonteringResponse",
-    description = "En kontering er et overført oppdrag til skatt for en måned i en oppdragsperiode."
+    description = "En kontering er et overført oppdrag til skatt for en måned i en oppdragsperiode.",
 )
 data class KonteringResponse(
 
     @field:Schema(
         description = "Id til konteringen.",
-        example = "30"
+        example = "30",
     )
     val konteringId: Int,
 
     @field:Schema(
         description = "Id til oppdragsperioden konteringen tilhører.",
-        example = "20"
+        example = "20",
     )
     val oppdragsperiodeId: Int?,
 
@@ -39,7 +39,7 @@ data class KonteringResponse(
             "| K1    |                 | Ettergivelse                               |\n" +
             "| K2    |                 | Direkte oppgjør (innbetalt beløp)          |\n" +
             "| K3    |                 | Tilbakekreving ettergivelse                |\n",
-        example = "B1"
+        example = "B1",
     )
     val transaksjonskode: Transaksjonskode,
 
@@ -47,27 +47,27 @@ data class KonteringResponse(
         description = "Angir hvilken periode (måned og år) konteringen gjelder.",
         type = "String",
         example = "2022-04",
-        required = true
+        required = true,
     )
     val overforingsperiode: String,
 
     @field:Schema(
         description = "Tidspunktet overføringen ble gjennomført.",
         format = "date-time",
-        example = "2022-02-01:00:00:00"
+        example = "2022-02-01:00:00:00",
     )
     val overforingstidspunkt: String?,
 
     @field:Schema(
         description = "Tidspunktet overføringen ble gjennomført.",
         format = "date-time",
-        example = "2022-02-01:00:00:00"
+        example = "2022-02-01:00:00:00",
     )
     val behandlingsstatusOkTidspunkt: String?,
 
     @field:Schema(
         description = "Angir om det er en ny transaksjon eller en endring.",
-        example = "NY"
+        example = "NY",
     )
     val type: Type?,
 
@@ -80,31 +80,31 @@ data class KonteringResponse(
             "| FABP | Benyttes for gebyr som gjelder BP.                                         |\n" +
             "| EN   | Alle andre typer endringer. Også førstegangsvedtak.                        |\n",
         example = "EN",
-        required = true
+        required = true,
     ) val soknadType: Søknadstype,
 
     @field:Schema(
         description = "Siste batch-uid vi har mottatt for overføringer på denne konteringer.",
-        example = "3f1248e9-8d19-4dc3-9584-84055421753d"
+        example = "3f1248e9-8d19-4dc3-9584-84055421753d",
     )
     val sisteReferansekode: String?,
 
     @field:Schema(
         description = "Angir hvilken periode konteringen generert i om den er generert via påløpsfil.",
-        example = "false"
+        example = "false",
     )
     val sendtIPalopsperiode: String?,
 
     @field:Schema(
         description = "Tidspunktet overføringen ble opprettet.",
         format = "date-time",
-        example = "2022-02-01:00:00:00"
+        example = "2022-02-01:00:00:00",
     )
     val opprettetTidspunkt: String?,
 
     @field:Schema(
         description = "VedtakId for konteringen.",
-        example = "101"
+        example = "101",
     )
-    val vedtakId: Int
+    val vedtakId: Int,
 )

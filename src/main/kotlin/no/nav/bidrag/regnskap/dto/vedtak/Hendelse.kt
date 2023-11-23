@@ -17,5 +17,5 @@ data class Hendelse(
     val utsattTilDato: LocalDate?,
     val referanse: String? = null,
     val omgjørVedtakId: Int? = null,
-    val periodeListe: List<Periode>
+    val periodeListe: List<Periode>,
 )

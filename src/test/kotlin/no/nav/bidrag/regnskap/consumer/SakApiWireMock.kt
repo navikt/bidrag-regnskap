@@ -37,9 +37,9 @@ class SakApiWireMock {
                }
              ]
            }
-        """
-                )
-            )
+        """,
+                ),
+            ),
         )
     }
 }

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class OppslagService(
-    private val persistenceService: PersistenceService
+    private val persistenceService: PersistenceService,
 ) {
     fun hentPåSakId(sakId: String): OppslagAvOppdragPåSakIdResponse? {
         val oppdrag = persistenceService.hentAlleOppdragPåSakId(sakId)
@@ -39,7 +39,7 @@ class OppslagService(
             gjelderIdent = oppdrag.gjelderIdent,
             utsattTilTidspunkt = oppdrag.utsattTilDato.toString(),
             endretTidspunkt = oppdrag.endretTidspunkt.toString(),
-            oppdragsperioder = hentOppdragsperioderMedKonteringer(oppdrag)
+            oppdragsperioder = hentOppdragsperioderMedKonteringer(oppdrag),
         )
     }
 
@@ -61,7 +61,7 @@ class OppslagService(
                 eksternReferanse = it.eksternReferanse,
                 aktivTil = it.aktivTil.toString(),
                 konteringer = hentKonteringer(it),
-                opphørendeOppdragsperiode = it.opphørendeOppdragsperiode
+                opphørendeOppdragsperiode = it.opphørendeOppdragsperiode,
             )
         }
     }
@@ -80,7 +80,7 @@ class OppslagService(
                 sendtIPalopsperiode = it.sendtIPåløpsperiode,
                 sisteReferansekode = it.sisteReferansekode,
                 opprettetTidspunkt = it.opprettetTidspunkt.toString(),
-                vedtakId = it.vedtakId
+                vedtakId = it.vedtakId,
             )
         }
     }
