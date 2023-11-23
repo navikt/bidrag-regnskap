@@ -14,7 +14,7 @@ private val LOGGER = LoggerFactory.getLogger(VedtakshendelseListener::class.java
 
 @Component
 class VedtakshendelseListener(
-    private val vedtakshendelseService: VedtakshendelseService
+    private val vedtakshendelseService: VedtakshendelseService,
 ) {
 
     companion object {
@@ -28,7 +28,7 @@ class VedtakshendelseListener(
         @Header(KafkaHeaders.RECEIVED_TOPIC) topic: String,
         @Header(KafkaHeaders.RECEIVED_PARTITION) partition: Int,
         @Header(KafkaHeaders.GROUP_ID) groupId: String,
-        acknowledgment: Acknowledgment
+        acknowledgment: Acknowledgment,
     ) {
         try {
             LOGGER.info("Starter behandling av vedtakhendelse med offset: $offset")
@@ -55,11 +55,11 @@ class VedtakshendelseListener(
         } catch (e: JacksonException) {
             LOGGER.error(
                 "Mapping av hendelse feilet for kafkamelding med offsett: $offset, topic: $topic, recieved_partition: $partition, groupId: $groupId!" +
-                    "\nSe secure log for mer informasjon."
+                    "\nSe secure log for mer informasjon.",
             )
             SECURE_LOGGER.error(
                 "Mapping av hendelse feilet for kafkamelding med offsett: $offset, topic: $topic, recieved_partition: $partition, groupId: $groupId!! " +
-                    "\nFeil: $e \n\nHendelse: $hendelse"
+                    "\nFeil: $e \n\nHendelse: $hendelse",
             )
             throw e
         }

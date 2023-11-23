@@ -90,7 +90,7 @@ class VedtakshendelseServiceTest {
             "correlationId": "12345"
           }
         }
-                """.trimIndent()
+                """.trimIndent(),
             )
         }
     }
@@ -117,7 +117,7 @@ class VedtakshendelseServiceTest {
             "correlationId": "12345"
           }
         }
-                """.trimIndent()
+                """.trimIndent(),
             )
         }
     }

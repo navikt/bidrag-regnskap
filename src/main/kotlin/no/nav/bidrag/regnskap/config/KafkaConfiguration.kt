@@ -26,7 +26,7 @@ private val LOGGER = LoggerFactory.getLogger(KafkaConfiguration::class.java)
 @Configuration
 class KafkaConfiguration(
     val environment: Environment,
-    val meterRegistry: MeterRegistry
+    val meterRegistry: MeterRegistry,
 ) {
 
     @Bean
@@ -38,7 +38,7 @@ class KafkaConfiguration(
         LOGGER.info(
             "Initializing Kafka errorhandler with backoffpolicy {}, maxRetry={}",
             backoffPolicy,
-            maxRetry
+            maxRetry,
         )
         val errorHandler = DefaultErrorHandler({ rec, e ->
             val key = rec.key()
@@ -48,7 +48,7 @@ class KafkaConfiguration(
             val partition = rec.partition()
             SECURE_LOGGER.error(
                 "Kafka melding med nøkkel $key, partition $partition og topic $topic feilet på offset $offset. Melding som feilet: $value",
-                e
+                e,
             )
         }, backoffPolicy)
         errorHandler.setRetryListeners(KafkaRetryListener())
@@ -87,7 +87,7 @@ class KafkaConfiguration(
             ConsumerConfig.CLIENT_ID_CONFIG to "consumer-bidrag-regnskap",
             ConsumerConfig.MAX_POLL_RECORDS_CONFIG to "1",
             ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "latest",
-            ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to "false"
+            ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to "false",
         )
 
         if (environment.activeProfiles.none { it.contains("local") || it.contains("h2") || it.contains("test") }) {
@@ -102,14 +102,15 @@ class KafkaConfiguration(
         val kafkaKeystorePath = System.getenv("KAFKA_KEYSTORE_PATH")
         return mapOf(
             CommonClientConfigs.SECURITY_PROTOCOL_CONFIG to "SSL",
-            SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG to "", // Disable server host name verification
+            // Disable server host name verification
+            SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG to "",
             SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG to "JKS",
             SslConfigs.SSL_KEYSTORE_TYPE_CONFIG to "PKCS12",
             SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG to kafkaTruststorePath,
             SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG to kafkaCredstorePassword,
             SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG to kafkaKeystorePath,
             SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG to kafkaCredstorePassword,
-            SslConfigs.SSL_KEY_PASSWORD_CONFIG to kafkaCredstorePassword
+            SslConfigs.SSL_KEY_PASSWORD_CONFIG to kafkaCredstorePassword,
         )
     }
 }

@@ -26,7 +26,7 @@ class BidragRegnskapConfiguration {
     @Bean
     fun lockProvider(dataSource: DataSource): LockProvider {
         return JdbcTemplateLockProvider(
-            JdbcTemplateLockProvider.Configuration.builder().withJdbcTemplate(JdbcTemplate(dataSource)).usingDbTime().build()
+            JdbcTemplateLockProvider.Configuration.builder().withJdbcTemplate(JdbcTemplate(dataSource)).usingDbTime().build(),
         )
     }
 }

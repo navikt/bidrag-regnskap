@@ -7,5 +7,5 @@ data class AvstemmingsfilSummeringer(
     val transaksjonskode: Transaksjonskode,
     var sum: BigDecimal,
     var antallKonteringer: Int,
-    val fradragEllerTillegg: String? = if (transaksjonskode.korreksjonskode == null) "F" else "T"
+    val fradragEllerTillegg: String? = if (transaksjonskode.korreksjonskode == null) "F" else "T",
 )

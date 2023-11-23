@@ -31,7 +31,7 @@ class SkattConsumer(
     @Qualifier("regnskap") private val restTemplate: RestTemplate,
     private val maskinportenClient: MaskinportenClient,
     private val objectMapper: ObjectMapper,
-    private val meterRegistry: MeterRegistry
+    private val meterRegistry: MeterRegistry,
 ) {
 
     companion object {
@@ -48,7 +48,7 @@ class SkattConsumer(
                 opprettSkattUrl(KRAV_PATH),
                 HttpMethod.POST,
                 HttpEntity<Kravliste>(kravliste, opprettHttpHeaders()),
-                String::class.java
+                String::class.java,
             )
         } catch (e: HttpStatusCodeException) {
             ResponseEntity.status(e.statusCode).body(e.responseBodyAsString)
@@ -69,7 +69,7 @@ class SkattConsumer(
             opprettSkattUrl(VEDLIKEHOLDSMODUS_PATH),
             HttpMethod.POST,
             HttpEntity<Vedlikeholdsmodus>(vedlikeholdsmodus, opprettHttpHeaders()),
-            Any::class.java
+            Any::class.java,
         )
     }
 
@@ -81,7 +81,7 @@ class SkattConsumer(
                 opprettSkattUrl(LIVENESS_PATH),
                 HttpMethod.GET,
                 HttpEntity<String>(opprettHttpHeaders()),
-                Any::class.java
+                Any::class.java,
             )
         } catch (e: HttpStatusCodeException) {
             ResponseEntity.status(e.statusCode).body(e.responseBodyAsString)
@@ -94,7 +94,7 @@ class SkattConsumer(
             opprettSkattUrl("$KRAV_PATH/$batchUid"),
             HttpMethod.GET,
             HttpEntity<String>(opprettHttpHeaders()),
-            BehandlingsstatusResponse::class.java
+            BehandlingsstatusResponse::class.java,
         )
     }
 

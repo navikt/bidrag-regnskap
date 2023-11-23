@@ -22,7 +22,7 @@ private val LOGGER = KotlinLogging.logger { }
 class ManglendeKonteringerService(
     private val oppdragsperiodeRepo: OppdragsperiodeRepository,
     private val persistenceService: PersistenceService,
-    @Value("\${KONTERINGER_FORELDET_DATO}") private val konteringerForeldetDato: String
+    @Value("\${KONTERINGER_FORELDET_DATO}") private val konteringerForeldetDato: String,
 ) {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -33,7 +33,7 @@ class ManglendeKonteringerService(
         }
         LOGGER.info {
             "TIDSBRUK opprettKonteringerForAlleOppdragsperiodePartisjon: ${System.currentTimeMillis() - startTime}ms, Ledig minne: ${
-            Runtime.getRuntime().freeMemory()
+                Runtime.getRuntime().freeMemory()
             }"
         }
     }
@@ -50,7 +50,7 @@ class ManglendeKonteringerService(
 
         opprettManglendeKonteringerForOppdragsperiode(
             oppdragsperiode,
-            YearMonth.from(påløpsPeriode)
+            YearMonth.from(påløpsPeriode),
         )
 
         if (erFørsteDatoSammeSomEllerTidligereEnnAndreDato(oppdragsperiode.aktivTil, påløpsPeriode)) {
@@ -80,8 +80,8 @@ class ManglendeKonteringerService(
                             søknadType = vurderSøknadType(oppdragsperiode.vedtakType, oppdragsperiode.oppdrag.stønadType, periodeIndex),
                             oppdragsperiode = oppdragsperiode,
                             sendtIPåløpsperiode = påløpsPeriode.toString(),
-                            vedtakId = oppdragsperiode.vedtakId
-                        )
+                            vedtakId = oppdragsperiode.vedtakId,
+                        ),
                     )
                 }
             }

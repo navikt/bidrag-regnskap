@@ -29,14 +29,14 @@ class OppdragsperiodeServiceTest {
                     TestData.opprettPeriodeDomene(
                         periodeFomDato = now.minusMonths(5),
                         periodeTilDato = now.minusMonths(3),
-                        beløp = BigDecimal.valueOf(7500)
+                        beløp = BigDecimal.valueOf(7500),
                     ),
                     TestData.opprettPeriodeDomene(
                         periodeFomDato = now.minusMonths(3),
                         periodeTilDato = now,
-                        beløp = BigDecimal.valueOf(7600)
-                    )
-                )
+                        beløp = BigDecimal.valueOf(7600),
+                    ),
+                ),
             )
             val oppdrag = TestData.opprettOppdrag()
 
@@ -68,9 +68,9 @@ class OppdragsperiodeServiceTest {
                     TestData.opprettOppdragsperiode(
                         periodeFra = LocalDate.now(),
                         periodeTil = periodeTil,
-                        aktivTil = null
-                    )
-                )
+                        aktivTil = null,
+                    ),
+                ),
             )
         }
 
@@ -78,7 +78,7 @@ class OppdragsperiodeServiceTest {
         fun `Skal sette aktivTil dato til periodeTil om periodeTil er satt og nye oppdragsperiodens periodeFra er etter periodeTil`() {
             oppdragsperiodeService.settAktivTilDatoPåEksisterendeOppdragsperioder(
                 oppdrag,
-                LocalDate.now().plusMonths(3)
+                LocalDate.now().plusMonths(3),
             )
 
             oppdrag.oppdragsperioder.first().aktivTil shouldBe periodeTil
@@ -108,7 +108,7 @@ class OppdragsperiodeServiceTest {
 
             oppdragsperiodeService.settAktivTilDatoPåEksisterendeOppdragsperioder(
                 oppdrag,
-                LocalDate.now().plusMonths(1)
+                LocalDate.now().plusMonths(1),
             )
 
             oppdrag.oppdragsperioder.first().aktivTil shouldBe now

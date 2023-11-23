@@ -29,17 +29,17 @@ class PersonApiWireMock {
                     "gruppe": "FOLKEREGISTERIDENT"
                 }
             ]
-               """
-                )
-            )
+               """,
+                ),
+            ),
         )
     }
 
     internal fun personidentMedNoBody() {
         mock.stubFor(
             WireMock.post(WireMock.urlEqualTo("/personidenter")).willReturn(
-                WireMock.aResponse().withHeader("Content-Type", "application/json").withStatus(204)
-            )
+                WireMock.aResponse().withHeader("Content-Type", "application/json").withStatus(204),
+            ),
         )
     }
 }

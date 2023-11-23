@@ -26,7 +26,7 @@ class VedtakshendelseService(
     private val oppdragService: OppdragService,
     private val kravService: KravService,
     private val persistenceService: PersistenceService,
-    private val identUtils: IdentUtils
+    private val identUtils: IdentUtils,
 ) {
 
     fun behandleHendelse(hendelse: String): List<Int> {
@@ -77,7 +77,7 @@ class VedtakshendelseService(
                 eksternReferanse = stønadsendring.eksternReferanse,
                 utsattTilDato = vedtakHendelse.innkrevingUtsattTilDato,
                 omgjørVedtakId = stønadsendring.omgjørVedtakId,
-                periodeListe = mapPeriodelisteTilDomene(stønadsendring.periodeListe)
+                periodeListe = mapPeriodelisteTilDomene(stønadsendring.periodeListe),
             )
             return oppdragService.lagreHendelse(hendelse)
         }
@@ -95,7 +95,7 @@ class VedtakshendelseService(
                 valutakode = periode.valutakode,
                 periodeFomDato = periode.periode.fomDato.verdi,
                 periodeTilDato = periode.periode.tilDato?.verdi,
-                delytelsesId = periode.delytelseId?.let { Integer.valueOf(it) }
+                delytelsesId = periode.delytelseId?.let { Integer.valueOf(it) },
             )
         }
     }
@@ -124,9 +124,9 @@ class VedtakshendelseService(
                         periodeTilDato = vedtakHendelse.vedtakstidspunkt.toLocalDate().withDayOfMonth(1).plusMonths(1),
                         beløp = engangsbeløp.beløp,
                         valutakode = engangsbeløp.valutakode,
-                        delytelsesId = engangsbeløp.delytelseId?.let { Integer.valueOf(it) }
-                    )
-                )
+                        delytelsesId = engangsbeløp.delytelseId?.let { Integer.valueOf(it) },
+                    ),
+                ),
             )
             return oppdragService.lagreHendelse(hendelse)
         }

@@ -32,7 +32,7 @@ class KonteringServiceTest {
             val oppdragsperiode = TestData.opprettOppdragsperiode(
                 konteringer = emptyList(),
                 periodeFra = LocalDate.now().minusMonths(3).withDayOfMonth(1),
-                periodeTil = LocalDate.now().minusMonths(1).withDayOfMonth(1)
+                periodeTil = LocalDate.now().minusMonths(1).withDayOfMonth(1),
             )
             val hendelse = TestData.opprettHendelse()
 
@@ -54,23 +54,23 @@ class KonteringServiceTest {
                     transaksjonskode = transaksjonskode.toString(),
                     overforingsperiode = overforingsperiode.toString(),
                     type = Type.NY.name,
-                    overforingstidspunkt = LocalDateTime.now()
+                    overforingstidspunkt = LocalDateTime.now(),
                 ),
                 TestData.opprettKontering(
                     konteringId = 2,
                     transaksjonskode = transaksjonskode.toString(),
                     overforingsperiode = overforingsperiode.plusMonths(1).toString(),
                     type = Type.ENDRING.name,
-                    overforingstidspunkt = LocalDateTime.now()
-                )
+                    overforingstidspunkt = LocalDateTime.now(),
+                ),
             )
             val nyOppdragsperiode = TestData.opprettOppdragsperiode(periodeFra = now, periodeTil = now.plusMonths(2))
             val oppdrag = TestData.opprettOppdrag(
                 oppdragsperioder = listOf(
                     TestData.opprettOppdragsperiode(
-                        konteringer = konteringer
-                    )
-                )
+                        konteringer = konteringer,
+                    ),
+                ),
             )
             val hendelse = TestData.opprettHendelse()
 
@@ -90,17 +90,17 @@ class KonteringServiceTest {
                     konteringId = 1,
                     transaksjonskode = transaksjonskode.toString(),
                     overforingsperiode = overforingsperiode.toString(),
-                    type = Type.NY.name
-                )
+                    type = Type.NY.name,
+                ),
             )
 
             val nyOppdragsperiode = TestData.opprettOppdragsperiode(periodeFra = now, periodeTil = now.plusMonths(2))
             val oppdrag = TestData.opprettOppdrag(
                 oppdragsperioder = listOf(
                     TestData.opprettOppdragsperiode(
-                        konteringer = konteringer
-                    )
-                )
+                        konteringer = konteringer,
+                    ),
+                ),
             )
             val hendelse = TestData.opprettHendelse()
 
@@ -123,17 +123,17 @@ class KonteringServiceTest {
                     TestData.opprettOppdragsperiode(
                         konteringer = listOf(
                             TestData.opprettKontering(
-                                overforingstidspunkt = overforingstidspunkt
+                                overforingstidspunkt = overforingstidspunkt,
                             ),
                             TestData.opprettKontering(
-                                overforingstidspunkt = overforingstidspunkt.minusMonths(1)
+                                overforingstidspunkt = overforingstidspunkt.minusMonths(1),
                             ),
                             TestData.opprettKontering(
-                                overforingstidspunkt = null
-                            )
-                        )
-                    )
-                )
+                                overforingstidspunkt = null,
+                            ),
+                        ),
+                    ),
+                ),
             )
 
             val overforteKonteringerListe = konteringService.hentAlleKonteringerForOppdrag(oppdrag)

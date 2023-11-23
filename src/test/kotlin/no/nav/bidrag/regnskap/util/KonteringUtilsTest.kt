@@ -18,7 +18,7 @@ internal class KonteringUtilsTest {
         val oppdragsperiode = TestData.opprettOppdragsperiode(
             oppdrag = oppdrag,
             periodeFra = LocalDate.now().minusMonths(3),
-            periodeTil = LocalDate.now()
+            periodeTil = LocalDate.now(),
         )
 
         @BeforeEach

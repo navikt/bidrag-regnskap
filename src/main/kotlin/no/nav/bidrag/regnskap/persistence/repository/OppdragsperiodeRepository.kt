@@ -12,7 +12,7 @@ interface OppdragsperiodeRepository : JpaRepository<Oppdragsperiode, Int> {
           SELECT o.oppdragsperiodeId
             FROM oppdragsperioder o
             WHERE konteringerFullførtOpprettet = false
-              AND opphørendeOppdragsperiode = false"""
+              AND opphørendeOppdragsperiode = false""",
     )
     @Transactional
     fun hentAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer(): List<Int>

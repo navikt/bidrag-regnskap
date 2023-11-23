@@ -8,7 +8,7 @@ interface OppdragRepository : JpaRepository<Oppdrag, Int> {
         stønadType: String,
         kravhaverIdent: String?,
         skyldnerIdent: String,
-        sakId: String
+        sakId: String,
     ): Oppdrag?
 
     fun findAllBySakIdIs(sakId: String): List<Oppdrag>

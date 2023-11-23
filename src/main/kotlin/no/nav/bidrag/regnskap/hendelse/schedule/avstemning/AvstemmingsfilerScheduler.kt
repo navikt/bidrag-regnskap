@@ -16,7 +16,7 @@ private val LOGGER = LoggerFactory.getLogger((AvstemmingsfilerScheduler::class.j
 @EnableScheduling
 @EnableSchedulerLock(defaultLockAtMostFor = "10m")
 class AvstemmingsfilerScheduler(
-    private val avstemmingService: AvstemmingService
+    private val avstemmingService: AvstemmingService,
 ) {
 
     @Scheduled(cron = "\${scheduler.avstemning.cron}")

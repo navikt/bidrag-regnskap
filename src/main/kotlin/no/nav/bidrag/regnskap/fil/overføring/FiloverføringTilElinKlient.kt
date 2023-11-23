@@ -15,7 +15,7 @@ private val LOGGER = LoggerFactory.getLogger(FiloverføringTilElinKlient::class.
 class FiloverføringTilElinKlient(
     private val config: FiloverføringTilElinConfig,
     private val gcpFilBucket: GcpFilBucket,
-    private val slackService: SlackService
+    private val slackService: SlackService,
 ) {
 
     private val jSch = JSch().apply {
@@ -23,7 +23,7 @@ class FiloverføringTilElinKlient(
             config.username,
             config.privateKeyDecoded,
             null,
-            null
+            null,
         )
     }
 
@@ -51,7 +51,7 @@ class FiloverføringTilElinKlient(
             slackService.sendMelding(
                 ":Warning: @channel Noe gikk galt ved overføring av ${filmappe + filnavn} til ELIN! :Warning:" +
                     "\n\nFeilmelding: ${e.message}" +
-                    "\n${gcpMelding(filmappe + filnavn)}"
+                    "\n${gcpMelding(filmappe + filnavn)}",
             )
             throw e
         } finally {

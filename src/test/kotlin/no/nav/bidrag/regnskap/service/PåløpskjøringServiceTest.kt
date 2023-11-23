@@ -36,7 +36,15 @@ class PåløpskjøringServiceTest {
     private val meterRegistry = mockk<MeterRegistry>(relaxed = true)
 
     private val påløpskjøringService =
-        PåløpskjøringService(oppdragsperiodeRepo, persistenceService, ManglendeKonteringerService(oppdragsperiodeRepo, persistenceService, "2006-04"), gcpFilBucket, filoverføringTilElinKlient, skattConsumer, meterRegistry)
+        PåløpskjøringService(
+            oppdragsperiodeRepo,
+            persistenceService,
+            ManglendeKonteringerService(oppdragsperiodeRepo, persistenceService, "2006-04"),
+            gcpFilBucket,
+            filoverføringTilElinKlient,
+            skattConsumer,
+            meterRegistry,
+        )
 
     @Test
     fun `Skal ved påløpskjøring kun starte eldste ikke kjørte påløpsperiode`() {
@@ -63,22 +71,24 @@ class PåløpskjøringServiceTest {
                 konteringer = emptyList(),
                 aktivTil = null,
                 konteringerFullførtOpprettet = false,
-                oppdrag = oppdrag
+                oppdrag = oppdrag,
             )
             oppdrag.oppdragsperioder = listOf(oppdragsperiodeMedManglendeKonteringer)
 
             val oppdragsperiodeIder = listOf(
-                oppdragsperiodeMedManglendeKonteringer.oppdragsperiodeId
+                oppdragsperiodeMedManglendeKonteringer.oppdragsperiodeId,
             )
             every { oppdragsperiodeRepo.hentAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer() } returns oppdragsperiodeIder
-            every { oppdragsperiodeRepo.findById(oppdragsperiodeMedManglendeKonteringer.oppdragsperiodeId) } returns Optional.of(oppdragsperiodeMedManglendeKonteringer)
+            every {
+                oppdragsperiodeRepo.findById(oppdragsperiodeMedManglendeKonteringer.oppdragsperiodeId)
+            } returns Optional.of(oppdragsperiodeMedManglendeKonteringer)
 
             påløpskjøringService.startPåløpskjøring(påløp, false, true)
 
             val perioderMellomDato = hentAllePerioderMellomDato(
                 oppdragsperiodeMedManglendeKonteringer.periodeFra,
                 oppdragsperiodeMedManglendeKonteringer.periodeTil,
-                YearMonth.parse(påløp.forPeriode)
+                YearMonth.parse(påløp.forPeriode),
             )
 
             val konteringer = oppdragsperiodeMedManglendeKonteringer.konteringer
@@ -108,7 +118,7 @@ class PåløpskjøringServiceTest {
                 konteringer = emptyList(),
                 aktivTil = LocalDate.of(2022, 1, 1),
                 konteringerFullførtOpprettet = false,
-                oppdrag = oppdrag
+                oppdrag = oppdrag,
             )
             val oppdragsperiodeMedManglendeKonteringer2 = TestData.opprettOppdragsperiode(
                 oppdragsperiodeId = 2,
@@ -117,14 +127,14 @@ class PåløpskjøringServiceTest {
                 konteringer = emptyList(),
                 aktivTil = null,
                 konteringerFullførtOpprettet = false,
-                oppdrag = oppdrag
+                oppdrag = oppdrag,
             )
             val oppdragsperioder = listOf(oppdragsperiodeMedManglendeKonteringer1, oppdragsperiodeMedManglendeKonteringer2)
             oppdrag.oppdragsperioder = oppdragsperioder
 
             val oppdragsperiodeIder = listOf(
                 oppdragsperiodeMedManglendeKonteringer1.oppdragsperiodeId,
-                oppdragsperiodeMedManglendeKonteringer2.oppdragsperiodeId
+                oppdragsperiodeMedManglendeKonteringer2.oppdragsperiodeId,
             )
             every { oppdragsperiodeRepo.hentAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer() } returns oppdragsperiodeIder
             oppdragsperioder.forEach {
@@ -136,7 +146,7 @@ class PåløpskjøringServiceTest {
             val perioderMellomDato = hentAllePerioderMellomDato(
                 oppdragsperiodeMedManglendeKonteringer1.periodeFra,
                 oppdragsperiodeMedManglendeKonteringer2.periodeTil,
-                YearMonth.parse(påløp.forPeriode)
+                YearMonth.parse(påløp.forPeriode),
             )
 
             val konteringer = oppdragsperiodeMedManglendeKonteringer1.konteringer.plus(oppdragsperiodeMedManglendeKonteringer2.konteringer)
@@ -170,22 +180,24 @@ class PåløpskjøringServiceTest {
                 vedtakType = Vedtakstype.INDEKSREGULERING,
                 aktivTil = null,
                 konteringerFullførtOpprettet = false,
-                oppdrag = oppdrag
+                oppdrag = oppdrag,
             )
             oppdrag.oppdragsperioder = listOf(oppdragsperiodeMedManglendeKonteringer)
 
             val oppdragsperiodeIder = listOf(
-                oppdragsperiodeMedManglendeKonteringer.oppdragsperiodeId
+                oppdragsperiodeMedManglendeKonteringer.oppdragsperiodeId,
             )
             every { oppdragsperiodeRepo.hentAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer() } returns oppdragsperiodeIder
-            every { oppdragsperiodeRepo.findById(oppdragsperiodeMedManglendeKonteringer.oppdragsperiodeId) } returns Optional.of(oppdragsperiodeMedManglendeKonteringer)
+            every {
+                oppdragsperiodeRepo.findById(oppdragsperiodeMedManglendeKonteringer.oppdragsperiodeId)
+            } returns Optional.of(oppdragsperiodeMedManglendeKonteringer)
 
             påløpskjøringService.startPåløpskjøring(påløp, false, true)
 
             val perioderMellomDato = hentAllePerioderMellomDato(
                 oppdragsperiodeMedManglendeKonteringer.periodeFra,
                 oppdragsperiodeMedManglendeKonteringer.periodeTil,
-                YearMonth.parse(påløp.forPeriode)
+                YearMonth.parse(påløp.forPeriode),
             )
 
             val konteringer = oppdragsperiodeMedManglendeKonteringer.konteringer
@@ -216,13 +228,13 @@ class PåløpskjøringServiceTest {
             vedtakType = Vedtakstype.INDEKSREGULERING,
             aktivTil = null,
             konteringerFullførtOpprettet = false,
-            oppdrag = oppdrag
+            oppdrag = oppdrag,
         )
 
         val perioderMellomDato = hentAllePerioderMellomDato(
             oppdragsperiodeMedManglendeKonteringer.periodeFra,
             oppdragsperiodeMedManglendeKonteringer.periodeTil,
-            YearMonth.parse(påløp.forPeriode)
+            YearMonth.parse(påløp.forPeriode),
         )
 
         perioderMellomDato shouldHaveSize 13

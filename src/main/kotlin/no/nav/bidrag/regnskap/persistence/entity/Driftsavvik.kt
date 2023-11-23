@@ -28,7 +28,7 @@ data class Driftsavvik(
     val opprettetAv: String? = null,
 
     @Column(name = "arsak")
-    val årsak: String? = null
+    val årsak: String? = null,
 ) {
 
     override fun toString(): String {

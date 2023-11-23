@@ -17,11 +17,7 @@ import java.time.YearMonth
 @Service
 class KonteringService {
 
-    fun opprettNyeKonteringerPåOppdragsperiode(
-        oppdragsperiode: Oppdragsperiode,
-        hendelse: Hendelse,
-        sisteOverførtePeriode: YearMonth
-    ) {
+    fun opprettNyeKonteringerPåOppdragsperiode(oppdragsperiode: Oppdragsperiode, hendelse: Hendelse, sisteOverførtePeriode: YearMonth) {
         val perioderForOppdragsperiode =
             hentAllePerioderForOppdragsperiodeForSisteOverførtePeriode(oppdragsperiode, sisteOverførtePeriode)
 
@@ -33,8 +29,8 @@ class KonteringService {
                     type = vurderType(oppdragsperiode, periode),
                     søknadType = vurderSøknadType(hendelse, indexPeriode),
                     oppdragsperiode = oppdragsperiode,
-                    vedtakId = hendelse.vedtakId
-                )
+                    vedtakId = hendelse.vedtakId,
+                ),
             )
         }
     }
@@ -45,14 +41,14 @@ class KonteringService {
         opprettKorreksjonskonteringForAlleredeOversendteKonteringer(
             PeriodeUtils.hentAllePerioderMellomDato(oppdragsperiode.periodeFra, oppdragsperiode.periodeTil, sisteOverførtePeriode),
             overførteKonteringerListe,
-            hendelse
+            hendelse,
         )
     }
 
     private fun opprettKorreksjonskonteringForAlleredeOversendteKonteringer(
         perioderForOppdragsperiode: List<YearMonth>,
         overførteKonteringerListe: List<Kontering>,
-        hendelse: Hendelse
+        hendelse: Hendelse,
     ) {
         overførteKonteringerListe.forEach { kontering ->
             val korreksjonskode = Transaksjonskode.valueOf(kontering.transaksjonskode).korreksjonskode
@@ -66,7 +62,7 @@ class KonteringService {
                     transaksjonskode = korreksjonskode,
                     type = Type.ENDRING.name,
                     søknadType = kontering.søknadType,
-                    vedtakId = hendelse.vedtakId
+                    vedtakId = hendelse.vedtakId,
                 )
 
                 kontering.oppdragsperiode?.konteringer = kontering.oppdragsperiode?.konteringer?.plus(nyKorreksjonskontering)
@@ -77,7 +73,7 @@ class KonteringService {
 
     private fun erPeriodeOverlappendeSlutterFørOverførteKonteringsperiodeEllerGebyr(
         perioderForOppdragsperiode: List<YearMonth>,
-        kontering: Kontering
+        kontering: Kontering,
     ): Boolean {
         return erPeriodeOverlappende(perioderForOppdragsperiode, kontering) ||
             slutterNyeOppdragsperiodeFørOverførteKonteringsPeriode(kontering, perioderForOppdragsperiode) ||
@@ -88,10 +84,7 @@ class KonteringService {
         return (kontering.søknadType == Søknadstype.FABM.name || kontering.søknadType == Søknadstype.FABP.name)
     }
 
-    private fun slutterNyeOppdragsperiodeFørOverførteKonteringsPeriode(
-        kontering: Kontering,
-        perioderForNyOppdrasperiode: List<YearMonth>
-    ): Boolean {
+    private fun slutterNyeOppdragsperiodeFørOverførteKonteringsPeriode(kontering: Kontering, perioderForNyOppdrasperiode: List<YearMonth>): Boolean {
         val maxOppdragsperiode = perioderForNyOppdrasperiode.maxOrNull() ?: return false
         return YearMonth.parse(kontering.overføringsperiode).isAfter(maxOppdragsperiode)
     }
@@ -102,19 +95,16 @@ class KonteringService {
 
     private fun hentAllePerioderForOppdragsperiodeForSisteOverførtePeriode(
         oppdragsperiode: Oppdragsperiode,
-        sisteOverførtePeriode: YearMonth
+        sisteOverførtePeriode: YearMonth,
     ): List<YearMonth> {
         return PeriodeUtils.hentAllePerioderMellomDato(
             oppdragsperiode.periodeFra,
             oppdragsperiode.periodeTil,
-            sisteOverførtePeriode
+            sisteOverførtePeriode,
         ).filter { it.isBefore(sisteOverførtePeriode.plusMonths(1)) }
     }
 
-    private fun erOverførtKonteringAlleredeKorrigert(
-        kontering: Kontering,
-        overførteKonteringerListe: List<Kontering>
-    ): Boolean {
+    private fun erOverførtKonteringAlleredeKorrigert(kontering: Kontering, overførteKonteringerListe: List<Kontering>): Boolean {
         return overførteKonteringerListe.any {
             it.transaksjonskode == Transaksjonskode.valueOf(kontering.transaksjonskode).korreksjonskode &&
                 it.oppdragsperiode == kontering.oppdragsperiode &&
@@ -130,7 +120,7 @@ class KonteringService {
         oppdrag: Oppdrag,
         oppdragsperiode: Oppdragsperiode,
         sisteOverførtePeriode: YearMonth,
-        hendelse: Hendelse
+        hendelse: Hendelse,
     ) {
         oppdrag.oppdragsperioder
             .filter { it.aktivTil == null && it.opphørendeOppdragsperiode }
@@ -140,7 +130,7 @@ class KonteringService {
                 val perioder = PeriodeUtils.hentAllePerioderMellomDato(
                     LocalDate.of(nestePeriode.year, nestePeriode.month, 1),
                     oppdragsperiode.periodeFra,
-                    sisteOverførtePeriode
+                    sisteOverførtePeriode,
                 )
                 perioder.forEach { periode ->
                     it.konteringer = it.konteringer.plus(
@@ -150,8 +140,8 @@ class KonteringService {
                             transaksjonskode = kontering.transaksjonskode,
                             type = Type.NY.name,
                             søknadType = kontering.søknadType,
-                            vedtakId = hendelse.vedtakId
-                        )
+                            vedtakId = hendelse.vedtakId,
+                        ),
                     )
                 }
             }

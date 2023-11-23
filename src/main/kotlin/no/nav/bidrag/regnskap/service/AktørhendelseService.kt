@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class AktørhendelseService(
-    private val persistenceService: PersistenceService
+    private val persistenceService: PersistenceService,
 ) {
 
     @Transactional

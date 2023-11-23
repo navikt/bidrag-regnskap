@@ -12,7 +12,7 @@ data class PåløpRequest(
         format = "date-time",
         example = "2022-01-01T16:00:00Z",
         type = "String",
-        required = true
+        required = true,
     )
     val kjoredato: LocalDateTime,
 
@@ -21,7 +21,7 @@ data class PåløpRequest(
         type = "String",
         format = "yyyy-MM",
         example = "2022-01",
-        required = true
+        required = true,
     )
-    val forPeriode: YearMonth
+    val forPeriode: YearMonth,
 )

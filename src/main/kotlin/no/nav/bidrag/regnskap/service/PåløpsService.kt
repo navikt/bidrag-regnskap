@@ -8,7 +8,7 @@ import java.time.YearMonth
 
 @Service
 class PåløpsService(
-    val persistenceService: PersistenceService
+    val persistenceService: PersistenceService,
 ) {
 
     fun hentPåløp(): List<PåløpResponse> {
@@ -20,7 +20,7 @@ class PåløpsService(
                 kjoredato = it.kjøredato.toString(),
                 startetTidspunkt = it.startetTidspunkt?.toString(),
                 fullfortTidspunkt = it.fullførtTidspunkt?.toString(),
-                forPeriode = it.forPeriode
+                forPeriode = it.forPeriode,
             )
         }.sortedByDescending { YearMonth.parse(it.forPeriode) }
     }
@@ -28,7 +28,7 @@ class PåløpsService(
     fun lagrePåløp(påløpRequest: PåløpRequest): Int {
         val påløp = Påløp(
             kjøredato = påløpRequest.kjoredato,
-            forPeriode = påløpRequest.forPeriode.toString()
+            forPeriode = påløpRequest.forPeriode.toString(),
         )
 
         return persistenceService.lagrePåløp(påløp)

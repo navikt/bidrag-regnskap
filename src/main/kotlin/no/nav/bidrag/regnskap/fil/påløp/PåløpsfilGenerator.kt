@@ -20,15 +20,12 @@ import javax.xml.stream.XMLStreamWriter
 class PåløpsfilGenerator(
     private val gcpFilBucket: GcpFilBucket,
     private val filoverføringTilElinKlient: FiloverføringTilElinKlient,
-    private val persistenceService: PersistenceService
+    private val persistenceService: PersistenceService,
 ) {
 
     private var lyttere: List<PåløpskjøringLytter> = emptyList()
 
-    fun skrivPåløpsfilOgLastOppPåFilsluse(
-        påløp: Påløp,
-        lyttere: List<PåløpskjøringLytter>
-    ) {
+    fun skrivPåløpsfilOgLastOppPåFilsluse(påløp: Påløp, lyttere: List<PåløpskjøringLytter>) {
         this.lyttere = lyttere
         val now = LocalDate.now()
         val konteringer = persistenceService.hentAlleIkkeOverførteKonteringer()
@@ -95,11 +92,7 @@ class PåløpsfilGenerator(
         writer.writeEndDocument()
     }
 
-    private fun skrivStartBatchBr01(
-        writer: XMLStreamWriter,
-        påløp: Påløp,
-        now: LocalDate
-    ) {
+    private fun skrivStartBatchBr01(writer: XMLStreamWriter, påløp: Påløp, now: LocalDate) {
         writer.writeCharacters("\n")
         writer.writeStartElement("start-batch-br01")
 

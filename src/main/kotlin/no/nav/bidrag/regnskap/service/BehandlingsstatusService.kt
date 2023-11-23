@@ -10,7 +10,7 @@ import java.time.LocalDateTime
 @Service
 class BehandlingsstatusService(
     private val skattConsumer: SkattConsumer,
-    private val persistenceService: PersistenceService
+    private val persistenceService: PersistenceService,
 ) {
 
     fun hentKonteringerMedIkkeGodkjentBehandlingsstatus(sisteReferanser: List<String> = emptyList()): HashMap<String, MutableSet<Kontering>> {
@@ -21,7 +21,9 @@ class BehandlingsstatusService(
         return map
     }
 
-    fun hentBehandlingsstatusForIkkeGodkjenteKonteringer(konteringerSomIkkeHarFåttGodkjentBehandlingsstatus: HashMap<String, MutableSet<Kontering>>): HashMap<String, String> {
+    fun hentBehandlingsstatusForIkkeGodkjenteKonteringer(
+        konteringerSomIkkeHarFåttGodkjentBehandlingsstatus: HashMap<String, MutableSet<Kontering>>,
+    ): HashMap<String, String> {
         val feilmeldinger = hashMapOf<String, String>()
         konteringerSomIkkeHarFåttGodkjentBehandlingsstatus.forEach { (key, value) ->
             val behandlingsstatusResponse = hentBehandlingsstatus(key)

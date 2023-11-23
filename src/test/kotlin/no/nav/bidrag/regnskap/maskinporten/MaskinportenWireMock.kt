@@ -23,7 +23,7 @@ class MaskinportenWireMock {
             clientId = "17b3e4e8-8203-4463-a947-5c24021b7742",
             privateKey = RSAKeyGenerator(2048).keyID("123").generate().toString(),
             validInSeconds = 120,
-            scope = "skatt:testscope.read skatt:testscope.write"
+            scope = "skatt:testscope.read skatt:testscope.write",
         )
     }
 
@@ -53,9 +53,9 @@ class MaskinportenWireMock {
                       "expires_in" : 599,
                       "scope" : "difitest:test1"
                     }
-                """
-                    )
-                ).willSetStateTo("Ended")
+                """,
+                    ),
+                ).willSetStateTo("Ended"),
         )
     }
 
@@ -70,16 +70,16 @@ class MaskinportenWireMock {
                   "expires_in" : 599,
                   "scope" : "difitest:test1"
                 }
-            """
-                    )
-                )
+            """,
+                    ),
+                ),
         )
     }
 
     internal fun medUgyldigResponse() {
         mock.stubFor(
             WireMock.post(WireMock.urlPathEqualTo(TOKEN_PATH)).withHeader("Content-Type", WireMock.equalTo(CONTENT_TYPE))
-                .withRequestBody(WireMock.matching("grant_type=$GRANT_TYPE&assertion=.*")).willReturn(WireMock.ok("""w"""))
+                .withRequestBody(WireMock.matching("grant_type=$GRANT_TYPE&assertion=.*")).willReturn(WireMock.ok("""w""")),
         )
     }
 
@@ -87,7 +87,7 @@ class MaskinportenWireMock {
         mock.stubFor(
             WireMock.post(WireMock.urlPathEqualTo(TOKEN_PATH)).withHeader("Content-Type", WireMock.equalTo(CONTENT_TYPE))
                 .withRequestBody(WireMock.matching("grant_type=$GRANT_TYPE&assertion=.*"))
-                .willReturn(WireMock.serverError().withBody("test body"))
+                .willReturn(WireMock.serverError().withBody("test body")),
         )
     }
 }

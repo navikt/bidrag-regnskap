@@ -35,12 +35,12 @@ class PåløpsfilGeneratorTest {
         val kontering1 = TestData.opprettKontering(
             konteringId = 1,
             transaksjonskode = Transaksjonskode.A1.toString(),
-            oppdragsperiode = oppdragsperiode
+            oppdragsperiode = oppdragsperiode,
         )
         val kontering2 = TestData.opprettKontering(
             konteringId = 2,
             transaksjonskode = Transaksjonskode.B1.toString(),
-            oppdragsperiode = oppdragsperiode
+            oppdragsperiode = oppdragsperiode,
         )
         val konteringer = listOf(kontering1, kontering2)
         oppdrag.oppdragsperioder = listOf(oppdragsperiode)
@@ -51,7 +51,7 @@ class PåløpsfilGeneratorTest {
         val kontering3 = TestData.opprettKontering(
             konteringId = 3,
             transaksjonskode = Transaksjonskode.H1.toString(),
-            oppdragsperiode = oppdragsperiode2
+            oppdragsperiode = oppdragsperiode2,
         )
         val konteringer2 = listOf(kontering3)
         oppdrag2.oppdragsperioder = listOf(oppdragsperiode2)

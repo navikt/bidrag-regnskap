@@ -49,7 +49,7 @@ data class Kontering(
     val opprettetTidspunkt: LocalDateTime = LocalDateTime.now(),
 
     @Column(name = "vedtak_id")
-    val vedtakId: Int
+    val vedtakId: Int,
 ) {
 
     override fun toString(): String {

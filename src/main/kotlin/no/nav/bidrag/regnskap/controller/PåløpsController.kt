@@ -24,22 +24,22 @@ import java.time.YearMonth
 @Protected
 @Tag(name = "Påløp")
 class PåløpsController(
-    val påløpsService: PåløpsService
+    val påløpsService: PåløpsService,
 ) {
 
     @GetMapping("/palop")
     @Operation(
         summary = "Hent påløp",
         description = "Operasjon for å hente planlagte og gjennomførte påløpskjøringer.",
-        security = [SecurityRequirement(name = "bearer-key")]
+        security = [SecurityRequirement(name = "bearer-key")],
     )
     @ApiResponses(
         value = [
             ApiResponse(
                 responseCode = "200",
-                description = "Returnerer påløp."
-            )
-        ]
+                description = "Returnerer påløp.",
+            ),
+        ],
     )
     fun hentPåløp(): ResponseEntity<List<PåløpResponse>> {
         return ResponseEntity.ok(påløpsService.hentPåløp())
@@ -49,27 +49,27 @@ class PåløpsController(
     @Operation(
         summary = "Lagre nytt påløp",
         description = "Operasjon for å lagre planlagte og gjennomførte påløpskjøringer.",
-        security = [SecurityRequirement(name = "bearer-key")]
+        security = [SecurityRequirement(name = "bearer-key")],
     )
     @ApiResponses(
         value = [
             ApiResponse(
                 responseCode = "200",
-                description = "Lagret påløp."
-            )
-        ]
+                description = "Lagret påløp.",
+            ),
+        ],
     )
     @Parameters(
         value = [
             Parameter(name = "kjøredato", example = "2022-01-01T10:00:00"),
-            Parameter(name = "forPeriode", example = "2022-02")
-        ]
+            Parameter(name = "forPeriode", example = "2022-02"),
+        ],
     )
     fun lagrePåløp(
         @RequestParam(required = true)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
         kjøredato: LocalDateTime,
-        @RequestParam(required = true) forPeriode: String
+        @RequestParam(required = true) forPeriode: String,
     ): ResponseEntity<Int> {
         return ResponseEntity.ok(påløpsService.lagrePåløp(PåløpRequest(kjøredato, YearMonth.parse(forPeriode))))
     }

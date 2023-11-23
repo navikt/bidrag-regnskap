@@ -42,7 +42,7 @@ class ManglendeKonteringerServiceTest {
             oppdrag = oppdrag,
             periodeFra = periodeFra,
             periodeTil = periodeTil,
-            konteringer = emptyList()
+            konteringer = emptyList(),
         )
         oppdrag.oppdragsperioder = listOf(oppdragsperiode)
         val påløpsperiode = YearMonth.parse("2011-01")

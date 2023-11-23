@@ -16,7 +16,7 @@ private val LOGGER = LoggerFactory.getLogger(GcpFilBucket::class.java)
 
 @Component
 class GcpFilBucket(
-    @Value("\${BUCKET_NAME}") private val bucketNavn: String
+    @Value("\${BUCKET_NAME}") private val bucketNavn: String,
 ) {
 
     private val retrySetting = RetrySettings.newBuilder().setTotalTimeout(Duration.ofMillis(3000)).build()

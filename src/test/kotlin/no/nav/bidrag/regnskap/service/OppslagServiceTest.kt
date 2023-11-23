@@ -35,7 +35,7 @@ class OppslagServiceTest {
 
             every { persistenceService.hentOppdrag(any()) } returns TestData.opprettOppdrag(
                 stonadType = stonadType,
-                skyldnerIdent = skyldnerIdent
+                skyldnerIdent = skyldnerIdent,
             )
 
             val oppdragResponse = oppslagService.hentOppdrag(1)!!
@@ -78,17 +78,17 @@ class OppslagServiceTest {
                                 konteringId = 1,
                                 transaksjonskode = transaksjonskode.toString(),
                                 overforingsperiode = overforingsperiode.toString(),
-                                type = Type.NY.name
+                                type = Type.NY.name,
                             ),
                             TestData.opprettKontering(
                                 konteringId = 2,
                                 transaksjonskode = transaksjonskode.toString(),
                                 overforingsperiode = overforingsperiode.plusMonths(1).toString(),
-                                type = Type.ENDRING.name
-                            )
-                        )
-                    )
-                )
+                                type = Type.ENDRING.name,
+                            ),
+                        ),
+                    ),
+                ),
             )
 
             val konteringResponseListe = oppslagService.hentKonteringer(oppdrag.oppdragsperioder.first())

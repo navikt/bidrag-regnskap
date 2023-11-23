@@ -33,7 +33,7 @@ class PersistenceService(
     val konteringRepository: KonteringRepository,
     val påløpRepository: PåløpRepository,
     val oppdragsperiodeRepository: OppdragsperiodeRepository,
-    val driftsavvikRepository: DriftsavvikRepository
+    val driftsavvikRepository: DriftsavvikRepository,
 ) {
 
     fun hentOppdrag(oppdragId: Int): Oppdrag? {
@@ -46,20 +46,15 @@ class PersistenceService(
         return oppdragRepository.findAllBySakIdIs(sakId)
     }
 
-    fun hentOppdragPaUnikeIdentifikatorer(
-        stønadType: String,
-        kravhaverIdent: String?,
-        skyldnerIdent: String,
-        sakId: String
-    ): Oppdrag? {
+    fun hentOppdragPaUnikeIdentifikatorer(stønadType: String, kravhaverIdent: String?, skyldnerIdent: String, sakId: String): Oppdrag? {
         SECURE_LOGGER.info(
-            "Henter oppdrag med stønadType: $stønadType, kravhaverIdent: $kravhaverIdent, skyldnerIdent: $skyldnerIdent, sakId: $sakId"
+            "Henter oppdrag med stønadType: $stønadType, kravhaverIdent: $kravhaverIdent, skyldnerIdent: $skyldnerIdent, sakId: $sakId",
         )
         return oppdragRepository.findByStønadTypeAndKravhaverIdentAndSkyldnerIdentAndSakId(
             stønadType,
             kravhaverIdent,
             skyldnerIdent,
-            sakId
+            sakId,
         )
     }
 
@@ -126,7 +121,9 @@ class PersistenceService(
     }
 
     fun hentKonteringerUtenBehandlingsstatusOkForReferansekode(sisteReferansekoder: List<String>): List<Kontering> {
-        return konteringRepository.findAllByBehandlingsstatusOkTidspunktIsNullAndOverføringstidspunktIsNotNullAndSisteReferansekodeIsIn(sisteReferansekoder)
+        return konteringRepository.findAllByBehandlingsstatusOkTidspunktIsNullAndOverføringstidspunktIsNotNullAndSisteReferansekodeIsIn(
+            sisteReferansekoder,
+        )
     }
 
     fun hentAlleKonteringerForDato(dato: LocalDate): List<Kontering> {

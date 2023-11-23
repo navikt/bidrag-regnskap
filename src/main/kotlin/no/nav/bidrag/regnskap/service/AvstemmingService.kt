@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 @Service
 class AvstemmingService(
     private val avstemmingsfilGenerator: AvstemmingsfilGenerator,
-    private val persistenceService: PersistenceService
+    private val persistenceService: PersistenceService,
 ) {
 
     companion object {
@@ -20,13 +20,17 @@ class AvstemmingService(
         LOGGER.info("Starter avstemning for dato: $dato")
         avstemmingsfilGenerator.skrivAvstemmingsfil(
             persistenceService.hentAlleKonteringerForDato(dato).filter { it.behandlingsstatusOkTidspunkt != null },
-            dato
+            dato,
         )
     }
 
     fun startAvstemming(dato: LocalDate, fomTidspunkt: LocalDateTime, tomTidspunkt: LocalDateTime) {
         LOGGER.info("Starter avstemning for dato: $dato for konteringer mellom $fomTidspunkt og $tomTidspunkt")
-        val konteringer = persistenceService.hentAlleKonteringerForDato(dato, fomTidspunkt, tomTidspunkt).filter { it.behandlingsstatusOkTidspunkt != null }
+        val konteringer = persistenceService.hentAlleKonteringerForDato(
+            dato,
+            fomTidspunkt,
+            tomTidspunkt,
+        ).filter { it.behandlingsstatusOkTidspunkt != null }
         avstemmingsfilGenerator.skrivAvstemmingsfil(konteringer, dato)
     }
 }

@@ -16,7 +16,7 @@ private val LOGGER = KotlinLogging.logger { }
 @Service
 class SakConsumer(
     @Value("\${SAK_URL}") private val sakUrl: String,
-    @Qualifier("azure") private val restTemplate: RestOperations
+    @Qualifier("azure") private val restTemplate: RestOperations,
 ) : AbstractRestClient(restTemplate, "bidrag-regnskap") {
 
     companion object {
@@ -31,7 +31,9 @@ class SakConsumer(
 
             hentFødselsnummerTilBmFraSak(responseEntity) ?: DUMMY_NUMMER
         } catch (e: Exception) {
-            LOGGER.error { "Noe gikk galt i kommunikasjon med bidrag-sak for sakId: $sakId! \nGjeldende URL mot sak er: ${sakUrl + SAK_PATH} \nFeilmelding: ${e.message}" }
+            LOGGER.error {
+                "Noe gikk galt i kommunikasjon med bidrag-sak for sakId: $sakId! \nGjeldende URL mot sak er: ${sakUrl + SAK_PATH} \nFeilmelding: ${e.message}"
+            }
             throw e
         }
     }

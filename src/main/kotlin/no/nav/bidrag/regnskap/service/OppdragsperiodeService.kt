@@ -26,7 +26,7 @@ class OppdragsperiodeService {
             delytelseId = periode.delytelsesId,
             eksternReferanse = hendelse.eksternReferanse,
             oppdrag = oppdrag,
-            opphørendeOppdragsperiode = periode.beløp == null
+            opphørendeOppdragsperiode = periode.beløp == null,
         )
     }
 
