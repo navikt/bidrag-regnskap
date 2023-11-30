@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.time.Duration
 import java.time.Instant
+import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.Optional
 
@@ -47,7 +48,7 @@ class SlackPåløpVarsler(
     }
 
     override fun oppdragsperioderBehandletFerdig(påløp: Påløp, antallOppdragsperioder: Int) {
-        pågåendePåløp(påløp)?.konteringerMelding?.oppdaterMelding("Opprettet konteringer for $antallOppdragsperioder oppdragsperioder")
+        pågåendePåløp(påløp)?.konteringerMelding?.oppdaterMelding("Opprettet konteringer for $antallOppdragsperioder oppdragsperioder. Fullført tidspunkt: ${LocalDateTime.now()}")
     }
 
     override fun generererFil(påløp: Påløp) {
@@ -72,7 +73,7 @@ class SlackPåløpVarsler(
     }
 
     override fun konteringerSkrevetTilFilFerdig(påløp: Påløp, antallKonteringerTotalt: Int) {
-        pågåendePåløp(påløp)?.påløpsfilMelding?.oppdaterMelding("Påløpet har skrevet ferdig fil med $antallKonteringerTotalt konteringer!")
+        pågåendePåløp(påløp)?.påløpsfilMelding?.oppdaterMelding("Påløpet har skrevet ferdig fil med $antallKonteringerTotalt konteringer! Fullført tidspunkt: ${LocalDateTime.now()}")
     }
 
     override fun rapporterKonteringerFullført(påløp: Påløp, antallFullført: Int, totaltAntall: Int) {
@@ -96,7 +97,7 @@ class SlackPåløpVarsler(
     }
 
     override fun konteringerFullførtFerdig(påløp: Påløp, totaltAntall: Int) {
-        pågåendePåløp(påløp)?.konteringerFullførtMelding?.oppdaterMelding("Påløpet har satt overføringstidspunkt for $totaltAntall konteringer.")
+        pågåendePåløp(påløp)?.konteringerFullførtMelding?.oppdaterMelding("Påløpet har satt overføringstidspunkt for $totaltAntall konteringer. Fullført tidspunkt: ${LocalDateTime.now()}")
     }
 
     override fun påløpFullført(påløp: Påløp) {

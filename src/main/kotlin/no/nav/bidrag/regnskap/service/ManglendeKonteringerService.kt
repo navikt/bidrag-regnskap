@@ -31,7 +31,7 @@ class ManglendeKonteringerService(
         oppdragsperiodeIds.forEach {
             opprettKonteringerForOppdragsperiode(påløpsPeriode, it)
         }
-        LOGGER.info {
+        LOGGER.debug {
             "TIDSBRUK opprettKonteringerForAlleOppdragsperiodePartisjon: ${System.currentTimeMillis() - startTime}ms, Ledig minne: ${
                 Runtime.getRuntime().freeMemory()
             }"
@@ -58,7 +58,7 @@ class ManglendeKonteringerService(
         }
 
         persistenceService.lagreOppdragsperiode(oppdragsperiode)
-        LOGGER.info { "TIDSBRUK opprettKonteringerForAlleOppdragsperiode: ${System.currentTimeMillis() - startTime}ms" }
+        LOGGER.debug { "TIDSBRUK opprettKonteringerForAlleOppdragsperiode: ${System.currentTimeMillis() - startTime}ms" }
     }
 
     @Transactional
@@ -85,7 +85,7 @@ class ManglendeKonteringerService(
                     )
                 }
             }
-        LOGGER.info { "TIDSBRUK opprettManglendeKonteringerForOppdragsperiode: ${System.currentTimeMillis() - startTime}ms" }
+        LOGGER.debug { "TIDSBRUK opprettManglendeKonteringerForOppdragsperiode: ${System.currentTimeMillis() - startTime}ms" }
     }
 
     private fun harIkkePassertAktivTilDato(oppdragsperiode: Oppdragsperiode, periode: YearMonth) =

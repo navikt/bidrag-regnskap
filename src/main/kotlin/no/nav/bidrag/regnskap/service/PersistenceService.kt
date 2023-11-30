@@ -14,8 +14,6 @@ import no.nav.bidrag.regnskap.persistence.repository.PåløpRepository
 import org.slf4j.LoggerFactory
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.dao.EmptyResultDataAccessException
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -100,7 +98,7 @@ class PersistenceService(
         LOGGER.debug("Henter siste overførte periode.")
         try {
             val sisteOverførtePeriode = YearMonth.parse(påløpRepository.finnSisteOverførtePeriodeForPåløp() ?: "1001-01")
-            LOGGER.debug("Siste overførte periode var: $sisteOverførtePeriode.")
+            LOGGER.debug("Siste overførte periode var: {}.", sisteOverførtePeriode)
             return sisteOverførtePeriode
         } catch (e: EmptyResultDataAccessException) {
             LOGGER.error("Det finnes ingen overførte påløp. Minst et påløp må være opprettet og overført før REST kan tas i bruk.")
@@ -110,10 +108,6 @@ class PersistenceService(
 
     fun hentAlleIkkeOverførteKonteringer(): List<Kontering> {
         return konteringRepository.findAllByOverføringstidspunktIsNull()
-    }
-
-    fun hentAlleIkkeOverførteKonteringer(pageNumber: Int, pageSize: Int): Page<Kontering> {
-        return konteringRepository.findAllByOverføringstidspunktIsNullOrderByKonteringId(PageRequest.of(pageNumber, pageSize))
     }
 
     fun hentAlleKonteringerUtenBehandlingsstatusOk(): List<Kontering> {
@@ -149,7 +143,7 @@ class PersistenceService(
         try {
             return oppdragsperiodeRepository.save(oppdragsperiode).oppdragsperiodeId
         } finally {
-            LOGGER.info("TIDSBRUK lagreOppdragsperiode: {}ms", System.currentTimeMillis() - startTime)
+            LOGGER.debug("TIDSBRUK lagreOppdragsperiode: {}ms", System.currentTimeMillis() - startTime)
         }
     }
 
