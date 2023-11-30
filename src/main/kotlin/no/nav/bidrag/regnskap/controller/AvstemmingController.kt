@@ -8,6 +8,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import no.nav.bidrag.regnskap.service.AvstemmingService
 import no.nav.security.token.support.core.api.Protected
 import org.springframework.format.annotation.DateTimeFormat
@@ -25,6 +28,7 @@ class AvstemmingController(
     private val avstemmingService: AvstemmingService,
 ) {
 
+    @OptIn(DelicateCoroutinesApi::class)
     @GetMapping("/avstemming")
     @Operation(
         summary = "Start manuell generering av avstemming- og summeringsfil for dato.",
@@ -66,10 +70,12 @@ class AvstemmingController(
         if (dato.isAfter(LocalDate.now())) {
             return ResponseEntity.badRequest().build()
         }
-        if (fomTidspunkt != null && tomTidspunkt != null) {
-            avstemmingService.startAvstemming(dato, fomTidspunkt, tomTidspunkt)
-        } else {
-            avstemmingService.startAvstemming(dato)
+        GlobalScope.launch {
+            if (fomTidspunkt != null && tomTidspunkt != null) {
+                avstemmingService.startAvstemming(dato, fomTidspunkt, tomTidspunkt)
+            } else {
+                avstemmingService.startAvstemming(dato)
+            }
         }
         return ResponseEntity.ok().build()
     }
