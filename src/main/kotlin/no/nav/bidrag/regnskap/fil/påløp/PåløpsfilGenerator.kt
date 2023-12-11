@@ -38,7 +38,7 @@ class PåløpsfilGenerator(
 
         var index = 0
         var sum = BigDecimal.ZERO
-        finnAlleOppdragFraKonteringer(konteringer).forEach { (_, konteringerForOppdrag) ->
+        finnAlleSakerFraKonteringer(konteringer).forEach { (_, konteringerForSak) ->
             if (++index % 10000 == 0) {
                 medLyttere { it.rapportertKonteringerSkrevetTilFil(påløp, index, konteringer.size) }
             }
@@ -46,7 +46,7 @@ class PåløpsfilGenerator(
             writer.writeCharacters("\n")
             writer.writeStartElement("oppdrag")
 
-            konteringerForOppdrag.forEach { kontering ->
+            konteringerForSak.forEach { kontering ->
                 skrivKonteringBr10(writer, kontering, now)
                 sum += kontering.oppdragsperiode!!.beløp
             }
@@ -229,20 +229,20 @@ class PåløpsfilGenerator(
         writer.writeEndElement() // stopp-batch-br99
     }
 
-    private fun finnAlleOppdragFraKonteringer(konteringer: List<Kontering>): HashMap<Int, ArrayList<Kontering>> {
-        val oppdragsMap = HashMap<Int, ArrayList<Kontering>>()
+    private fun finnAlleSakerFraKonteringer(konteringer: List<Kontering>): HashMap<String, ArrayList<Kontering>> {
+        val sakerMap = HashMap<String, ArrayList<Kontering>>()
 
         // Går igjennom alle konteringer, oppretter en liste for hvert oppdrag om det ikke allerede finnes og legger til konteringen i listen tilhørende tilknyttet oppdrag.
         konteringer.forEach { kontering ->
-            val oppdrag = kontering.oppdragsperiode?.oppdrag?.oppdragId!!
-            var current = oppdragsMap[oppdrag]
+            val saksnummer = kontering.oppdragsperiode?.oppdrag?.sakId!!
+            var current = sakerMap[saksnummer]
             if (current == null) {
                 current = ArrayList()
-                oppdragsMap[oppdrag] = current
+                sakerMap[saksnummer] = current
             }
             current.add(kontering)
         }
-        return oppdragsMap
+        return sakerMap
     }
 
     private fun medLyttere(lytterConsumer: Consumer<PåløpskjøringLytter>) = lyttere.forEach(lytterConsumer)

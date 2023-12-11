@@ -30,7 +30,7 @@ class PåløpsfilGeneratorTest {
 
     @Test
     fun `skal skrive påløpsfil`() = runTest {
-        val oppdrag = TestData.opprettOppdrag(oppdragId = 1)
+        val oppdrag = TestData.opprettOppdrag(oppdragId = 1, sakId = "123")
         val oppdragsperiode = TestData.opprettOppdragsperiode(oppdrag = oppdrag)
         val kontering1 = TestData.opprettKontering(
             konteringId = 1,
@@ -46,7 +46,7 @@ class PåløpsfilGeneratorTest {
         oppdrag.oppdragsperioder = listOf(oppdragsperiode)
         oppdragsperiode.konteringer = konteringer
 
-        val oppdrag2 = TestData.opprettOppdrag(oppdragId = 2)
+        val oppdrag2 = TestData.opprettOppdrag(oppdragId = 2, sakId = "1234")
         val oppdragsperiode2 = TestData.opprettOppdragsperiode(oppdrag = oppdrag2)
         val kontering3 = TestData.opprettKontering(
             konteringId = 3,
@@ -56,6 +56,17 @@ class PåløpsfilGeneratorTest {
         val konteringer2 = listOf(kontering3)
         oppdrag2.oppdragsperioder = listOf(oppdragsperiode2)
         oppdragsperiode2.konteringer = konteringer2
+
+        val oppdrag3 = TestData.opprettOppdrag(oppdragId = 2, sakId = "1234")
+        val oppdragsperiode3 = TestData.opprettOppdragsperiode(oppdrag = oppdrag3)
+        val kontering4 = TestData.opprettKontering(
+            konteringId = 4,
+            transaksjonskode = Transaksjonskode.I1.toString(),
+            oppdragsperiode = oppdragsperiode3,
+        )
+        val konteringer3 = listOf(kontering4)
+        oppdrag.oppdragsperioder = listOf(oppdragsperiode3)
+        oppdragsperiode3.konteringer = konteringer3
 
         val påløp = TestData.opprettPåløp()
 
