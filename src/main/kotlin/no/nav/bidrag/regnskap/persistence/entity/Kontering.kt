@@ -7,13 +7,15 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
+import jakarta.persistence.SequenceGenerator
 import java.time.LocalDateTime
 
 @Entity(name = "konteringer")
 data class Kontering(
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "kontering_sequence")
+    @SequenceGenerator(name = "kontering_sequence", sequenceName = "kontering_id_sequence", allocationSize = 100)
     @Column(name = "kontering_id")
     val konteringId: Int = 0,
 

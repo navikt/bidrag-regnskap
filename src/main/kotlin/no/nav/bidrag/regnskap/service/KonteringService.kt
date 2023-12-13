@@ -20,16 +20,19 @@ class KonteringService {
     fun opprettNyeKonteringerPåOppdragsperiode(oppdragsperiode: Oppdragsperiode, hendelse: Hendelse, sisteOverførtePeriode: YearMonth) {
         val perioderForOppdragsperiode =
             hentAllePerioderForOppdragsperiodeForSisteOverførtePeriode(oppdragsperiode, sisteOverførtePeriode)
+        val alleOppdragsperioderForOppdrag = oppdragsperiode.oppdrag?.oppdragsperioder ?: emptyList()
+        val transaksjonskode = Transaksjonskode.hentTransaksjonskodeForType(hendelse.type).name
+        val vedtakId = hendelse.vedtakId
 
         perioderForOppdragsperiode.forEachIndexed { indexPeriode, periode ->
             oppdragsperiode.konteringer = oppdragsperiode.konteringer.plus(
                 Kontering(
-                    transaksjonskode = Transaksjonskode.hentTransaksjonskodeForType(hendelse.type).name,
+                    transaksjonskode = transaksjonskode,
                     overføringsperiode = periode.toString(),
-                    type = vurderType(oppdragsperiode, periode),
+                    type = vurderType(alleOppdragsperioderForOppdrag, periode),
                     søknadType = vurderSøknadType(hendelse, indexPeriode),
                     oppdragsperiode = oppdragsperiode,
-                    vedtakId = hendelse.vedtakId,
+                    vedtakId = vedtakId,
                 ),
             )
         }

@@ -85,7 +85,7 @@ class PersistenceService(
 
     fun lagrePåløp(påløp: Påløp): Int {
         val lagretPåløp = påløpRepository.save(påløp)
-        LOGGER.info("Lagret påløp med ID: ${lagretPåløp.påløpId}")
+        LOGGER.debug("Lagret påløp med ID: ${lagretPåløp.påløpId}")
         return lagretPåløp.påløpId
     }
 
@@ -145,6 +145,10 @@ class PersistenceService(
         } finally {
             LOGGER.debug("TIDSBRUK lagreOppdragsperiode: {}ms", System.currentTimeMillis() - startTime)
         }
+    }
+
+    fun lagreOppdragsperioder(oppdragsperioder: List<Oppdragsperiode>) {
+        oppdragsperiodeRepository.saveAll(oppdragsperioder)
     }
 
     fun lagreDriftsavvik(driftsavvik: Driftsavvik): Int {

@@ -17,6 +17,15 @@ interface OppdragsperiodeRepository : JpaRepository<Oppdragsperiode, Int> {
     @Transactional
     fun hentAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer(): List<Int>
 
+    @Query(
+        """ SELECT o
+            FROM oppdragsperioder o
+            JOIN FETCH o.oppdrag
+            WHERE o.oppdragsperiodeId IN :oppdragsperioder
+        """,
+    )
+    fun hentAlleOppdragsperioderForListe(oppdragsperioder: List<Int>): List<Oppdragsperiode>
+
     fun findByReferanseAndVedtakId(referanse: String, vedtakId: Int): List<Oppdragsperiode>
 
     fun findAllByMottakerIdent(mottakerIdent: String): List<Oppdragsperiode>

@@ -23,7 +23,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import java.time.LocalDate
 import java.time.YearMonth
-import java.util.Optional
 
 @ExtendWith(MockKExtension::class)
 class PåløpskjøringServiceTest {
@@ -79,9 +78,7 @@ class PåløpskjøringServiceTest {
                 oppdragsperiodeMedManglendeKonteringer.oppdragsperiodeId,
             )
             every { oppdragsperiodeRepo.hentAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer() } returns oppdragsperiodeIder
-            every {
-                oppdragsperiodeRepo.findById(oppdragsperiodeMedManglendeKonteringer.oppdragsperiodeId)
-            } returns Optional.of(oppdragsperiodeMedManglendeKonteringer)
+            every { oppdragsperiodeRepo.hentAlleOppdragsperioderForListe(any()) } returns listOf(oppdragsperiodeMedManglendeKonteringer)
 
             påløpskjøringService.startPåløpskjøring(påløp, false, true)
 
@@ -137,9 +134,7 @@ class PåløpskjøringServiceTest {
                 oppdragsperiodeMedManglendeKonteringer2.oppdragsperiodeId,
             )
             every { oppdragsperiodeRepo.hentAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer() } returns oppdragsperiodeIder
-            oppdragsperioder.forEach {
-                every { oppdragsperiodeRepo.findById(it.oppdragsperiodeId) } returns Optional.of(it)
-            }
+            every { oppdragsperiodeRepo.hentAlleOppdragsperioderForListe(any()) } returns oppdragsperioder
 
             påløpskjøringService.startPåløpskjøring(påløp, false, true)
 
@@ -188,9 +183,7 @@ class PåløpskjøringServiceTest {
                 oppdragsperiodeMedManglendeKonteringer.oppdragsperiodeId,
             )
             every { oppdragsperiodeRepo.hentAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer() } returns oppdragsperiodeIder
-            every {
-                oppdragsperiodeRepo.findById(oppdragsperiodeMedManglendeKonteringer.oppdragsperiodeId)
-            } returns Optional.of(oppdragsperiodeMedManglendeKonteringer)
+            every { oppdragsperiodeRepo.hentAlleOppdragsperioderForListe(any()) } returns listOf(oppdragsperiodeMedManglendeKonteringer)
 
             påløpskjøringService.startPåløpskjøring(påløp, false, true)
 

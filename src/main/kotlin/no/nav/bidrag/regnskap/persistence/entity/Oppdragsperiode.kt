@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
 import jakarta.persistence.OrderBy
+import jakarta.persistence.SequenceGenerator
 import org.hibernate.annotations.ColumnDefault
 import org.hibernate.annotations.DynamicInsert
 import java.math.BigDecimal
@@ -20,7 +21,8 @@ import java.time.LocalDate
 data class Oppdragsperiode(
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "oppdragsperiode_sequence")
+    @SequenceGenerator(name = "oppdragsperiode_sequence", sequenceName = "oppdragsperiode_id_sequence", allocationSize = 100)
     @Column(name = "oppdragsperiode_id")
     val oppdragsperiodeId: Int = 0,
 

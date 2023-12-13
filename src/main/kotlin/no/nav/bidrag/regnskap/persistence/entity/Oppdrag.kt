@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.OneToMany
 import jakarta.persistence.OrderBy
+import jakarta.persistence.SequenceGenerator
 import jakarta.persistence.Version
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -16,7 +17,8 @@ import java.time.LocalDateTime
 data class Oppdrag(
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "oppdrag_sequence")
+    @SequenceGenerator(name = "oppdrag_sequence", sequenceName = "oppdrag_id_sequence", allocationSize = 100)
     @Column(name = "oppdrag_id")
     val oppdragId: Int = 0,
 

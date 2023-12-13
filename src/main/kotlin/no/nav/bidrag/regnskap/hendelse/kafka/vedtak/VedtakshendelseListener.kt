@@ -5,6 +5,7 @@ import no.nav.bidrag.regnskap.SECURE_LOGGER
 import no.nav.bidrag.regnskap.service.VedtakshendelseService
 import org.slf4j.LoggerFactory
 import org.springframework.kafka.annotation.KafkaListener
+import org.springframework.kafka.listener.AbstractConsumerSeekAware
 import org.springframework.kafka.support.Acknowledgment
 import org.springframework.kafka.support.KafkaHeaders
 import org.springframework.messaging.handler.annotation.Header
@@ -15,10 +16,11 @@ private val LOGGER = LoggerFactory.getLogger(VedtakshendelseListener::class.java
 @Component
 class VedtakshendelseListener(
     private val vedtakshendelseService: VedtakshendelseService,
-) {
+) : AbstractConsumerSeekAware() {
 
     companion object {
         var hoppOverNesteMelding = false
+        var sisteOffset: Long = -1
     }
 
     @KafkaListener(groupId = "bidrag-regnskap", topics = ["\${TOPIC_VEDTAK}"])
@@ -30,6 +32,7 @@ class VedtakshendelseListener(
         @Header(KafkaHeaders.GROUP_ID) groupId: String,
         acknowledgment: Acknowledgment,
     ) {
+        sisteOffset = offset
         try {
             LOGGER.info("Starter behandling av vedtakhendelse med offset: $offset")
 
@@ -67,5 +70,13 @@ class VedtakshendelseListener(
 
     fun hoppOverNesteMelding() {
         hoppOverNesteMelding = true
+    }
+
+    fun hoppOverAlleMeldinger() {
+        this.seekToEnd()
+    }
+
+    fun hentSisteLesteHendelse(): Long {
+        return sisteOffset
     }
 }

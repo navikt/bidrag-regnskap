@@ -127,7 +127,7 @@ class AvstemmingsfilGenerator(
 
     private fun opprettAvstemmingsfilSummeringer(): Map<String, AvstemmingsfilSummeringer> {
         val summering = mutableMapOf<String, AvstemmingsfilSummeringer>()
-        Transaksjonskode.values().forEach {
+        Transaksjonskode.entries.forEach {
             summering[it.name] = AvstemmingsfilSummeringer(it, BigDecimal(0), 0)
         }
         return summering
