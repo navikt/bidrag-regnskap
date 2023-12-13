@@ -148,7 +148,7 @@ internal class VedtakshendelseListenerIT {
         val vedtakHendelse = hentFilOgSendPåKafka("gebyrSkyldner.json", 1)
 
         val kontering = assertVedOpprettelseAvEngangsbeløp(
-            1,
+            100000001,
             vedtakHendelse,
             Engangsbeløptype.GEBYR_SKYLDNER,
             Transaksjonskode.G1,
@@ -165,7 +165,7 @@ internal class VedtakshendelseListenerIT {
         hentFilOgSendPåKafka("gebyrSkyldnerOppdatering.json", 3)
 
         val konteringer = assertVedOppdateringAvEngangsbeløpOgReturnerKonteringer(
-            1,
+            100000001,
             Transaksjonskode.G1,
             Transaksjonskode.G3,
             100000000,
@@ -180,7 +180,7 @@ internal class VedtakshendelseListenerIT {
         val vedtakHendelse = hentFilOgSendPåKafka("gebyrMottaker.json", 4)
 
         val kontering = assertVedOpprettelseAvEngangsbeløp(
-            2,
+            100000002,
             vedtakHendelse,
             Engangsbeløptype.GEBYR_MOTTAKER,
             Transaksjonskode.G1,
@@ -195,13 +195,13 @@ internal class VedtakshendelseListenerIT {
     @Order(4)
     fun `skal oppdatere gebyr for mottaker`() {
         await().atMost(TEN_SECONDS).until {
-            return@until persistenceService.hentOppdrag(2) != null
+            return@until persistenceService.hentOppdrag(100000002) != null
         }
 
         hentFilOgSendPåKafka("gebyrMottakerOppdatering.json", 6)
 
         val konteringer = assertVedOppdateringAvEngangsbeløpOgReturnerKonteringer(
-            2,
+            100000002,
             Transaksjonskode.G1,
             Transaksjonskode.G3,
             100000001,
@@ -216,7 +216,7 @@ internal class VedtakshendelseListenerIT {
         val vedtakHendelse = hentFilOgSendPåKafka("særtilskudd.json", 7)
 
         val kontering = assertVedOpprettelseAvEngangsbeløp(
-            3,
+            100000003,
             vedtakHendelse,
             Engangsbeløptype.SAERTILSKUDD,
             Transaksjonskode.E1,
@@ -231,13 +231,13 @@ internal class VedtakshendelseListenerIT {
     @Order(6)
     fun `skal oppdatere særtilskudd`() {
         await().atMost(TEN_SECONDS).until {
-            return@until persistenceService.hentOppdrag(3) != null
+            return@until persistenceService.hentOppdrag(100000003) != null
         }
 
         hentFilOgSendPåKafka("særtilskuddOppdatering.json", 9)
 
         val konteringer = assertVedOppdateringAvEngangsbeløpOgReturnerKonteringer(
-            3,
+            100000003,
             Transaksjonskode.E1,
             Transaksjonskode.E3,
             100000003,
@@ -252,7 +252,7 @@ internal class VedtakshendelseListenerIT {
         val vedtakHendelse = hentFilOgSendPåKafka("tilbakekreving.json", 10)
 
         val kontering = assertVedOpprettelseAvEngangsbeløp(
-            4,
+            100000004,
             vedtakHendelse,
             Engangsbeløptype.TILBAKEKREVING,
             Transaksjonskode.H1,
@@ -267,13 +267,13 @@ internal class VedtakshendelseListenerIT {
     @Order(8)
     fun `skal oppdatere tilbakekreving`() {
         await().atMost(TEN_SECONDS).until {
-            return@until persistenceService.hentOppdrag(4) != null
+            return@until persistenceService.hentOppdrag(100000004) != null
         }
 
         hentFilOgSendPåKafka("tilbakekrevingOppdatering.json", 12)
 
         val konteringer = assertVedOppdateringAvEngangsbeløpOgReturnerKonteringer(
-            4,
+            100000004,
             Transaksjonskode.H1,
             Transaksjonskode.H3,
             100000004,
@@ -288,7 +288,7 @@ internal class VedtakshendelseListenerIT {
         val vedtakHendelse = hentFilOgSendPåKafka("ettergivelse.json", 14)
 
         val kontering = assertVedOpprettelseAvEngangsbeløp(
-            5,
+            100000005,
             vedtakHendelse,
             Engangsbeløptype.ETTERGIVELSE,
             Transaksjonskode.K1,
@@ -305,7 +305,7 @@ internal class VedtakshendelseListenerIT {
         val vedtakHendelse = hentFilOgSendPåKafka("direkteOppgjor.json", 15)
 
         val kontering = assertVedOpprettelseAvEngangsbeløp(
-            7,
+            100000007,
             vedtakHendelse,
             Engangsbeløptype.DIREKTE_OPPGJOR,
             Transaksjonskode.K2,
@@ -322,7 +322,7 @@ internal class VedtakshendelseListenerIT {
         val vedtakHendelse = hentFilOgSendPåKafka("ettergivelseTilbakekreving.json", 16)
 
         val kontering = assertVedOpprettelseAvEngangsbeløp(
-            8,
+            100000008,
             vedtakHendelse,
             Engangsbeløptype.ETTERGIVELSE_TILBAKEKREVING,
             Transaksjonskode.K3,
@@ -342,7 +342,7 @@ internal class VedtakshendelseListenerIT {
         val vedtakHendelse = hentFilOgSendPåKafka("bidragsforskudd.json", 31, skyldnerIdent, kravhaverIdent)
 
         val oppdrag = assertStønader(
-            9,
+            100000009,
             vedtakHendelse,
             Stønadstype.FORSKUDD,
             3,
@@ -359,7 +359,7 @@ internal class VedtakshendelseListenerIT {
     @Order(13)
     fun `skal oppdatere bidragsforskudd`() {
         await().atMost(TEN_SECONDS).until {
-            return@until persistenceService.hentOppdrag(9) != null
+            return@until persistenceService.hentOppdrag(100000009) != null
         }
 
         val vedtakHendelse = hentFilOgSendPåKafka(
@@ -370,7 +370,7 @@ internal class VedtakshendelseListenerIT {
         )
 
         val oppdrag = assertStønader(
-            9,
+            100000009,
             vedtakHendelse,
             Stønadstype.FORSKUDD,
             4,
@@ -405,7 +405,7 @@ internal class VedtakshendelseListenerIT {
         )
 
         val oppdrag1 = assertStønader(
-            10,
+            100000010,
             vedtakHendelse,
             Stønadstype.BIDRAG,
             2,
@@ -415,7 +415,7 @@ internal class VedtakshendelseListenerIT {
         )
 
         val oppdrag2 = assertStønader(
-            11,
+            100000011,
             vedtakHendelse,
             Stønadstype.BIDRAG,
             2,
@@ -426,7 +426,7 @@ internal class VedtakshendelseListenerIT {
         )
 
         val gebyrBp = assertVedOpprettelseAvEngangsbeløp(
-            12,
+            100000012,
             vedtakHendelse,
             Engangsbeløptype.GEBYR_SKYLDNER,
             Transaksjonskode.G1,
@@ -435,7 +435,7 @@ internal class VedtakshendelseListenerIT {
         )
 
         val gebyrBm = assertVedOpprettelseAvEngangsbeløp(
-            13,
+            100000013,
             vedtakHendelse,
             Engangsbeløptype.GEBYR_MOTTAKER,
             Transaksjonskode.G1,
@@ -463,7 +463,7 @@ internal class VedtakshendelseListenerIT {
         )
 
         val oppdrag1 = assertStønader(
-            10,
+            100000010,
             vedtakHendelse,
             Stønadstype.BIDRAG,
             3,
@@ -479,7 +479,7 @@ internal class VedtakshendelseListenerIT {
         )
 
         val oppdrag2 = assertStønader(
-            11,
+            100000011,
             vedtakHendelse,
             Stønadstype.BIDRAG,
             3,
@@ -512,11 +512,11 @@ internal class VedtakshendelseListenerIT {
         )
 
         await().atMost(TEN_SECONDS).until {
-            return@until persistenceService.hentOppdrag(14) != null
+            return@until persistenceService.hentOppdrag(100000014) != null
         }
 
         val oppdrag1 = assertStønader(
-            14,
+            100000014,
             vedtakHendelse,
             Stønadstype.OPPFOSTRINGSBIDRAG,
             1,
@@ -526,11 +526,11 @@ internal class VedtakshendelseListenerIT {
         )
 
         await().atMost(TEN_SECONDS).until {
-            return@until persistenceService.hentOppdrag(15) != null
+            return@until persistenceService.hentOppdrag(100000015) != null
         }
 
         val oppdrag2 = assertStønader(
-            15,
+            100000015,
             vedtakHendelse,
             Stønadstype.OPPFOSTRINGSBIDRAG,
             1,
@@ -555,7 +555,7 @@ internal class VedtakshendelseListenerIT {
         )
 
         val oppdrag1 = assertStønader(
-            14,
+            100000014,
             vedtakHendelse,
             Stønadstype.OPPFOSTRINGSBIDRAG,
             2,
@@ -572,7 +572,7 @@ internal class VedtakshendelseListenerIT {
         )
 
         val oppdrag2 = assertStønader(
-            15,
+            100000015,
             vedtakHendelse,
             Stønadstype.OPPFOSTRINGSBIDRAG,
             2,
@@ -600,11 +600,11 @@ internal class VedtakshendelseListenerIT {
         )
 
         await().atMost(TEN_SECONDS).until {
-            return@until persistenceService.hentOppdrag(16) != null
+            return@until persistenceService.hentOppdrag(100000016) != null
         }
 
         val oppdrag = assertStønader(
-            16,
+            100000016,
             vedtakHendelse,
             Stønadstype.BIDRAG18AAR,
             3,
@@ -627,7 +627,7 @@ internal class VedtakshendelseListenerIT {
         )
 
         val oppdrag = assertStønader(
-            16,
+            100000016,
             vedtakHendelse,
             Stønadstype.BIDRAG18AAR,
             4,
@@ -657,11 +657,11 @@ internal class VedtakshendelseListenerIT {
         )
 
         await().atMost(TEN_SECONDS).until {
-            return@until persistenceService.hentOppdrag(17) != null
+            return@until persistenceService.hentOppdrag(100000017) != null
         }
 
         val oppdrag = assertStønader(
-            17,
+            100000017,
             vedtakHendelse,
             Stønadstype.EKTEFELLEBIDRAG,
             2,
@@ -684,7 +684,7 @@ internal class VedtakshendelseListenerIT {
         )
 
         val oppdrag = assertStønader(
-            17,
+            100000017,
             vedtakHendelse,
             Stønadstype.EKTEFELLEBIDRAG,
             3,
@@ -709,11 +709,11 @@ internal class VedtakshendelseListenerIT {
         )
 
         await().atMost(TEN_SECONDS).until {
-            return@until persistenceService.hentOppdrag(18) != null
+            return@until persistenceService.hentOppdrag(100000018) != null
         }
 
         val oppdrag = assertStønader(
-            18,
+            100000018,
             vedtakHendelse,
             Stønadstype.MOTREGNING,
             1,
