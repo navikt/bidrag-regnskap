@@ -16,3 +16,4 @@ jobs:
     secrets: inherit
     with:
       maven_options: -B -q -fae -Pit
+      maven_test_lifecycle: verify
