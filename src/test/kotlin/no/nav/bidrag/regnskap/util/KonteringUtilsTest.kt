@@ -28,25 +28,25 @@ internal class KonteringUtilsTest {
 
         @Test
         fun `Skal vurdere til type NY dersom det ikke finnes noen kontering for den perioden`() {
-            val type = KonteringUtils.vurderType(oppdragsperiode, YearMonth.now().plusMonths(1))
+            val type = KonteringUtils.vurderType(oppdragsperiode.oppdrag?.oppdragsperioder ?: emptyList(), YearMonth.now().plusMonths(1))
             type shouldBe Type.NY.name
         }
 
         @Test
         fun `Skal vurdere til type NY dersom det ikke finnes noen kontering for den perioden og period er tilbake i tid`() {
-            val type = KonteringUtils.vurderType(oppdragsperiode, YearMonth.now().minusMonths(6))
+            val type = KonteringUtils.vurderType(oppdragsperiode.oppdrag?.oppdragsperioder ?: emptyList(), YearMonth.now().minusMonths(6))
             type shouldBe Type.NY.name
         }
 
         @Test
         fun `Skal vurdere til type NY dersom det ikke finnes noen kontering for den perioden og period er langt frem i tid`() {
-            val type = KonteringUtils.vurderType(oppdragsperiode, YearMonth.now().plusMonths(18))
+            val type = KonteringUtils.vurderType(oppdragsperiode.oppdrag?.oppdragsperioder ?: emptyList(), YearMonth.now().plusMonths(18))
             type shouldBe Type.NY.name
         }
 
         @Test
         fun `Skal vurdere til type ENDRING dersom det finnes kontering for perioden`() {
-            val type = KonteringUtils.vurderType(oppdragsperiode, YearMonth.now())
+            val type = KonteringUtils.vurderType(oppdragsperiode.oppdrag?.oppdragsperioder ?: emptyList(), YearMonth.now())
             type shouldBe Type.ENDRING.name
         }
     }

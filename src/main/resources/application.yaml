@@ -85,7 +85,7 @@ spring:
 
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_DATABASE}?user=${DB_USERNAME}&password=${DB_PASSWORD}
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_DATABASE}?user=${DB_USERNAME}&password=${DB_PASSWORD}&reWriteBatchedInserts=true
     hikari:
       max-lifetime: 900000
       maximum-pool-size: 10
@@ -102,3 +102,6 @@ spring:
         query:
           plan_cache_max_size: 1024
           plan_parameter_metadata_max_size:  64
+        jdbc:
+          batch_size: 1000
+          batch_versioned_data: true

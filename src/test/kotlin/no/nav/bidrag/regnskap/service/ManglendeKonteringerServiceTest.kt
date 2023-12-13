@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.test.util.ReflectionTestUtils
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.YearMonth
 
 @ExtendWith(MockKExtension::class)
@@ -47,7 +48,7 @@ class ManglendeKonteringerServiceTest {
         oppdrag.oppdragsperioder = listOf(oppdragsperiode)
         val påløpsperiode = YearMonth.parse("2011-01")
 
-        manglendeKonteringerService.opprettManglendeKonteringerForOppdragsperiode(oppdragsperiode, påløpsperiode)
+        manglendeKonteringerService.opprettManglendeKonteringerForOppdragsperiode(oppdragsperiode, påløpsperiode, LocalDateTime.now())
 
         oppdragsperiode.konteringer shouldHaveSize 45
         oppdragsperiode.konteringer.first().overføringsperiode shouldBe konteringerForeldetDato

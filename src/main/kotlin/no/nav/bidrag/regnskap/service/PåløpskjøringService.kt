@@ -23,7 +23,7 @@ import java.util.function.Consumer
 
 private val LOGGER = LoggerFactory.getLogger(PåløpskjøringService::class.java)
 
-private const val PARTISJONSSTØRRELSE = 1000
+private const val PARTISJONSSTØRRELSE = 100
 
 @Service
 class PåløpskjøringService(
@@ -45,6 +45,7 @@ class PåløpskjøringService(
             LOGGER.warn("Påløpskjøring har satt startet tidspunkt! Dette kan være grunnet allerede kjørende påløp. Starter derfor ikke nytt påløp.")
             return
         }
+
         medLyttere { it.påløpStartet(påløp, schedulertKjøring, genererFil) }
         try {
             validerDriftsavvik(påløp, schedulertKjøring)
@@ -52,24 +53,23 @@ class PåløpskjøringService(
             persistenceService.registrerPåløpStartet(påløp.påløpId, LocalDateTime.now())
 
             if (genererFil) {
-                endreElinVedlikeholdsmodus(
-                    Årsakskode.PAALOEP_GENERERES,
-                    "Påløp for ${påløp.forPeriode} genereres hos NAV.",
-                )
+                endreElinVedlikeholdsmodus(Årsakskode.PAALOEP_GENERERES, "Påløp for ${påløp.forPeriode} genereres hos NAV.")
             }
+
             opprettKonteringerForAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer(påløp)
+
             if (genererFil) {
                 genererPåløpsfil(påløp)
             }
+
             settOverføringstidspunktPåKonteringer(påløp)
             avsluttDriftsavvik(påløp)
             fullførPåløp(påløp)
+
             if (genererFil) {
-                endreElinVedlikeholdsmodus(
-                    Årsakskode.PAALOEP_LEVERT,
-                    "Påløp for ${påløp.forPeriode} er ferdig generert fra NAV.",
-                )
+                endreElinVedlikeholdsmodus(Årsakskode.PAALOEP_LEVERT, "Påløp for ${påløp.forPeriode} er ferdig generert fra NAV.")
             }
+
             medLyttere { it.påløpFullført(påløp) }
             Metrics.timer("palop-kjoretid-ferdig").record<Long> { longTaskTimer.stop() }
         } catch (e: Error) {
@@ -88,12 +88,7 @@ class PåløpskjøringService(
             throw IllegalStateException("Det finnes aktive driftsavvik som ikke er knyttet til påløpet! Kan derfor ikke starte påløpskjøring!")
         }
         if (driftsavvikListe.isEmpty()) {
-            persistenceService.lagreDriftsavvik(
-                opprettDriftsavvik(
-                    påløp,
-                    schedulertKjøring,
-                ),
-            )
+            persistenceService.lagreDriftsavvik(opprettDriftsavvik(påløp, schedulertKjøring))
         }
     }
 
@@ -112,18 +107,16 @@ class PåløpskjøringService(
 
     fun opprettKonteringerForAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer(påløp: Påløp) {
         val påløpsPeriode = LocalDate.parse(påløp.forPeriode + "-01")
-        val oppdragsperioder =
-            ArrayList(oppdragsperiodeRepo.hentAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer())
+        val oppdragsperioder = ArrayList(oppdragsperiodeRepo.hentAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer())
         var antallBehandlet = 0
 
         medLyttere { it.rapporterOppdragsperioderBehandlet(påløp, antallBehandlet, oppdragsperioder.size) }
 
-        Lists.partition(oppdragsperioder, PARTISJONSSTØRRELSE).forEach { oppdragsperiodeIds ->
-            manglendeKonteringerService.opprettKonteringerForAlleOppdragsperiodePartisjon(
+        Lists.partition(oppdragsperioder, PARTISJONSSTØRRELSE).parallelStream().forEach { oppdragsperiodeIds ->
+            manglendeKonteringerService.opprettKonteringerForOppdragsperiode(
                 påløpsPeriode,
                 oppdragsperiodeIds,
             )
-
             antallBehandlet += oppdragsperiodeIds.size
             medLyttere { it.rapporterOppdragsperioderBehandlet(påløp, antallBehandlet, oppdragsperioder.size) }
         }
@@ -142,7 +135,7 @@ class PåløpskjøringService(
         val timestamp = LocalDateTime.now()
         var antallBehandlet = 0
 
-        LOGGER.info("Starter å sette overføringstidspunkt konteringer.")
+        LOGGER.debug("Starter å sette overføringstidspunkt konteringer.")
         val konteringer = ArrayList(persistenceService.hentAlleIkkeOverførteKonteringer())
         Lists.partition(konteringer, PARTISJONSSTØRRELSE).forEach { konteringerPartition ->
             konteringerPartition.forEach {
@@ -156,7 +149,7 @@ class PåløpskjøringService(
         }
 
         medLyttere { it.konteringerFullførtFerdig(påløp, konteringer.size) }
-        LOGGER.info("Fullført setting av overføringstidspunkt for konteringer.")
+        LOGGER.debug("Fullført setting av overføringstidspunkt for konteringer.")
     }
 
     private fun skrivPåløpsfilOgLastOppPåFilsluse(påløp: Påløp) {
@@ -171,9 +164,7 @@ class PåløpskjøringService(
     }
 
     fun avsluttDriftsavvik(påløp: Påløp) {
-        val driftsavvik =
-            persistenceService.hentDriftsavvikForPåløp(påløp.påløpId)
-                ?: error("Fant ikke driftsavvik på ID: ${påløp.påløpId}")
+        val driftsavvik = persistenceService.hentDriftsavvikForPåløp(påløp.påløpId) ?: error("Fant ikke driftsavvik på ID: ${påløp.påløpId}")
         persistenceService.lagreDriftsavvik(driftsavvik.copy(tidspunktTil = LocalDateTime.now()))
     }
 }

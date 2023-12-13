@@ -33,14 +33,13 @@ object KonteringUtils {
             Søknadstype.EN.name
         }
     }
-
-    fun vurderType(oppdragsperiode: Oppdragsperiode, periode: YearMonth): String {
-        if (finnesKonteringForPeriode(oppdragsperiode, periode)) {
+    fun vurderType(oppdragsperioder: List<Oppdragsperiode>, periode: YearMonth): String {
+        if (finnesKonteringForPeriode(oppdragsperioder, periode)) {
             return Type.NY.name
         }
         return Type.ENDRING.name
     }
 
-    private fun finnesKonteringForPeriode(oppdragsperiode: Oppdragsperiode, periode: YearMonth) =
-        oppdragsperiode.oppdrag?.oppdragsperioder?.none { it.konteringer.any { kontering -> kontering.overføringsperiode == periode.toString() } } == true
+    private fun finnesKonteringForPeriode(oppdragsperioder: List<Oppdragsperiode>, periode: YearMonth) =
+        oppdragsperioder.none { it.konteringer.any { kontering -> kontering.overføringsperiode == periode.toString() } }
 }
