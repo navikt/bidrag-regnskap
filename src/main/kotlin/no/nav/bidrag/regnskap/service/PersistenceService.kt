@@ -45,10 +45,10 @@ class PersistenceService(
     }
 
     fun hentOppdragPaUnikeIdentifikatorer(stønadType: String, kravhaverIdent: String?, skyldnerIdent: String, sakId: String): Oppdrag? {
-        SECURE_LOGGER.info(
+        SECURE_LOGGER.debug(
             "Henter oppdrag med stønadType: $stønadType, kravhaverIdent: $kravhaverIdent, skyldnerIdent: $skyldnerIdent, sakId: $sakId",
         )
-        return oppdragRepository.findByStønadTypeAndKravhaverIdentAndSkyldnerIdentAndSakId(
+        return oppdragRepository.finnOppdragMedStønadTypeKravhanderSkylderOgSaksnummer(
             stønadType,
             kravhaverIdent,
             skyldnerIdent,
@@ -58,7 +58,7 @@ class PersistenceService(
 
     fun hentOppdragPåReferanseOgOmgjørVedtakId(referanse: String, omgjørVedtakId: Int): Oppdrag? {
         LOGGER.debug("Henter oppdrag på referanse: $referanse og omgjørVedtakId: $omgjørVedtakId")
-        return oppdragsperiodeRepository.findByReferanseAndVedtakId(referanse, omgjørVedtakId).firstOrNull()?.oppdrag
+        return oppdragsperiodeRepository.hentOppdragPåReferanseOgVedtakId(referanse, omgjørVedtakId).firstOrNull()?.oppdrag
     }
 
     fun lagreOppdrag(oppdrag: Oppdrag): Int {
@@ -94,6 +94,7 @@ class PersistenceService(
         return påløpRepository.findAllByFullførtTidspunktIsNull()
     }
 
+    @Cacheable(value = ["siste_overforte_periode_cache"])
     fun finnSisteOverførtePeriode(): YearMonth {
         LOGGER.debug("Henter siste overførte periode.")
         try {
