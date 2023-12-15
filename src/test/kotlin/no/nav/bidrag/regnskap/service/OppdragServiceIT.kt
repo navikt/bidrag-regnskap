@@ -74,7 +74,6 @@ class OppdragServiceIT {
     @BeforeEach
     fun beforeEach() {
         sakApiWireMock.sakMedGyldigResponse()
-
     }
 
     @Test
@@ -112,9 +111,9 @@ class OppdragServiceIT {
                             periodeFomDato = LocalDate.of(2023, 1, 1),
                             periodeTilDato = null,
                             delytelsesId = null,
-                        )
-                    )
-                )
+                        ),
+                    ),
+                ),
             )
         }
         return hendelser
