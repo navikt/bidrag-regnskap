@@ -15,7 +15,7 @@
   <name>bidrag-regnskap</name>
   <properties>
     <java.version>21</java.version>
-    <kotlin.version>1.9.20</kotlin.version>
+    <kotlin.version>1.9.21</kotlin.version>
     <kotlin-coroutines.version>1.7.3</kotlin-coroutines.version>
     <bidrag-commons.version>20231114143627_14d61cd</bidrag-commons.version>
     <bidrag-transport.version>20231113102624_1040a39</bidrag-transport.version>
@@ -26,12 +26,12 @@
     <mockk.version>1.13.5</mockk.version>
     <kotest.version>5.6.2</kotest.version>
     <bidrag-commons-test.version>1.20230511093912_dc35d81</bidrag-commons-test.version>
-    <shedlock.version>5.10.0</shedlock.version>
+    <shedlock.version>5.10.2</shedlock.version>
     <google-api-extention.version>2.37.0</google-api-extention.version>
     <google-cloud-storage.version>2.22.2</google-cloud-storage.version>
     <jsch.version>0.2.8</jsch.version>
     <testcontainers.version>1.19.3</testcontainers.version>
-    <maven-failsafe-plugin.version>3.1.0</maven-failsafe-plugin.version>
+    <maven-failsafe-plugin.version>3.2.2</maven-failsafe-plugin.version>
     <spring-kafka.version>3.0.12</spring-kafka.version>
     <scala.version>2.13.12</scala.version>
     <kotlin-logging-jwv.version>5.1.0</kotlin-logging-jwv.version>
