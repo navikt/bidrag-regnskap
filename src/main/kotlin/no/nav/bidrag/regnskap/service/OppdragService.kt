@@ -59,7 +59,7 @@ class OppdragService(
         oppdatererVerdierPåOppdrag(hendelse, oppdrag)
         val oppdragId = persistenceService.lagreOppdrag(oppdrag)
 
-        LOGGER.info("Oppdrag med ID: $oppdragId er ${if (erOppdatering) "oppdatert." else "opprettet."}")
+        LOGGER.debug("Oppdrag med ID: $oppdragId er ${if (erOppdatering) "oppdatert." else "opprettet."}")
 
         return oppdragId
     }
@@ -79,7 +79,7 @@ class OppdragService(
     }
 
     private fun opprettOppdrag(hendelse: Hendelse): Oppdrag {
-        LOGGER.info("Fant ikke eksisterende oppdrag for vedtakID: ${hendelse.vedtakId}. Opprettet nytt oppdrag..")
+        LOGGER.debug("Fant ikke eksisterende oppdrag for vedtakID: ${hendelse.vedtakId}. Opprettet nytt oppdrag..")
         return Oppdrag(
             stønadType = hendelse.type,
             sakId = hendelse.sakId,

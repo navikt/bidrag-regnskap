@@ -2,9 +2,21 @@ package no.nav.bidrag.regnskap.persistence.repository
 
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
 
 interface OppdragRepository : JpaRepository<Oppdrag, Int> {
-    fun findByStønadTypeAndKravhaverIdentAndSkyldnerIdentAndSakId(
+
+    @Query(
+        """ SELECT o
+            FROM oppdrag o
+            JOIN FETCH o.oppdragsperioder
+            WHERE o.stønadType = :stønadType 
+                AND o.kravhaverIdent = :kravhaverIdent 
+                AND o.skyldnerIdent = :skyldnerIdent 
+                AND o.sakId = :sakId
+        """,
+    )
+    fun finnOppdragMedStønadTypeKravhanderSkylderOgSaksnummer(
         stønadType: String,
         kravhaverIdent: String?,
         skyldnerIdent: String,
