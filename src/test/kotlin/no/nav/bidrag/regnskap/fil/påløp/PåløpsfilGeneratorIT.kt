@@ -63,7 +63,6 @@ class PåløpsfilGeneratorIT {
         }
     }
 
-
     @Autowired
     private lateinit var persistenceService: PersistenceService
 
@@ -77,6 +76,7 @@ class PåløpsfilGeneratorIT {
         påløpsfilGenerator = PåløpsfilGenerator(gcpFilBucket, filoverføringTilElinKlient, persistenceService)
         opprettOppdragOgOppdragsperioderOgKonteringer(antallOppdrag)
     }
+
     @Test
     fun `skal ta tiden på opprettelse av filgenerering`() {
         val tidsbruk = measureTime {
@@ -118,7 +118,7 @@ class PåløpsfilGeneratorIT {
                 behandlingsstatusOkTidspunkt = null,
                 type = Type.NY.name,
                 søknadType = Søknadstype.EN.name,
-                vedtakId = Random.nextInt()
+                vedtakId = Random.nextInt(),
             )
             val kontering2 = Kontering(
                 oppdragsperiode = oppdragsperiode,
@@ -128,7 +128,7 @@ class PåløpsfilGeneratorIT {
                 behandlingsstatusOkTidspunkt = null,
                 type = Type.NY.name,
                 søknadType = Søknadstype.EN.name,
-                vedtakId = Random.nextInt()
+                vedtakId = Random.nextInt(),
             )
             oppdragsperiode.konteringer = listOf(kontering, kontering2)
             oppdrag.oppdragsperioder = listOf(oppdragsperiode)
