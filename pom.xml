@@ -42,6 +42,8 @@
     <fasterxml-jackson-module-kotlin.version>2.16.0</fasterxml-jackson-module-kotlin.version>
     <ktlint.version>1.1.0</ktlint.version>
     <logback.version>1.4.14</logback.version>
+    <commons-compress.version>1.25.0</commons-compress.version>
+    <commons-io.version>2.15.1</commons-io.version>
   </properties>
 
   <repositories>
@@ -61,7 +63,7 @@
       <dependency>
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
-        <version>2.15.1</version>
+        <version>${commons-io.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -155,6 +157,11 @@
       <groupId>org.scala-lang</groupId>
       <artifactId>scala-library</artifactId>
       <version>${scala.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-compress</artifactId>
+      <version>${commons-compress.version}</version>
     </dependency>
 
     <!--SpringDoc-->
@@ -433,26 +440,6 @@
           </dependency>
         </dependencies>
       </plugin>
-<!--      <plugin>-->
-<!--        <groupId>org.apache.maven.plugins</groupId>-->
-<!--        <artifactId>maven-compiler-plugin</artifactId>-->
-<!--        <executions>-->
-<!--          <execution>-->
-<!--            <id>compile</id>-->
-<!--            <phase>compile</phase>-->
-<!--            <goals>-->
-<!--              <goal>compile</goal>-->
-<!--            </goals>-->
-<!--          </execution>-->
-<!--          <execution>-->
-<!--            <id>testCompile</id>-->
-<!--            <phase>test-compile</phase>-->
-<!--            <goals>-->
-<!--              <goal>testCompile</goal>-->
-<!--            </goals>-->
-<!--          </execution>-->
-<!--        </executions>-->
-<!--      </plugin>-->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
