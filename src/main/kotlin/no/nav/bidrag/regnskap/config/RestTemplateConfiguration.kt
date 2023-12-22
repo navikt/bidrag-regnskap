@@ -12,6 +12,8 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Scope
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
+import org.springframework.http.client.observation.ClientRequestObservationConvention
+import org.springframework.http.client.observation.DefaultClientRequestObservationConvention
 import org.springframework.web.client.RestTemplate
 
 @Configuration
@@ -36,4 +38,7 @@ class RestTemplateConfiguration {
         observationRestTemplateCustomizer.customize(restTemplate)
         return restTemplate
     }
+
+    @Bean
+    fun clientRequestObservationConvention(): ClientRequestObservationConvention = DefaultClientRequestObservationConvention()
 }

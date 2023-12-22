@@ -2,7 +2,7 @@ package no.nav.bidrag.regnskap.consumer
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.nav.bidrag.commons.web.client.AbstractRestClient
-import no.nav.bidrag.domene.enums.Rolletype
+import no.nav.bidrag.domene.enums.rolle.Rolletype
 import no.nav.bidrag.transport.sak.BidragssakDto
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value

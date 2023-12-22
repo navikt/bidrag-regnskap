@@ -9,8 +9,8 @@ import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.verify
-import no.nav.bidrag.domene.enums.Engangsbeløptype
-import no.nav.bidrag.domene.enums.Stønadstype
+import no.nav.bidrag.domene.enums.vedtak.Engangsbeløptype
+import no.nav.bidrag.domene.enums.vedtak.Stønadstype
 import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
 import no.nav.bidrag.regnskap.util.IdentUtils
 import org.junit.jupiter.api.Assertions.assertDoesNotThrow
@@ -81,6 +81,7 @@ class VedtakshendelseServiceTest {
           "vedtakstidspunkt":"2022-06-03T00:00:00.000000000",
           "enhetsnummer":"4812",
           "opprettetAv":"B101173",
+          "kildeapplikasjon": "TEST",
           "opprettetTidspunkt":"2022-10-19T16:00:23.254988482",
           "stønadsendringListe":[
           ],
@@ -131,6 +132,7 @@ class VedtakshendelseServiceTest {
         "vedtakstidspunkt":"2022-06-01T00:00:00.000000000",
         "enhetsnummer":"4812",
         "opprettetAv":"B111111",
+        "kildeapplikasjon":"TEST",
         "opprettetTidspunkt":"2022-01-01T16:00:00.000000000",
         "stønadsendringListe":[
           {

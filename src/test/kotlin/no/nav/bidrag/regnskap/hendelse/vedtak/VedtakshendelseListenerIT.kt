@@ -11,11 +11,11 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.types.shouldBeSameInstanceAs
 import no.nav.bidrag.commons.util.PersonidentGenerator
-import no.nav.bidrag.domene.enums.Engangsbeløptype
-import no.nav.bidrag.domene.enums.Stønadstype
 import no.nav.bidrag.domene.enums.regnskap.Søknadstype
 import no.nav.bidrag.domene.enums.regnskap.Transaksjonskode
 import no.nav.bidrag.domene.enums.regnskap.Type
+import no.nav.bidrag.domene.enums.vedtak.Engangsbeløptype
+import no.nav.bidrag.domene.enums.vedtak.Stønadstype
 import no.nav.bidrag.regnskap.BidragRegnskapLocal
 import no.nav.bidrag.regnskap.consumer.KravApiWireMock
 import no.nav.bidrag.regnskap.consumer.PersonApiWireMock
@@ -218,7 +218,7 @@ internal class VedtakshendelseListenerIT {
         val kontering = assertVedOpprettelseAvEngangsbeløp(
             100000003,
             vedtakHendelse,
-            Engangsbeløptype.SAERTILSKUDD,
+            Engangsbeløptype.SÆRTILSKUDD,
             Transaksjonskode.E1,
             100000002,
             Søknadstype.EN,
@@ -307,7 +307,7 @@ internal class VedtakshendelseListenerIT {
         val kontering = assertVedOpprettelseAvEngangsbeløp(
             100000007,
             vedtakHendelse,
-            Engangsbeløptype.DIREKTE_OPPGJOR,
+            Engangsbeløptype.DIREKTE_OPPGJØR,
             Transaksjonskode.K2,
             Integer.valueOf(vedtakHendelse.engangsbeløpListe!![0].delytelseId),
             Søknadstype.EN,
@@ -750,14 +750,14 @@ internal class VedtakshendelseListenerIT {
                 oppdragsperiode.opprettetAv shouldBe vedtakHendelse.opprettetAv
                 oppdragsperiode.mottakerIdent shouldBe vedtakHendelse.stønadsendringListe!![stonadsendringIndex].mottaker.verdi
                 oppdragsperiode.delytelseId shouldNotBe null
-                oppdragsperiode.periodeFra shouldBe vedtakHendelse.stønadsendringListe!![stonadsendringIndex].periodeListe[i].periode.fomDato.verdi
-                oppdragsperiode.periodeTil shouldBe vedtakHendelse.stønadsendringListe!![stonadsendringIndex].periodeListe[i].periode.tilDato?.verdi
+                oppdragsperiode.periodeFra shouldBe vedtakHendelse.stønadsendringListe!![stonadsendringIndex].periodeListe[i].periode.toDatoperiode().fom
+                oppdragsperiode.periodeTil shouldBe vedtakHendelse.stønadsendringListe!![stonadsendringIndex].periodeListe[i].periode.toDatoperiode().til
                 oppdragsperiode.beløp shouldBe vedtakHendelse.stønadsendringListe!![stonadsendringIndex].periodeListe[i].beløp
                 oppdragsperiode.valuta shouldBe vedtakHendelse.stønadsendringListe!![stonadsendringIndex].periodeListe[i].valutakode
 
                 val månederForKontering = finnAlleMånederForKonteringer(
-                    vedtakHendelse.stønadsendringListe!![stonadsendringIndex].periodeListe[i].periode.fomDato.verdi,
-                    vedtakHendelse.stønadsendringListe!![stonadsendringIndex].periodeListe[i].periode.tilDato?.verdi,
+                    vedtakHendelse.stønadsendringListe!![stonadsendringIndex].periodeListe[i].periode.toDatoperiode().fom,
+                    vedtakHendelse.stønadsendringListe!![stonadsendringIndex].periodeListe[i].periode.toDatoperiode().til,
                 )
 
                 oppdragsperiode.konteringer.size shouldBe månederForKontering.size

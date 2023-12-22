@@ -5,12 +5,13 @@
   "vedtakstidspunkt": "2022-01-02T00:00:00.000000000",
   "enhetsnummer": "4812",
   "opprettetAv": "B101173",
+  "kildeapplikasjon": "TEST",
   "opprettetTidspunkt": "2022-01-02T16:00:23.254988482",
   "stønadsendringListe": [
   ],
   "engangsbeløpListe": [
     {
-      "type": "SAERTILSKUDD",
+      "type": "SÆRTILSKUDD",
       "sak": "2200400",
       "skyldner": "",
       "kravhaver": "",

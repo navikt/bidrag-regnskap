@@ -3,6 +3,7 @@
   "type": "FASTSETTELSE",
   "id": "5",
   "opprettetAv": "B129973",
+  "kildeapplikasjon": "TEST",
   "vedtakstidspunkt": "2022-06-01T00:00:00.000000000",
   "enhetsnummer": "4865",
   "innkrevingUtsattTilDato": null,

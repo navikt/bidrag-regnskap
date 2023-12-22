@@ -3,6 +3,7 @@
   "type": "FASTSETTELSE",
   "id": "3",
   "opprettetAv": "O163248",
+  "kildeapplikasjon": "TEST",
   "vedtakstidspunkt": "2022-02-28T00:00:00.000000000",
   "enhetsnummer": "4817",
   "innkrevingUtsattTilDato": null,
@@ -10,7 +11,7 @@
   "stønadsendringListe": [],
   "engangsbeløpListe": [
     {
-      "type": "DIREKTE_OPPGJOR",
+      "type": "DIREKTE_OPPGJØR",
       "sak": "0809546",
       "skyldner": "",
       "kravhaver": "",

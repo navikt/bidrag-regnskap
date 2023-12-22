@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import no.nav.bidrag.domene.enums.Beslutningstype
-import no.nav.bidrag.domene.enums.Innkrevingstype
+import no.nav.bidrag.domene.enums.vedtak.Beslutningstype
+import no.nav.bidrag.domene.enums.vedtak.Innkrevingstype
 import no.nav.bidrag.regnskap.SECURE_LOGGER
 import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
 import no.nav.bidrag.regnskap.dto.vedtak.Periode
@@ -93,8 +93,8 @@ class VedtakshendelseService(
             Periode(
                 beløp = periode.beløp,
                 valutakode = periode.valutakode,
-                periodeFomDato = periode.periode.fomDato.verdi,
-                periodeTilDato = periode.periode.tilDato?.verdi,
+                periodeFomDato = periode.periode.toDatoperiode().fom,
+                periodeTilDato = periode.periode.toDatoperiode().til,
                 delytelsesId = periode.delytelseId?.let { Integer.valueOf(it) },
             )
         }

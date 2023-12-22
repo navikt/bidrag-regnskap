@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.1.5</version>
+    <version>3.2.0</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
   <groupId>no.nav</groupId>
@@ -17,28 +17,31 @@
     <java.version>21</java.version>
     <kotlin.version>1.9.21</kotlin.version>
     <kotlin-coroutines.version>1.7.3</kotlin-coroutines.version>
-    <bidrag-commons.version>20231114143627_14d61cd</bidrag-commons.version>
-    <bidrag-transport.version>20231113102624_1040a39</bidrag-transport.version>
+    <bidrag-commons.version>20231220091947_b4b43f0</bidrag-commons.version>
+    <bidrag-transport.version>20231221145650_4172b07</bidrag-transport.version>
     <logback-encoder.version>7.4</logback-encoder.version>
-    <token-support.version>3.1.9</token-support.version>
-    <springdoc-openapi-ui.version>2.1.0</springdoc-openapi-ui.version>
-    <springframework-cloud.version>4.0.2</springframework-cloud.version>
-    <mockk.version>1.13.5</mockk.version>
-    <kotest.version>5.6.2</kotest.version>
-    <bidrag-commons-test.version>1.20230511093912_dc35d81</bidrag-commons-test.version>
+    <token-support.version>3.2.0</token-support.version>
+    <springdoc-openapi-ui.version>2.3.0</springdoc-openapi-ui.version>
+    <springframework-cloud.version>4.1.0</springframework-cloud.version>
+    <mockk.version>1.13.8</mockk.version>
+    <kotest.version>5.8.0</kotest.version>
+    <bidrag-commons-test.version>1.20231220143255_5a8d330</bidrag-commons-test.version>
     <shedlock.version>5.10.2</shedlock.version>
-    <google-api-extention.version>2.37.0</google-api-extention.version>
-    <google-cloud-storage.version>2.22.2</google-cloud-storage.version>
-    <jsch.version>0.2.8</jsch.version>
+    <google-api-gax.version>2.38.0</google-api-gax.version>
+    <google-cloud-storage.version>2.30.1</google-cloud-storage.version>
+    <jsch.version>0.2.15</jsch.version>
     <testcontainers.version>1.19.3</testcontainers.version>
     <maven-failsafe-plugin.version>3.2.2</maven-failsafe-plugin.version>
-    <spring-kafka.version>3.0.12</spring-kafka.version>
+    <maven-antrun.version>3.1.0</maven-antrun.version>
+    <spring-kafka.version>3.1.1</spring-kafka.version>
     <scala.version>2.13.12</scala.version>
-    <kotlin-logging-jwv.version>5.1.0</kotlin-logging-jwv.version>
+    <kotlin-logging-jwv.version>6.0.1</kotlin-logging-jwv.version>
     <slack-api.version>1.36.1</slack-api.version>
     <avro.version>1.11.3</avro.version>
     <avro-serializer.version>7.5.2</avro-serializer.version>
     <fasterxml-jackson-module-kotlin.version>2.16.0</fasterxml-jackson-module-kotlin.version>
+    <ktlint.version>1.1.0</ktlint.version>
+    <logback.version>1.4.14</logback.version>
   </properties>
 
   <repositories>
@@ -55,11 +58,6 @@
 
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>org.yaml</groupId>
-        <artifactId>snakeyaml</artifactId>
-        <version>2.2</version>
-      </dependency>
       <dependency>
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
@@ -190,7 +188,7 @@
     <dependency>
       <groupId>com.google.api</groupId>
       <artifactId>gax</artifactId>
-      <version>${google-api-extention.version}</version>
+      <version>${google-api-gax.version}</version>
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
@@ -293,10 +291,12 @@
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-core</artifactId>
+      <version>${logback.version}</version>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
+      <version>${logback.version}</version>
     </dependency>
     <dependency>
       <groupId>net.logstash.logback</groupId>
@@ -413,7 +413,7 @@
             <plugin>spring</plugin>
             <plugin>jpa</plugin>
           </compilerPlugins>
-          <jvmTarget>1.8</jvmTarget>
+          <jvmTarget>${java.version}</jvmTarget>
         </configuration>
         <dependencies>
           <dependency>
@@ -433,30 +433,30 @@
           </dependency>
         </dependencies>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>compile</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>compile</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>testCompile</id>
-            <phase>test-compile</phase>
-            <goals>
-              <goal>testCompile</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+<!--      <plugin>-->
+<!--        <groupId>org.apache.maven.plugins</groupId>-->
+<!--        <artifactId>maven-compiler-plugin</artifactId>-->
+<!--        <executions>-->
+<!--          <execution>-->
+<!--            <id>compile</id>-->
+<!--            <phase>compile</phase>-->
+<!--            <goals>-->
+<!--              <goal>compile</goal>-->
+<!--            </goals>-->
+<!--          </execution>-->
+<!--          <execution>-->
+<!--            <id>testCompile</id>-->
+<!--            <phase>test-compile</phase>-->
+<!--            <goals>-->
+<!--              <goal>testCompile</goal>-->
+<!--            </goals>-->
+<!--          </execution>-->
+<!--        </executions>-->
+<!--      </plugin>-->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
-        <version>3.1.0</version>
+        <version>${maven-antrun.version}</version>
         <executions>
           <execution>
             <id>ktlint</id>
@@ -496,7 +496,7 @@
           <dependency>
             <groupId>com.pinterest.ktlint</groupId>
             <artifactId>ktlint-cli</artifactId>
-            <version>1.0.1</version>
+            <version>${ktlint.version}</version>
           </dependency>
           <!-- additional 3rd party ruleset(s) can be specified here -->
         </dependencies>
