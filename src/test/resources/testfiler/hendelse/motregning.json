@@ -3,6 +3,7 @@
   "type": "FASTSETTELSE",
   "id": "8",
   "opprettetAv": "E158931",
+  "kildeapplikasjon": "TEST",
   "vedtakstidspunkt": "2021-06-30T00:00:00.000000000",
   "enhetsnummer": "9401",
   "innkrevingUtsattTilDato": null,

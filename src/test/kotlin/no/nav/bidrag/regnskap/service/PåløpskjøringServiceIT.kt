@@ -83,10 +83,10 @@ class PåløpskjøringServiceIT {
         for (i in 0..<antallOppdrag) {
             val konteringer = oppdrag[i].oppdragsperioder.first().konteringer
             konteringer shouldHaveSize 2
-            konteringer.first.overføringstidspunkt shouldNotBe null
-            konteringer.first.behandlingsstatusOkTidspunkt shouldNotBe null
-            konteringer.last.overføringstidspunkt shouldNotBe null
-            konteringer.last.behandlingsstatusOkTidspunkt shouldNotBe null
+            konteringer.first().overføringstidspunkt shouldNotBe null
+            konteringer.first().behandlingsstatusOkTidspunkt shouldNotBe null
+            konteringer.last().overføringstidspunkt shouldNotBe null
+            konteringer.last().behandlingsstatusOkTidspunkt shouldNotBe null
         }
     }
 

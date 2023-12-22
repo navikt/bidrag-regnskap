@@ -1,6 +1,6 @@
-SKATT_URL: http://localhost:${wiremock.server.port:8097}
-SAK_URL: http://localhost:${wiremock.server.port:8098}
-PERSON_URL: http://localhost:${wiremock.server.port:8099}
+SKATT_URL: http://localhost:8097
+SAK_URL: http://localhost:8098
+PERSON_URL: http://localhost:8099
 AZURE_OPENID_CONFIG_ISSUER: http://localhost:${mock-oauth2-server.port}/aad
 TOPIC_VEDTAK: bidrag.vedtak-feature-test
 TOPIC_PDL_AKTOR_V2: pdl.aktor-v2-test

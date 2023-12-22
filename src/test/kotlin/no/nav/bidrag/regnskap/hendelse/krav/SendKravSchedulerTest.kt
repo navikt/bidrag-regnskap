@@ -10,9 +10,9 @@ import io.mockk.mockkStatic
 import io.mockk.verify
 import net.javacrumbs.shedlock.core.LockAssert
 import no.nav.bidrag.commons.util.PersonidentGenerator
-import no.nav.bidrag.domene.enums.Engangsbeløptype
 import no.nav.bidrag.domene.enums.regnskap.Søknadstype
 import no.nav.bidrag.domene.enums.regnskap.Transaksjonskode
+import no.nav.bidrag.domene.enums.vedtak.Engangsbeløptype
 import no.nav.bidrag.regnskap.hendelse.schedule.krav.KravSchedulerUtils
 import no.nav.bidrag.regnskap.hendelse.schedule.krav.SendKravScheduler
 import no.nav.bidrag.regnskap.service.KravService
