@@ -15,7 +15,7 @@
   <name>bidrag-regnskap</name>
   <properties>
     <java.version>21</java.version>
-    <kotlin.version>1.9.21</kotlin.version>
+    <kotlin.version>1.9.22</kotlin.version>
     <kotlin-coroutines.version>1.7.3</kotlin-coroutines.version>
     <bidrag-commons.version>20231220091947_b4b43f0</bidrag-commons.version>
     <bidrag-transport.version>20231221145650_4172b07</bidrag-transport.version>
