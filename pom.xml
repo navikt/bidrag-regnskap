@@ -18,9 +18,9 @@
     <kotlin.version>1.9.22</kotlin.version>
     <kotlin-coroutines.version>1.7.3</kotlin-coroutines.version>
     <bidrag-commons.version>20231220091947_b4b43f0</bidrag-commons.version>
-    <bidrag-transport.version>20231221145650_4172b07</bidrag-transport.version>
+    <bidrag-transport.version>20240102141621_d1f249e</bidrag-transport.version>
     <logback-encoder.version>7.4</logback-encoder.version>
-    <token-support.version>3.2.1</token-support.version>
+    <token-support.version>3.2.0</token-support.version>
     <springdoc-openapi-ui.version>2.3.0</springdoc-openapi-ui.version>
     <springframework-cloud.version>4.1.0</springframework-cloud.version>
     <mockk.version>1.13.8</mockk.version>
@@ -227,6 +227,24 @@
       <groupId>no.nav.bidrag</groupId>
       <artifactId>bidrag-commons</artifactId>
       <version>${bidrag-commons.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-tomcat</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.tomcat.embed</groupId>
+          <artifactId>tomcat-embed-core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.tomcat.embed</groupId>
+          <artifactId>tomcat-embed-el</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-jetty</artifactId>
     </dependency>
     <dependency>
       <groupId>no.nav.bidrag</groupId>
