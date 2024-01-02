@@ -38,9 +38,9 @@ class KravApiWireMock {
                           "konteringFeil": [],
                           "batchStatus": "Done",
                           "batchUid": "3f1248e9-8d19-4dc3-9584-84055421753d",
-                          "totaltAntall": 1,
-                          "mislyketAntall": 0,
-                          "fullfoertAntall": 1
+                          "totaltAntallKrav": 1,
+                          "mislyketAntallKrav": 0,
+                          "fullfoertAntallKrav": 1
                         }
                         """,
                 ),
