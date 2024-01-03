@@ -12,6 +12,8 @@ interface KonteringRepository : JpaRepository<Kontering, Int> {
 
     fun findAllByOverføringstidspunktIsNull(): List<Kontering>
 
+    fun findAllByOverføringsperiodeOrOverføringstidspunktIsNull(overforingsperiode: String): List<Kontering>
+
     fun findAllByOverføringstidspunktIsNullOrderByKonteringId(pageable: Pageable): Page<Kontering>
 
     @Query(

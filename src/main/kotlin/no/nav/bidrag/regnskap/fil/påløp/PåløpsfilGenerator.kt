@@ -28,7 +28,7 @@ class PåløpsfilGenerator(
     fun skrivPåløpsfilOgLastOppPåFilsluse(påløp: Påløp, lyttere: List<PåløpskjøringLytter>) {
         this.lyttere = lyttere
         val now = LocalDate.now()
-        val konteringer = persistenceService.hentAlleIkkeOverførteKonteringer()
+        val konteringer = persistenceService.hentAlleKonteringerForPeriodeOgSomIkkeErOverførtEnda(påløp.forPeriode)
 
         val byteArrayOutputStream = ByteArrayOutputStreamTilByteBuffer()
         val writer = XMLOutputFactory.newInstance().createXMLStreamWriter(byteArrayOutputStream, "ISO-8859-1")
