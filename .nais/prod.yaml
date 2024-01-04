@@ -29,6 +29,7 @@ env:
   JAVA_OPTS: -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -XX:MaxRAMPercentage=80.0
   KONTERINGER_FORELDET_DATO: 2006-04
   SEND_KRAV_CRON: "-" #Deaktivert midlertidig TODO()
+  RESEND_KRAV_CRON: "0 0 6 * * *" #Hver dag kl 06:00
   BEHANDLINGSSTATUS_CRON: "-" #Deaktivert midlertidig TODO()
   AVSTEMNING_CRON: "-" #Deaktivert midlertidig TODO()
   PALOSKJORING_CRON: "-" #Deaktivert midlertidig TODO()

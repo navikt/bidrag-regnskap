@@ -29,6 +29,7 @@ env:
   MASKINPORTEN_SCOPES: "nav:bidrag/v1/bidragskravq4"
   KONTERINGER_FORELDET_DATO: 2006-04
   SEND_KRAV_CRON: "0 */10 * * * *" #Hvert 10. minutt
+  RESEND_KRAV_CRON: "0 0 6 * * *" #Hver dag kl 06:00
   BEHANDLINGSSTATUS_CRON: "0 25 * * * *" #Hver time 25 minutter over hel
   AVSTEMNING_CRON: "0 15 0 * * *" #Hver dag kl 00:15
   PALOSKJORING_CRON: "0 5 * * * *" #Hver time 5 minutter over hel
