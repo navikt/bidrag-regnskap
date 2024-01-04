@@ -42,15 +42,11 @@ class BehandlingsstatusService(
     }
 
     private fun hentKonteringer(sisteReferanser: List<String>): List<Kontering> {
-        return if (sisteReferanser.isEmpty()) hentAlleKonteringer() else hentKonteringerForReferanse(sisteReferanser)
-    }
-
-    private fun hentAlleKonteringer(): List<Kontering> {
-        return persistenceService.hentAlleKonteringerUtenBehandlingsstatusOk()
-    }
-
-    private fun hentKonteringerForReferanse(sisteReferanser: List<String>): List<Kontering> {
-        return persistenceService.hentKonteringerUtenBehandlingsstatusOkForReferansekode(sisteReferanser)
+        return if (sisteReferanser.isEmpty()) {
+            persistenceService.hentAlleKonteringerUtenBehandlingsstatusOk()
+        } else {
+            persistenceService.hentKonteringerUtenBehandlingsstatusOkForReferansekode(sisteReferanser)
+        }
     }
 
     private fun hentBehandlingsstatus(batchUid: String): BehandlingsstatusResponse {

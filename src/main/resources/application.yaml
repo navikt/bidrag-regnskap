@@ -13,6 +13,8 @@ scheduler:
     cron: ${AVSTEMNING_CRON}
   påløpkjøring:
     cron: ${PALOSKJORING_CRON}
+  resendkrav:
+    cron: ${RESEND_KRAV_CRON}
 
 springdoc:
   packages-to-scan: no.nav.bidrag.regnskap.controller
