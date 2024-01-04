@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional
 
 private val LOGGER = KotlinLogging.logger { }
 
-
 /**
  * Denne scheduled tasken er opprettet for å sørge for at feilede krav forsøkes å sendes over på nytt automatisk.
  * Dette gjøres ved å sette overføringstidspunkt til null, slik at SendKravScheduler plukker opp kravene ved neste kjøring.
@@ -21,7 +20,7 @@ private val LOGGER = KotlinLogging.logger { }
 @EnableScheduling
 @EnableSchedulerLock(defaultLockAtMostFor = "10m")
 class ResendingAvKravScheduler(
-    private val persistenceService: PersistenceService
+    private val persistenceService: PersistenceService,
 ) {
 
     @Scheduled(cron = "\${scheduler.resendkrav.cron}")
