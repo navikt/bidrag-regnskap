@@ -26,12 +26,16 @@ class BehandlingsstatusService(
     ): HashMap<String, String> {
         val feilmeldinger = hashMapOf<String, String>()
         konteringerSomIkkeHarFåttGodkjentBehandlingsstatus.forEach { (key, value) ->
-            val behandlingsstatusResponse = hentBehandlingsstatus(key)
-            val now = LocalDateTime.now()
-            if (behandlingsstatusResponse.batchStatus == Batchstatus.Done) {
-                value.forEach { it.behandlingsstatusOkTidspunkt = now }
-            } else {
-                feilmeldinger[key] = "Behandling av konteringer for batchuid $key har feilet: $behandlingsstatusResponse\n"
+            try {
+                val behandlingsstatusResponse = hentBehandlingsstatus(key)
+                val now = LocalDateTime.now()
+                if (behandlingsstatusResponse.batchStatus == Batchstatus.Done) {
+                    value.forEach { it.behandlingsstatusOkTidspunkt = now }
+                } else {
+                    feilmeldinger[key] = "Behandling av konteringer for batchuid $key har feilet: $behandlingsstatusResponse\n"
+                }
+            } catch (e: Exception) {
+                feilmeldinger[key] = "Behandling av konteringer for batchuid $key har feilet og kastet exception!: ${e.message}\n"
             }
         }
         return feilmeldinger
