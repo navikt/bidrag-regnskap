@@ -10,11 +10,14 @@ import no.nav.bidrag.regnskap.dto.oppdrag.OppslagAvOppdragPåSakIdResponse
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class OppslagService(
     private val persistenceService: PersistenceService,
 ) {
+
+    @Transactional
     fun hentPåSakId(sakId: String): OppslagAvOppdragPåSakIdResponse? {
         val oppdrag = persistenceService.hentAlleOppdragPåSakId(sakId)
 
@@ -23,6 +26,7 @@ class OppslagService(
         return OppslagAvOppdragPåSakIdResponse(oppdrag.map { hentOppdragResponse(it) })
     }
 
+    @Transactional
     fun hentOppdrag(oppdragId: Int): OppdragResponse? {
         val oppdrag = persistenceService.hentOppdrag(oppdragId) ?: return null
 
