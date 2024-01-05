@@ -1,6 +1,6 @@
 # Bidrag-regnskap
 
-[![continuous integration](https://github.com/navikt/bidrag-regnskap/actions/workflows/ci.yaml/badge.svg?branch=main)](https://github.com/navikt/bidrag-regnskap/actions/workflows/ci.yaml)
+[![continuous integration](https://github.com/navikt/bidrag-regnskap/actions/workflows/pr.yaml/badge.svg?branch=main)](https://github.com/navikt/bidrag-regnskap/actions/workflows/ci.yaml)
 [![release bidrag-regnskap](https://github.com/navikt/bidrag-regnskap/actions/workflows/release.yaml/badge.svg)](https://github.com/navikt/bidrag-regnskap/actions/workflows/release.yaml)
 
 Bidrag-regnskap er en applikasjon for å opprette og sende konteringer til Skatteetaten slik at
