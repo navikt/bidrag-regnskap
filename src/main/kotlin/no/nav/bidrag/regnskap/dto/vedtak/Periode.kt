@@ -6,7 +6,7 @@ import java.time.LocalDate
 data class Periode(
     val beløp: BigDecimal?,
     val valutakode: String?,
-    val periodeFomDato: LocalDate,
-    val periodeTilDato: LocalDate?,
+    var periodeFomDato: LocalDate,
+    var periodeTilDato: LocalDate?,
     val delytelsesId: Int?,
 )

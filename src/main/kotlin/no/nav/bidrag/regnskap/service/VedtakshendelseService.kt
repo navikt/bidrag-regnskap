@@ -128,7 +128,7 @@ class VedtakshendelseService(
                     ),
                 ),
             )
-            return oppdragService.lagreHendelse(hendelse)
+            return oppdragService.lagreHendelse(hendelse, true)
         }
         return null
     }
