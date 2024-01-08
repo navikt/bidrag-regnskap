@@ -60,13 +60,12 @@ class VedtakshendelseServiceTest {
         val hendelseCaptor = mutableListOf<Hendelse>()
         val hendelse = opprettVedtakshendelse()
 
-        every { oppdragService.lagreHendelse(capture(hendelseCaptor)) } returns 1
+        every { oppdragService.lagreHendelse(any()) } returns 1
 
         vedtakshendelseService.behandleHendelse(hendelse)
 
-        verify(exactly = 2) { oppdragService.lagreHendelse(any()) }
-        hendelseCaptor[0].type shouldBe Stønadstype.BIDRAG.name
-        hendelseCaptor[1].type shouldBe Engangsbeløptype.GEBYR_SKYLDNER.name
+        verify(exactly = 1) { oppdragService.lagreHendelse(any(), false) }
+        verify(exactly = 1) { oppdragService.lagreHendelse(any(), true) }
     }
 
     @Test
