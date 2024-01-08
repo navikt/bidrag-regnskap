@@ -19,13 +19,13 @@ class OppdragService(
 ) {
 
     @Transactional
-    fun lagreHendelse(hendelse: Hendelse): Int? {
+    fun lagreHendelse(hendelse: Hendelse, erEngangsbeløp: Boolean = false): Int? {
         val oppdrag = hentOppdrag(hendelse)
 
-        return lagreEllerOppdaterOppdrag(oppdrag, hendelse)
+        return lagreEllerOppdaterOppdrag(oppdrag, hendelse, erEngangsbeløp)
     }
 
-    fun lagreEllerOppdaterOppdrag(hentetOppdrag: Oppdrag?, hendelse: Hendelse): Int? {
+    fun lagreEllerOppdaterOppdrag(hentetOppdrag: Oppdrag?, hendelse: Hendelse, erEngangsbeløp: Boolean): Int? {
         // Dette er en edge case hvor vedtak som inneholder gebyrfritak, eller andre stønadstyper som kun blir sendt inn med avslag, kommer med beløp null og ikke eksisterer fra før av. Disse skal ikke opprettes.
         if (hentetOppdrag == null && hendelse.periodeListe.all { it.beløp == null }) {
             LOGGER.info("Hendelse for vedtak: ${hendelse.vedtakId} har fått fritak for ${hendelse.type}")
@@ -35,6 +35,11 @@ class OppdragService(
         val erOppdatering = hentetOppdrag != null
         val oppdrag = hentetOppdrag ?: opprettOppdrag(hendelse)
         val sisteOverførtePeriode = persistenceService.finnSisteOverførtePeriode()
+
+        // For oppdateringer på engangsbeløp skal fra og til dato være lik det opprinnelige engangsbeløpet.
+        if (erOppdatering && erEngangsbeløp) {
+            settNyPeriodeFraOgTilDatoForOppdateringPåEngangsbeløp(hendelse, hentetOppdrag)
+        }
 
         hendelse.periodeListe.forEach { periode ->
             val oppdragsperiode = oppdragsperiodeService.opprettNyOppdragsperiode(hendelse, periode, oppdrag)
@@ -62,6 +67,13 @@ class OppdragService(
         LOGGER.debug("Oppdrag med ID: $oppdragId er ${if (erOppdatering) "oppdatert." else "opprettet."}")
 
         return oppdragId
+    }
+
+    private fun settNyPeriodeFraOgTilDatoForOppdateringPåEngangsbeløp(hendelse: Hendelse, hentetOppdrag: Oppdrag?) {
+        hendelse.periodeListe.forEach {
+            it.periodeFomDato = hentetOppdrag!!.oppdragsperioder.first.periodeFra
+            it.periodeTilDato = hentetOppdrag.oppdragsperioder.first.periodeTil
+        }
     }
 
     private fun hentOppdrag(hendelse: Hendelse): Oppdrag? {

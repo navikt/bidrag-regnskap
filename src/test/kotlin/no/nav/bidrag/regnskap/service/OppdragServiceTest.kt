@@ -39,7 +39,7 @@ class OppdragServiceTest {
 
             every { oppdragsperiodeService.opprettNyOppdragsperiode(any(), any(), any()) } returns TestData.opprettOppdragsperiode()
 
-            val oppdragId = oppdragService.lagreEllerOppdaterOppdrag(null, hendelse)
+            val oppdragId = oppdragService.lagreEllerOppdaterOppdrag(null, hendelse, false)
 
             oppdragId shouldBe 0
         }
@@ -55,7 +55,7 @@ class OppdragServiceTest {
 
             every { oppdragsperiodeService.opprettNyOppdragsperiode(any(), any(), any()) } returns TestData.opprettOppdragsperiode()
 
-            oppdragService.lagreEllerOppdaterOppdrag(oppdrag, hendelse)
+            oppdragService.lagreEllerOppdaterOppdrag(oppdrag, hendelse, false)
 
             verify { persistenceService.lagreOppdrag(oppdrag) }
         }
