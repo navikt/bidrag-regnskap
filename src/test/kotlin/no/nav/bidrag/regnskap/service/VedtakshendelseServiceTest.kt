@@ -9,8 +9,6 @@ import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.verify
-import no.nav.bidrag.domene.enums.vedtak.Engangsbeløptype
-import no.nav.bidrag.domene.enums.vedtak.Stønadstype
 import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
 import no.nav.bidrag.regnskap.util.IdentUtils
 import org.junit.jupiter.api.Assertions.assertDoesNotThrow
