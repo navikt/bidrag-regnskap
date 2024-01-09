@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalTime
 
 private val LOGGER = KotlinLogging.logger { }
 
@@ -59,11 +60,21 @@ class SjekkAvBehandlingsstatusScheduler(
         if (feiledeOverføringer.isNotEmpty()) {
             val feilmeldingSammenslått = feiledeOverføringer.entries.joinToString("\n") { it.value }
 
-            slackService.sendMelding(":ohno: Sjekk av behandlingsstatus feilet for følgende batchUid:\n $feilmeldingSammenslått")
+            if (skalSendeDagligSlack()) {
+                slackService.sendMelding(":ohno: Sjekk av behandlingsstatus feilet for følgende batchUid:\n $feilmeldingSammenslått")
+            }
             LOGGER.error { "Det har oppstått feil ved overføring av krav på følgende batchUider med følgende feilmelding:\n $feilmeldingSammenslått" }
             Gauge.builder("behandlingsstatus-feilet-for-antall") { feiledeOverføringer.size }.strongReference(true).register(meterRegistry)
         } else {
             Gauge.builder("behandlingsstatus-feilet-for-antall") { 0 }.strongReference(true).register(meterRegistry)
         }
+    }
+
+    // Sørger for at slack melding på behandlingsstatus kun blir sendt en gang om dagen
+    private fun skalSendeDagligSlack(): Boolean {
+        val now = LocalTime.now()
+        val tidFra = LocalTime.parse("07:00:00")
+        val tidTil = LocalTime.parse("08:00:00")
+        return tidFra.isBefore(now) && tidTil.isAfter(now)
     }
 }
