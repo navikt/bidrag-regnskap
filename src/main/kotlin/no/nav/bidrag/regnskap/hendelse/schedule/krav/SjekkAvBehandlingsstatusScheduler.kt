@@ -27,6 +27,7 @@ class SjekkAvBehandlingsstatusScheduler(
     private val meterRegistry: MeterRegistry,
     @Value("\${NAIS_CLIENT_ID}") private val clientId: String,
 ) {
+
     @Scheduled(cron = "\${scheduler.behandlingsstatus.cron}")
     @SchedulerLock(name = "skedulertSjekkAvBehandlingsstatus")
     @Transactional
@@ -55,16 +56,19 @@ class SjekkAvBehandlingsstatusScheduler(
             behandlingsstatusService.hentBehandlingsstatusForIkkeGodkjenteKonteringer(konteringerSomIkkeHarFåttGodkjentBehandlingsstatus)
 
         LOGGER.info {
-            "${konteringerSomIkkeHarFåttGodkjentBehandlingsstatus.size} batchUider har nå fått sjekket behandlingsstatus. (${konteringerSomIkkeHarFåttGodkjentBehandlingsstatus.entries.joinToString(
-                ", ",
-            ) { it.key }})"
+            "${konteringerSomIkkeHarFåttGodkjentBehandlingsstatus.size} batchUider har nå fått sjekket behandlingsstatus. (${
+                konteringerSomIkkeHarFåttGodkjentBehandlingsstatus.entries.joinToString(
+                    ", ",
+                ) { it.key }
+            })"
         }
         if (feiledeOverføringer.isNotEmpty()) {
             val feilmeldingSammenslått = feiledeOverføringer.entries.joinToString("\n") { it.value }
 
             if (skalSendeDagligSlack()) {
-                slackService.sendMelding(":ohno: Sjekk av behandlingsstatus feilet! Miljø: $clientId\n\n" +
-                        "Følgende batchUider feilet:\n $feilmeldingSammenslått")
+                slackService.sendMelding(
+                    ":ohno: Sjekk av behandlingsstatus feilet! Miljø: $clientId\n\nFølgende batchUider feilet:\n $feilmeldingSammenslått",
+                )
             }
             LOGGER.error { "Det har oppstått feil ved overføring av krav på følgende batchUider med følgende feilmelding:\n $feilmeldingSammenslått" }
             Gauge.builder("behandlingsstatus-feilet-for-antall") { feiledeOverføringer.size }.strongReference(true).register(meterRegistry)
