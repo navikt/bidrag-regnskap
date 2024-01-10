@@ -225,7 +225,12 @@ internal class SendKravSchedulerTest {
 
         every { kravSchedulerUtils.harAktivtDriftsavvik() } returns false
         every { kravSchedulerUtils.erVedlikeholdsmodusPåslått() } returns false
-        every { persistenceService.hentAlleIkkeOverførteKonteringer() } returns listOf(annenKontering, bidragKontering, gebyrBpKontering, gebyrBmKontering)
+        every { persistenceService.hentAlleIkkeOverførteKonteringer() } returns listOf(
+            annenKontering,
+            bidragKontering,
+            gebyrBpKontering,
+            gebyrBmKontering,
+        )
 
         every { kravService.sendKrav(any()) } just Runs
 
