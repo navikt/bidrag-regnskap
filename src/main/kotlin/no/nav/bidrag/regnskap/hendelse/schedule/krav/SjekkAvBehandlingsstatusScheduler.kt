@@ -8,6 +8,7 @@ import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
 import no.nav.bidrag.regnskap.service.BehandlingsstatusService
 import no.nav.bidrag.regnskap.slack.SlackService
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
@@ -24,6 +25,7 @@ class SjekkAvBehandlingsstatusScheduler(
     private val kravSchedulerUtils: KravSchedulerUtils,
     private val slackService: SlackService,
     private val meterRegistry: MeterRegistry,
+    @Value("\${NAIS_CLIENT_ID}") private val clientId: String,
 ) {
     @Scheduled(cron = "\${scheduler.behandlingsstatus.cron}")
     @SchedulerLock(name = "skedulertSjekkAvBehandlingsstatus")
@@ -61,7 +63,8 @@ class SjekkAvBehandlingsstatusScheduler(
             val feilmeldingSammenslått = feiledeOverføringer.entries.joinToString("\n") { it.value }
 
             if (skalSendeDagligSlack()) {
-                slackService.sendMelding(":ohno: Sjekk av behandlingsstatus feilet for følgende batchUid:\n $feilmeldingSammenslått")
+                slackService.sendMelding(":ohno: Sjekk av behandlingsstatus feilet! Miljø: $clientId\n\n" +
+                        "Følgende batchUider feilet:\n $feilmeldingSammenslått")
             }
             LOGGER.error { "Det har oppstått feil ved overføring av krav på følgende batchUider med følgende feilmelding:\n $feilmeldingSammenslått" }
             Gauge.builder("behandlingsstatus-feilet-for-antall") { feiledeOverføringer.size }.strongReference(true).register(meterRegistry)
