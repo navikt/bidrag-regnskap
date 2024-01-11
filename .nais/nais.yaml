@@ -85,3 +85,7 @@ spec:
               protocol: TCP
         - host: slack.com
         - host: api.slack.com
+      rules:
+        - application: bidrag-stubs
+          namespace: bidrag
+          cluster: dev-gcp
