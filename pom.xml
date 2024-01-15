@@ -28,7 +28,7 @@
     <bidrag-commons-test.version>1.20231220143255_5a8d330</bidrag-commons-test.version>
     <shedlock.version>5.10.2</shedlock.version>
     <google-api-gax.version>2.39.0</google-api-gax.version>
-    <google-cloud-storage.version>2.30.1</google-cloud-storage.version>
+    <google-cloud-storage.version>2.31.0</google-cloud-storage.version>
     <jsch.version>0.2.16</jsch.version>
     <testcontainers.version>1.19.3</testcontainers.version>
     <maven-failsafe-plugin.version>3.2.3</maven-failsafe-plugin.version>
