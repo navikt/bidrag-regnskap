@@ -11,8 +11,8 @@ maskinporten:
   url: https://maskinporten.no
 elin_subscription_key: bidrag-regnskap-elin-subscription-key-prod #TODO() Opprette key for prod
 env:
-  SKATT_URL: https://bidrag-stubs.intern.dev.nav.no #TODO()
-  SKATT_HOST: bidrag-stubs.intern.dev.nav.no #TODO()
+  SKATT_URL: https://bidrag-stubs.intern.nav.no #TODO()
+  SKATT_HOST: bidrag-stubs.intern.nav.no #TODO()
   TOPIC_VEDTAK: bidrag.vedtak
   TOPIC_PDL_AKTOR_V2: pdl.aktor-v2
   AKTOR_V2_GROUP_ID: aktor-v2.bidrag-regnskap
