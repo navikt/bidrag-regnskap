@@ -12,6 +12,7 @@ import no.nav.bidrag.regnskap.persistence.repository.OppdragRepository
 import no.nav.bidrag.regnskap.persistence.repository.OppdragsperiodeRepository
 import no.nav.bidrag.regnskap.persistence.repository.PåløpRepository
 import org.slf4j.LoggerFactory
+import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.domain.Pageable
@@ -156,6 +157,7 @@ class PersistenceService(
         oppdragsperiodeRepository.saveAll(oppdragsperioder)
     }
 
+    @CacheEvict(value = ["driftsaavik_cache"], allEntries = true)
     fun lagreDriftsavvik(driftsavvik: Driftsavvik): Int {
         return driftsavvikRepository.save(driftsavvik).driftsavvikId
     }
