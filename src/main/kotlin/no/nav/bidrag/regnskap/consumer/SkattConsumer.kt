@@ -10,6 +10,7 @@ import no.nav.bidrag.transport.regnskap.krav.Kravliste
 import no.nav.bidrag.transport.regnskap.vedlikeholdsmodus.Vedlikeholdsmodus
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -63,6 +64,7 @@ class SkattConsumer(
         }
     }
 
+    @CacheEvict(value = ["vedlikeholdsmodus_cache"], allEntries = true)
     fun oppdaterVedlikeholdsmodus(vedlikeholdsmodus: Vedlikeholdsmodus): ResponseEntity<Any> {
         LOGGER.info { "Oppdaterer vedlikeholdsmodud til følgende: $vedlikeholdsmodus" }
         return restTemplate.exchange(

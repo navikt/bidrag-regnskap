@@ -13,6 +13,6 @@ class CacheConfig {
 
     @Bean
     fun caffeineConfig() = CaffeineCacheManager().apply {
-        setCaffeine(Caffeine.newBuilder().expireAfterWrite(60, TimeUnit.SECONDS))
+        setCaffeine(Caffeine.newBuilder().expireAfterWrite(600, TimeUnit.SECONDS))
     }
 }
