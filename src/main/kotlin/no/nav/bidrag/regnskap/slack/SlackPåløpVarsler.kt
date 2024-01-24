@@ -37,7 +37,7 @@ class SlackPåløpVarsler(
             val melding = "Opprettet konteringer for $antallBehandlet av $antallOppdragsperioder oppdragsperioder\n${fremdriftsindikator(
                 antallBehandlet,
                 antallOppdragsperioder,
-            )}\nTid pr periode: ${varsel.millisekunderPrPeriode().map{it.toString()}.orElse("?")} ms"
+            )}\nTid pr periode: ${varsel.millisekunderPrPeriode().map{it.toString()}.orElse("?")} ms\nSist oppdatert: ${LocalDateTime.now()}"
             if (varsel.konteringerMelding == null) {
                 varsel.konteringerMelding =
                     pågåendePåløp?.melding?.svarITråd(melding)

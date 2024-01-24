@@ -119,6 +119,9 @@ class PåløpskjøringService(
             )
             antallBehandlet += oppdragsperiodeIds.size
             medLyttere { it.rapporterOppdragsperioderBehandlet(påløp, antallBehandlet, oppdragsperioder.size) }
+            LOGGER.info(
+                "Opprettet konteringer for $antallBehandlet av ${oppdragsperioder.size} oppdragsperioder i påløpskjøring for periode: ${påløp.forPeriode}",
+            )
         }
 
         medLyttere { it.oppdragsperioderBehandletFerdig(påløp, oppdragsperioder.size) }
