@@ -32,4 +32,4 @@ env:
   RESEND_KRAV_CRON: "0 0 6 * * *" #Hver dag kl 06:00
   BEHANDLINGSSTATUS_CRON: "-" #Deaktivert midlertidig TODO()
   AVSTEMNING_CRON: "0 15 0 * * *" #Hver dag kl 00:15
-  PALOSKJORING_CRON: "-" #Deaktivert midlertidig TODO()
+  PALOSKJORING_CRON: "0 5 * * * *" #Hver time 5 minutter over hel
