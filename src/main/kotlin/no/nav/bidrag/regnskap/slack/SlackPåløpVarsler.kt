@@ -1,14 +1,18 @@
 package no.nav.bidrag.regnskap.slack
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.nav.bidrag.regnskap.persistence.entity.Påløp
 import no.nav.bidrag.regnskap.service.PåløpskjøringLytter
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
+import java.net.SocketTimeoutException
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.Optional
+
+private val LOGGER = KotlinLogging.logger {}
 
 @Service
 class SlackPåløpVarsler(
@@ -28,22 +32,28 @@ class SlackPåløpVarsler(
     }
 
     override fun rapporterOppdragsperioderBehandlet(påløp: Påløp, antallBehandlet: Int, antallOppdragsperioder: Int) {
-        val varsel = pågåendePåløp(påløp)
-        if (varsel != null) {
-            if (!varsel.skalOppdatereKonteringerMelding()) {
-                return
+        try {
+            val varsel = pågåendePåløp(påløp)
+            if (varsel != null) {
+                if (!varsel.skalOppdatereKonteringerMelding()) {
+                    return
+                }
+                varsel.registrerObservasjon(antallBehandlet)
+                val melding = "Opprettet konteringer for $antallBehandlet av $antallOppdragsperioder oppdragsperioder\n${
+                    fremdriftsindikator(
+                        antallBehandlet,
+                        antallOppdragsperioder,
+                    )
+                }\nTid pr periode: ${varsel.millisekunderPrPeriode().map { it.toString() }.orElse("?")} ms\nSist oppdatert: ${LocalDateTime.now()}"
+                if (varsel.konteringerMelding == null) {
+                    varsel.konteringerMelding =
+                        pågåendePåløp?.melding?.svarITråd(melding)
+                } else {
+                    varsel.konteringerMelding?.oppdaterMelding(melding)
+                }
             }
-            varsel.registrerObservasjon(antallBehandlet)
-            val melding = "Opprettet konteringer for $antallBehandlet av $antallOppdragsperioder oppdragsperioder\n${fremdriftsindikator(
-                antallBehandlet,
-                antallOppdragsperioder,
-            )}\nTid pr periode: ${varsel.millisekunderPrPeriode().map{it.toString()}.orElse("?")} ms\nSist oppdatert: ${LocalDateTime.now()}"
-            if (varsel.konteringerMelding == null) {
-                varsel.konteringerMelding =
-                    pågåendePåløp?.melding?.svarITråd(melding)
-            } else {
-                varsel.konteringerMelding?.oppdaterMelding(melding)
-            }
+        } catch (e: SocketTimeoutException) {
+            LOGGER.error { "Oppdatering av slackmelding feilet grunnet: ${e.message}" }
         }
     }
 
