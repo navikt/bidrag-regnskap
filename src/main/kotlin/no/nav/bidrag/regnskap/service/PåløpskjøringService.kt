@@ -23,7 +23,7 @@ import java.util.function.Consumer
 
 private val LOGGER = LoggerFactory.getLogger(PåløpskjøringService::class.java)
 
-private const val PARTISJONSSTØRRELSE = 100
+private const val PARTISJONSSTØRRELSE = 1000
 
 @Service
 class PåløpskjøringService(
