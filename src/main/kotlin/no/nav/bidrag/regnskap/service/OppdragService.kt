@@ -1,5 +1,6 @@
 package no.nav.bidrag.regnskap.service
 
+import no.nav.bidrag.domene.enums.vedtak.Vedtakstype
 import no.nav.bidrag.regnskap.consumer.SakConsumer
 import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
@@ -61,6 +62,10 @@ class OppdragService(
             )
         }
 
+        if (hendelse.vedtakType == Vedtakstype.ENDRING_MOTTAKER) {
+            oppdaterMottakerPåOppdragsperioder(hendelse, oppdrag)
+        }
+
         oppdatererVerdierPåOppdrag(hendelse, oppdrag)
         val oppdragId = persistenceService.lagreOppdrag(oppdrag)
 
@@ -71,8 +76,8 @@ class OppdragService(
 
     private fun settNyPeriodeFraOgTilDatoForOppdateringPåEngangsbeløp(hendelse: Hendelse, hentetOppdrag: Oppdrag?) {
         hendelse.periodeListe.forEach {
-            it.periodeFomDato = hentetOppdrag!!.oppdragsperioder.first.periodeFra
-            it.periodeTilDato = hentetOppdrag.oppdragsperioder.first.periodeTil
+            it.periodeFomDato = hentetOppdrag!!.oppdragsperioder.first().periodeFra
+            it.periodeTilDato = hentetOppdrag.oppdragsperioder.first().periodeTil
         }
     }
 
@@ -100,6 +105,12 @@ class OppdragService(
             gjelderIdent = sakConsumer.hentBmFraSak(hendelse.sakId),
             utsattTilDato = hendelse.utsattTilDato,
         )
+    }
+
+    private fun oppdaterMottakerPåOppdragsperioder(hendelse: Hendelse, oppdrag: Oppdrag) {
+        oppdrag.oppdragsperioder.forEach {
+            it.mottakerIdent = hendelse.mottakerIdent
+        }
     }
 
     private fun oppdatererVerdierPåOppdrag(hendelse: Hendelse, oppdrag: Oppdrag) {

@@ -725,6 +725,48 @@ internal class VedtakshendelseListenerIT {
         skrivTilTestdatafil(hentAlleKonteringerForOppdrag(oppdrag), "Motregning")
     }
 
+    val endreRmBmBidrag = PersonidentGenerator.genererFødselsnummer()
+    val endreRmBmNyBidrag = PersonidentGenerator.genererFødselsnummer()
+    val endreRmBpBidrag = PersonidentGenerator.genererFødselsnummer()
+    val endreRmBarn1Bidrag = PersonidentGenerator.genererFødselsnummer()
+
+    @Test
+    @Order(23)
+    fun `skal endre rm`() {
+        val vedtakHendelse = hentFilOgSendPåKafka(
+            "endreRm.json",
+            178,
+            bm = endreRmBmBidrag,
+            bp = endreRmBpBidrag,
+            barn1 = endreRmBarn1Bidrag,
+        )
+
+        assertStønader(
+            100000019,
+            vedtakHendelse,
+            Stønadstype.BIDRAG,
+            1,
+            1,
+            Transaksjonskode.B1,
+            Søknadstype.EN,
+        )
+    }
+
+    @Test
+    @Order(24)
+    fun `skal endre rm oppdatering`() {
+        hentFilOgSendPåKafka(
+            "endreRmOppdatering.json",
+            178,
+            bm = endreRmBmNyBidrag,
+            bp = endreRmBpBidrag,
+            barn1 = endreRmBarn1Bidrag,
+        )
+
+        val oppdrag = persistenceService.hentOppdrag(100000019)
+        oppdrag?.oppdragsperioder?.forEach { it.mottakerIdent shouldBe endreRmBmNyBidrag }
+    }
+
     private fun assertStønader(
         oppdragId: Int,
         vedtakHendelse: VedtakHendelse,
