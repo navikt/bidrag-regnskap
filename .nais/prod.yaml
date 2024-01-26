@@ -9,10 +9,10 @@ bucket:
   navn: bidrag-regnskap-prod
 maskinporten:
   url: https://maskinporten.no
-elin_subscription_key: bidrag-regnskap-elin-subscription-key-prod #TODO() Opprette key for prod
+elin_subscription_key: bidrag-regnskap-elin-subscription-key-prod
 env:
-  SKATT_URL: https://bidrag-stubs.intern.nav.no/ekstern/skatt #TODO()
-  SKATT_HOST: bidrag-stubs.intern.nav.no #TODO()
+  SKATT_URL: https://api.nav.no/bidrag/v1/bidragskrav/api/krav
+  SKATT_HOST: api.nav.no
   TOPIC_VEDTAK: bidrag.vedtak
   TOPIC_PDL_AKTOR_V2: pdl.aktor-v2
   AKTOR_V2_GROUP_ID: aktor-v2.bidrag-regnskap
@@ -28,8 +28,8 @@ env:
   MASKINPORTEN_SCOPES: "nav:bidrag/v1/bidragskrav"
   JAVA_OPTS: -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -XX:MaxRAMPercentage=80.0
   KONTERINGER_FORELDET_DATO: 2006-04
-  SEND_KRAV_CRON: "-" #Deaktivert midlertidig TODO()
+  SEND_KRAV_CRON: "0 */10 * * * *" #Hvert 10. minutt
   RESEND_KRAV_CRON: "0 0 6 * * *" #Hver dag kl 06:00
-  BEHANDLINGSSTATUS_CRON: "-" #Deaktivert midlertidig TODO()
+  BEHANDLINGSSTATUS_CRON: "0 25 * * * *" #Hver time 25 minutter over hel
   AVSTEMNING_CRON: "0 15 0 * * *" #Hver dag kl 00:15
   PALOSKJORING_CRON: "0 5 * * * *" #Hver time 5 minutter over hel
