@@ -33,3 +33,9 @@ env:
   BEHANDLINGSSTATUS_CRON: "0 25 * * * *" #Hver time 25 minutter over hel
   AVSTEMNING_CRON: "0 15 0 * * *" #Hver dag kl 00:15
   PALOSKJORING_CRON: "0 5 * * * *" #Hver time 5 minutter over hel
+azure:
+  inbound:
+    rules:
+      - application: bisys
+        namespace: bidrag
+        cluster: prod-fss
