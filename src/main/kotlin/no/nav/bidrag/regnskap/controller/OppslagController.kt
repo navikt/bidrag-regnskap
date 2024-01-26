@@ -12,6 +12,7 @@ import no.nav.bidrag.domene.sak.Saksnummer
 import no.nav.bidrag.regnskap.dto.oppdrag.OppdragResponse
 import no.nav.bidrag.regnskap.dto.oppdrag.OppslagAvOppdragPåSakIdResponse
 import no.nav.bidrag.regnskap.service.OppslagService
+import no.nav.bidrag.regnskap.service.OppslagService.UtsatteOgFeiledeVedtak
 import no.nav.security.token.support.core.api.Protected
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -109,17 +110,14 @@ class OppslagController(
         value = [
             ApiResponse(
                 responseCode = "200",
-                description = "Returnerer alt lagret for saken.",
+                description = "Returnerer alle utsatte og feilede vedtak for saksnummeret.",
                 content = [
                     (
                         Content(
-                            array = (ArraySchema(schema = Schema(implementation = OppslagAvOppdragPåSakIdResponse::class))),
+                            array = (ArraySchema(schema = Schema(implementation = UtsatteOgFeiledeVedtak::class))),
                         )
                         ),
                 ],
-            ), ApiResponse(
-                responseCode = "204",
-                description = "Fant ingenting lagret på saken.",
             ),
         ],
     )
