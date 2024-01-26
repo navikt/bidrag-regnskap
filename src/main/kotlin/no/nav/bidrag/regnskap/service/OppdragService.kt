@@ -113,8 +113,11 @@ class OppdragService(
         }
     }
 
-    private fun oppdatererVerdierPåOppdrag(hendelse: Hendelse, oppdrag: Oppdrag) {
+    fun oppdatererVerdierPåOppdrag(hendelse: Hendelse, oppdrag: Oppdrag) {
         oppdrag.endretTidspunkt = LocalDateTime.now()
-        oppdrag.utsattTilDato = hendelse.utsattTilDato
+        // Utsatt til dato skal ikke kunne forkortes eller fjernes om først satt via vedtak
+        if (oppdrag.utsattTilDato == null || hendelse.utsattTilDato?.isAfter(oppdrag.utsattTilDato) == true) {
+            oppdrag.utsattTilDato = hendelse.utsattTilDato
+        }
     }
 }

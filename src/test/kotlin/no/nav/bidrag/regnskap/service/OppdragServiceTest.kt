@@ -11,6 +11,7 @@ import no.nav.bidrag.regnskap.utils.TestData
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import java.time.LocalDate
 
 @ExtendWith(MockKExtension::class)
 class OppdragServiceTest {
@@ -58,6 +59,60 @@ class OppdragServiceTest {
             oppdragService.lagreEllerOppdaterOppdrag(oppdrag, hendelse, false)
 
             verify { persistenceService.lagreOppdrag(oppdrag) }
+        }
+
+        @Test
+        fun `skal oppdatere utsatt til dato om ikke satt på oppdrag`() {
+            val utsattTilDato = LocalDate.now().plusDays(3)
+            val hendelse = TestData.opprettHendelse(utsattTilDato = utsattTilDato)
+            val oppdrag = TestData.opprettOppdrag(utsattTilDato = null)
+
+            oppdragService.oppdatererVerdierPåOppdrag(hendelse, oppdrag)
+
+            oppdrag.utsattTilDato shouldBe utsattTilDato
+        }
+
+        @Test
+        fun `skal oppdatere utsatt til dato om satt på oppdrag men hendelse er lenger frem i tid`() {
+            val utsattTilDato = LocalDate.now().plusDays(3)
+            val hendelse = TestData.opprettHendelse(utsattTilDato = utsattTilDato)
+            val oppdrag = TestData.opprettOppdrag(utsattTilDato = utsattTilDato.minusDays(1))
+
+            oppdragService.oppdatererVerdierPåOppdrag(hendelse, oppdrag)
+
+            oppdrag.utsattTilDato shouldBe utsattTilDato
+        }
+
+        @Test
+        fun `skal ikke oppdatere utsatt til dato om satt på oppdrag og hendelse er tilbake i tid`() {
+            val utsattTilDato = LocalDate.now().plusDays(3)
+            val hendelse = TestData.opprettHendelse(utsattTilDato = utsattTilDato)
+            val oppdrag = TestData.opprettOppdrag(utsattTilDato = utsattTilDato.plusDays(1))
+
+            oppdragService.oppdatererVerdierPåOppdrag(hendelse, oppdrag)
+
+            oppdrag.utsattTilDato shouldBe utsattTilDato.plusDays(1)
+        }
+
+        @Test
+        fun `skal ikke oppdatere utsatt til dato om satt på oppdrag og hendelse er null`() {
+            val utsattTilDato = LocalDate.now().plusDays(3)
+            val hendelse = TestData.opprettHendelse(utsattTilDato = null)
+            val oppdrag = TestData.opprettOppdrag(utsattTilDato = utsattTilDato)
+
+            oppdragService.oppdatererVerdierPåOppdrag(hendelse, oppdrag)
+
+            oppdrag.utsattTilDato shouldBe utsattTilDato
+        }
+
+        @Test
+        fun `skal ikke oppdatere utsatt til dato null på oppdrag og hendelse er null`() {
+            val hendelse = TestData.opprettHendelse(utsattTilDato = null)
+            val oppdrag = TestData.opprettOppdrag(utsattTilDato = null)
+
+            oppdragService.oppdatererVerdierPåOppdrag(hendelse, oppdrag)
+
+            oppdrag.utsattTilDato shouldBe null
         }
     }
 }
