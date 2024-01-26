@@ -54,10 +54,11 @@ class OppslagService(
         // Alle vedtak som ikke har satt overføringstidspunkt, som vil si at det ikke har blitt sendt til oppdrag
         val ikkeOversendteVedtak = oppdrag
             .flatMap { it.oppdragsperioder }
-            .distinctBy { it.vedtakId }
             .flatMap { it.konteringer }
             .filter { it.overføringstidspunkt == null }
-            .map { IkkeOversendteVedtak(it.oppdragsperiode!!.vedtakId) }
+            .map { it.oppdragsperiode!! }
+            .distinctBy { it.vedtakId }
+            .map { IkkeOversendteVedtak(it.vedtakId) }
 
         // Alle vedtak som ikke har fått behandlingsstatus ok fra skatt. Her kalles skatt en gang for å sjekke om det kan godkjennes umiddelbart
         val feiledeVedtak = oppdrag
