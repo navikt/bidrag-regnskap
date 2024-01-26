@@ -87,3 +87,10 @@ spec:
         - application: bidrag-stubs
           namespace: bidrag
           cluster: dev-gcp
+    inbound:
+      rules:
+      { { #each azure.inbound.rules}}
+          - application: {{this.application } }
+      namespace: {{this.namespace}}
+      cluster: {{this.cluster}}
+      {{/each}}
