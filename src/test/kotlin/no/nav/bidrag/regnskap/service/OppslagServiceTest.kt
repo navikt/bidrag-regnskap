@@ -9,18 +9,30 @@ import io.mockk.junit5.MockKExtension
 import no.nav.bidrag.commons.util.PersonidentGenerator
 import no.nav.bidrag.domene.enums.regnskap.Transaksjonskode
 import no.nav.bidrag.domene.enums.regnskap.Type
+import no.nav.bidrag.domene.enums.regnskap.behandlingsstatus.Batchstatus
 import no.nav.bidrag.domene.enums.vedtak.Stønadstype
+import no.nav.bidrag.domene.sak.Saksnummer
+import no.nav.bidrag.regnskap.consumer.SkattConsumer
 import no.nav.bidrag.regnskap.utils.TestData
+import no.nav.bidrag.transport.regnskap.behandlingsstatus.BehandlingsstatusResponse
+import no.nav.bidrag.transport.regnskap.behandlingsstatus.Feilmelding
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.springframework.http.ResponseEntity
+import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.YearMonth
+import java.util.UUID
 
 @ExtendWith(MockKExtension::class)
 class OppslagServiceTest {
 
     @MockK(relaxed = true)
     private lateinit var persistenceService: PersistenceService
+
+    @MockK(relaxed = true)
+    private lateinit var skattConsumer: SkattConsumer
 
     @InjectMockKs
     private lateinit var oppslagService: OppslagService
@@ -105,5 +117,193 @@ class OppslagServiceTest {
     }
 
     @Nested
-    inner class HentPåSakId
+    inner class HentUtsatteVedtakForSak {
+
+        @Test
+        fun `skal opprette liste med utsatte vedtak`() {
+            val now = LocalDateTime.now()
+            val saksnummer = Saksnummer("123456789")
+            val utsattTilDato = LocalDate.now().plusDays(1)
+            val oppdrag = TestData.opprettOppdrag(
+                sakId = saksnummer.verdi,
+                utsattTilDato = utsattTilDato,
+            )
+            val oppdragsperiode = TestData.opprettOppdragsperiode(
+                oppdrag = oppdrag,
+            )
+            val kontering = TestData.opprettKontering(
+                oppdragsperiode = oppdragsperiode,
+            ).apply {
+                overføringstidspunkt = now
+                behandlingsstatusOkTidspunkt = now
+            }
+            oppdragsperiode.konteringer = listOf(kontering)
+            oppdrag.oppdragsperioder = listOf(oppdragsperiode)
+
+            every { persistenceService.hentAlleOppdragPåSakId(saksnummer.verdi) } returns listOf(oppdrag)
+
+            val utsatteOgFeiledeVedtak = oppslagService.hentUtsatteOgFeiledeVedtakForSak(saksnummer)
+
+            utsatteOgFeiledeVedtak.utsatteVedtak shouldHaveSize 1
+            utsatteOgFeiledeVedtak.feiledeVedtak shouldHaveSize 0
+            utsatteOgFeiledeVedtak.ikkeOversendteVedtak shouldHaveSize 0
+            utsatteOgFeiledeVedtak.utsatteVedtak.first().utsattTil shouldBe utsattTilDato
+        }
+
+        @Test
+        fun `skal ha tom liste med utsatte vedtak om vedtakk ikke er utsatt lenger enn i dag`() {
+            val now = LocalDateTime.now()
+            val saksnummer = Saksnummer("123456789")
+            val oppdrag = TestData.opprettOppdrag(
+                sakId = saksnummer.verdi,
+                utsattTilDato = LocalDate.now(),
+            )
+            val oppdragsperiode = TestData.opprettOppdragsperiode(
+                oppdrag = oppdrag,
+            )
+            val kontering = TestData.opprettKontering(
+                oppdragsperiode = oppdragsperiode,
+            ).apply {
+                overføringstidspunkt = now
+                behandlingsstatusOkTidspunkt = now
+            }
+            oppdragsperiode.konteringer = listOf(kontering)
+            oppdrag.oppdragsperioder = listOf(oppdragsperiode)
+
+            every { persistenceService.hentAlleOppdragPåSakId(saksnummer.verdi) } returns listOf(oppdrag)
+
+            val utsatteOgFeiledeVedtak = oppslagService.hentUtsatteOgFeiledeVedtakForSak(saksnummer)
+
+            utsatteOgFeiledeVedtak.utsatteVedtak shouldHaveSize 0
+            utsatteOgFeiledeVedtak.feiledeVedtak shouldHaveSize 0
+            utsatteOgFeiledeVedtak.ikkeOversendteVedtak shouldHaveSize 0
+        }
+
+        @Test
+        fun `skal ha liste med feilede vedtak`() {
+            val now = LocalDateTime.now()
+            val generertReferansekode = UUID.randomUUID().toString()
+            val saksnummer = Saksnummer("123456789")
+            val feilmelding = "FEILET"
+            val oppdrag = TestData.opprettOppdrag(
+                sakId = saksnummer.verdi,
+                utsattTilDato = null,
+            )
+            val oppdragsperiode = TestData.opprettOppdragsperiode(
+                oppdrag = oppdrag,
+            )
+            val kontering = TestData.opprettKontering(
+                oppdragsperiode = oppdragsperiode,
+            ).apply {
+                overføringstidspunkt = now
+                behandlingsstatusOkTidspunkt = null
+                sisteReferansekode = generertReferansekode
+            }
+            oppdragsperiode.konteringer = listOf(kontering)
+            oppdrag.oppdragsperioder = listOf(oppdragsperiode)
+
+            every { persistenceService.hentAlleOppdragPåSakId(saksnummer.verdi) } returns listOf(oppdrag)
+            every { skattConsumer.sjekkBehandlingsstatus(generertReferansekode) } returns ResponseEntity.ok(
+                BehandlingsstatusResponse(
+                    listOf(Feilmelding(null, null, null, null, null, feilmelding)),
+                    Batchstatus.Failed,
+                    UUID.randomUUID().toString(),
+                    1,
+                    1,
+                    0,
+                ),
+            )
+
+            val utsatteOgFeiledeVedtak = oppslagService.hentUtsatteOgFeiledeVedtakForSak(saksnummer)
+
+            utsatteOgFeiledeVedtak.utsatteVedtak shouldHaveSize 0
+            utsatteOgFeiledeVedtak.feiledeVedtak shouldHaveSize 1
+            utsatteOgFeiledeVedtak.ikkeOversendteVedtak shouldHaveSize 0
+            utsatteOgFeiledeVedtak.feiledeVedtak.first().feilmelding shouldBe feilmelding
+        }
+
+        @Test
+        fun `skal ha tomme lister`() {
+            val now = LocalDateTime.now()
+            val generertReferansekode = UUID.randomUUID().toString()
+            val saksnummer = Saksnummer("123456789")
+            val oppdrag = TestData.opprettOppdrag(
+                sakId = saksnummer.verdi,
+                utsattTilDato = null,
+            )
+            val oppdragsperiode = TestData.opprettOppdragsperiode(
+                oppdrag = oppdrag,
+            )
+            val kontering = TestData.opprettKontering(
+                oppdragsperiode = oppdragsperiode,
+            ).apply {
+                overføringstidspunkt = now
+                behandlingsstatusOkTidspunkt = null
+                sisteReferansekode = generertReferansekode
+            }
+            oppdragsperiode.konteringer = listOf(kontering)
+            oppdrag.oppdragsperioder = listOf(oppdragsperiode)
+
+            every { persistenceService.hentAlleOppdragPåSakId(saksnummer.verdi) } returns listOf(oppdrag)
+            every { skattConsumer.sjekkBehandlingsstatus(generertReferansekode) } returns ResponseEntity.ok(
+                BehandlingsstatusResponse(
+                    emptyList(),
+                    Batchstatus.Done,
+                    UUID.randomUUID().toString(),
+                    1,
+                    0,
+                    1,
+                ),
+            )
+
+            val utsatteOgFeiledeVedtak = oppslagService.hentUtsatteOgFeiledeVedtakForSak(saksnummer)
+
+            utsatteOgFeiledeVedtak.utsatteVedtak shouldHaveSize 0
+            utsatteOgFeiledeVedtak.feiledeVedtak shouldHaveSize 0
+            utsatteOgFeiledeVedtak.ikkeOversendteVedtak shouldHaveSize 0
+        }
+
+        @Test
+        fun `skal ha liste over ikke overførte vedtak`() {
+            val generertReferansekode = UUID.randomUUID().toString()
+            val saksnummer = Saksnummer("123456789")
+            val vedtakId = 123
+            val oppdrag = TestData.opprettOppdrag(
+                sakId = saksnummer.verdi,
+                utsattTilDato = null,
+            )
+            val oppdragsperiode = TestData.opprettOppdragsperiode(
+                oppdrag = oppdrag,
+                vedtakId = vedtakId,
+            )
+            val kontering = TestData.opprettKontering(
+                oppdragsperiode = oppdragsperiode,
+            ).apply {
+                overføringstidspunkt = null
+                behandlingsstatusOkTidspunkt = null
+                sisteReferansekode = generertReferansekode
+            }
+            oppdragsperiode.konteringer = listOf(kontering)
+            oppdrag.oppdragsperioder = listOf(oppdragsperiode)
+
+            every { persistenceService.hentAlleOppdragPåSakId(saksnummer.verdi) } returns listOf(oppdrag)
+            every { skattConsumer.sjekkBehandlingsstatus(generertReferansekode) } returns ResponseEntity.ok(
+                BehandlingsstatusResponse(
+                    emptyList(),
+                    Batchstatus.Done,
+                    UUID.randomUUID().toString(),
+                    1,
+                    0,
+                    1,
+                ),
+            )
+
+            val utsatteOgFeiledeVedtak = oppslagService.hentUtsatteOgFeiledeVedtakForSak(saksnummer)
+
+            utsatteOgFeiledeVedtak.utsatteVedtak shouldHaveSize 0
+            utsatteOgFeiledeVedtak.feiledeVedtak shouldHaveSize 0
+            utsatteOgFeiledeVedtak.ikkeOversendteVedtak shouldHaveSize 1
+            utsatteOgFeiledeVedtak.ikkeOversendteVedtak.first().vedtakId shouldBe vedtakId
+        }
+    }
 }

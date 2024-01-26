@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
+import no.nav.bidrag.domene.sak.Saksnummer
 import no.nav.bidrag.regnskap.dto.oppdrag.OppdragResponse
 import no.nav.bidrag.regnskap.dto.oppdrag.OppslagAvOppdragPåSakIdResponse
 import no.nav.bidrag.regnskap.service.OppslagService
@@ -96,5 +97,33 @@ class OppslagController(
                 .header(HttpHeaders.WARNING, "Det finnes ingen oppdrag med angitt sakId: $sakId")
                 .build<Any>()
         }
+    }
+
+    @GetMapping("/utsatteOgFeiledeVedtak")
+    @Operation(
+        summary = "Hent alle utsatte vedtak for en sak",
+        description = "Operasjon for å hente alle utsatte vedtak for en sak.",
+        security = [SecurityRequirement(name = "bearer-key")],
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Returnerer alt lagret for saken.",
+                content = [
+                    (
+                        Content(
+                            array = (ArraySchema(schema = Schema(implementation = OppslagAvOppdragPåSakIdResponse::class))),
+                        )
+                        ),
+                ],
+            ), ApiResponse(
+                responseCode = "204",
+                description = "Fant ingenting lagret på saken.",
+            ),
+        ],
+    )
+    fun hentUtsatteOgFeiledeVedtakForSak(saksnummer: Saksnummer): ResponseEntity<*> {
+        return ResponseEntity.ok(oppslagService.hentUtsatteOgFeiledeVedtakForSak(saksnummer))
     }
 }
