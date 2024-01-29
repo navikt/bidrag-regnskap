@@ -48,7 +48,11 @@ class PåløpsfilGenerator(
 
             konteringerForSak.forEach { kontering ->
                 skrivKonteringBr10(writer, kontering, now)
-                sum += kontering.oppdragsperiode!!.beløp
+                if (Transaksjonskode.valueOf(kontering.transaksjonskode).negativtBeløp) {
+                    sum -= kontering.oppdragsperiode!!.beløp
+                } else {
+                    sum += kontering.oppdragsperiode!!.beløp
+                }
             }
 
             writer.writeEndElement()
