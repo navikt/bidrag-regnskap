@@ -10,6 +10,10 @@ import no.nav.bidrag.regnskap.dto.oppdrag.KonteringResponse
 import no.nav.bidrag.regnskap.dto.oppdrag.OppdragResponse
 import no.nav.bidrag.regnskap.dto.oppdrag.OppdragsperiodeResponse
 import no.nav.bidrag.regnskap.dto.oppdrag.OppslagAvOppdragPåSakIdResponse
+import no.nav.bidrag.regnskap.dto.vedtak.FeiledeVedtak
+import no.nav.bidrag.regnskap.dto.vedtak.IkkeOversendteVedtak
+import no.nav.bidrag.regnskap.dto.vedtak.UtsatteOgFeiledeVedtak
+import no.nav.bidrag.regnskap.dto.vedtak.UtsatteVedtak
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
 import org.springframework.stereotype.Service
@@ -80,25 +84,6 @@ class OppslagService(
 
         return UtsatteOgFeiledeVedtak(utsatteVedtak, ikkeOversendteVedtak, feiledeVedtak)
     }
-
-    data class UtsatteOgFeiledeVedtak(
-        val utsatteVedtak: List<UtsatteVedtak>,
-        val ikkeOversendteVedtak: List<IkkeOversendteVedtak>,
-        val feiledeVedtak: List<FeiledeVedtak>,
-    )
-
-    data class IkkeOversendteVedtak(
-        val vedtakId: Int,
-    )
-
-    data class UtsatteVedtak(
-        val vedtakId: Int,
-        val utsattTil: LocalDate,
-    )
-    data class FeiledeVedtak(
-        val vedtakId: Int,
-        val feilmelding: String?,
-    )
 
     fun hentOppdragResponse(oppdrag: Oppdrag): OppdragResponse {
         return OppdragResponse(
