@@ -11,8 +11,8 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.bidrag.domene.sak.Saksnummer
 import no.nav.bidrag.regnskap.dto.oppdrag.OppdragResponse
 import no.nav.bidrag.regnskap.dto.oppdrag.OppslagAvOppdragPåSakIdResponse
+import no.nav.bidrag.regnskap.dto.vedtak.UtsatteOgFeiledeVedtak
 import no.nav.bidrag.regnskap.service.OppslagService
-import no.nav.bidrag.regnskap.service.OppslagService.UtsatteOgFeiledeVedtak
 import no.nav.security.token.support.core.api.Protected
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
