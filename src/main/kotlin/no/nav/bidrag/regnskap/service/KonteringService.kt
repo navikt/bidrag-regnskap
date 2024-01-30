@@ -11,6 +11,7 @@ import no.nav.bidrag.regnskap.util.KonteringUtils.vurderSøknadType
 import no.nav.bidrag.regnskap.util.KonteringUtils.vurderType
 import no.nav.bidrag.regnskap.util.PeriodeUtils
 import org.springframework.stereotype.Service
+import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -25,6 +26,16 @@ class KonteringService {
         val vedtakId = hendelse.vedtakId
 
         perioderForOppdragsperiode.forEachIndexed { indexPeriode, periode ->
+
+            // Om det opprettes et opphør og det ikke finnes eksisterende korrigerte konteringer for perioden skal det ikke opprettes ny kontering.
+            if (oppdragsperiode.opphørendeOppdragsperiode && oppdragsperiode.beløp == BigDecimal.ZERO && !finnesKorrigerendeKonteringerForMåned(
+                    periode,
+                    oppdragsperiode,
+                )
+            ) {
+                return@forEachIndexed
+            }
+
             oppdragsperiode.konteringer = oppdragsperiode.konteringer.plus(
                 Kontering(
                     transaksjonskode = transaksjonskode,
@@ -35,6 +46,12 @@ class KonteringService {
                     vedtakId = vedtakId,
                 ),
             )
+        }
+    }
+
+    private fun finnesKorrigerendeKonteringerForMåned(periode: YearMonth, oppdragsperiode: Oppdragsperiode): Boolean {
+        return oppdragsperiode.oppdrag!!.oppdragsperioder.flatMap { it.konteringer }.any {
+            YearMonth.parse(it.overføringsperiode) == periode && Transaksjonskode.valueOf(it.transaksjonskode).korreksjonskode == null
         }
     }
 
