@@ -1,9 +1,14 @@
 package no.nav.bidrag.regnskap.service
 
+import no.nav.bidrag.domene.enums.vedtak.Engangsbeløptype
+import no.nav.bidrag.domene.enums.vedtak.Stønadstype
 import no.nav.bidrag.domene.enums.vedtak.Vedtakstype
+import no.nav.bidrag.domene.ident.Personident
+import no.nav.bidrag.domene.sak.Saksnummer
 import no.nav.bidrag.regnskap.consumer.SakConsumer
 import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
+import no.nav.bidrag.regnskap.util.IdentUtils
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -64,6 +69,7 @@ class OppdragService(
 
         if (hendelse.vedtakType == Vedtakstype.ENDRING_MOTTAKER) {
             oppdaterMottakerPåOppdragsperioder(hendelse, oppdrag)
+            oppdrag.mottakerIdent = hendelse.mottakerIdent
         }
 
         oppdatererVerdierPåOppdrag(hendelse, oppdrag)
@@ -103,6 +109,7 @@ class OppdragService(
             kravhaverIdent = hendelse.kravhaverIdent,
             skyldnerIdent = hendelse.skyldnerIdent,
             gjelderIdent = sakConsumer.hentBmFraSak(hendelse.sakId),
+            mottakerIdent = hendelse.mottakerIdent,
             utsattTilDato = hendelse.utsattTilDato,
         )
     }
@@ -118,6 +125,46 @@ class OppdragService(
         // Utsatt til dato skal ikke kunne forkortes eller fjernes om først satt via vedtak
         if (oppdrag.utsattTilDato == null || hendelse.utsattTilDato?.isAfter(oppdrag.utsattTilDato) == true) {
             oppdrag.utsattTilDato = hendelse.utsattTilDato
+        }
+    }
+
+    @Transactional
+    fun patchMottaker(saksnummer: Saksnummer, kravhaver: Personident, mottaker: Personident) {
+        val oppdragPåSaksnummerOgKravhaver = persistenceService.hentOppdragPåSaksnummerOgKravhaver(saksnummer, kravhaver)
+
+        val stønadstyperSomSkalOppdatereMedBmEllerRm = arrayOf(
+            Stønadstype.FORSKUDD.name,
+            Stønadstype.BIDRAG18AAR.name,
+            Stønadstype.BIDRAG.name,
+            Stønadstype.OPPFOSTRINGSBIDRAG.name,
+            Stønadstype.MOTREGNING.name,
+            Engangsbeløptype.SÆRTILSKUDD.name,
+            Engangsbeløptype.ETTERGIVELSE.name,
+            Engangsbeløptype.DIREKTE_OPPGJØR.name,
+        )
+
+        val stønaderSomSkalOppdatereTilNavIdent = arrayOf(
+            Engangsbeløptype.GEBYR_MOTTAKER.name,
+            Engangsbeløptype.GEBYR_SKYLDNER.name,
+            Engangsbeløptype.TILBAKEKREVING.name,
+            Engangsbeløptype.ETTERGIVELSE_TILBAKEKREVING.name,
+        )
+
+        oppdragPåSaksnummerOgKravhaver.forEach { oppdrag ->
+            when (oppdrag.stønadType) {
+                in stønadstyperSomSkalOppdatereMedBmEllerRm -> {
+                    oppdrag.mottakerIdent = mottaker.verdi
+                    oppdrag.oppdragsperioder.forEach { oppdragsperiode -> oppdragsperiode.mottakerIdent = mottaker.verdi }
+                }
+                in stønaderSomSkalOppdatereTilNavIdent -> {
+                    oppdrag.mottakerIdent = IdentUtils.NAV_TSS_IDENT
+                    oppdrag.oppdragsperioder.forEach { oppdragsperiode -> oppdragsperiode.mottakerIdent = IdentUtils.NAV_TSS_IDENT }
+                }
+                Stønadstype.EKTEFELLEBIDRAG.name -> {
+                    oppdrag.mottakerIdent = oppdrag.kravhaverIdent
+                    oppdrag.oppdragsperioder.forEach { oppdragsperiode -> oppdragsperiode.mottakerIdent = oppdrag.kravhaverIdent!! }
+                }
+            }
         }
     }
 }

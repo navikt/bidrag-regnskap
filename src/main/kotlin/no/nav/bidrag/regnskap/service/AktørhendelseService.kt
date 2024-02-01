@@ -26,6 +26,7 @@ class AktørhendelseService(
 
                 persistenceService.hentAlleMottakereMedIdent(tidligereIdent?.idnummer.toString()).forEach {
                     it.mottakerIdent = gjeldendeIdent
+                    it.oppdrag!!.mottakerIdent = gjeldendeIdent // Todo(Endre hentAlleMottakereMedIdent til å returnere oppdrag etter flytting av RM)
                     SECURE_LOGGER.info("Aktorhendelse: $tidligereIdent oppdatert til $gjeldendeIdent for oppdragsperiodeId: ${it.oppdragsperiodeId}")
                 }
 
