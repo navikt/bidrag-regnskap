@@ -1,5 +1,7 @@
 package no.nav.bidrag.regnskap.service
 
+import no.nav.bidrag.domene.ident.Personident
+import no.nav.bidrag.domene.sak.Saksnummer
 import no.nav.bidrag.regnskap.SECURE_LOGGER
 import no.nav.bidrag.regnskap.persistence.entity.Driftsavvik
 import no.nav.bidrag.regnskap.persistence.entity.Kontering
@@ -72,6 +74,10 @@ class PersistenceService(
         val lagredeOppdrag = oppdragRepository.saveAll(oppdrag)
         LOGGER.debug("Lagret alle oppdrag med ID: {}", lagredeOppdrag.map { it.oppdragId })
         return lagredeOppdrag.map { it.oppdragId }
+    }
+
+    fun hentOppdragPåSaksnummerOgKravhaver(saksnummer: Saksnummer, kravhaver: Personident): List<Oppdrag> {
+        return oppdragRepository.findAllBySakIdAndKravhaverIdent(saksnummer.verdi, kravhaver.verdi)
     }
 
     fun hentPåløp(): List<Påløp> {

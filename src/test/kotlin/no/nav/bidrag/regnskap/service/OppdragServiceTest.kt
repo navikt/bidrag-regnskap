@@ -6,7 +6,13 @@ import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.verify
+import no.nav.bidrag.commons.util.PersonidentGenerator
+import no.nav.bidrag.domene.enums.vedtak.Engangsbeløptype
+import no.nav.bidrag.domene.enums.vedtak.Stønadstype
+import no.nav.bidrag.domene.ident.Personident
+import no.nav.bidrag.domene.sak.Saksnummer
 import no.nav.bidrag.regnskap.consumer.SakConsumer
+import no.nav.bidrag.regnskap.util.IdentUtils
 import no.nav.bidrag.regnskap.utils.TestData
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -113,6 +119,100 @@ class OppdragServiceTest {
             oppdragService.oppdatererVerdierPåOppdrag(hendelse, oppdrag)
 
             oppdrag.utsattTilDato shouldBe null
+        }
+    }
+
+    @Nested
+    inner class PatchMottaker {
+
+        @Test
+        fun `skal patche mottaker når det finnes et bidrags oppdrag`() {
+            val saksnummer = Saksnummer("123456")
+            val kravhaver = Personident(PersonidentGenerator.genererFødselsnummer())
+            val mottaker = Personident(PersonidentGenerator.genererFødselsnummer())
+
+            val oppdrag = TestData.opprettOppdrag(stonadType = Stønadstype.BIDRAG, sakId = saksnummer.verdi, kravhaverIdent = kravhaver.verdi)
+            val oppdragsperiode1 = TestData.opprettOppdragsperiode(oppdrag = oppdrag, mottakerIdent = "DUMMY")
+            val oppdragsperiode2 = TestData.opprettOppdragsperiode(oppdrag = oppdrag, mottakerIdent = "DUMMY")
+            oppdrag.oppdragsperioder = listOf(oppdragsperiode1, oppdragsperiode2)
+
+            every { persistenceService.hentOppdragPåSaksnummerOgKravhaver(saksnummer, kravhaver) } returns listOf(oppdrag)
+
+            oppdragService.patchMottaker(saksnummer, kravhaver, mottaker)
+
+            oppdrag.mottakerIdent shouldBe mottaker.verdi
+            oppdrag.oppdragsperioder.forEach { it.mottakerIdent shouldBe mottaker.verdi }
+        }
+
+        @Test
+        fun `skal patche mottaker når det finnes et bidrag- og et forskudds oppdrag`() {
+            val saksnummer = Saksnummer("123456")
+            val kravhaver = Personident(PersonidentGenerator.genererFødselsnummer())
+            val mottaker = Personident(PersonidentGenerator.genererFødselsnummer())
+
+            val oppdrag1 = TestData.opprettOppdrag(stonadType = Stønadstype.BIDRAG, sakId = saksnummer.verdi, kravhaverIdent = kravhaver.verdi)
+            val oppdragsperiode1 = TestData.opprettOppdragsperiode(oppdrag = oppdrag1, mottakerIdent = "DUMMY")
+            val oppdragsperiode2 = TestData.opprettOppdragsperiode(oppdrag = oppdrag1, mottakerIdent = "DUMMY")
+            oppdrag1.oppdragsperioder = listOf(oppdragsperiode1, oppdragsperiode2)
+
+            val oppdrag2 = TestData.opprettOppdrag(stonadType = Stønadstype.FORSKUDD, sakId = saksnummer.verdi, kravhaverIdent = kravhaver.verdi)
+            val oppdragsperiode3 = TestData.opprettOppdragsperiode(oppdrag = oppdrag2, mottakerIdent = "DUMMY")
+            val oppdragsperiode4 = TestData.opprettOppdragsperiode(oppdrag = oppdrag2, mottakerIdent = "DUMMY")
+            oppdrag2.oppdragsperioder = listOf(oppdragsperiode3, oppdragsperiode4)
+
+            every { persistenceService.hentOppdragPåSaksnummerOgKravhaver(saksnummer, kravhaver) } returns listOf(oppdrag1, oppdrag2)
+
+            oppdragService.patchMottaker(saksnummer, kravhaver, mottaker)
+
+            oppdrag1.mottakerIdent shouldBe mottaker.verdi
+            oppdrag2.mottakerIdent shouldBe mottaker.verdi
+            oppdrag1.oppdragsperioder.forEach { it.mottakerIdent shouldBe mottaker.verdi }
+            oppdrag2.oppdragsperioder.forEach { it.mottakerIdent shouldBe mottaker.verdi }
+        }
+
+        @Test
+        fun `skal patche mottaker for gebyr`() {
+            val saksnummer = Saksnummer("123456")
+            val kravhaver = Personident(PersonidentGenerator.genererFødselsnummer())
+            val mottaker = Personident(PersonidentGenerator.genererFødselsnummer())
+
+            val oppdrag1 = TestData.opprettOppdrag(
+                stonadType = null,
+                engangsbelopType = Engangsbeløptype.GEBYR_MOTTAKER,
+                sakId = saksnummer.verdi,
+                kravhaverIdent = kravhaver.verdi,
+            )
+            val oppdragsperiode1 = TestData.opprettOppdragsperiode(oppdrag = oppdrag1, mottakerIdent = "DUMMY")
+            oppdrag1.oppdragsperioder = listOf(oppdragsperiode1)
+
+            every { persistenceService.hentOppdragPåSaksnummerOgKravhaver(saksnummer, kravhaver) } returns listOf(oppdrag1)
+
+            oppdragService.patchMottaker(saksnummer, kravhaver, mottaker)
+
+            oppdrag1.mottakerIdent shouldBe IdentUtils.NAV_TSS_IDENT
+            oppdrag1.oppdragsperioder.forEach { it.mottakerIdent shouldBe IdentUtils.NAV_TSS_IDENT }
+        }
+
+        @Test
+        fun `skal patche mottaker for ektefellebidrag`() {
+            val saksnummer = Saksnummer("123456")
+            val kravhaver = Personident(PersonidentGenerator.genererFødselsnummer())
+            val mottaker = Personident(PersonidentGenerator.genererFødselsnummer())
+
+            val oppdrag1 = TestData.opprettOppdrag(
+                stonadType = Stønadstype.EKTEFELLEBIDRAG,
+                sakId = saksnummer.verdi,
+                kravhaverIdent = kravhaver.verdi,
+            )
+            val oppdragsperiode1 = TestData.opprettOppdragsperiode(oppdrag = oppdrag1, mottakerIdent = "DUMMY")
+            oppdrag1.oppdragsperioder = listOf(oppdragsperiode1)
+
+            every { persistenceService.hentOppdragPåSaksnummerOgKravhaver(saksnummer, kravhaver) } returns listOf(oppdrag1)
+
+            oppdragService.patchMottaker(saksnummer, kravhaver, mottaker)
+
+            oppdrag1.mottakerIdent shouldBe oppdrag1.kravhaverIdent
+            oppdrag1.oppdragsperioder.forEach { it.mottakerIdent shouldBe oppdrag1.kravhaverIdent }
         }
     }
 }

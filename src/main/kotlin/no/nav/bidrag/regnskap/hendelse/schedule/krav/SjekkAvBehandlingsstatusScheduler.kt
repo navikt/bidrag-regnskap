@@ -67,7 +67,7 @@ class SjekkAvBehandlingsstatusScheduler(
 
             if (skalSendeDagligSlack()) {
                 slackService.sendMelding(
-                    ":ohno: Sjekk av behandlingsstatus feilet! Miljø: $clientId\n\nFølgende batchUider feilet:\n $feilmeldingSammenslått",
+                    ":ohno: Sjekk av behandlingsstatus feilet! Miljø: $clientId\n\nFølgende batchUider feilet:\n$feilmeldingSammenslått",
                 )
             }
             LOGGER.error { "Det har oppstått feil ved overføring av krav på følgende batchUider med følgende feilmelding:\n $feilmeldingSammenslått" }
