@@ -6,6 +6,7 @@ import no.nav.bidrag.domene.sak.Saksnummer
 import no.nav.bidrag.regnskap.service.OppdragService
 import no.nav.security.token.support.core.api.Protected
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -13,7 +14,7 @@ class PatchController(private val oppdragService: OppdragService) {
 
     @Protected
     @PostMapping("/patchMottaker")
-    fun sendMelding(patchMottakerRequest: PatchMottakerRequest) {
+    fun sendMelding(@RequestBody patchMottakerRequest: PatchMottakerRequest) {
         oppdragService.patchMottaker(patchMottakerRequest.saksnummer, patchMottakerRequest.kravhaver, patchMottakerRequest.mottaker)
     }
 }
