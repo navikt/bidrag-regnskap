@@ -1,0 +1,1 @@
+CREATE INDEX sakid_kravhaverident_index ON oppdrag (sak_id, kravhaver_ident);
