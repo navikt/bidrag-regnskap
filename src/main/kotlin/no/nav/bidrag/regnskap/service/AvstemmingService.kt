@@ -1,15 +1,18 @@
 package no.nav.bidrag.regnskap.service
 
 import no.nav.bidrag.regnskap.fil.avstemning.AvstemmingsfilGenerator
+import no.nav.bidrag.regnskap.fil.overføring.FiloverføringTilElinKlient
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Service
 class AvstemmingService(
     private val avstemmingsfilGenerator: AvstemmingsfilGenerator,
     private val persistenceService: PersistenceService,
+    private val filoverføringTilElinKlient: FiloverføringTilElinKlient,
 ) {
 
     companion object {
@@ -32,5 +35,15 @@ class AvstemmingService(
             tomTidspunkt,
         ).filter { it.behandlingsstatusOkTidspunkt != null }
         avstemmingsfilGenerator.skrivAvstemmingsfil(konteringer, dato)
+    }
+
+    fun startManuellOverføringAvsteming(dato: LocalDate) {
+        val nowFormattert = dato.format(DateTimeFormatter.ofPattern("yyMMdd")).toString()
+        val avstemmingMappe = "avstemning/"
+        val avstemmingKonteringFilnavn = "avstdet_D$nowFormattert.xml"
+        val avstemmingSummeringFilnavn = "avstsum_D$nowFormattert.xml"
+
+        filoverføringTilElinKlient.lastOppFilTilFilsluse(avstemmingMappe, avstemmingKonteringFilnavn)
+        filoverføringTilElinKlient.lastOppFilTilFilsluse(avstemmingMappe, avstemmingSummeringFilnavn)
     }
 }

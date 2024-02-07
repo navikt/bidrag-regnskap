@@ -42,7 +42,8 @@ class AvstemmingController(
                 responseCode = "200",
                 description = "Avstemmingsfilene har blitt generert.",
                 content = [Content()],
-            ), ApiResponse(
+            ),
+            ApiResponse(
                 responseCode = "400",
                 description = "Dato er satt frem i tid. Generering blir derfor ikke startet.",
                 content = [Content()],
@@ -77,6 +78,36 @@ class AvstemmingController(
                 avstemmingService.startAvstemming(dato)
             }
         }
+        return ResponseEntity.ok().build()
+    }
+
+    @GetMapping("/manuellOverforingAvstemning")
+    @Operation(
+        summary = "Start manuell overføring av avstemming- og summeringsfil for dato fra GCP bucket til SFTP.",
+        description = "Operasjon for å starte manuell overføring av avstemmingsfil og summeringsfil for en spesifikk dato." +
+            "Hentes fra bucket på GCP og deretter overført til en sftp filsluse hvor ELIN plukker ned filene.",
+        security = [SecurityRequirement(name = "bearer-key")],
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Avstemmingsfilene har blitt generert.",
+                content = [Content()],
+            ),
+        ],
+    )
+    @Parameters(
+        value = [
+            Parameter(name = "dato", example = "2022-01-01"),
+        ],
+    )
+    fun startManuellOverføringAvstemning(
+        @RequestParam(required = true)
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+        dato: LocalDate,
+    ): ResponseEntity<Any> {
+        avstemmingService.startManuellOverføringAvsteming(dato)
         return ResponseEntity.ok().build()
     }
 }
