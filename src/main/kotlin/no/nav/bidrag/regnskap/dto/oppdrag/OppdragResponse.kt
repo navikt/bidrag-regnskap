@@ -49,6 +49,13 @@ data class OppdragResponse(
     val gjelderIdent: String,
 
     @field:Schema(
+        description = "Personident (FNR/DNR) eller aktoernummer (TSS-ident/samhandler) til mottaker av kravet." +
+            "\n\nFor gebyr settes mottakerIdent til NAVs aktoernummer 80000345435.",
+        example = "12345678910",
+    )
+    val mottakerIdent: String,
+
+    @field:Schema(
         description = "Tidspunkt oversending av oppdraget er utsatt til.",
         format = "date-time",
         example = "2022-02-01:00:00:00",

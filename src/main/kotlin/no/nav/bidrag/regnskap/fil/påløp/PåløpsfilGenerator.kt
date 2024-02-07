@@ -158,7 +158,7 @@ class PåløpsfilGenerator(
         writer.writeEndElement()
 
         writer.writeStartElement("utbetalesTilId")
-        writer.writeCharacters(kontering.oppdragsperiode?.mottakerIdent)
+        writer.writeCharacters(kontering.oppdragsperiode?.oppdrag?.mottakerIdent)
         writer.writeEndElement()
 
         writer.writeStartElement("belop")

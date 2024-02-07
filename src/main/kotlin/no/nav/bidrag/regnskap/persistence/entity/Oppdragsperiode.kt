@@ -39,9 +39,6 @@ data class Oppdragsperiode(
     @Column(name = "vedtak_type")
     var vedtakType: String,
 
-    @Column(name = "mottaker_ident")
-    var mottakerIdent: String,
-
     @Column(name = "belop")
     val beløp: BigDecimal,
 
@@ -88,7 +85,6 @@ data class Oppdragsperiode(
             "vedtakId = $vedtakId , " +
             "referanse = $referanse , " +
             "vedtakType = $vedtakType , " +
-            "mottakerIdent = $mottakerIdent , " +
             "beløp = $beløp , " +
             "valuta = $valuta , " +
             "periodeFra = $periodeFra , " +
@@ -113,7 +109,6 @@ data class Oppdragsperiode(
         if (vedtakId != other.vedtakId) return false
         if (referanse != other.referanse) return false
         if (vedtakType != other.vedtakType) return false
-        if (mottakerIdent != other.mottakerIdent) return false
         if (beløp != other.beløp) return false
         if (valuta != other.valuta) return false
         if (periodeFra != other.periodeFra) return false
@@ -135,7 +130,6 @@ data class Oppdragsperiode(
         result = 31 * result + vedtakId
         result = 31 * result + (referanse?.hashCode() ?: 0)
         result = 31 * result + vedtakType.hashCode()
-        result = 31 * result + mottakerIdent.hashCode()
         result = 31 * result + beløp.hashCode()
         result = 31 * result + valuta.hashCode()
         result = 31 * result + periodeFra.hashCode()

@@ -29,6 +29,8 @@ interface OppdragRepository : JpaRepository<Oppdrag, Int> {
 
     fun findAllBySakIdAndKravhaverIdent(sakId: String, kravhaverIdent: String): List<Oppdrag>
 
+    fun findAllByMottakerIdent(mottakerIdent: String): List<Oppdrag>
+
     fun findAllBySkyldnerIdent(skyldnerIdent: String): List<Oppdrag>
 
     fun findAllByGjelderIdent(gjelderIdent: String): List<Oppdrag>

@@ -95,12 +95,12 @@ class PåløpsfilGeneratorIT {
                 sakId = Random.nextInt().toString(),
                 skyldnerIdent = PersonidentGenerator.genererFødselsnummer(),
                 gjelderIdent = PersonidentGenerator.genererFødselsnummer(),
+                mottakerIdent = PersonidentGenerator.genererFødselsnummer(),
             )
             val oppdragsperiode = Oppdragsperiode(
                 oppdrag = oppdrag,
                 vedtakId = Random.nextInt(),
                 vedtakType = "FASTSETTELSE",
-                mottakerIdent = PersonidentGenerator.genererFødselsnummer(),
                 beløp = BigDecimal(Random.nextDouble()),
                 valuta = "NOK",
                 periodeFra = LocalDate.of(2023, 1, 1),

@@ -145,7 +145,15 @@ internal class SendKravSchedulerTest {
 
         val annetOppdrag = TestData.opprettOppdrag(oppdragId = 0, sakId = "654321")
 
-        val bidragOppdrag = TestData.opprettOppdrag(oppdragId = 1, skyldnerIdent = bp, kravhaverIdent = bm, gjelderIdent = barn, sakId = "123456")
+        val bidragOppdrag = TestData.opprettOppdrag(
+            oppdragId = 1,
+            skyldnerIdent = bp,
+            kravhaverIdent = bm,
+            gjelderIdent = barn,
+            mottakerIdent = bm,
+            sakId = "123456",
+        )
+
         val gebyrBpOppdrag = TestData.opprettOppdrag(
             stonadType = null,
             engangsbelopType = Engangsbeløptype.GEBYR_SKYLDNER,
@@ -153,6 +161,7 @@ internal class SendKravSchedulerTest {
             skyldnerIdent = bp,
             kravhaverIdent = nav,
             gjelderIdent = bp,
+            mottakerIdent = nav,
             sakId = "123456",
         )
         val gebyrBmOppdrag = TestData.opprettOppdrag(
@@ -162,6 +171,7 @@ internal class SendKravSchedulerTest {
             skyldnerIdent = bm,
             kravhaverIdent = nav,
             gjelderIdent = bm,
+            mottakerIdent = nav,
             sakId = "123456",
         )
 
@@ -170,19 +180,16 @@ internal class SendKravSchedulerTest {
         val bidragOppdragsperiode = TestData.opprettOppdragsperiode(
             oppdrag = bidragOppdrag,
             oppdragsperiodeId = 1,
-            mottakerIdent = bm,
             periodeTil = null,
         )
         val gebyrBpOppdragsperiode = TestData.opprettOppdragsperiode(
             oppdrag = gebyrBpOppdrag,
             oppdragsperiodeId = 2,
-            mottakerIdent = nav,
             periodeFra = LocalDate.now(),
         )
         val gebyrBmOppdragsperiode = TestData.opprettOppdragsperiode(
             oppdrag = gebyrBmOppdrag,
             oppdragsperiodeId = 3,
-            mottakerIdent = nav,
             periodeFra = LocalDate.now(),
         )
 
