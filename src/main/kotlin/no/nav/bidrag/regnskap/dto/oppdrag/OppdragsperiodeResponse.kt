@@ -36,13 +36,6 @@ data class OppdragsperiodeResponse(
     val referanse: String?,
 
     @field:Schema(
-        description = "Personident (FNR/DNR) eller aktoernummer (TSS-ident/samhandler) til mottaker av kravet." +
-            "\n\nFor gebyr settes mottakerIdent til NAVs aktoernummer 80000345435.",
-        example = "12345678910",
-    )
-    val mottakerIdent: String,
-
-    @field:Schema(
         description = "Beløpet oppdraget er på.",
         example = "7500",
     )

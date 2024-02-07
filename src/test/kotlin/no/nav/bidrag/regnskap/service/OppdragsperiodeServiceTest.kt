@@ -38,17 +38,17 @@ class OppdragsperiodeServiceTest {
                     ),
                 ),
             )
-            val oppdrag = TestData.opprettOppdrag()
+            val oppdrag = TestData.opprettOppdrag(mottakerIdent = hendelse.mottakerIdent)
 
             val nyeOppdragsperioder = hendelse.periodeListe.map { periode ->
                 oppdragsperiodeService.opprettNyOppdragsperiode(hendelse, periode, oppdrag)
             }
 
-            nyeOppdragsperioder[0].mottakerIdent shouldBe hendelse.mottakerIdent
+            nyeOppdragsperioder[0].oppdrag?.mottakerIdent shouldBe hendelse.mottakerIdent
             nyeOppdragsperioder[0].beløp shouldBe hendelse.periodeListe[0].beløp
             nyeOppdragsperioder[0].periodeFra shouldBe hendelse.periodeListe[0].periodeFomDato
             nyeOppdragsperioder[0].periodeTil shouldBe hendelse.periodeListe[0].periodeTilDato
-            nyeOppdragsperioder[1].mottakerIdent shouldBe hendelse.mottakerIdent
+            nyeOppdragsperioder[1].oppdrag?.mottakerIdent shouldBe hendelse.mottakerIdent
             nyeOppdragsperioder[1].beløp shouldBe hendelse.periodeListe[1].beløp
             nyeOppdragsperioder[1].periodeFra shouldBe hendelse.periodeListe[1].periodeFomDato
             nyeOppdragsperioder[1].periodeTil shouldBe hendelse.periodeListe[1].periodeTilDato

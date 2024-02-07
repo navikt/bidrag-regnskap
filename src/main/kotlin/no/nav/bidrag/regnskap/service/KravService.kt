@@ -192,7 +192,7 @@ class KravService(
                     soknadType = Søknadstype.valueOf(kontering.søknadType),
                     gjelderIdent = kontering.oppdragsperiode!!.oppdrag!!.gjelderIdent,
                     kravhaverIdent = kontering.oppdragsperiode.oppdrag!!.kravhaverIdent,
-                    mottakerIdent = kontering.oppdragsperiode.mottakerIdent,
+                    mottakerIdent = kontering.oppdragsperiode.oppdrag.mottakerIdent,
                     skyldnerIdent = kontering.oppdragsperiode.oppdrag.skyldnerIdent,
                     belop = if (Transaksjonskode.valueOf(
                             kontering.transaksjonskode,

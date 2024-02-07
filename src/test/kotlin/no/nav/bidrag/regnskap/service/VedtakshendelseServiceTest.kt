@@ -9,7 +9,6 @@ import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.verify
-import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
 import no.nav.bidrag.regnskap.util.IdentUtils
 import org.junit.jupiter.api.Assertions.assertDoesNotThrow
 import org.junit.jupiter.api.BeforeEach
@@ -55,7 +54,6 @@ class VedtakshendelseServiceTest {
 
     @Test
     fun `skal opprette oppdrag for stonadsendringer og engangsbeløp`() {
-        val hendelseCaptor = mutableListOf<Hendelse>()
         val hendelse = opprettVedtakshendelse()
 
         every { oppdragService.lagreHendelse(any()) } returns 1

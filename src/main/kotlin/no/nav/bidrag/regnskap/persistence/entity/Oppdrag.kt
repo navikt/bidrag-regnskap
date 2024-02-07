@@ -38,7 +38,7 @@ data class Oppdrag(
     var gjelderIdent: String,
 
     @Column(name = "mottaker_ident")
-    var mottakerIdent: String? = null,
+    var mottakerIdent: String,
 
     @Column(name = "utsatt_til_dato")
     var utsattTilDato: LocalDate? = null,

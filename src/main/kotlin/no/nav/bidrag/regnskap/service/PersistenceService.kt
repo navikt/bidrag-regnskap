@@ -80,6 +80,10 @@ class PersistenceService(
         return oppdragRepository.findAllBySakIdAndKravhaverIdent(saksnummer.verdi, kravhaver.verdi)
     }
 
+    fun hentAlleMottakereMedIdent(ident: String): List<Oppdrag> {
+        return oppdragRepository.findAllByMottakerIdent(ident)
+    }
+
     fun hentPåløp(): List<Påløp> {
         return påløpRepository.findAll()
     }
@@ -187,10 +191,6 @@ class PersistenceService(
 
     fun hentDriftsavvikForPåløp(påløpId: Int): Driftsavvik? {
         return driftsavvikRepository.findByPåløpId(påløpId)
-    }
-
-    fun hentAlleMottakereMedIdent(ident: String): List<Oppdragsperiode> {
-        return oppdragsperiodeRepository.findAllByMottakerIdent(ident)
     }
 
     fun hentAlleKravhavereMedIdent(ident: String): List<Oppdrag> {

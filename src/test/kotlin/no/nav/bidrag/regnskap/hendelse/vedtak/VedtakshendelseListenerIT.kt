@@ -764,7 +764,7 @@ internal class VedtakshendelseListenerIT {
         )
 
         val oppdrag = persistenceService.hentOppdrag(100000019)
-        oppdrag?.oppdragsperioder?.forEach { it.mottakerIdent shouldBe endreRmBmNyBidrag }
+        oppdrag?.mottakerIdent shouldBe endreRmBmNyBidrag
     }
 
     private fun assertStønader(
@@ -784,13 +784,14 @@ internal class VedtakshendelseListenerIT {
         oppdrag.stønadType shouldBe stønadstype.name
         oppdrag.oppdragsperioder.size shouldBe antallOppdragsperioder
         oppdrag.sakId shouldBe vedtakHendelse.stønadsendringListe!![stonadsendringIndex].sak.verdi
+        oppdrag.mottakerIdent shouldBe vedtakHendelse.stønadsendringListe!![stonadsendringIndex].mottaker.verdi
+
         oppdrag.oppdragsperioder.subList(antallOppdragsperioder - antallOpprettetIGjeldendeFil, antallOppdragsperioder)
             .forEachIndexed { i: Int, oppdragsperiode: Oppdragsperiode ->
                 oppdragsperiode.vedtaksdato shouldBe vedtakHendelse.vedtakstidspunkt.toLocalDate()
                 oppdragsperiode.vedtakId shouldBe vedtakHendelse.id
                 oppdragsperiode.eksternReferanse shouldBe vedtakHendelse.stønadsendringListe!![stonadsendringIndex].eksternReferanse
                 oppdragsperiode.opprettetAv shouldBe vedtakHendelse.opprettetAv
-                oppdragsperiode.mottakerIdent shouldBe vedtakHendelse.stønadsendringListe!![stonadsendringIndex].mottaker.verdi
                 oppdragsperiode.delytelseId shouldNotBe null
                 oppdragsperiode.periodeFra shouldBe vedtakHendelse.stønadsendringListe!![stonadsendringIndex].periodeListe[i].periode.toDatoperiode().fom
                 oppdragsperiode.periodeTil shouldBe vedtakHendelse.stønadsendringListe!![stonadsendringIndex].periodeListe[i].periode.toDatoperiode().til

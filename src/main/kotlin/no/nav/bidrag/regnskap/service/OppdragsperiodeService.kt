@@ -16,7 +16,6 @@ class OppdragsperiodeService {
             vedtakId = hendelse.vedtakId,
             referanse = hendelse.referanse,
             vedtakType = hendelse.vedtakType.toString(),
-            mottakerIdent = hendelse.mottakerIdent,
             beløp = periode.beløp ?: BigDecimal.ZERO,
             valuta = periode.valutakode ?: "NOK",
             periodeFra = periode.periodeFomDato,

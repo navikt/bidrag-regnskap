@@ -131,9 +131,14 @@ class OppdragServiceTest {
             val kravhaver = Personident(PersonidentGenerator.genererFødselsnummer())
             val mottaker = Personident(PersonidentGenerator.genererFødselsnummer())
 
-            val oppdrag = TestData.opprettOppdrag(stonadType = Stønadstype.BIDRAG, sakId = saksnummer.verdi, kravhaverIdent = kravhaver.verdi)
-            val oppdragsperiode1 = TestData.opprettOppdragsperiode(oppdrag = oppdrag, mottakerIdent = "DUMMY")
-            val oppdragsperiode2 = TestData.opprettOppdragsperiode(oppdrag = oppdrag, mottakerIdent = "DUMMY")
+            val oppdrag = TestData.opprettOppdrag(
+                stonadType = Stønadstype.BIDRAG,
+                sakId = saksnummer.verdi,
+                kravhaverIdent = kravhaver.verdi,
+                mottakerIdent = "DUMMY",
+            )
+            val oppdragsperiode1 = TestData.opprettOppdragsperiode(oppdrag = oppdrag)
+            val oppdragsperiode2 = TestData.opprettOppdragsperiode(oppdrag = oppdrag)
             oppdrag.oppdragsperioder = listOf(oppdragsperiode1, oppdragsperiode2)
 
             every { persistenceService.hentOppdragPåSaksnummerOgKravhaver(saksnummer, kravhaver) } returns listOf(oppdrag)
@@ -141,7 +146,6 @@ class OppdragServiceTest {
             oppdragService.patchMottaker(saksnummer, kravhaver, mottaker)
 
             oppdrag.mottakerIdent shouldBe mottaker.verdi
-            oppdrag.oppdragsperioder.forEach { it.mottakerIdent shouldBe mottaker.verdi }
         }
 
         @Test
@@ -150,14 +154,24 @@ class OppdragServiceTest {
             val kravhaver = Personident(PersonidentGenerator.genererFødselsnummer())
             val mottaker = Personident(PersonidentGenerator.genererFødselsnummer())
 
-            val oppdrag1 = TestData.opprettOppdrag(stonadType = Stønadstype.BIDRAG, sakId = saksnummer.verdi, kravhaverIdent = kravhaver.verdi)
-            val oppdragsperiode1 = TestData.opprettOppdragsperiode(oppdrag = oppdrag1, mottakerIdent = "DUMMY")
-            val oppdragsperiode2 = TestData.opprettOppdragsperiode(oppdrag = oppdrag1, mottakerIdent = "DUMMY")
+            val oppdrag1 = TestData.opprettOppdrag(
+                stonadType = Stønadstype.BIDRAG,
+                sakId = saksnummer.verdi,
+                kravhaverIdent = kravhaver.verdi,
+                mottakerIdent = "DUMMY",
+            )
+            val oppdragsperiode1 = TestData.opprettOppdragsperiode(oppdrag = oppdrag1)
+            val oppdragsperiode2 = TestData.opprettOppdragsperiode(oppdrag = oppdrag1)
             oppdrag1.oppdragsperioder = listOf(oppdragsperiode1, oppdragsperiode2)
 
-            val oppdrag2 = TestData.opprettOppdrag(stonadType = Stønadstype.FORSKUDD, sakId = saksnummer.verdi, kravhaverIdent = kravhaver.verdi)
-            val oppdragsperiode3 = TestData.opprettOppdragsperiode(oppdrag = oppdrag2, mottakerIdent = "DUMMY")
-            val oppdragsperiode4 = TestData.opprettOppdragsperiode(oppdrag = oppdrag2, mottakerIdent = "DUMMY")
+            val oppdrag2 = TestData.opprettOppdrag(
+                stonadType = Stønadstype.FORSKUDD,
+                sakId = saksnummer.verdi,
+                kravhaverIdent = kravhaver.verdi,
+                mottakerIdent = "DUMMY",
+            )
+            val oppdragsperiode3 = TestData.opprettOppdragsperiode(oppdrag = oppdrag2)
+            val oppdragsperiode4 = TestData.opprettOppdragsperiode(oppdrag = oppdrag2)
             oppdrag2.oppdragsperioder = listOf(oppdragsperiode3, oppdragsperiode4)
 
             every { persistenceService.hentOppdragPåSaksnummerOgKravhaver(saksnummer, kravhaver) } returns listOf(oppdrag1, oppdrag2)
@@ -166,8 +180,6 @@ class OppdragServiceTest {
 
             oppdrag1.mottakerIdent shouldBe mottaker.verdi
             oppdrag2.mottakerIdent shouldBe mottaker.verdi
-            oppdrag1.oppdragsperioder.forEach { it.mottakerIdent shouldBe mottaker.verdi }
-            oppdrag2.oppdragsperioder.forEach { it.mottakerIdent shouldBe mottaker.verdi }
         }
 
         @Test
@@ -181,8 +193,9 @@ class OppdragServiceTest {
                 engangsbelopType = Engangsbeløptype.GEBYR_MOTTAKER,
                 sakId = saksnummer.verdi,
                 kravhaverIdent = kravhaver.verdi,
+                mottakerIdent = "DUMMY",
             )
-            val oppdragsperiode1 = TestData.opprettOppdragsperiode(oppdrag = oppdrag1, mottakerIdent = "DUMMY")
+            val oppdragsperiode1 = TestData.opprettOppdragsperiode(oppdrag = oppdrag1)
             oppdrag1.oppdragsperioder = listOf(oppdragsperiode1)
 
             every { persistenceService.hentOppdragPåSaksnummerOgKravhaver(saksnummer, kravhaver) } returns listOf(oppdrag1)
@@ -190,7 +203,6 @@ class OppdragServiceTest {
             oppdragService.patchMottaker(saksnummer, kravhaver, mottaker)
 
             oppdrag1.mottakerIdent shouldBe IdentUtils.NAV_TSS_IDENT
-            oppdrag1.oppdragsperioder.forEach { it.mottakerIdent shouldBe IdentUtils.NAV_TSS_IDENT }
         }
 
         @Test
@@ -203,8 +215,9 @@ class OppdragServiceTest {
                 stonadType = Stønadstype.EKTEFELLEBIDRAG,
                 sakId = saksnummer.verdi,
                 kravhaverIdent = kravhaver.verdi,
+                mottakerIdent = "DUMMY",
             )
-            val oppdragsperiode1 = TestData.opprettOppdragsperiode(oppdrag = oppdrag1, mottakerIdent = "DUMMY")
+            val oppdragsperiode1 = TestData.opprettOppdragsperiode(oppdrag = oppdrag1)
             oppdrag1.oppdragsperioder = listOf(oppdragsperiode1)
 
             every { persistenceService.hentOppdragPåSaksnummerOgKravhaver(saksnummer, kravhaver) } returns listOf(oppdrag1)
@@ -212,7 +225,6 @@ class OppdragServiceTest {
             oppdragService.patchMottaker(saksnummer, kravhaver, mottaker)
 
             oppdrag1.mottakerIdent shouldBe oppdrag1.kravhaverIdent
-            oppdrag1.oppdragsperioder.forEach { it.mottakerIdent shouldBe oppdrag1.kravhaverIdent }
         }
     }
 }
