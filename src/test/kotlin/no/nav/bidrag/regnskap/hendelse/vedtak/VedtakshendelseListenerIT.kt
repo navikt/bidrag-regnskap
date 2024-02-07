@@ -767,7 +767,7 @@ internal class VedtakshendelseListenerIT {
         oppdrag?.mottakerIdent shouldBe endreRmBmNyBidrag
     }
 
-    private fun assertStønader(
+    fun assertStønader(
         oppdragId: Int,
         vedtakHendelse: VedtakHendelse,
         stønadstype: Stønadstype,
@@ -778,6 +778,10 @@ internal class VedtakshendelseListenerIT {
         forventetKorreksjonskode: Transaksjonskode? = null,
         stonadsendringIndex: Int = 0,
     ): Oppdrag {
+        await().atMost(TEN_SECONDS).until {
+            return@until persistenceService.hentOppdrag(oppdragId)!!.mottakerIdent == vedtakHendelse.stønadsendringListe!![stonadsendringIndex].mottaker.verdi
+        }
+
         val oppdrag = persistenceService.hentOppdrag(oppdragId)
             ?: error("Det finnes ingen oppdrag med angitt oppdragsId: $oppdragId")
 
