@@ -589,6 +589,9 @@ internal class VedtakshendelseListenerIT {
         )
     }
 
+    val bidrag18årsMottaker = PersonidentGenerator.genererFødselsnummer()
+    val bidrag18årsMottakerNy = PersonidentGenerator.genererFødselsnummer()
+
     @Test
     @Order(18)
     fun `skal opprette 18 års bidrag`() {
@@ -597,6 +600,7 @@ internal class VedtakshendelseListenerIT {
             124,
             bp = skyldnerIdEktefelleBidrag,
             kravhaverIdent = kravhaverIdEktefellebidrag,
+            mottaker = bidrag18årsMottaker,
         )
 
         await().atMost(TEN_SECONDS).until {
@@ -624,6 +628,7 @@ internal class VedtakshendelseListenerIT {
             antallKonteringerTotalt = 135,
             bp = skyldnerIdEktefelleBidrag,
             kravhaverIdent = kravhaverIdEktefellebidrag,
+            mottaker = bidrag18årsMottakerNy,
         )
 
         val oppdrag = assertStønader(
