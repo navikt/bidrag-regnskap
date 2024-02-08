@@ -615,6 +615,7 @@ internal class VedtakshendelseListenerIT {
             3,
             Transaksjonskode.D1,
             Søknadstype.EN,
+            forventetMottaker = bidrag18årsMottaker,
         )
 
         skrivTilTestdatafil(hentAlleKonteringerForOppdrag(oppdrag), "18 års bidrag")
@@ -640,6 +641,7 @@ internal class VedtakshendelseListenerIT {
             Transaksjonskode.D1,
             Søknadstype.EN,
             Transaksjonskode.D3,
+            forventetMottaker = bidrag18årsMottakerNy,
         )
 
         skrivTilTestdatafil(
@@ -650,6 +652,8 @@ internal class VedtakshendelseListenerIT {
 
     val skyldnerIdEktefelleBidrag = PersonidentGenerator.genererFødselsnummer()
     val kravhaverIdEktefellebidrag = PersonidentGenerator.genererFødselsnummer()
+    val mottakerEktefellebidrag = PersonidentGenerator.genererFødselsnummer()
+    val mottakerEktefellebidragNy = PersonidentGenerator.genererFødselsnummer()
 
     @Test
     @Order(20)
@@ -673,6 +677,7 @@ internal class VedtakshendelseListenerIT {
             2,
             Transaksjonskode.F1,
             Søknadstype.EN,
+            forventetMottaker = mottakerEktefellebidrag,
         )
 
         skrivTilTestdatafil(hentAlleKonteringerForOppdrag(oppdrag), "Ektefellebidrag")
@@ -697,6 +702,7 @@ internal class VedtakshendelseListenerIT {
             Transaksjonskode.F1,
             Søknadstype.EN,
             Transaksjonskode.F3,
+            forventetMottaker = mottakerEktefellebidragNy,
         )
 
         skrivTilTestdatafil(
@@ -782,8 +788,12 @@ internal class VedtakshendelseListenerIT {
         forventetSøknadstype: Søknadstype,
         forventetKorreksjonskode: Transaksjonskode? = null,
         stonadsendringIndex: Int = 0,
+        forventetMottaker: String? = null,
     ): Oppdrag {
         await().atMost(TEN_SECONDS).until {
+            if (forventetMottaker != null) {
+                return@until persistenceService.hentOppdrag(oppdragId)!!.mottakerIdent == forventetMottaker
+            }
             return@until persistenceService.hentOppdrag(oppdragId)!!.mottakerIdent == vedtakHendelse.stønadsendringListe!![stonadsendringIndex].mottaker.verdi
         }
 
