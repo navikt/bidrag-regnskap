@@ -794,7 +794,9 @@ internal class VedtakshendelseListenerIT {
             if (forventetMottaker != null) {
                 return@until persistenceService.hentOppdrag(oppdragId)!!.mottakerIdent == forventetMottaker
             }
-            return@until persistenceService.hentOppdrag(oppdragId)!!.mottakerIdent == vedtakHendelse.stønadsendringListe!![stonadsendringIndex].mottaker.verdi
+            return@until persistenceService.hentOppdrag(
+                oppdragId,
+            )!!.mottakerIdent == vedtakHendelse.stønadsendringListe!![stonadsendringIndex].mottaker.verdi
         }
 
         val oppdrag = persistenceService.hentOppdrag(oppdragId)
