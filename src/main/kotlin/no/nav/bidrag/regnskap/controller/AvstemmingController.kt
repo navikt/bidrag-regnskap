@@ -84,7 +84,7 @@ class AvstemmingController(
     @GetMapping("/manuellOverforingAvstemning")
     @Operation(
         summary = "Start manuell overføring av avstemming- og summeringsfil for dato fra GCP bucket til SFTP.",
-        description = "Operasjon for å starte manuell overføring av avstemmingsfil og summeringsfil for en spesifikk dato." +
+        description = "Operasjon for å starte manuell overføring av avstemming-og summeringsfil for en spesifikk dato." +
             "Hentes fra bucket på GCP og deretter overført til en sftp filsluse hvor ELIN plukker ned filene.",
         security = [SecurityRequirement(name = "bearer-key")],
     )
@@ -92,7 +92,7 @@ class AvstemmingController(
         value = [
             ApiResponse(
                 responseCode = "200",
-                description = "Avstemmingsfilene har blitt generert.",
+                description = "Avstemming- og summeringsfil har blitt overført.",
                 content = [Content()],
             ),
         ],

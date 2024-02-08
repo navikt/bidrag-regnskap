@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.function.Consumer
 
 private val LOGGER = LoggerFactory.getLogger(PåløpskjøringService::class.java)
@@ -169,6 +170,14 @@ class PåløpskjøringService(
     fun avsluttDriftsavvik(påløp: Påløp) {
         val driftsavvik = persistenceService.hentDriftsavvikForPåløp(påløp.påløpId) ?: error("Fant ikke driftsavvik på ID: ${påløp.påløpId}")
         persistenceService.lagreDriftsavvik(driftsavvik.copy(tidspunktTil = LocalDateTime.now()))
+    }
+
+    fun startManuellOverføringPåløp(dato: LocalDate) {
+        val nowFormattert = dato.format(DateTimeFormatter.ofPattern("yyMMdd")).toString()
+        val påløpsMappe = "påløp/"
+        val påløpsfilnavn = "paaloop_D$nowFormattert.xml"
+
+        filoverføringTilElinKlient.lastOppFilTilFilsluse(påløpsMappe, påløpsfilnavn)
     }
 }
 
