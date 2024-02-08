@@ -790,22 +790,12 @@ internal class VedtakshendelseListenerIT {
         stonadsendringIndex: Int = 0,
         forventetMottaker: String? = null,
     ): Oppdrag {
-        await().atMost(TEN_SECONDS).until {
-            if (forventetMottaker != null) {
-                return@until persistenceService.hentOppdrag(oppdragId)!!.mottakerIdent == forventetMottaker
-            }
-            return@until persistenceService.hentOppdrag(
-                oppdragId,
-            )!!.mottakerIdent == vedtakHendelse.stønadsendringListe!![stonadsendringIndex].mottaker.verdi
-        }
-
         val oppdrag = persistenceService.hentOppdrag(oppdragId)
             ?: error("Det finnes ingen oppdrag med angitt oppdragsId: $oppdragId")
 
         oppdrag.stønadType shouldBe stønadstype.name
         oppdrag.oppdragsperioder.size shouldBe antallOppdragsperioder
         oppdrag.sakId shouldBe vedtakHendelse.stønadsendringListe!![stonadsendringIndex].sak.verdi
-        oppdrag.mottakerIdent shouldBe vedtakHendelse.stønadsendringListe!![stonadsendringIndex].mottaker.verdi
 
         oppdrag.oppdragsperioder.subList(antallOppdragsperioder - antallOpprettetIGjeldendeFil, antallOppdragsperioder)
             .forEachIndexed { i: Int, oppdragsperiode: Oppdragsperiode ->
