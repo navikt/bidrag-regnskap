@@ -148,7 +148,7 @@ class OppslagService(
     }
 
     @Transactional
-    fun hentAlleUtsatteVedtak(): UtsatteOppdragResponse {
+    fun hentAlleUtsatteOppdrag(): UtsatteOppdragResponse {
         val alleUtsatteOppdrag = persistenceService.hentAlleUtsatteOppdrag()
 
         return UtsatteOppdragResponse(
