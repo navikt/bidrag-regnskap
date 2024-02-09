@@ -1,6 +1,7 @@
 package no.nav.bidrag.regnskap.dto.vedtak
 
 import no.nav.bidrag.domene.enums.vedtak.Vedtakstype
+import no.nav.bidrag.domene.organisasjon.Enhetsnummer
 import java.time.LocalDate
 
 data class Hendelse(
@@ -13,6 +14,7 @@ data class Hendelse(
     val vedtakId: Int,
     val vedtakDato: LocalDate,
     val opprettetAv: String,
+    val enhetsnummer: Enhetsnummer?,
     val eksternReferanse: String?,
     val utsattTilDato: LocalDate?,
     val referanse: String? = null,

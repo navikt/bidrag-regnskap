@@ -2,6 +2,7 @@ package no.nav.bidrag.regnskap.service
 
 import no.nav.bidrag.commons.util.PersonidentGenerator
 import no.nav.bidrag.domene.enums.vedtak.Vedtakstype
+import no.nav.bidrag.domene.organisasjon.Enhetsnummer
 import no.nav.bidrag.regnskap.BidragRegnskapLocal
 import no.nav.bidrag.regnskap.consumer.SakApiWireMock
 import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
@@ -102,6 +103,7 @@ class OppdragServiceIT {
                     vedtakId = Random.nextInt(),
                     vedtakDato = LocalDate.now(),
                     opprettetAv = "TEST",
+                    enhetsnummer = Enhetsnummer("1234"),
                     utsattTilDato = null,
                     eksternReferanse = null,
                     periodeListe = listOf(

@@ -1,7 +1,6 @@
 package no.nav.bidrag.regnskap.controller
 
 import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -41,13 +40,10 @@ class OppslagController(
                 responseCode = "200",
                 description = "Returnerer oppdragets ID.",
                 content = [
-                    (
-                        Content(
-                            array = (ArraySchema(schema = Schema(implementation = OppdragResponse::class))),
-                        )
-                        ),
+                    ((Content(schema = Schema(implementation = OppdragResponse::class)))),
                 ],
-            ), ApiResponse(
+            ),
+            ApiResponse(
                 responseCode = "204",
                 description = "Oppdraget finnes ikke.",
             ),
@@ -77,13 +73,10 @@ class OppslagController(
                 responseCode = "200",
                 description = "Returnerer alt lagret for saken.",
                 content = [
-                    (
-                        Content(
-                            array = (ArraySchema(schema = Schema(implementation = OppslagAvOppdragPåSakIdResponse::class))),
-                        )
-                        ),
+                    ((Content(schema = Schema(implementation = OppslagAvOppdragPåSakIdResponse::class)))),
                 ],
-            ), ApiResponse(
+            ),
+            ApiResponse(
                 responseCode = "204",
                 description = "Fant ingenting lagret på saken.",
             ),
@@ -112,11 +105,7 @@ class OppslagController(
                 responseCode = "200",
                 description = "Returnerer alle utsatte og feilede vedtak for saksnummeret.",
                 content = [
-                    (
-                        Content(
-                            array = (ArraySchema(schema = Schema(implementation = UtsatteOgFeiledeVedtak::class))),
-                        )
-                        ),
+                    (Content(schema = Schema(implementation = UtsatteOgFeiledeVedtak::class))),
                 ],
             ),
         ],
