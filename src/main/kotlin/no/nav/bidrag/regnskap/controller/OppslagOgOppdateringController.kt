@@ -10,21 +10,26 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.bidrag.domene.sak.Saksnummer
 import no.nav.bidrag.regnskap.dto.oppdrag.OppdragResponse
 import no.nav.bidrag.regnskap.dto.oppdrag.OppslagAvOppdragPåSakIdResponse
+import no.nav.bidrag.regnskap.dto.patch.OppdaterUtsattTilDatoRequest
 import no.nav.bidrag.regnskap.dto.vedtak.UtsatteOgFeiledeVedtak
 import no.nav.bidrag.regnskap.dto.vedtak.UtsatteOppdragResponse
+import no.nav.bidrag.regnskap.service.OppdragService
 import no.nav.bidrag.regnskap.service.OppslagService
 import no.nav.security.token.support.core.api.Protected
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @Protected
-@Tag(name = "Oppslag")
-class OppslagController(
+@Tag(name = "Oppslag og oppdatering")
+class OppslagOgOppdateringController(
     private val oppslagService: OppslagService,
+    private val oppdragService: OppdragService,
 ) {
 
     @GetMapping("/oppdrag")
@@ -131,5 +136,29 @@ class OppslagController(
     )
     fun hentAlleUtsatteOppdrag(): ResponseEntity<*> {
         return ResponseEntity.ok(oppslagService.hentAlleUtsatteOppdrag())
+    }
+
+    @PostMapping("oppdrag/utsatte")
+    @Operation(
+        summary = "Oppdaterer utsatt til dato for et oppdrag.",
+        security = [SecurityRequirement(name = "bearer-key")],
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Oppdatert utsatt til dato for oppdrag. Returnerer oppdragsid.",
+                content = [(Content(schema = Schema(implementation = Int::class)))],
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Fant ikke oppdrag med angitt oppdragsid.",
+                content = [Content()],
+            ),
+        ],
+    )
+    fun oppdaterUtsattTilDato(@RequestBody oppdaterUtsattTilDatoRequest: OppdaterUtsattTilDatoRequest): ResponseEntity<*> {
+        val oppdatertOppdrag = oppdragService.oppdaterUtsattTilDato(oppdaterUtsattTilDatoRequest) ?: return ResponseEntity.notFound().build<Any>()
+        return ResponseEntity.ok(oppdatertOppdrag)
     }
 }
