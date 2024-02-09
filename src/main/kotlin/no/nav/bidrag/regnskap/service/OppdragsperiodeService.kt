@@ -22,6 +22,7 @@ class OppdragsperiodeService {
             periodeTil = periode.periodeTilDato,
             vedtaksdato = hendelse.vedtakDato,
             opprettetAv = hendelse.opprettetAv,
+            enhetsnummer = hendelse.enhetsnummer?.verdi,
             delytelseId = periode.delytelsesId,
             eksternReferanse = hendelse.eksternReferanse,
             oppdrag = oppdrag,

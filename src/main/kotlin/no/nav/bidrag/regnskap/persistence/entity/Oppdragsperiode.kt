@@ -63,6 +63,9 @@ data class Oppdragsperiode(
     @Column(name = "opprettet_av")
     val opprettetAv: String,
 
+    @Column(name = "enhetsnummer")
+    val enhetsnummer: String? = null,
+
     @Column(name = "konteringer_fullfort_opprettet")
     var konteringerFullførtOpprettet: Boolean = false,
 

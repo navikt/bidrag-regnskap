@@ -7,6 +7,7 @@ import no.nav.bidrag.domene.enums.regnskap.Type
 import no.nav.bidrag.domene.enums.vedtak.Engangsbeløptype
 import no.nav.bidrag.domene.enums.vedtak.Stønadstype
 import no.nav.bidrag.domene.enums.vedtak.Vedtakstype
+import no.nav.bidrag.domene.organisasjon.Enhetsnummer
 import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
 import no.nav.bidrag.regnskap.dto.vedtak.Periode
 import no.nav.bidrag.regnskap.persistence.entity.Driftsavvik
@@ -59,6 +60,7 @@ object TestData {
         vedtakId: Int = 12345,
         vedtakDato: LocalDate = LocalDate.now(),
         opprettetAv: String = "SaksbehandlerId",
+        enhetsnummer: Enhetsnummer? = Enhetsnummer("1234"),
         eksternReferanse: String? = "UTENLANDSREFERANSE",
         utsattTilDato: LocalDate? = LocalDate.now().plusDays(7),
         periodeListe: List<Periode> = listOf(opprettPeriodeDomene()),
@@ -73,6 +75,7 @@ object TestData {
             vedtakId = vedtakId,
             vedtakDato = vedtakDato,
             opprettetAv = opprettetAv,
+            enhetsnummer = enhetsnummer,
             eksternReferanse = eksternReferanse,
             utsattTilDato = utsattTilDato,
             periodeListe = periodeListe,
