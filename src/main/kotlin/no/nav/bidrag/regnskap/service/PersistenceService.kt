@@ -84,6 +84,11 @@ class PersistenceService(
         return oppdragRepository.findAllByMottakerIdent(ident)
     }
 
+    fun hentAlleUtsatteOppdrag(): List<Oppdrag> {
+        val now = LocalDate.now()
+        return oppdragRepository.findAllByUtsattTilDatoIsNotNullAndUtsattTilDatoIsAfter(now)
+    }
+
     fun hentPåløp(): List<Påløp> {
         return påløpRepository.findAll()
     }

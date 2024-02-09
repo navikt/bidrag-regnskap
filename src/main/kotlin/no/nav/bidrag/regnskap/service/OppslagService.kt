@@ -4,6 +4,8 @@ import no.nav.bidrag.domene.enums.regnskap.Søknadstype
 import no.nav.bidrag.domene.enums.regnskap.Transaksjonskode
 import no.nav.bidrag.domene.enums.regnskap.Type
 import no.nav.bidrag.domene.enums.regnskap.behandlingsstatus.Batchstatus
+import no.nav.bidrag.domene.enums.vedtak.Engangsbeløptype
+import no.nav.bidrag.domene.enums.vedtak.Stønadstype
 import no.nav.bidrag.domene.sak.Saksnummer
 import no.nav.bidrag.regnskap.consumer.SkattConsumer
 import no.nav.bidrag.regnskap.dto.oppdrag.KonteringResponse
@@ -13,9 +15,13 @@ import no.nav.bidrag.regnskap.dto.oppdrag.OppslagAvOppdragPåSakIdResponse
 import no.nav.bidrag.regnskap.dto.vedtak.FeiledeVedtak
 import no.nav.bidrag.regnskap.dto.vedtak.IkkeOversendteVedtak
 import no.nav.bidrag.regnskap.dto.vedtak.UtsatteOgFeiledeVedtak
+import no.nav.bidrag.regnskap.dto.vedtak.UtsatteOppdrag
+import no.nav.bidrag.regnskap.dto.vedtak.UtsatteOppdragResponse
 import no.nav.bidrag.regnskap.dto.vedtak.UtsatteVedtak
+import no.nav.bidrag.regnskap.dto.vedtak.Vedtak
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
+import no.nav.bidrag.regnskap.util.EnumUtils
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -139,5 +145,28 @@ class OppslagService(
                 vedtakId = it.vedtakId,
             )
         }
+    }
+
+    @Transactional
+    fun hentAlleUtsatteVedtak(): UtsatteOppdragResponse {
+        val alleUtsatteOppdrag = persistenceService.hentAlleUtsatteOppdrag()
+
+        return UtsatteOppdragResponse(
+            alleUtsatteOppdrag.map { oppdrag ->
+                UtsatteOppdrag(
+                    oppdrag.oppdragId,
+                    Saksnummer(oppdrag.sakId),
+                    if (EnumUtils.erAvEnumType<Stønadstype>(oppdrag.stønadType)) Stønadstype.valueOf(oppdrag.stønadType) else null,
+                    if (EnumUtils.erAvEnumType<Engangsbeløptype>(oppdrag.stønadType)) Engangsbeløptype.valueOf(oppdrag.stønadType) else null,
+                    oppdrag.utsattTilDato!!,
+                    oppdrag.oppdragsperioder.map { oppdragsperiode ->
+                        Vedtak(
+                            oppdragsperiode.vedtakId,
+                            oppdragsperiode.vedtaksdato,
+                        )
+                    },
+                )
+            },
+        )
     }
 }

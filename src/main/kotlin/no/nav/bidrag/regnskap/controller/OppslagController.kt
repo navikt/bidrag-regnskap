@@ -11,6 +11,7 @@ import no.nav.bidrag.domene.sak.Saksnummer
 import no.nav.bidrag.regnskap.dto.oppdrag.OppdragResponse
 import no.nav.bidrag.regnskap.dto.oppdrag.OppslagAvOppdragPåSakIdResponse
 import no.nav.bidrag.regnskap.dto.vedtak.UtsatteOgFeiledeVedtak
+import no.nav.bidrag.regnskap.dto.vedtak.UtsatteOppdragResponse
 import no.nav.bidrag.regnskap.service.OppslagService
 import no.nav.security.token.support.core.api.Protected
 import org.springframework.http.HttpHeaders
@@ -112,5 +113,23 @@ class OppslagController(
     )
     fun hentUtsatteOgFeiledeVedtakForSak(saksnummer: Saksnummer): ResponseEntity<*> {
         return ResponseEntity.ok(oppslagService.hentUtsatteOgFeiledeVedtakForSak(saksnummer))
+    }
+
+    @GetMapping("/utsatteVedtak")
+    @Operation(
+        summary = "Henter alle utsatte vedtak.",
+        security = [SecurityRequirement(name = "bearer-key")],
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Oppdatert utsatt til dato for oppdrag. Returnerer oppdragsid.",
+                content = [(Content(schema = Schema(implementation = UtsatteOppdragResponse::class)))],
+            ),
+        ],
+    )
+    fun hentAlleUtsatteVedtak(): ResponseEntity<*> {
+        return ResponseEntity.ok(oppslagService.hentAlleUtsatteVedtak())
     }
 }

@@ -6,6 +6,7 @@ import no.nav.bidrag.domene.enums.vedtak.Stønadstype
 import no.nav.bidrag.domene.ident.Personident
 import no.nav.bidrag.domene.sak.Saksnummer
 import no.nav.bidrag.regnskap.consumer.SakConsumer
+import no.nav.bidrag.regnskap.dto.patch.OppdaterUtsattTilDatoRequest
 import no.nav.bidrag.regnskap.dto.vedtak.Hendelse
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.util.IdentUtils
@@ -155,5 +156,14 @@ class OppdragService(
                 }
             }
         }
+    }
+
+    @Transactional
+    fun oppdaterUtsattTilDato(oppdaterUtsattTilDatoRequest: OppdaterUtsattTilDatoRequest): Int? {
+        val oppdrag = persistenceService.hentOppdrag(oppdaterUtsattTilDatoRequest.oppdragsid) ?: return null
+
+        oppdrag.utsattTilDato = oppdaterUtsattTilDatoRequest.nyUtsattTilDato
+
+        return oppdrag.oppdragId
     }
 }

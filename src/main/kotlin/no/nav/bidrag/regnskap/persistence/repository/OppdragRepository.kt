@@ -3,6 +3,7 @@ package no.nav.bidrag.regnskap.persistence.repository
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
+import java.time.LocalDate
 
 interface OppdragRepository : JpaRepository<Oppdrag, Int> {
 
@@ -34,4 +35,6 @@ interface OppdragRepository : JpaRepository<Oppdrag, Int> {
     fun findAllBySkyldnerIdent(skyldnerIdent: String): List<Oppdrag>
 
     fun findAllByGjelderIdent(gjelderIdent: String): List<Oppdrag>
+
+    fun findAllByUtsattTilDatoIsNotNullAndUtsattTilDatoIsAfter(utsattTilDato: LocalDate): List<Oppdrag>
 }
