@@ -163,6 +163,7 @@ class OppslagService(
                         Vedtak(
                             oppdragsperiode.vedtakId,
                             oppdragsperiode.vedtaksdato,
+                            oppdragsperiode.enhetsnummer,
                         )
                     },
                 )
