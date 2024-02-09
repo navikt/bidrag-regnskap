@@ -21,4 +21,5 @@ data class UtsatteOppdrag(
 data class Vedtak(
     val vedtaksid: Int,
     val vedtaksdato: LocalDate,
+    val enhetsnummer: String?,
 )
