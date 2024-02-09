@@ -115,21 +115,21 @@ class OppslagController(
         return ResponseEntity.ok(oppslagService.hentUtsatteOgFeiledeVedtakForSak(saksnummer))
     }
 
-    @GetMapping("/utsatteVedtak")
+    @GetMapping("/oppdrag/utsatte")
     @Operation(
-        summary = "Henter alle utsatte vedtak.",
+        summary = "Henter alle utsatte oppdrag.",
         security = [SecurityRequirement(name = "bearer-key")],
     )
     @ApiResponses(
         value = [
             ApiResponse(
                 responseCode = "200",
-                description = "Oppdatert utsatt til dato for oppdrag. Returnerer oppdragsid.",
+                description = "Henter alle utsatte oppdrag.",
                 content = [(Content(schema = Schema(implementation = UtsatteOppdragResponse::class)))],
             ),
         ],
     )
-    fun hentAlleUtsatteVedtak(): ResponseEntity<*> {
-        return ResponseEntity.ok(oppslagService.hentAlleUtsatteVedtak())
+    fun hentAlleUtsatteOppdrag(): ResponseEntity<*> {
+        return ResponseEntity.ok(oppslagService.hentAlleUtsatteOppdrag())
     }
 }
