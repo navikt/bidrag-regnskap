@@ -92,13 +92,15 @@ class KravService(
         }
 
         try {
-            val skattResponse =
-                skattConsumer.sendKrav(opprettKravliste(oppdragsperioderMedIkkeOverførteKonteringerListe))
-            lagreOverføringAvKrav(
-                skattResponse,
-                finnAlleIkkeOverførteKonteringer(oppdragsperioderMedIkkeOverførteKonteringerListe),
-                oppdragListe,
-            )
+            val kravlister = opprettKravlister(oppdragsperioderMedIkkeOverførteKonteringerListe)
+            kravlister.forEach { kravliste ->
+                val skattResponse = skattConsumer.sendKrav(kravliste)
+                lagreOverføringAvKrav(
+                    skattResponse,
+                    finnAlleIkkeOverførteKonteringer(oppdragsperioderMedIkkeOverførteKonteringerListe),
+                    oppdragListe,
+                )
+            }
         } catch (e: Exception) {
             LOGGER.error("Kallet mot skatt feilet på noe uventet! Feil: ${e.message}, stacktrace: ${e.stackTraceToString()}")
         }
@@ -118,18 +120,19 @@ class KravService(
         }
     }
 
-    fun opprettKravliste(oppdragsperioderMedIkkeOverførteKonteringerListe: List<Oppdragsperiode>): Kravliste {
+    fun opprettKravlister(oppdragsperioderMedIkkeOverførteKonteringerListe: List<Oppdragsperiode>): List<Kravliste> {
         // Gruperer alle oppdragene på vedtakId for å sende over oppdrag knyttet til en vedtakId om gangen,
         // sorterer på vedtakId slik at tidligste vedtak kommer først
         // mapper så til kontering for å opprette en KravKontering per kontering
-        return Kravliste(
-            finnAlleIkkeOverførteKonteringer(oppdragsperioderMedIkkeOverførteKonteringerListe)
-                .groupBy { it.vedtakId }
-                .mapValues { entry ->
-                    entry.value.sortedBy { kontering -> kontering.vedtakId }
-                }.toSortedMap()
-                .map { opprettKravKonteringListe(it.value) },
-        )
+        // mapper deretter kravKonteringene per vedtak i hver sin kravliste og sender til skatt per kravliste
+
+        return finnAlleIkkeOverførteKonteringer(oppdragsperioderMedIkkeOverførteKonteringerListe)
+            .groupBy { it.vedtakId }
+            .mapValues { entry ->
+                entry.value.sortedBy { kontering -> kontering.vedtakId }
+            }.toSortedMap()
+            .map { opprettKravKonteringListe(it.value) }
+            .map { Kravliste(listOf(it)) }
     }
 
     private fun lagreOverføringAvKrav(skattResponse: ResponseEntity<String>, alleIkkeOverførteKonteringer: List<Kontering>, oppdrag: List<Oppdrag>) {
