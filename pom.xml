@@ -17,31 +17,25 @@
     <java.version>21</java.version>
     <kotlin.version>1.9.22</kotlin.version>
     <kotlin-coroutines.version>1.7.3</kotlin-coroutines.version>
-    <bidrag-commons.version>20231220091947_b4b43f0</bidrag-commons.version>
-    <bidrag-transport.version>20240102141621_d1f249e</bidrag-transport.version>
+    <bidrag-felles.version>2024.02.14.132138</bidrag-felles.version>
     <logback-encoder.version>7.4</logback-encoder.version>
     <token-support.version>3.2.0</token-support.version>
     <springdoc-openapi-ui.version>2.3.0</springdoc-openapi-ui.version>
     <springframework-cloud.version>4.1.0</springframework-cloud.version>
     <mockk.version>1.13.9</mockk.version>
     <kotest.version>5.8.0</kotest.version>
-    <bidrag-commons-test.version>1.20231220143255_5a8d330</bidrag-commons-test.version>
     <shedlock.version>5.10.2</shedlock.version>
     <google-api-gax.version>2.39.0</google-api-gax.version>
     <google-cloud-storage.version>2.30.1</google-cloud-storage.version>
     <jsch.version>0.2.16</jsch.version>
     <testcontainers.version>1.19.3</testcontainers.version>
-    <maven-failsafe-plugin.version>3.2.3</maven-failsafe-plugin.version>
-    <maven-antrun.version>3.1.0</maven-antrun.version>
     <spring-kafka.version>3.1.1</spring-kafka.version>
-    <scala.version>2.13.12</scala.version>
     <kotlin-logging-jvm.version>6.0.1</kotlin-logging-jvm.version>
     <slack-api.version>1.36.1</slack-api.version>
     <avro.version>1.11.3</avro.version>
     <avro-serializer.version>7.5.3</avro-serializer.version>
     <fasterxml-jackson-module-kotlin.version>2.16.1</fasterxml-jackson-module-kotlin.version>
     <ktlint.version>1.1.1</ktlint.version>
-    <commons-compress.version>1.25.0</commons-compress.version>
     <commons-io.version>2.15.1</commons-io.version>
   </properties>
 
@@ -57,27 +51,12 @@
     </repository>
   </repositories>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>commons-io</groupId>
-        <artifactId>commons-io</artifactId>
-        <version>${commons-io.version}</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
+
     <!--Spring-->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.yaml</groupId>
-          <artifactId>snakeyaml</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -135,32 +114,6 @@
       <groupId>org.springframework.kafka</groupId>
       <artifactId>spring-kafka-test</artifactId>
       <version>${spring-kafka.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.scala-lang</groupId>
-          <artifactId>scala-library</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>io.netty</groupId>
-          <artifactId>netty-codec</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>io.netty</groupId>
-          <artifactId>netty-handler</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <!--Manuelt oppdatert versjon på avhengighet pga vulnerabilities-->
-    <dependency>
-      <groupId>org.scala-lang</groupId>
-      <artifactId>scala-library</artifactId>
-      <version>${scala.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-compress</artifactId>
-      <version>${commons-compress.version}</version>
     </dependency>
 
     <!--SpringDoc-->
@@ -180,7 +133,6 @@
       <artifactId>postgresql</artifactId>
       <scope>runtime</scope>
     </dependency>
-
     <dependency>
       <groupId>org.flywaydb</groupId>
       <artifactId>flyway-core</artifactId>
@@ -225,43 +177,16 @@
     <!--NAV-->
     <dependency>
       <groupId>no.nav.bidrag</groupId>
-      <artifactId>bidrag-commons</artifactId>
-      <version>${bidrag-commons.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.springframework.boot</groupId>
-          <artifactId>spring-boot-starter-tomcat</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.tomcat.embed</groupId>
-          <artifactId>tomcat-embed-core</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.tomcat.embed</groupId>
-          <artifactId>tomcat-embed-el</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-jetty</artifactId>
+      <artifactId>bidrag-commons-felles</artifactId>
+      <version>${bidrag-felles.version}</version>
     </dependency>
     <dependency>
       <groupId>no.nav.bidrag</groupId>
-      <artifactId>bidrag-transport</artifactId>
-      <version>${bidrag-transport.version}</version>
+      <artifactId>bidrag-transport-felles</artifactId>
+      <version>${bidrag-felles.version}</version>
     </dependency>
 
     <!--Diverse-->
-    <dependency>
-      <groupId>org.jetbrains.kotlin</groupId>
-      <artifactId>kotlin-stdlib-jdk8</artifactId>
-      <version>${kotlin.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jetbrains.kotlin</groupId>
-      <artifactId>kotlin-reflect</artifactId>
-    </dependency>
     <dependency>
       <groupId>org.jetbrains.kotlinx</groupId>
       <artifactId>kotlinx-coroutines-core</artifactId>
@@ -271,10 +196,6 @@
       <groupId>com.fasterxml.jackson.module</groupId>
       <artifactId>jackson-module-kotlin</artifactId>
       <version>${fasterxml-jackson-module-kotlin.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.httpcomponents.client5</groupId>
-      <artifactId>httpclient5</artifactId>
     </dependency>
     <dependency>
       <groupId>com.github.ben-manes.caffeine</groupId>
@@ -362,8 +283,8 @@
     </dependency>
     <dependency>
       <groupId>no.nav.bidrag</groupId>
-      <artifactId>bidrag-commons-test</artifactId>
-      <version>${bidrag-commons-test.version}</version>
+      <artifactId>bidrag-commons-test-felles</artifactId>
+      <version>${bidrag-felles.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -458,7 +379,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
-        <version>${maven-antrun.version}</version>
+        <version>${maven-antrun-plugin.version}</version>
         <executions>
           <execution>
             <id>ktlint</id>
