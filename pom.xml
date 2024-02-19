@@ -33,7 +33,7 @@
     <kotlin-logging-jvm.version>6.0.3</kotlin-logging-jvm.version>
     <slack-api.version>1.38.1</slack-api.version>
     <avro.version>1.11.3</avro.version>
-    <avro-serializer.version>7.5.3</avro-serializer.version>
+    <avro-serializer.version>7.6.0</avro-serializer.version>
     <fasterxml-jackson-module-kotlin.version>2.16.1</fasterxml-jackson-module-kotlin.version>
     <ktlint.version>1.1.1</ktlint.version>
     <commons-io.version>2.15.1</commons-io.version>
