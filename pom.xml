@@ -24,7 +24,7 @@
     <springframework-cloud.version>4.1.0</springframework-cloud.version>
     <mockk.version>1.13.9</mockk.version>
     <kotest.version>5.8.0</kotest.version>
-    <shedlock.version>5.10.2</shedlock.version>
+    <shedlock.version>5.11.0</shedlock.version>
     <google-api-gax.version>2.39.0</google-api-gax.version>
     <google-cloud-storage.version>2.33.0</google-cloud-storage.version>
     <jsch.version>0.2.16</jsch.version>
