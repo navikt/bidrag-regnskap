@@ -38,7 +38,7 @@ class PåløpsfilGenerator(
 
         var index = 0
         var sum = BigDecimal.ZERO
-        finnAlleSakerFraKonteringer(konteringer).forEach { (_, konteringerForSak) ->
+        finnAlleSakerFraKonteringer(konteringer, påløp).forEach { (_, konteringerForSak) ->
             if (++index % 10000 == 0) {
                 medLyttere { it.rapportertKonteringerSkrevetTilFil(påløp, index, konteringer.size) }
             }
@@ -233,11 +233,22 @@ class PåløpsfilGenerator(
         writer.writeEndElement() // stopp-batch-br99
     }
 
-    private fun finnAlleSakerFraKonteringer(konteringer: List<Kontering>): HashMap<String, ArrayList<Kontering>> {
+    private fun finnAlleSakerFraKonteringer(konteringer: List<Kontering>, påløp: Påløp): HashMap<String, ArrayList<Kontering>> {
         val sakerMap = HashMap<String, ArrayList<Kontering>>()
+        val påløpKjøredato = påløp.kjøredato.toLocalDate()
 
         // Går igjennom alle konteringer, oppretter en liste for hvert oppdrag om det ikke allerede finnes og legger til konteringen i listen tilhørende tilknyttet oppdrag.
         konteringer.forEach { kontering ->
+
+            // Om konteringen er knyttet til et oppdrag som har utsattTilDato senere enn nåværende tidspunkt så skal konteringen ikke være med i fila.
+            if (kontering.oppdragsperiode?.oppdrag?.utsattTilDato?.isAfter(påløpKjøredato) == true) {
+                return@forEach
+            }
+            // Om konteringen er forsøkt overført tidligere på noen andre konteringer i oppdragsperioden så
+            if (kontering.oppdragsperiode?.konteringer?.any { it.overføringstidspunkt != null && it.behandlingsstatusOkTidspunkt == null } == true) {
+                return@forEach
+            }
+
             val saksnummer = kontering.oppdragsperiode?.oppdrag?.sakId!!
             var current = sakerMap[saksnummer]
             if (current == null) {

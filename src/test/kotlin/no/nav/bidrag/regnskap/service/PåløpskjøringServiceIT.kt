@@ -1,9 +1,11 @@
 package no.nav.bidrag.regnskap.service
 
 import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import no.nav.bidrag.commons.util.PersonidentGenerator
 import no.nav.bidrag.regnskap.BidragRegnskapLocal
+import no.nav.bidrag.regnskap.persistence.entity.Kontering
 import no.nav.bidrag.regnskap.persistence.entity.Oppdrag
 import no.nav.bidrag.regnskap.persistence.entity.Oppdragsperiode
 import no.nav.bidrag.regnskap.persistence.entity.Påløp
@@ -88,6 +90,24 @@ class PåløpskjøringServiceIT {
             konteringer.last().overføringstidspunkt shouldNotBe null
             konteringer.last().behandlingsstatusOkTidspunkt shouldNotBe null
         }
+
+        val utsattOppdragsperiode = oppdrag[antallOppdrag].oppdragsperioder.first()
+        utsattOppdragsperiode.konteringer shouldHaveSize 2
+        utsattOppdragsperiode.konteringer[0].sendtIPåløpsperiode shouldBe null
+        utsattOppdragsperiode.konteringer[0].overføringstidspunkt shouldBe null
+        utsattOppdragsperiode.konteringer[0].behandlingsstatusOkTidspunkt shouldBe null
+        utsattOppdragsperiode.konteringer[1].sendtIPåløpsperiode shouldBe null
+        utsattOppdragsperiode.konteringer[1].overføringstidspunkt shouldBe null
+        utsattOppdragsperiode.konteringer[1].behandlingsstatusOkTidspunkt shouldBe null
+
+        val feiledOppdragsperiode = oppdrag[antallOppdrag + 1].oppdragsperioder.first()
+        feiledOppdragsperiode.konteringer shouldHaveSize 2
+        feiledOppdragsperiode.konteringer[0].sendtIPåløpsperiode shouldBe null
+        feiledOppdragsperiode.konteringer[0].overføringstidspunkt shouldNotBe null
+        feiledOppdragsperiode.konteringer[0].behandlingsstatusOkTidspunkt shouldBe null
+        feiledOppdragsperiode.konteringer[1].sendtIPåløpsperiode shouldBe null
+        feiledOppdragsperiode.konteringer[1].overføringstidspunkt shouldBe null
+        feiledOppdragsperiode.konteringer[1].behandlingsstatusOkTidspunkt shouldBe null
     }
 
     fun lagrePåløp() = persistenceService.påløpRepository.save(Påløp(kjøredato = LocalDateTime.now(), forPeriode = "2023-02"))
@@ -119,5 +139,65 @@ class PåløpskjøringServiceIT {
 
             persistenceService.oppdragRepository.save(oppdrag)
         }
+
+        val utsattOppdrag = Oppdrag(
+            stønadType = "BIDRAG",
+            sakId = Random.nextInt().toString(),
+            utsattTilDato = LocalDate.now().plusDays(1),
+            skyldnerIdent = PersonidentGenerator.genererFødselsnummer(),
+            gjelderIdent = PersonidentGenerator.genererFødselsnummer(),
+            mottakerIdent = PersonidentGenerator.genererFødselsnummer(),
+        )
+        val utsattOppdragsperiode = Oppdragsperiode(
+            oppdrag = utsattOppdrag,
+            vedtakId = Random.nextInt(),
+            vedtakType = "FASTSETTELSE",
+            beløp = BigDecimal(Random.nextDouble()),
+            valuta = "NOK",
+            periodeFra = LocalDate.of(2023, 1, 1),
+            vedtaksdato = LocalDate.now(),
+            opprettetAv = "TEST",
+            periodeTil = null,
+            delytelseId = null,
+            referanse = null,
+        )
+        utsattOppdrag.oppdragsperioder = listOf(utsattOppdragsperiode)
+        persistenceService.oppdragRepository.save(utsattOppdrag)
+
+        val feiletOppdrag = Oppdrag(
+            stønadType = "BIDRAG",
+            sakId = Random.nextInt().toString(),
+            skyldnerIdent = PersonidentGenerator.genererFødselsnummer(),
+            gjelderIdent = PersonidentGenerator.genererFødselsnummer(),
+            mottakerIdent = PersonidentGenerator.genererFødselsnummer(),
+        )
+        val feiledVedtakId = Random.nextInt()
+        val feiletOppdragsperiode = Oppdragsperiode(
+            oppdrag = feiletOppdrag,
+            vedtakId = feiledVedtakId,
+            vedtakType = "FASTSETTELSE",
+            beløp = BigDecimal(Random.nextDouble()),
+            valuta = "NOK",
+            periodeFra = LocalDate.of(2023, 1, 1),
+            vedtaksdato = LocalDate.now(),
+            opprettetAv = "TEST",
+            periodeTil = null,
+            delytelseId = null,
+            referanse = null,
+        )
+        val feiletKontering = Kontering(
+            oppdragsperiode = feiletOppdragsperiode,
+            overføringsperiode = "2023-01",
+            søknadType = "FASTSETTELSE",
+            transaksjonskode = "B1",
+            type = "NY",
+            vedtakId = feiledVedtakId,
+            behandlingsstatusOkTidspunkt = null,
+            overføringstidspunkt = LocalDateTime.now().minusDays(1),
+        )
+
+        feiletOppdragsperiode.konteringer = listOf(feiletKontering)
+        feiletOppdrag.oppdragsperioder = listOf(feiletOppdragsperiode)
+        persistenceService.oppdragRepository.save(feiletOppdrag)
     }
 }

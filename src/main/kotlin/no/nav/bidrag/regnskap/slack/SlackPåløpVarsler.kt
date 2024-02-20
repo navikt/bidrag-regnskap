@@ -57,10 +57,17 @@ class SlackPåløpVarsler(
         }
     }
 
+    override fun rapporterAntallUtsatteEllerFeiledeKonteringer(påløp: Påløp, antallOppdragsperioder: Int) {
+        pågåendePåløp?.melding?.svarITråd("Oppretter konteringer for $antallOppdragsperioder oppdragsperioder med utsatte eller feilede konteringer.")
+    }
+
+    override fun rapporterAntallUtsatteEllerFeiledeKonteringerFerdig(påløp: Påløp) {
+        pågåendePåløp(påløp)?.påløpsfilMelding
+            ?.oppdaterMelding("Ferdig med å opprette konteringer for oppdragsperioder med utsatte eller feilede konteringer!")
+    }
+
     override fun oppdragsperioderBehandletFerdig(påløp: Påløp, antallOppdragsperioder: Int) {
-        pågåendePåløp(
-            påløp,
-        )?.konteringerMelding?.oppdaterMelding(
+        pågåendePåløp(påløp)?.konteringerMelding?.oppdaterMelding(
             "Opprettet konteringer for $antallOppdragsperioder oppdragsperioder. Fullført tidspunkt: ${LocalDateTime.now()}",
         )
     }
@@ -76,7 +83,7 @@ class SlackPåløpVarsler(
             varsel.registrerObservasjon(antallSkrevetTilFil)
             val melding = "Skrevet $antallSkrevetTilFil av $antallKonteringerTotalt konteringer til fil" +
                 "\n${fremdriftsindikator(antallSkrevetTilFil, antallKonteringerTotalt)}" +
-                "\nTid pr kontering: ${varsel.millisekunderPrPeriode().map{it.toString()}.orElse("?")} ms"
+                "\nTid pr kontering: ${varsel.millisekunderPrPeriode().map { it.toString() }.orElse("?")} ms"
             if (varsel.påløpsfilMelding == null) {
                 varsel.påløpsfilMelding =
                     pågåendePåløp?.melding?.svarITråd(melding)
@@ -104,7 +111,7 @@ class SlackPåløpVarsler(
             varsel.registrerObservasjon(antallFullført)
             val melding = "Påløpet har fullført $antallFullført av $totaltAntall konteringer og satt overføringstidspunkt." +
                 "\n${fremdriftsindikator(antallFullført, totaltAntall)}" +
-                "\nTid pr kontering: ${varsel.millisekunderPrPeriode().map{it.toString()}.orElse("?")} ms"
+                "\nTid pr kontering: ${varsel.millisekunderPrPeriode().map { it.toString() }.orElse("?")} ms"
             if (varsel.konteringerFullførtMelding == null) {
                 varsel.konteringerFullførtMelding =
                     pågåendePåløp?.melding?.svarITråd(melding)
@@ -200,6 +207,7 @@ class SlackPåløpVarsler(
                 sisteObservasjon = PåløpObservasjon(tidspunkt, antallBehandlet)
             }
         }
+
         fun millisekunderPrPeriode(): Optional<Int> {
             val behandletDelta = sisteObservasjon.antallBehandlet - nestSisteObservasjon.antallBehandlet
             if (behandletDelta <= 0) {

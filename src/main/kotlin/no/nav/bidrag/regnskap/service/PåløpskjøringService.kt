@@ -57,13 +57,14 @@ class PåløpskjøringService(
                 endreElinVedlikeholdsmodus(Årsakskode.PAALOEP_GENERERES, "Påløp for ${påløp.forPeriode} genereres hos NAV.")
             }
 
-            opprettKonteringerForAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer(påløp)
+            val utsatteEllerFeiledeOppdragsperioder = opprettKonteringerForAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer(påløp)
 
             if (genererFil) {
                 genererPåløpsfil(påløp)
             }
 
             settOverføringstidspunktPåKonteringer(påløp)
+            opprettKonteringerForAlleUtsatteEllerFeiledeOppdragsperioder(utsatteEllerFeiledeOppdragsperioder, påløp)
             avsluttDriftsavvik(påløp)
             fullførPåløp(påløp)
 
@@ -106,17 +107,19 @@ class PåløpskjøringService(
         skattConsumer.oppdaterVedlikeholdsmodus(Vedlikeholdsmodus(true, årsakskode, kommentar))
     }
 
-    fun opprettKonteringerForAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer(påløp: Påløp) {
-        val påløpsPeriode = LocalDate.parse(påløp.forPeriode + "-01")
+    fun opprettKonteringerForAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer(påløp: Påløp): List<Int> {
         val oppdragsperioder = ArrayList(oppdragsperiodeRepo.hentAlleOppdragsperioderSomIkkeHarOpprettetAlleKonteringer())
         var antallBehandlet = 0
+        val utsatteEllerFeiledeOppdragsperioder = mutableListOf<Int>()
 
         medLyttere { it.rapporterOppdragsperioderBehandlet(påløp, antallBehandlet, oppdragsperioder.size) }
 
         Lists.partition(oppdragsperioder, PARTISJONSSTØRRELSE).parallelStream().forEach { oppdragsperiodeIds ->
-            manglendeKonteringerService.opprettKonteringerForOppdragsperiode(
-                påløpsPeriode,
-                oppdragsperiodeIds,
+            utsatteEllerFeiledeOppdragsperioder.addAll(
+                manglendeKonteringerService.opprettKonteringerForOppdragsperiode(
+                    påløp,
+                    oppdragsperiodeIds,
+                ),
             )
             antallBehandlet += oppdragsperiodeIds.size
             medLyttere { it.rapporterOppdragsperioderBehandlet(påløp, antallBehandlet, oppdragsperioder.size) }
@@ -126,6 +129,19 @@ class PåløpskjøringService(
         }
 
         medLyttere { it.oppdragsperioderBehandletFerdig(påløp, oppdragsperioder.size) }
+
+        return utsatteEllerFeiledeOppdragsperioder
+    }
+
+    fun opprettKonteringerForAlleUtsatteEllerFeiledeOppdragsperioder(utsatteEllerFeiledeOppdragsperioder: List<Int>, påløp: Påløp) {
+        medLyttere { it.rapporterAntallUtsatteEllerFeiledeKonteringer(påløp, utsatteEllerFeiledeOppdragsperioder.size) }
+
+        manglendeKonteringerService.opprettKonteringerForUtsatteOgFeiledeOppdragsperiode(
+            påløp,
+            utsatteEllerFeiledeOppdragsperioder,
+        )
+
+        medLyttere { it.rapporterAntallUtsatteEllerFeiledeKonteringerFerdig(påløp) }
     }
 
     fun genererPåløpsfil(påløp: Påløp) {
@@ -184,6 +200,10 @@ class PåløpskjøringService(
 interface PåløpskjøringLytter {
     fun påløpStartet(påløp: Påløp, schedulertKjøring: Boolean, genererFil: Boolean)
     fun rapporterOppdragsperioderBehandlet(påløp: Påløp, antallBehandlet: Int, antallOppdragsperioder: Int)
+
+    fun rapporterAntallUtsatteEllerFeiledeKonteringer(påløp: Påløp, antallOppdragsperioder: Int)
+
+    fun rapporterAntallUtsatteEllerFeiledeKonteringerFerdig(påløp: Påløp)
 
     fun oppdragsperioderBehandletFerdig(påløp: Påløp, antallOppdragsperioder: Int)
 
