@@ -70,7 +70,7 @@ class PåløpsfilGeneratorTest {
 
         val påløp = TestData.opprettPåløp()
 
-        every { persistenceService.hentAlleIkkeOverførteKonteringer() } returns konteringer + konteringer2
+        every { persistenceService.hentAlleKonteringerForPeriodeOgSomIkkeErOverførtEnda(påløp.forPeriode) } returns konteringer + konteringer2
 
         påløpsfilGenerator.skrivPåløpsfilOgLastOppPåFilsluse(påløp, emptyList())
     }
